@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">HSK Flashcards Widget</string>
+    <string name="app_name">HSKFlashcardsWidget</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">Android Studio</string>
@@ -10,5 +10,10 @@
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>
-    <string name="flashcardwidget_description"><![CDATA[Display a flashcard of random HSK characters & words.]]></string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="configure">Configure</string>
+    <string name="add_widget">Add widget</string>
+    <string name="widget_btn_speak">Listen to this word</string>
+    <string name="widget_btn_reload">New word</string>
+    <string name="app_widget_description"><![CDATA[Display a flashcard of random HSK characters & words.]]></string>
 </resources>

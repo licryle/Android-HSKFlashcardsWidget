@@ -1,0 +1,20 @@
+<resources>
+
+    <style name="Widget.HSKFlashcardsWidget.AppWidget.Container" parent="android:Widget">
+        <item name="android:id">@android:id/background</item>
+        <item name="android:background">?android:attr/colorBackground</item>
+    </style>
+
+    <style name="Widget.HSKFlashcardsWidget.AppWidget.InnerView" parent="android:Widget">
+        <item name="android:background">?android:attr/colorBackground</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+    </style>
+
+    <style name="Widget.HSKFlashCardsWidget.Icons" parent="android:Widget">
+        <item name="android:tint">?android:attr/colorBackground</item>
+        <item name="android:background">?android:attr/colorAccent</item>
+        <item name="android:layout_margin">5dp</item>
+        <item name="android:layout_height">30dp</item>
+        <item name="android:layout_width">30dp</item>
+    </style>
+</resources>

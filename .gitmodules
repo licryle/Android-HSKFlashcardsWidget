@@ -1,0 +1,6 @@
+[submodule "app/src/main/res/raw/hsk_csk"]
+	path = app/src/main/res/raw/hsk_csk
+	url = https://github.com/plaktos/hsk_csv
+[submodule "app/src/main/assets/hsk_csk"]
+	path = app/src/main/assets/hsk_csk
+	url = https://github.com/plaktos/hsk_csv

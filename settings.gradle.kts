@@ -13,5 +13,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "HSK Flashcards Widget"
+rootProject.name = "HSKFlashcardsWidget"
 include(":app")
+ 

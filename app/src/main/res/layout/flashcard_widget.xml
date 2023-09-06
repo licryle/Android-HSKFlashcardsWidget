@@ -1,0 +1,61 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/Widget.HSKFlashcardsWidget.AppWidget.Container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:theme="@style/Theme.HSKFlashcardsWidget.AppWidgetContainer">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ImageView
+            style="@style/Widget.HSKFlashCardsWidget.Icons"
+            android:layout_gravity="start"
+            android:src="@drawable/baseline_autorenew_24"
+            android:id="@+id/flashcard_reload"
+            android:contentDescription="@string/widget_btn_reload"/>
+        <!--app:shapeAppearanceOverlay="@style/roundedImageView"-->
+        <TextView
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:text="你好"
+            android:textSize="30sp"
+            android:id="@+id/flashcard_chinese"/>
+        <ImageView
+            style="@style/Widget.HSKFlashCardsWidget.Icons"
+            android:layout_gravity="end"
+            android:src="@drawable/baseline_volume_up_24"
+            android:id="@+id/flashcard_speak"
+            android:contentDescription="@string/widget_btn_speak"/>
+        <!--app:shapeAppearanceOverlay="@style/roundedImageView"-->
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:text="ni hao"
+        android:textSize="20sp"
+        android:id="@+id/flashcard_pinyin"
+        android:layout_marginTop="0dp"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:text="HSK1"
+        android:textSize="11sp"
+        android:id="@+id/flashcard_hsklevel"
+        android:layout_marginTop="10dp"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:text="Hello"
+        android:textSize="15sp"
+        android:id="@+id/flashcard_english"
+        android:layout_marginTop="10dp"/>
+</LinearLayout>
