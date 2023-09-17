@@ -1,5 +1,6 @@
 package fr.berliat.hskwidget
 
+import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
@@ -10,22 +11,25 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.widget.RemoteViews
+import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.Operation
 import androidx.work.WorkManager
+import androidx.work.Worker
+import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.opencsv.CSVReader
 import fr.berliat.hskwidget.data.ChineseWord
 import fr.berliat.hskwidget.data.ChineseWords
 import fr.berliat.hskwidget.ui.flashcardwidget.BackgroundSpeechService
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 /**
  * Implementation of App Widget functionality.
  * App Widget Configuration implemented in [FlashcardWidgetConfigureActivity]
  */
 class FlashcardWidget : AppWidgetProvider() {
-
     private fun getWidgetPreferences(context: Context, widgetId: Int) : WidgetPreferencesStore {
         return WidgetPreferencesStore(context, widgetId)
     }
@@ -95,15 +99,36 @@ class FlashcardWidget : AppWidgetProvider() {
     override fun onEnabled(context: Context) {
         // Enter relevant functionality for when the first widget is created
         super.onEnabled(context)
+
+        // Thanks to https://stackoverflow.com/questions/70654474/starting-workmanager-task-from-appwidgetprovider-results-in-endless-onupdate-cal
+        val alwaysPendingWork = OneTimeWorkRequestBuilder<DummyWorker>()
+            .setInitialDelay(5000L, TimeUnit.DAYS)
+            .build()
+
+        WorkManager.getInstance(context).enqueueUniqueWork(
+            "always_pending_work",
+            ExistingWorkPolicy.KEEP,
+            alwaysPendingWork
+        )
     }
 
     override fun onDisabled(context: Context) {
         // Enter relevant functionality for when the last widget is disabled
         super.onDisabled(context)
+
+        WorkManager.getInstance(context).cancelUniqueWork("always_pending_work")
     }
 
     override fun onRestored(context: Context?, oldWidgetIds: IntArray?, newWidgetIds: IntArray?) {
         super.onRestored(context, oldWidgetIds, newWidgetIds)
+    }
+
+    @SuppressLint("WorkerHasAPublicModifier")
+    private class DummyWorker(context: Context, workerParams: WorkerParameters)
+        : Worker(context, workerParams) {
+        override fun doWork(): Result {
+            return Result.success()
+        }
     }
 }
 
