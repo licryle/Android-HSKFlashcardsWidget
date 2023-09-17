@@ -190,6 +190,6 @@ internal fun getPendingSelfIntent(context: Context?, action: String?, widgetId: 
     intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
     intent.putExtras(extras)
 
-    return PendingIntent.getBroadcast(context, 0, intent,
+    return PendingIntent.getBroadcast(context, widgetId, intent,
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 }
