@@ -16,4 +16,28 @@
     <string name="widget_btn_speak">Listen to this word</string>
     <string name="widget_btn_reload">New word</string>
     <string name="app_widget_description"><![CDATA[Display a flashcard of random HSK characters & words.]]></string>
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="flashcard_widget_configure_section_hsk">Vocabulary list to include</string>
+    <string name="flashcard_widget_configure_hsk1">HSK 1 words</string>
+    <string name="flashcard_widget_configure_hsk2">HSK 2 words</string>
+    <string name="flashcard_widget_configure_hsk3">HSK 3 words</string>
+    <string name="flashcard_widget_configure_hsk4">HSK 4 words</string>
+    <string name="flashcard_widget_configure_hsk5">HSK 5 words</string>
+    <string name="flashcard_widget_configure_hsk6">HSK 6 words</string>
+    <string name="widget_default_chinese">你好</string>
+    <string name="widget_default_english">Hello</string>
+    <string name="widget_default_pinyin">ni hao</string>
 </resources>

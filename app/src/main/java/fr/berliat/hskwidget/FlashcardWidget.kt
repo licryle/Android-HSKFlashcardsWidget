@@ -6,6 +6,7 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.widget.RemoteViews
@@ -14,7 +15,6 @@ import androidx.work.Operation
 import androidx.work.WorkManager
 import androidx.work.workDataOf
 import com.opencsv.CSVReader
-import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.ChineseWord
 import fr.berliat.hskwidget.data.ChineseWords
 import fr.berliat.hskwidget.ui.flashcardwidget.BackgroundSpeechService
@@ -25,14 +25,19 @@ import java.util.Locale
  * App Widget Configuration implemented in [FlashcardWidgetConfigureActivity]
  */
 class FlashcardWidget : AppWidgetProvider() {
+
+    private fun getWidgetPreferences(context: Context, widgetId: Int) : WidgetPreferencesStore {
+        return WidgetPreferencesStore(context, widgetId)
+    }
+
     override fun onUpdate(
         context: Context,
         appWidgetManager: AppWidgetManager,
         appWidgetIds: IntArray
     ) {
-        val dict = getChineseWords(context)
         // There may be multiple widgets active, so update all of them
         for (appWidgetId in appWidgetIds) {
+            val dict = getChineseWords(context, getWidgetPreferences(context, appWidgetId))
             updateAppWidget(context, appWidgetManager, appWidgetId, dict)
         }
     }
@@ -40,7 +45,7 @@ class FlashcardWidget : AppWidgetProvider() {
     override fun onDeleted(context: Context, appWidgetIds: IntArray) {
         // When the user deletes the widget, delete the preference associated with it.
         for (appWidgetId in appWidgetIds) {
-            deleteTitlePref(context, appWidgetId)
+            getWidgetPreferences(context, appWidgetId).clear()
         }
     }
 
@@ -70,6 +75,7 @@ class FlashcardWidget : AppWidgetProvider() {
                 } else {
                     widgetIds[0] = widgetId
                 }
+
                 onUpdate(context, appMgr, widgetIds)
             }
 
@@ -109,7 +115,16 @@ internal fun updateAppWidget(
     appWidgetId: Int,
     dict: ChineseWords
 ) {
-    /*val widgetText = loadTitlePref(context, appWidgetId)*/
+    var currentWord = ChineseWord(context.getString(R.string.widget_default_chinese),
+                         "",
+                                  mapOf(Locale.ENGLISH to context.getString(R.string.widget_default_english)),
+                                  ChineseWord.HSK_Level.HSK1,
+                                  ChineseWord.Pinyins(context.getString(R.string.widget_default_pinyin))
+    )
+    if (dict.size > 0) currentWord = dict.random()
+
+    val wordBundle = Bundle()
+    wordBundle.putString("word", currentWord.simplified)
 
     // Create an Intent to launch ExampleActivity.
     val openAppIntent: PendingIntent = PendingIntent.getActivity(
@@ -119,9 +134,13 @@ internal fun updateAppWidget(
         /* flags = */ PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
     )
 
-    val currentWord : ChineseWord = dict.random()
-    val wordBundle = Bundle()
-    wordBundle.putString("word", currentWord.simplified)
+    var searchWordIntent: PendingIntent = PendingIntent.getActivity(
+        context,
+        0,
+        Intent(Intent.ACTION_VIEW, Uri.parse("https://www.omgchinese.com/dictionary/chinese/"
+                + currentWord.simplified)),
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+    )
 
     // Get the layout for the widget and attach an on-click listener
     // to the button.
@@ -129,7 +148,9 @@ internal fun updateAppWidget(
         context.packageName,
         R.layout.flashcard_widget
     ).apply {
-        setOnClickPendingIntent(R.id.flashcard_chinese, openAppIntent)
+        setOnClickPendingIntent(R.id.flashcard_chinese, searchWordIntent)
+        setOnClickPendingIntent(R.id.flashcard_english, searchWordIntent)
+        setOnClickPendingIntent(R.id.flashcard_pinyin, searchWordIntent)
 
         setOnClickPendingIntent(R.id.flashcard_speak,
             getPendingSelfIntent(context, ACTION_SPEAK, appWidgetId, wordBundle))
@@ -147,13 +168,15 @@ internal fun updateAppWidget(
     // widget.
     appWidgetManager.updateAppWidget(appWidgetId, views)
 }
-internal fun getChineseWords(context: Context) : ChineseWords {
+internal fun getChineseWords(context: Context, preferences: WidgetPreferencesStore) : ChineseWords {
     //ToDo: put that code in a better place, optimize into a database, etc. etc.
     val cnW = ChineseWords()
 
-    for (i in 1..6) {
-        val reader = CSVReader(context.assets.open("hsk_csk/hsk$i.csv").reader())
-        cnW.addFromCSVResource(ChineseWord.HSK_Level.from(i), reader)
+    for (hskLevel in ChineseWord.HSK_Level.values()) {
+        if (preferences.showHSK(hskLevel)) {
+            val reader = CSVReader(context.assets.open("hsk_csk/hsk${hskLevel.level}.csv").reader())
+            cnW.addFromCSVResource(hskLevel, reader)
+        }
     }
 
     return cnW

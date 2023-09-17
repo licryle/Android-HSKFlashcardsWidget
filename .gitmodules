@@ -4,3 +4,6 @@
 [submodule "app/src/main/assets/hsk_csk"]
 	path = app/src/main/assets/hsk_csk
 	url = https://github.com/plaktos/hsk_csv
+[submodule "app/src/main/java/thirdparty/Pittvandewitt/PreferenceDataStoreBridge"]
+	path = app/src/main/java/thirdparty/Pittvandewitt/PreferenceDataStoreBridge
+	url = https://gist.github.com/Pittvandewitt/c7c620412ec246e34824647a3a4605d0
