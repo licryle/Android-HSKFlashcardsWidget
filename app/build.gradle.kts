@@ -41,17 +41,16 @@ android {
 
 dependencies {
 
-    implementation("androidx.core:core-ktx:1.9.0")
+    implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.9.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
-    implementation("androidx.navigation:navigation-fragment-ktx:2.7.1")
-    implementation("androidx.navigation:navigation-ui-ktx:2.7.1")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.2")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.7.3")
+    implementation("androidx.navigation:navigation-ui-ktx:2.7.3")
     implementation("androidx.work:work-runtime-ktx:2.8.1")
     implementation("com.opencsv:opencsv:4.6")
-    implementation("androidx.preference:preference:1.2.0")
     implementation("androidx.preference:preference-ktx:1.2.1")
     implementation("androidx.datastore:datastore-preferences-core:1.0.0")
     testImplementation("junit:junit:4.13.2")
@@ -62,4 +61,5 @@ dependencies {
     implementation("androidx.datastore:datastore-rxjava2:1.0.0")
     implementation("androidx.datastore:datastore-rxjava3:1.0.0")
     implementation("androidx.datastore:datastore-preferences:1.0.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.2.0-alpha12")
 }

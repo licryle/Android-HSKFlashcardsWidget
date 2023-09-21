@@ -11,4 +11,15 @@
     <color name="light_blue_200">#FF81D4FA</color>
     <color name="light_blue_600">#FF039BE5</color>
     <color name="light_blue_900">#FF01579B</color>
+
+
+    <color name="dark_primary_color">#FFD32F2F</color>
+    <color name="primary_color">#FFF44336</color>
+    <color name="light_primary_color">#FFFFCDD2</color>
+    <color name="color_on_primary">#FFFFFFFF</color>
+    <color name="accent_color">#FFEB3B</color>
+    <color name="dark_accent_color">#FFFFA000</color>
+    <color name="primary_text">#FF212121</color>
+    <color name="secondary_text">#FF757575</color>
+    <color name="divider">#FFBDBDBD</color>
 </resources>

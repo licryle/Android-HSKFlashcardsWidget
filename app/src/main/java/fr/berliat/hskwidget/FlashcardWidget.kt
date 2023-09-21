@@ -38,6 +38,7 @@ class FlashcardWidget : AppWidgetProvider() {
         appWidgetManager: AppWidgetManager,
         appWidgetIds: IntArray
     ) {
+        Log.i("WidgetProvider", "onUpdate")
         // There may be multiple widgets active, so update all of them
         for (appWidgetId in appWidgetIds) {
             val dict = getChineseWords(context, getWidgetPreferences(context, appWidgetId))
@@ -46,6 +47,8 @@ class FlashcardWidget : AppWidgetProvider() {
     }
 
     override fun onDeleted(context: Context, appWidgetIds: IntArray) {
+        Log.i("WidgetProvider", "onDeleted")
+
         // When the user deletes the widget, delete the preference associated with it.
         for (appWidgetId in appWidgetIds) {
             getWidgetPreferences(context, appWidgetId).clear()
@@ -53,10 +56,11 @@ class FlashcardWidget : AppWidgetProvider() {
     }
 
     override fun onReceive(context: Context?, intent: Intent?) {
+        Log.i("WidgetProvider", "onReceive (action: " + intent?.action + ")")
+
         val widgetId = intent?.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, -1) ?: -1
         val appMgr = AppWidgetManager.getInstance(context!!)
 
-        Log.i("WidgetProvider", "onReceive (action: " + intent?.action + ")")
 
         when (intent!!.action) {
             ACTION_SPEAK -> {
@@ -92,10 +96,12 @@ class FlashcardWidget : AppWidgetProvider() {
         appWidgetId: Int,
         newOptions: Bundle?
     ) {
+        Log.i("WidgetProvider", "onAppWidgetOptionsChanged")
         super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions)
     }
 
     override fun onEnabled(context: Context) {
+        Log.i("WidgetProvider", "onEnabled")
         // Enter relevant functionality for when the first widget is created
         super.onEnabled(context)
 
@@ -116,6 +122,7 @@ class FlashcardWidget : AppWidgetProvider() {
     }
 
     override fun onDisabled(context: Context) {
+        Log.i("WidgetProvider", "onDisabled")
         // Enter relevant functionality for when the last widget is disabled
         super.onDisabled(context)
 
@@ -123,6 +130,7 @@ class FlashcardWidget : AppWidgetProvider() {
     }
 
     override fun onRestored(context: Context?, oldWidgetIds: IntArray?, newWidgetIds: IntArray?) {
+        Log.i("WidgetProvider", "onRestored")
         super.onRestored(context, oldWidgetIds, newWidgetIds)
     }
 

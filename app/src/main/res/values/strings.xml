@@ -12,7 +12,7 @@
     <string name="menu_slideshow">Slideshow</string>
     <string name="appwidget_text">EXAMPLE</string>
     <string name="configure">Configure</string>
-    <string name="add_widget">Add widget</string>
+    <string name="add_widget_btn">Add widget</string>
     <string name="widget_btn_speak">Listen to this word</string>
     <string name="widget_btn_reload">New word</string>
     <string name="app_widget_description"><![CDATA[Display a flashcard of random HSK characters & words.]]></string>
@@ -40,4 +40,6 @@
     <string name="widget_default_chinese">你好</string>
     <string name="widget_default_english">Hello</string>
     <string name="widget_default_pinyin">ni hao</string>
+    <string name="add_widget_title">Add a new HSK Widget</string>
+    <string name="widget_default_loading">…Loading…</string>
 </resources>

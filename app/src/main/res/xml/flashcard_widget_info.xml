@@ -3,11 +3,14 @@
     android:configure="fr.berliat.hskwidget.FlashcardWidgetConfigureActivity"
     android:description="@string/app_widget_description"
     android:initialKeyguardLayout="@layout/flashcard_widget"
-    android:previewImage="@drawable/example_appwidget_preview"
-    android:initialLayout="@layout/flashcard_widget"
+
+    android:previewImage="@drawable/flashcard_widget_example"
+    android:initialLayout="@layout/flashcard_widget_loading"
     android:previewLayout="@layout/flashcard_widget"
+
     android:updatePeriodMillis="600000"
     android:widgetCategory="home_screen"
+    android:widgetFeatures="reconfigurable"
 
     android:minWidth="120dp"
     android:minHeight="30dp"
