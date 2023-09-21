@@ -13,7 +13,6 @@ import android.util.Log
 import android.widget.RemoteViews
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.Operation
 import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
@@ -67,7 +66,7 @@ class FlashcardWidget : AppWidgetProvider() {
                         .setInputData(workDataOf(Pair("word", word)))
                         .build()
 
-                    val watch : Operation = WorkManager.getInstance(context).enqueue(speechRequest)
+                    WorkManager.getInstance(context).enqueue(speechRequest)
                 }
             }
 
@@ -110,6 +109,10 @@ class FlashcardWidget : AppWidgetProvider() {
             ExistingWorkPolicy.KEEP,
             alwaysPendingWork
         )
+
+        val appMgr = AppWidgetManager.getInstance(context)
+        onUpdate(context, appMgr, appMgr.getAppWidgetIds(
+            ComponentName(context, FlashcardWidget::class.java)))
     }
 
     override fun onDisabled(context: Context) {
@@ -150,7 +153,6 @@ internal fun updateAppWidget(
 
     val wordBundle = Bundle()
     wordBundle.putString("word", currentWord.simplified)
-
     // Create an Intent to launch ExampleActivity.
     val openAppIntent: PendingIntent = PendingIntent.getActivity(
         /* context = */ context,
@@ -159,7 +161,7 @@ internal fun updateAppWidget(
         /* flags = */ PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
     )
 
-    var searchWordIntent: PendingIntent = PendingIntent.getActivity(
+    val searchWordIntent: PendingIntent = PendingIntent.getActivity(
         context,
         0,
         Intent(Intent.ACTION_VIEW, Uri.parse("https://www.omgchinese.com/dictionary/chinese/"
