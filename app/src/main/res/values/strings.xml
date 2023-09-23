@@ -1,15 +1,15 @@
 <resources>
-    <string name="app_name">HSKFlashcardsWidget</string>
+    <string name="app_name">HSK Widget</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">Android Studio</string>
-    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_title">HSK Widget</string>
+    <string name="nav_header_subtitle">Learn at every phone unlock</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
 
     <string name="menu_home">Home</string>
-    <string name="menu_gallery">Gallery</string>
-    <string name="menu_slideshow">Slideshow</string>
+    <string name="menu_widgets">Widgets</string>
+    <string name="menu_about">Slideshow</string>
     <string name="appwidget_text">EXAMPLE</string>
     <string name="configure">Configure</string>
     <string name="add_widget_btn">Add widget</string>
@@ -24,12 +24,14 @@
     <string name="signature_title">Your signature</string>
     <string name="reply_title">Default reply action</string>
 
-    <!-- Sync Preferences -->
     <string name="sync_title">Sync email periodically</string>
     <string name="attachment_title">Download incoming attachments</string>
     <string name="attachment_summary_on">Automatically download attachments for incoming emails
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
+
+
+    <!-- Widget Preferences -->
     <string name="flashcard_widget_configure_section_hsk">Vocabulary list to include</string>
     <string name="flashcard_widget_configure_hsk1">HSK 1 words</string>
     <string name="flashcard_widget_configure_hsk2">HSK 2 words</string>
@@ -37,9 +39,11 @@
     <string name="flashcard_widget_configure_hsk4">HSK 4 words</string>
     <string name="flashcard_widget_configure_hsk5">HSK 5 words</string>
     <string name="flashcard_widget_configure_hsk6">HSK 6 words</string>
+    <string name="add_widget_title">Add a new HSK Widget</string>
+
+    <!-- Widget Default -->
     <string name="widget_default_chinese">你好</string>
     <string name="widget_default_english">Hello</string>
     <string name="widget_default_pinyin">ni hao</string>
-    <string name="add_widget_title">Add a new HSK Widget</string>
     <string name="widget_default_loading">…Loading…</string>
 </resources>

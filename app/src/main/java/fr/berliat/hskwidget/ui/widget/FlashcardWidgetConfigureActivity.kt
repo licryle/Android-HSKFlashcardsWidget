@@ -1,14 +1,11 @@
-package fr.berliat.hskwidget
+package fr.berliat.hskwidget.ui.widget
 
 import android.appwidget.AppWidgetManager
-import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
-import android.widget.CheckBox
 import androidx.fragment.app.FragmentActivity
-import androidx.preference.PreferenceManager
+import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.databinding.FlashcardWidgetConfigureBinding
 
 
@@ -55,7 +52,7 @@ class FlashcardWidgetConfigureActivity : FragmentActivity() {
             return
         }
         //If you want to insert data in your settings
-        val fragment = FlashcardWidgetConfigureFragment(appWidgetId);
+        val fragment = FlashcardWidgetConfigureFragment(appWidgetId)
         //frag.preferenceManager.
 
         supportFragmentManager

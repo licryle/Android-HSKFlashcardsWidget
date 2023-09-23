@@ -1,4 +1,4 @@
-package fr.berliat.hskwidget
+package fr.berliat.hskwidget.ui.widget
 
 import android.annotation.SuppressLint
 import android.app.PendingIntent
@@ -17,10 +17,13 @@ import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.opencsv.CSVReader
-import fr.berliat.hskwidget.data.ChineseWord
-import fr.berliat.hskwidget.data.ChineseWords
-import fr.berliat.hskwidget.ui.flashcardwidget.BackgroundSpeechService
+import fr.berliat.hskwidget.MainActivity
+import fr.berliat.hskwidget.R
+import fr.berliat.hskwidget.data.model.ChineseWord
+import fr.berliat.hskwidget.data.model.ChineseWords
+import fr.berliat.hskwidget.data.store.ChineseWordsStore
+import fr.berliat.hskwidget.data.store.WidgetPreferencesStore
+import fr.berliat.hskwidget.domain.BackgroundSpeechService
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
@@ -29,9 +32,6 @@ import java.util.concurrent.TimeUnit
  * App Widget Configuration implemented in [FlashcardWidgetConfigureActivity]
  */
 class FlashcardWidget : AppWidgetProvider() {
-    private fun getWidgetPreferences(context: Context, widgetId: Int) : WidgetPreferencesStore {
-        return WidgetPreferencesStore(context, widgetId)
-    }
 
     override fun onUpdate(
         context: Context,
@@ -41,8 +41,7 @@ class FlashcardWidget : AppWidgetProvider() {
         Log.i("WidgetProvider", "onUpdate")
         // There may be multiple widgets active, so update all of them
         for (appWidgetId in appWidgetIds) {
-            val dict = getChineseWords(context, getWidgetPreferences(context, appWidgetId))
-            updateAppWidget(context, appWidgetManager, appWidgetId, dict)
+            updateAppWidget(context, appWidgetManager, appWidgetId)
         }
     }
 
@@ -145,19 +144,36 @@ class FlashcardWidget : AppWidgetProvider() {
 
 internal val ACTION_SPEAK = "fr.berliat.hskwidget.ACTION_WIDGET_SPEAK"
 
+internal fun getDefaultWord(context: Context) : ChineseWord {
+    return ChineseWord(context.getString(R.string.widget_default_chinese),
+                        "",
+                        mapOf(Locale.ENGLISH to context.getString(R.string.widget_default_english)),
+                        ChineseWord.HSK_Level.HSK1,
+                        ChineseWord.Pinyins(context.getString(R.string.widget_default_pinyin)))
+}
+
+internal fun getWidgetPreferences(context: Context, widgetId: Int) : WidgetPreferencesStore {
+    return WidgetPreferencesStore(context, widgetId)
+}
+
 internal fun updateAppWidget(
     context: Context,
     appWidgetManager: AppWidgetManager,
-    appWidgetId: Int,
-    dict: ChineseWords
+    appWidgetId: Int
 ) {
-    var currentWord = ChineseWord(context.getString(R.string.widget_default_chinese),
-                         "",
-                                  mapOf(Locale.ENGLISH to context.getString(R.string.widget_default_english)),
-                                  ChineseWord.HSK_Level.HSK1,
-                                  ChineseWord.Pinyins(context.getString(R.string.widget_default_pinyin))
-    )
-    if (dict.size > 0) currentWord = dict.random()
+    val hskLevels = mutableListOf<ChineseWord.HSK_Level>()
+    val preferences = getWidgetPreferences(context, appWidgetId)
+    ChineseWord.HSK_Level.values().forEach {
+        if (preferences.showHSK(it)) {
+            hskLevels.add(it)
+        }
+    }
+
+    val defaultWord = getDefaultWord(context)
+    var currentWord = ChineseWordsStore.getRandomWord(context, hskLevels.toTypedArray(),
+                                                      ChineseWords())
+
+    if (currentWord == null) currentWord = defaultWord
 
     val wordBundle = Bundle()
     wordBundle.putString("word", currentWord.simplified)
@@ -187,11 +203,15 @@ internal fun updateAppWidget(
         setOnClickPendingIntent(R.id.flashcard_english, searchWordIntent)
         setOnClickPendingIntent(R.id.flashcard_pinyin, searchWordIntent)
 
-        setOnClickPendingIntent(R.id.flashcard_speak,
-            getPendingSelfIntent(context, ACTION_SPEAK, appWidgetId, wordBundle))
-        setOnClickPendingIntent(R.id.flashcard_reload,
+        setOnClickPendingIntent(
+            R.id.flashcard_speak,
+            getPendingSelfIntent(context, ACTION_SPEAK, appWidgetId, wordBundle)
+        )
+        setOnClickPendingIntent(
+            R.id.flashcard_reload,
             getPendingSelfIntent(context, AppWidgetManager.ACTION_APPWIDGET_UPDATE,
-                appWidgetId, Bundle()))
+                appWidgetId, Bundle())
+        )
 
         setTextViewText(R.id.flashcard_chinese, currentWord.simplified)
         setTextViewText(R.id.flashcard_english, currentWord.definition[Locale.ENGLISH])
@@ -202,19 +222,6 @@ internal fun updateAppWidget(
     // Tell the AppWidgetManager to perform an update on the current
     // widget.
     appWidgetManager.updateAppWidget(appWidgetId, views)
-}
-internal fun getChineseWords(context: Context, preferences: WidgetPreferencesStore) : ChineseWords {
-    //ToDo: put that code in a better place, optimize into a database, etc. etc.
-    val cnW = ChineseWords()
-
-    for (hskLevel in ChineseWord.HSK_Level.values()) {
-        if (preferences.showHSK(hskLevel)) {
-            val reader = CSVReader(context.assets.open("hsk_csk/hsk${hskLevel.level}.csv").reader())
-            cnW.addFromCSVResource(hskLevel, reader)
-        }
-    }
-
-    return cnW
 }
 
 /** Thanks to https://gist.github.com/manishcm/bd05dff09b5b1640d25f **/

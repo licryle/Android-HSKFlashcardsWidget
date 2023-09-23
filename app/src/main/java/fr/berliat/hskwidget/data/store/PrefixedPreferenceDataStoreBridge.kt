@@ -1,4 +1,4 @@
-package fr.berliat.hskwidget
+package fr.berliat.hskwidget.data.store
 
 /*** Thanks to Pittvandewitt for his PreferenceDataStoreBridge **/
 
@@ -23,7 +23,7 @@ import kotlinx.coroutines.runBlocking
 open class PrefixedPreferenceDataStoreBridge(private val dataStore: DataStore<Preferences>, private val prefix: String) :
     PreferenceDataStore(), CoroutineScope by CoroutineScope(Dispatchers.IO + SupervisorJob()) {
 
-    public fun getPrefix(): String { return prefixKey("") }
+    fun getPrefix(): String { return prefixKey("") }
 
     fun prefixKey(key: String): String { return prefix + '_' + key }
 

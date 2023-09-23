@@ -1,4 +1,4 @@
-package fr.berliat.hskwidget.data
+package fr.berliat.hskwidget.data.model
 
 import java.util.Locale
 
@@ -9,9 +9,9 @@ data class ChineseWord(
     val definition: Map<Locale, String>,
     val HSK: HSK_Level,
 
-    val pinyins: Pinyins) {
+    val pinyins: Pinyins
+) {
     class Pinyins: ArrayList<Pinyin> {
-        constructor() : super() { }
 
         constructor(s: String) {
             val pinStrings = s.split(" ").toTypedArray()
@@ -19,13 +19,13 @@ data class ChineseWord(
 
             var tone : Pinyin.Tone = Pinyin.Tone.NEUTRAL
             pinStrings.forEach { syllable ->
-                if (syllable.contains(Regex("à|è|ì|ò|ù|ǜ"))) {
+                if (syllable.contains(Regex("[àèìòùǜ]"))) {
                     tone = Pinyin.Tone.FALLING
-                } else if (syllable.contains(Regex("á|é|í|ó|ú|ǘ"))) {
+                } else if (syllable.contains(Regex("[áéíóúǘ]"))) {
                     tone = Pinyin.Tone.RISING
-                } else if (syllable.contains(Regex("ǎ|ě|ǐ|ǒ|ǔ|ǚ"))) {
+                } else if (syllable.contains(Regex("[ǎěǐǒǔǚ]"))) {
                     tone = Pinyin.Tone.FALLING_RISING
-                } else if (syllable.contains(Regex("ā|ē|ī|ō|ū|ǖ"))) {
+                } else if (syllable.contains(Regex("[āēīōūǖ]"))) {
                     tone = Pinyin.Tone.FLAT
                 }
 

@@ -1,4 +1,4 @@
-package fr.berliat.hskwidget.ui.flashcardwidget
+package fr.berliat.hskwidget.domain
 
 import android.content.Context
 import android.os.SystemClock.sleep
@@ -21,13 +21,13 @@ class BackgroundSpeechService(context: Context, workerParams: WorkerParameters)
             return Result.failure()
         }
 
-        val result = textToSpeech!!.setLanguage(Locale.SIMPLIFIED_CHINESE)
+        val result = textToSpeech.setLanguage(Locale.SIMPLIFIED_CHINESE)
         if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
             Log.e("TTS","Simplified_chinese not supported on this phone.")
             return Result.failure()
         }
 
-        textToSpeech!!.speak(inputData.getString("word"), TextToSpeech.QUEUE_FLUSH, null,"")
+        textToSpeech.speak(inputData.getString("word"), TextToSpeech.QUEUE_FLUSH, null,"")
 
         return Result.success()
     }
