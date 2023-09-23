@@ -9,10 +9,10 @@
 
     <string name="menu_home">Home</string>
     <string name="menu_widgets">Widgets</string>
-    <string name="menu_about">Slideshow</string>
+    <string name="menu_about">About</string>
     <string name="appwidget_text">EXAMPLE</string>
     <string name="configure">Configure</string>
-    <string name="add_widget_btn">Add widget</string>
+    <string name="add_widget_btn">Configure Widget</string>
     <string name="widget_btn_speak">Listen to this word</string>
     <string name="widget_btn_reload">New word</string>
     <string name="app_widget_description"><![CDATA[Display a flashcard of random HSK characters & words.]]></string>
@@ -46,4 +46,5 @@
     <string name="widget_default_english">Hello</string>
     <string name="widget_default_pinyin">ni hao</string>
     <string name="widget_default_loading">…Loading…</string>
+    <string name="widgets_intro"><![CDATA[Find below & reconfigure all existing widgets]]></string>
 </resources>
