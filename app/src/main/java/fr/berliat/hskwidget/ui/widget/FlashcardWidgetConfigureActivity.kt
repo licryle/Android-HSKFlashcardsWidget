@@ -52,7 +52,7 @@ class FlashcardWidgetConfigureActivity : FragmentActivity() {
             return
         }
         //If you want to insert data in your settings
-        val fragment = FlashcardWidgetConfigureFragment(appWidgetId)
+        val fragment = FlashcardWidgetConfigureFragment.newInstance(appWidgetId)
         //frag.preferenceManager.
 
         supportFragmentManager

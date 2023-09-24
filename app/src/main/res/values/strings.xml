@@ -20,16 +20,6 @@
     <string name="messages_header">Messages</string>
     <string name="sync_header">Sync</string>
 
-    <!-- Messages Preferences -->
-    <string name="signature_title">Your signature</string>
-    <string name="reply_title">Default reply action</string>
-
-    <string name="sync_title">Sync email periodically</string>
-    <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails
-    </string>
-    <string name="attachment_summary_off">Only download attachments when manually requested</string>
-
 
     <!-- Widget Preferences -->
     <string name="flashcard_widget_configure_section_hsk">Vocabulary list to include</string>
@@ -40,6 +30,8 @@
     <string name="flashcard_widget_configure_hsk5">HSK 5 words</string>
     <string name="flashcard_widget_configure_hsk6">HSK 6 words</string>
     <string name="add_widget_title">Add a new HSK Widget</string>
+    <string name="flashcard_widget_configure_toggle_on">%1$s words will now show up on this widget</string>
+    <string name="flashcard_widget_configure_toggle_off">%1$s words will no longer show up on this widget</string>
 
     <!-- Widget Default -->
     <string name="widget_default_chinese">你好</string>
@@ -47,4 +39,6 @@
     <string name="widget_default_pinyin">ni hao</string>
     <string name="widget_default_loading">…Loading…</string>
     <string name="widgets_intro"><![CDATA[Find below & reconfigure all existing widgets]]></string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

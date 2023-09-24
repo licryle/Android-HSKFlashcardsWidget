@@ -14,7 +14,9 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -85,5 +87,34 @@ open class PrefixedPreferenceDataStoreBridge(private val dataStore: DataStore<Pr
                 }
             }
         }
+    }
+
+    fun clear() {
+        GlobalScope.async {
+            dataStore.edit {
+                it.asMap().forEach {
+                        entry ->
+                    if (entry.key.name.startsWith(getPrefix()))
+                        it.remove(entry.key)
+                }
+            }
+        }
+    }
+
+    suspend fun getAllKeys(strip_prefix: Boolean) : Array<String> {
+        val prefs = dataStore.data.map {
+                preferences ->
+            preferences.asMap().filter {
+                it.key.name.startsWith(getPrefix())
+            }.map {
+                if (strip_prefix) {
+                    it.key.name.substring(getPrefix().length)
+                } else {
+                    it.key.name
+                }
+            }
+        }.first()
+
+        return prefs.toTypedArray()
     }
 }

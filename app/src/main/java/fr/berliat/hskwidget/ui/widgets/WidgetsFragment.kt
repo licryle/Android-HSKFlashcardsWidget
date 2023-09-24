@@ -14,7 +14,6 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import fr.berliat.hskwidget.databinding.FragmentWidgetsBinding
 import fr.berliat.hskwidget.ui.widget.FlashcardWidget
-import fr.berliat.hskwidget.ui.widget.FlashcardWidgetConfigureFragment
 
 class WidgetsFragment : Fragment() {
 
@@ -45,9 +44,8 @@ class WidgetsFragment : Fragment() {
         )
 
         val widgetPager = binding.widgetsTabsConfigure
-        widgetPager.adapter = WidgetPagerAdapter(parentFragmentManager, lifecycle, widgetIds)
+        widgetPager.adapter = WidgetPagerAdapter(childFragmentManager, lifecycle, widgetIds)
 
-        // TODO: move to OnCreateView? Issue: it triggers a "Error: FragmentManager is already executing transactions"
         TabLayoutMediator(tabsLayout, widgetPager) {
                 tab, position ->
             tab.text = "Widget $position"
@@ -68,7 +66,7 @@ class WidgetsFragment : Fragment() {
         }
 
         override fun createFragment(position: Int): Fragment {
-            return FlashcardWidgetConfigureFragment(widgetIds[position])
+            return WidgetsWidgetFragment.newInstance(widgetIds[position])
         }
 
     }
