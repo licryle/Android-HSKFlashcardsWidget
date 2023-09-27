@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.ViewModelProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
@@ -30,12 +31,33 @@ class WidgetsFragment : Fragment() {
     ): View {
         _binding = FragmentWidgetsBinding.inflate(inflater, container, false)
 
+        val widgetsViewModel = ViewModelProvider(this)[WidgetsViewModel::class.java]
+
+        binding.widgetsTabs.addOnTabSelectedListener (object : TabLayout.OnTabSelectedListener{
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                if (tab != null) widgetsViewModel.onToggleTab(tab.position)
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+
+            }
+
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+                if (tab != null) widgetsViewModel.onToggleTab(tab.position)
+            }
+        })
+
         return binding.root
     }
 
     override fun onResume() {
         super.onResume()
         val tabsLayout: TabLayout = binding.widgetsTabs
+
+        val widgetsViewModel =
+            ViewModelProvider(this)[WidgetsViewModel::class.java]
+
+        val prevTabPos = widgetsViewModel.getLastTabPosition()
 
         val context = requireActivity().applicationContext
         val appMgr = AppWidgetManager.getInstance(context!!)
@@ -45,11 +67,14 @@ class WidgetsFragment : Fragment() {
 
         val widgetPager = binding.widgetsTabsConfigure
         widgetPager.adapter = WidgetPagerAdapter(childFragmentManager, lifecycle, widgetIds)
-
         TabLayoutMediator(tabsLayout, widgetPager) {
                 tab, position ->
             tab.text = "Widget $position"
         }.attach()
+
+        if (widgetIds.size > prevTabPos) {
+            tabsLayout.selectTab(binding.widgetsTabs.getTabAt(prevTabPos))
+        }
     }
 
     override fun onDestroyView() {

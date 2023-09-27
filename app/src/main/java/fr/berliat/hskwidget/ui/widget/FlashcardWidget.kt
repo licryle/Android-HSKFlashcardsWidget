@@ -1,29 +1,21 @@
 package fr.berliat.hskwidget.ui.widget
 
-import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.widget.RemoteViews
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import androidx.work.Worker
-import androidx.work.WorkerParameters
-import androidx.work.workDataOf
-import fr.berliat.hskwidget.MainActivity
 import fr.berliat.hskwidget.R
-import fr.berliat.hskwidget.data.model.ChineseWord
-import fr.berliat.hskwidget.data.model.ChineseWords
-import fr.berliat.hskwidget.data.store.ChineseWordsStore
 import fr.berliat.hskwidget.data.store.WidgetPreferencesStore
-import fr.berliat.hskwidget.domain.BackgroundSpeechService
+import fr.berliat.hskwidget.domain.Utils
+import fr.berliat.hskwidget.domain.FlashcardManager
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
@@ -31,6 +23,8 @@ import java.util.concurrent.TimeUnit
  * Implementation of App Widget functionality.
  * App Widget Configuration implemented in [FlashcardWidgetConfigureActivity]
  */
+
+internal const val ACTION_SPEAK = "fr.berliat.hskwidget.ACTION_WIDGET_SPEAK"
 class FlashcardWidget : AppWidgetProvider() {
 
     override fun onUpdate(
@@ -41,7 +35,8 @@ class FlashcardWidget : AppWidgetProvider() {
         Log.i("WidgetProvider", "onUpdate")
         // There may be multiple widgets active, so update all of them
         for (appWidgetId in appWidgetIds) {
-            updateAppWidget(context, appWidgetManager, appWidgetId)
+            FlashcardManager.getInstance(context, appWidgetId).getNewWord()
+            updateFlashCardWidget(context, appWidgetManager, appWidgetId)
         }
     }
 
@@ -60,17 +55,9 @@ class FlashcardWidget : AppWidgetProvider() {
         val widgetId = intent?.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, -1) ?: -1
         val appMgr = AppWidgetManager.getInstance(context!!)
 
-
         when (intent!!.action) {
             ACTION_SPEAK -> {
-                val word = intent.getStringExtra("word")
-                if (word != "") {
-                    val speechRequest = OneTimeWorkRequestBuilder<BackgroundSpeechService>()
-                        .setInputData(workDataOf(Pair("word", word)))
-                        .build()
-
-                    WorkManager.getInstance(context).enqueue(speechRequest)
-                }
+                FlashcardManager.getInstance(context, widgetId).playWidgetWord()
             }
 
             AppWidgetManager.ACTION_APPWIDGET_UPDATE -> {
@@ -82,7 +69,9 @@ class FlashcardWidget : AppWidgetProvider() {
                     widgetIds[0] = widgetId
                 }
 
-                onUpdate(context, appMgr, widgetIds)
+                widgetIds.forEach {
+                    FlashcardManager.getInstance(context, it).updateWord()
+                }
             }
 
             else -> { super.onReceive(context, intent) }
@@ -105,7 +94,7 @@ class FlashcardWidget : AppWidgetProvider() {
         super.onEnabled(context)
 
         // Thanks to https://stackoverflow.com/questions/70654474/starting-workmanager-task-from-appwidgetprovider-results-in-endless-onupdate-cal
-        val alwaysPendingWork = OneTimeWorkRequestBuilder<DummyWorker>()
+        val alwaysPendingWork = OneTimeWorkRequestBuilder<Utils.DummyWorker>()
             .setInitialDelay(5000L, TimeUnit.DAYS)
             .build()
 
@@ -133,104 +122,56 @@ class FlashcardWidget : AppWidgetProvider() {
         super.onRestored(context, oldWidgetIds, newWidgetIds)
     }
 
-    @SuppressLint("WorkerHasAPublicModifier")
-    private class DummyWorker(context: Context, workerParams: WorkerParameters)
-        : Worker(context, workerParams) {
-        override fun doWork(): Result {
-            return Result.success()
+    fun updateFlashCardWidget(
+        context: Context,
+        appWidgetManager: AppWidgetManager,
+        appWidgetId: Int
+    ) {
+        val flashcardsMfr = FlashcardManager.getInstance(context, appWidgetId)
+        val word = flashcardsMfr.getCurrentWord()
+        Log.i("WidgetProvider", "updateFlashCardWidget ID $appWidgetId with word $word")
+
+        val searchWordIntent = flashcardsMfr.getOpenDictionaryIntent(word.simplified)
+        // Get the layout for the widget and attach an on-click listener
+        // to the button.
+        val views: RemoteViews = RemoteViews(
+            context.packageName,
+            R.layout.flashcard_widget
+        ).apply {
+            setOnClickPendingIntent(R.id.flashcard_chinese, searchWordIntent)
+            setOnClickPendingIntent(R.id.flashcard_definition, searchWordIntent)
+            setOnClickPendingIntent(R.id.flashcard_pinyin, searchWordIntent)
+
+            setOnClickPendingIntent(
+                R.id.flashcard_speak,
+                getPendingSelfIntent(context, ACTION_SPEAK, appWidgetId)
+            )
+            setOnClickPendingIntent(
+                R.id.flashcard_reload,
+                getPendingSelfIntent(context, AppWidgetManager.ACTION_APPWIDGET_UPDATE, appWidgetId)
+            )
+
+            setTextViewText(R.id.flashcard_chinese, word.simplified)
+            setTextViewText(R.id.flashcard_definition, word.definition[Locale.ENGLISH])
+            setTextViewText(R.id.flashcard_pinyin, word.pinyins.toString())
+            setTextViewText(R.id.flashcard_hsklevel, word.HSK.toString())
         }
+
+        // Tell the AppWidgetManager to perform an update on the current widget.
+        appWidgetManager.updateAppWidget(appWidgetId, views)
     }
-}
-
-internal val ACTION_SPEAK = "fr.berliat.hskwidget.ACTION_WIDGET_SPEAK"
-
-internal fun getDefaultWord(context: Context) : ChineseWord {
-    return ChineseWord(context.getString(R.string.widget_default_chinese),
-                        "",
-                        mapOf(Locale.ENGLISH to context.getString(R.string.widget_default_english)),
-                        ChineseWord.HSK_Level.HSK1,
-                        ChineseWord.Pinyins(context.getString(R.string.widget_default_pinyin)))
 }
 
 internal fun getWidgetPreferences(context: Context, widgetId: Int) : WidgetPreferencesStore {
     return WidgetPreferencesStore(context, widgetId)
 }
 
-internal fun updateAppWidget(
-    context: Context,
-    appWidgetManager: AppWidgetManager,
-    appWidgetId: Int
-) {
-    val hskLevels = mutableListOf<ChineseWord.HSK_Level>()
-    val preferences = getWidgetPreferences(context, appWidgetId)
-    ChineseWord.HSK_Level.values().forEach {
-        if (preferences.showHSK(it)) {
-            hskLevels.add(it)
-        }
-    }
-
-    val defaultWord = getDefaultWord(context)
-    var currentWord = ChineseWordsStore.getRandomWord(context, hskLevels.toTypedArray(),
-                                                      ChineseWords())
-
-    if (currentWord == null) currentWord = defaultWord
-
-    val wordBundle = Bundle()
-    wordBundle.putString("word", currentWord.simplified)
-    // Create an Intent to launch ExampleActivity.
-    val openAppIntent: PendingIntent = PendingIntent.getActivity(
-        /* context = */ context,
-        /* requestCode = */  0,
-        /* intent = */ Intent(context, MainActivity::class.java),
-        /* flags = */ PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-    )
-
-    val searchWordIntent: PendingIntent = PendingIntent.getActivity(
-        context,
-        0,
-        Intent(Intent.ACTION_VIEW, Uri.parse("https://www.omgchinese.com/dictionary/chinese/"
-                + currentWord.simplified)),
-        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-    )
-
-    // Get the layout for the widget and attach an on-click listener
-    // to the button.
-    val views: RemoteViews = RemoteViews(
-        context.packageName,
-        R.layout.flashcard_widget
-    ).apply {
-        setOnClickPendingIntent(R.id.flashcard_chinese, searchWordIntent)
-        setOnClickPendingIntent(R.id.flashcard_english, searchWordIntent)
-        setOnClickPendingIntent(R.id.flashcard_pinyin, searchWordIntent)
-
-        setOnClickPendingIntent(
-            R.id.flashcard_speak,
-            getPendingSelfIntent(context, ACTION_SPEAK, appWidgetId, wordBundle)
-        )
-        setOnClickPendingIntent(
-            R.id.flashcard_reload,
-            getPendingSelfIntent(context, AppWidgetManager.ACTION_APPWIDGET_UPDATE,
-                appWidgetId, Bundle())
-        )
-
-        setTextViewText(R.id.flashcard_chinese, currentWord.simplified)
-        setTextViewText(R.id.flashcard_english, currentWord.definition[Locale.ENGLISH])
-        setTextViewText(R.id.flashcard_pinyin, currentWord.pinyins.toString())
-        setTextViewText(R.id.flashcard_hsklevel, currentWord.HSK.toString())
-    }
-
-    // Tell the AppWidgetManager to perform an update on the current
-    // widget.
-    appWidgetManager.updateAppWidget(appWidgetId, views)
-}
-
 /** Thanks to https://gist.github.com/manishcm/bd05dff09b5b1640d25f **/
-internal fun getPendingSelfIntent(context: Context?, action: String?, widgetId: Int,
-                                  extras: Bundle) : PendingIntent? {
+internal fun getPendingSelfIntent(context: Context?, action: String?, widgetId: Int)
+    : PendingIntent? {
     val intent = Intent(context, FlashcardWidget::class.java)
     intent.action = action
     intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
-    intent.putExtras(extras)
 
     return PendingIntent.getBroadcast(context, widgetId, intent,
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)

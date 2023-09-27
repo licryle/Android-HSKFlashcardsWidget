@@ -36,7 +36,7 @@
     <!-- Widget Default -->
     <string name="widget_default_chinese">你好</string>
     <string name="widget_default_english">Hello</string>
-    <string name="widget_default_pinyin">ni hao</string>
+    <string name="widget_default_pinyin">nĭ hăo</string>
     <string name="widget_default_loading">…Loading…</string>
     <string name="widgets_intro"><![CDATA[Find below & reconfigure all existing widgets]]></string>
     <!-- TODO: Remove or change this placeholder text -->

@@ -1,8 +1,6 @@
 package fr.berliat.hskwidget.ui.widget
 
-import android.appwidget.AppWidgetManager
 import android.os.Bundle
-import android.widget.Toast
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import fr.berliat.hskwidget.R
@@ -13,18 +11,21 @@ import kotlinx.coroutines.async
 private const val ARG_WIDGETID = "WIDGETID"
 
 class FlashcardWidgetConfigureFragment() : PreferenceFragmentCompat() {
-    private var widgetId: Int? = null
+    private var _widgetId: Int? = null
+    private val prefListeners = mutableListOf<WidgetPreferenceListener>()
 
+    // Properties only valid between onCreateView and onDestroyView.
+    private val widgetId get() = _widgetId!!
     override fun onCreate(savedInstanceState: Bundle?) {
         arguments?.let {
-            widgetId = it.getInt(ARG_WIDGETID)
+            _widgetId = it.getInt(ARG_WIDGETID)
         }
 
         super.onCreate(savedInstanceState)
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        val store = WidgetPreferencesStore(requireContext(), widgetId!!)
+        val store = WidgetPreferencesStore(requireContext(), widgetId)
         preferenceManager.preferenceDataStore = store
 
         setPreferencesFromResource(R.xml.flashcard_widget_configure, rootKey)
@@ -34,10 +35,7 @@ class FlashcardWidgetConfigureFragment() : PreferenceFragmentCompat() {
                 preferenceManager.findPreference<Preference>(it)!!.onPreferenceChangeListener =
                     Preference.OnPreferenceChangeListener { preference, newValue ->
 
-                        // @ToDo: add a listener registration and move that to activities
-                        val res_toast_text = if (newValue as Boolean) R.string.flashcard_widget_configure_toggle_on else  R.string.flashcard_widget_configure_toggle_off
-                        Toast.makeText(activity, getString(res_toast_text, it), Toast.LENGTH_LONG).show()
-                        FlashcardWidget().onUpdate(requireContext(), AppWidgetManager.getInstance(context), intArrayOf(widgetId!!))
+                        fireWidgetPreferenceChange(preference, newValue)
 
                         // Reflect the newValue to Preference?
                         true
@@ -46,6 +44,19 @@ class FlashcardWidgetConfigureFragment() : PreferenceFragmentCompat() {
         }
     }
 
+    fun addWidgetPreferenceListener(listener: WidgetPreferenceListener) {
+        prefListeners.add(listener)
+    }
+
+    fun removeWidgetPreferenceListener(listener: WidgetPreferenceListener) {
+        prefListeners.remove(listener)
+    }
+
+    private fun fireWidgetPreferenceChange(preference: Preference, newValue: Any) {
+        prefListeners.forEach() {
+            it.onWidgetPreferenceChange(widgetId, preference, newValue)
+        }
+    }
 
     companion object {
         /**
@@ -62,6 +73,10 @@ class FlashcardWidgetConfigureFragment() : PreferenceFragmentCompat() {
                     putInt(ARG_WIDGETID, widgetId)
                 }
             }
+    }
+
+    interface WidgetPreferenceListener {
+        fun onWidgetPreferenceChange(widgetId: Int, preference: Preference, newValue: Any)
     }
 }
 

@@ -13,13 +13,13 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 open class PrefixedPreferenceDataStoreBridge(private val dataStore: DataStore<Preferences>, private val prefix: String) :
@@ -31,6 +31,11 @@ open class PrefixedPreferenceDataStoreBridge(private val dataStore: DataStore<Pr
 
     override fun putString(key: String, value: String?) {
         putPreference(stringPreferencesKey(prefixKey(key)), value)
+    }
+
+    fun putStringBlocking(key: String, value: String?) = runBlocking {
+        val j = putPreference(stringPreferencesKey(prefixKey(key)), value)
+        j.await()
     }
 
     override fun putStringSet(key: String, values: MutableSet<String>?) {
@@ -77,8 +82,8 @@ open class PrefixedPreferenceDataStoreBridge(private val dataStore: DataStore<Pr
         dataStore.data.map { it[booleanPreferencesKey(prefixKey(key))] ?: defValue }.first()
     }
 
-    private fun <T> putPreference(key: Preferences.Key<T>, value: T?) {
-        launch {
+    protected fun <T> putPreference(key: Preferences.Key<T>, value: T?): Deferred<Preferences> {
+        return GlobalScope.async {
             dataStore.edit {
                 if (value == null) {
                     it.remove(key)
@@ -89,8 +94,8 @@ open class PrefixedPreferenceDataStoreBridge(private val dataStore: DataStore<Pr
         }
     }
 
-    fun clear() {
-        GlobalScope.async {
+    fun clear(): Deferred<Preferences> {
+        return GlobalScope.async {
             dataStore.edit {
                 it.asMap().forEach {
                         entry ->
