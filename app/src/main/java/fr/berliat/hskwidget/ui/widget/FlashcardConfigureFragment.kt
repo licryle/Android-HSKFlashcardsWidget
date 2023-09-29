@@ -10,7 +10,7 @@ import kotlinx.coroutines.async
 
 private const val ARG_WIDGETID = "WIDGETID"
 
-class FlashcardWidgetConfigureFragment() : PreferenceFragmentCompat() {
+class FlashcardConfigureFragment() : PreferenceFragmentCompat() {
     private var _widgetId: Int? = null
     private val prefListeners = mutableListOf<WidgetPreferenceListener>()
 
@@ -68,7 +68,7 @@ class FlashcardWidgetConfigureFragment() : PreferenceFragmentCompat() {
          */
         @JvmStatic
         fun newInstance(widgetId: Int) =
-            FlashcardWidgetConfigureFragment().apply {
+            FlashcardConfigureFragment().apply {
                 arguments = Bundle().apply {
                     putInt(ARG_WIDGETID, widgetId)
                 }

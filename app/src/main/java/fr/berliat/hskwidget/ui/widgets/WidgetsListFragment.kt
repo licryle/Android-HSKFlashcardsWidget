@@ -16,7 +16,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 import fr.berliat.hskwidget.databinding.FragmentWidgetsBinding
 import fr.berliat.hskwidget.ui.widget.FlashcardWidget
 
-class WidgetsFragment : Fragment() {
+class WidgetsListFragment : Fragment() {
 
     private var _binding: FragmentWidgetsBinding? = null
 
@@ -31,11 +31,11 @@ class WidgetsFragment : Fragment() {
     ): View {
         _binding = FragmentWidgetsBinding.inflate(inflater, container, false)
 
-        val widgetsViewModel = ViewModelProvider(this)[WidgetsViewModel::class.java]
+        val widgetsListViewModel = ViewModelProvider(this)[WidgetsListViewModel::class.java]
 
         binding.widgetsTabs.addOnTabSelectedListener (object : TabLayout.OnTabSelectedListener{
             override fun onTabSelected(tab: TabLayout.Tab?) {
-                if (tab != null) widgetsViewModel.onToggleTab(tab.position)
+                if (tab != null) widgetsListViewModel.onToggleTab(tab.position)
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab?) {
@@ -43,7 +43,7 @@ class WidgetsFragment : Fragment() {
             }
 
             override fun onTabReselected(tab: TabLayout.Tab?) {
-                if (tab != null) widgetsViewModel.onToggleTab(tab.position)
+                if (tab != null) widgetsListViewModel.onToggleTab(tab.position)
             }
         })
 
@@ -54,10 +54,10 @@ class WidgetsFragment : Fragment() {
         super.onResume()
         val tabsLayout: TabLayout = binding.widgetsTabs
 
-        val widgetsViewModel =
-            ViewModelProvider(this)[WidgetsViewModel::class.java]
+        val widgetsListViewModel =
+            ViewModelProvider(this)[WidgetsListViewModel::class.java]
 
-        val prevTabPos = widgetsViewModel.getLastTabPosition()
+        val prevTabPos = widgetsListViewModel.getLastTabPosition()
 
         val context = requireActivity().applicationContext
         val appMgr = AppWidgetManager.getInstance(context!!)

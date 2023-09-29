@@ -10,12 +10,12 @@ import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.store.ChineseWordsStore
 import fr.berliat.hskwidget.ui.widget.FlashcardWidget
 import fr.berliat.hskwidget.ui.widget.getWidgetPreferences
-import fr.berliat.hskwidget.ui.widgets.WidgetsWidgetFragment
+import fr.berliat.hskwidget.ui.widgets.FlashcardFragment
 
 class FlashcardManager private constructor(private val context: Context,
                                            private val widgetId: Int) {
     private val dict = ChineseWordsStore.getInstance(context)
-    private val fragments = mutableMapOf<Int, MutableSet<WidgetsWidgetFragment>>()
+    private val fragments = mutableMapOf<Int, MutableSet<FlashcardFragment>>()
 
     fun getCurrentWord() : ChineseWord {
         val preferences = getWidgetPreferences(context, widgetId)
@@ -52,16 +52,16 @@ class FlashcardManager private constructor(private val context: Context,
             AppWidgetManager.getInstance(context), widgetId)
     }
 
-    fun registerFragment(widgetsWidgetFragment: WidgetsWidgetFragment) : Boolean {
+    fun registerFragment(frag: FlashcardFragment) : Boolean {
         if (fragments[widgetId] == null) fragments[widgetId] = mutableSetOf()
 
-        return fragments[widgetId]!!.add(widgetsWidgetFragment)
+        return fragments[widgetId]!!.add(frag)
     }
 
-    fun deregisterFragment(widgetsWidgetFragment: WidgetsWidgetFragment) : Boolean{
+    fun deregisterFragment(frag: FlashcardFragment) : Boolean{
         if (fragments[widgetId] == null) return false
 
-        return fragments[widgetId]!!.remove(widgetsWidgetFragment)
+        return fragments[widgetId]!!.remove(frag)
     }
 
     fun playWidgetWord() : Boolean {
@@ -85,7 +85,7 @@ class FlashcardManager private constructor(private val context: Context,
             context,
             0,
             Intent(
-                Intent.ACTION_VIEW, Uri.parse("https://www.wordsense.eu/$word")),
+                Intent.ACTION_VIEW, Uri.parse("https://www.wordsense.eu/$word/")),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
     }

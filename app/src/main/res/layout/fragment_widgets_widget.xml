@@ -7,15 +7,15 @@
     tools:context=".ui.widgets.WidgetsWidgetFragment">
 
 
-    <include
-        layout="@layout/flashcard_widget"
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/widgets_flashcard_fragment"
         android:layout_width="150dp"
         android:layout_height="150dp"
         android:layout_gravity="center"
         android:layout_margin="10dp" />
 
     <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/widgets_widget_container"
+        android:id="@+id/widgets_widgetconf_fragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

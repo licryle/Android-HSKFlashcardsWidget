@@ -12,11 +12,11 @@ import fr.berliat.hskwidget.databinding.FlashcardWidgetConfigureBinding
 /**
  * The configuration screen for the [FlashcardWidget] AppWidget.
  */
-class FlashcardWidgetConfigureActivity : FragmentActivity() {
+class FlashcardConfigureActivity : FragmentActivity() {
     private var appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID
 
     private var addWidgetClick = View.OnClickListener {
-        val context = this@FlashcardWidgetConfigureActivity
+        val context = this@FlashcardConfigureActivity
 
         // It is the responsibility of the configuration activity to update the app widget
         val appWidgetManager = AppWidgetManager.getInstance(context)
@@ -52,7 +52,7 @@ class FlashcardWidgetConfigureActivity : FragmentActivity() {
             return
         }
         //If you want to insert data in your settings
-        val fragment = FlashcardWidgetConfigureFragment.newInstance(appWidgetId)
+        val fragment = FlashcardConfigureFragment.newInstance(appWidgetId)
         //frag.preferenceManager.
 
         supportFragmentManager

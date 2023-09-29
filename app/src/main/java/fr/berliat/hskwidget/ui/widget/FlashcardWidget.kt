@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit
 
 /**
  * Implementation of App Widget functionality.
- * App Widget Configuration implemented in [FlashcardWidgetConfigureActivity]
+ * App Widget Configuration implemented in [FlashcardConfigureActivity]
  */
 
 internal const val ACTION_SPEAK = "fr.berliat.hskwidget.ACTION_WIDGET_SPEAK"
