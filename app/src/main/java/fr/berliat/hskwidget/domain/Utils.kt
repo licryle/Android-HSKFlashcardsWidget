@@ -51,7 +51,10 @@ class Utils {
         }
 
         fun getOpenURLIntent(url: String): Intent {
-            return Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            return Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse(url)
+            ).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
 
         fun sendEmail(context: Context, address: String, subject: String = "", body: String = "") {
@@ -98,7 +101,12 @@ class Utils {
             val appMgr = FlashcardWidgetProvider()
             val widgets = appMgr.getWidgetIds(context)
             bundle.putString("WIDGET_TOTAL_NUMBER", widgets.size.toString())
-            bundle.putString("MAX_WIDGET_ID", widgets.last().toString())
+
+            if (widgets.isEmpty()) {
+                bundle.putString("MAX_WIDGET_ID", "0")
+            } else {
+                bundle.putString("MAX_WIDGET_ID", widgets.last().toString())
+            }
 
             Firebase.analytics.logEvent(event.name, bundle)
         }
