@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.preference.Preference
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.domain.FlashcardManager
+import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.ui.flashcard.FlashcardConfigureFragment
 import fr.berliat.hskwidget.ui.flashcard.FlashcardFragment
 
@@ -67,6 +68,15 @@ class WidgetsWidgetConfPreviewFragment : Fragment() {
         super.onDestroy()
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        Utils.logAnalyticsWidgetAction(
+            requireContext(),
+            Utils.ANALYTICS_EVENTS.WIDGET_CONFIG_VIEW, widgetId
+        )
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -101,11 +111,21 @@ class WidgetsWidgetConfPreviewFragment : Fragment() {
                 preference: Preference,
                 newValue: Any
             ) {
-                val resToastText = if (newValue as Boolean) R.string.flashcard_widget_configure_toggle_on else R.string.flashcard_widget_configure_toggle_off
+                val resToastText =
+                    if (newValue as Boolean) R.string.flashcard_widget_configure_toggle_on else R.string.flashcard_widget_configure_toggle_off
 
-                Toast.makeText(activity, context.getString(resToastText, preference.key), Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    activity,
+                    context.getString(resToastText, preference.key),
+                    Toast.LENGTH_LONG
+                ).show()
 
                 FlashcardManager.getInstance(context, widgetId).updateWord()
+
+                Utils.logAnalyticsWidgetAction(
+                    activity,
+                    Utils.ANALYTICS_EVENTS.WIDGET_RECONFIGURE, widgetId
+                )
             }
         }
     }

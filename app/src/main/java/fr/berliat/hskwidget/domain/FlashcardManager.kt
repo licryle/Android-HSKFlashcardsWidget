@@ -1,14 +1,14 @@
 package fr.berliat.hskwidget.domain
 
-import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.content.Context
+import android.content.Intent
 import android.util.Log
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.store.ChineseWordsStore
 import fr.berliat.hskwidget.data.store.FlashcardPreferencesStore
-import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
 import fr.berliat.hskwidget.ui.flashcard.FlashcardFragment
+import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 
@@ -16,10 +16,10 @@ class FlashcardManager private constructor(private val context: Context,
                                            private val widgetId: Int) {
     private val dict = ChineseWordsStore.getInstance(context)
     private val fragments = mutableMapOf<Int, MutableSet<FlashcardFragment>>()
-    private val flashCardPrefs =  getPreferenceStore(widgetId)
+    private val flashCardPrefs = getPreferenceStore()
     private val appWidgetMgr = AppWidgetManager.getInstance(context)
 
-    fun getPreferenceStore(widgetId: Int) : FlashcardPreferencesStore {
+    fun getPreferenceStore(): FlashcardPreferencesStore {
         return FlashcardPreferencesStore(context, widgetId)
     }
 
@@ -82,17 +82,22 @@ class FlashcardManager private constructor(private val context: Context,
     fun openDictionary() {
         val word = flashCardPrefs.getCurrentSimplified()
 
-        getOpenDictionaryIntent(word).send()
+        context.startActivity(getOpenDictionaryIntent(word))
+
+        Utils.logAnalyticsWidgetAction(
+            context,
+            Utils.ANALYTICS_EVENTS.WIDGET_OPEN_DICTIONARY, widgetId
+        )
     }
 
-    fun getOpenDictionaryIntent(word : String) : PendingIntent {
-        return Utils.getOpenURLPendingIntent(context, "https://www.wordsense.eu/$word/")
+    fun getOpenDictionaryIntent(word: String): Intent {
+        return Utils.getOpenURLIntent("https://www.wordsense.eu/$word/")
     }
 
     companion object {
         private var instances = mutableMapOf<Int, FlashcardManager>()
 
-        fun getInstance(context: Context, widgetId: Int) : FlashcardManager {
+        fun getInstance(context: Context, widgetId: Int): FlashcardManager {
             if (instances[widgetId] == null)
                 instances[widgetId] = FlashcardManager(context, widgetId)
 

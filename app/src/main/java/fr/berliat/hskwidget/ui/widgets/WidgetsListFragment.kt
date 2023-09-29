@@ -8,15 +8,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.ViewModelProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.databinding.FragmentWidgetsBinding
+import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.ui.flashcard.FlashcardFragment
 import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
 
@@ -83,8 +84,7 @@ class WidgetsListFragment : Fragment() {
             val prevTabPos = viewModel.getLastTabPosition()
 
             widgetPager.adapter = WidgetPagerAdapter(childFragmentManager, lifecycle, widgetIds)
-            TabLayoutMediator(tabsLayout, widgetPager) {
-                    tab, position ->
+            TabLayoutMediator(tabsLayout, widgetPager) { tab, position ->
                 tab.text = "Widget $position"
             }.attach()
 
@@ -92,6 +92,8 @@ class WidgetsListFragment : Fragment() {
                 tabsLayout.selectTab(binding.widgetsTabs.getTabAt(prevTabPos))
             }
         }
+
+        Utils.logAnalyticsScreenView(requireContext(), "WidgetsList")
     }
 
     override fun onDestroyView() {

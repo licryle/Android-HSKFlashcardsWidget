@@ -1,5 +1,6 @@
 package fr.berliat.hskwidget.ui.flashcard
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -9,18 +10,23 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.domain.FlashcardManager
+import fr.berliat.hskwidget.domain.Utils
 import java.util.Locale
 
 const val ARG_WIDGETID = "WIDGETID"
 class FlashcardFragment : Fragment() {
     private var _widgetId: Int? = null
-    private var _root : View? = null
-    private var _flashcardsMfr : FlashcardManager? = null
+    private var _root: View? = null
+    private var _flashcardsMfr: FlashcardManager? = null
+    private var _context: Context? = null
 
     // Properties only valid between onCreateView and onDestroyView.
     private val widgetId get() = _widgetId!!
     private val root get() = _root!!
     private val flashcardsMfr get() = _flashcardsMfr!!
+
+    @get:JvmName("getContext2")
+    private val context get() = _context!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,7 +37,8 @@ class FlashcardFragment : Fragment() {
 
         Log.i("FlashcardFragment", "Creating a new Flashcard Fragment for widget $widgetId")
 
-        _flashcardsMfr = FlashcardManager.getInstance(requireContext(), widgetId)
+        _context = requireContext()
+        _flashcardsMfr = FlashcardManager.getInstance(context, widgetId)
         flashcardsMfr.registerFragment(this)
     }
 
@@ -46,32 +53,44 @@ class FlashcardFragment : Fragment() {
         val currentWord = flashcardsMfr.getCurrentWord()
         Log.i("FlashcardFragment", "Updating Fragment view with $currentWord")
 
+        val openDictionary: () -> Unit = {
+            flashcardsMfr.openDictionary()
+        }
+
         with(root.findViewById<TextView>(R.id.flashcard_chinese)) {
-            setOnClickListener{ flashcardsMfr.openDictionary() }
+            setOnClickListener { openDictionary() }
             text = currentWord.simplified
         }
 
         with(root.findViewById<TextView>(R.id.flashcard_definition)) {
-            setOnClickListener{ flashcardsMfr.openDictionary() }
+            setOnClickListener { openDictionary() }
             text = currentWord.definition[Locale.ENGLISH]
         }
 
         with(root.findViewById<TextView>(R.id.flashcard_pinyin)) {
-            setOnClickListener{ flashcardsMfr.openDictionary() }
+            setOnClickListener { openDictionary() }
             text = currentWord.pinyins.toString()
         }
 
         with(root.findViewById<TextView>(R.id.flashcard_hsklevel)) {
-            setOnClickListener{ flashcardsMfr.openDictionary() }
+            setOnClickListener { openDictionary() }
             text = currentWord.HSK.toString()
         }
 
         root.findViewById<View>(R.id.flashcard_speak).setOnClickListener{
             flashcardsMfr.playWidgetWord()
+            Utils.logAnalyticsWidgetAction(
+                context,
+                Utils.ANALYTICS_EVENTS.WIDGET_PLAY_WORD, widgetId
+            )
         }
 
         root.findViewById<View>(R.id.flashcard_reload).setOnClickListener{
             flashcardsMfr.updateWord()
+            Utils.logAnalyticsWidgetAction(
+                context,
+                Utils.ANALYTICS_EVENTS.WIDGET_MANUAL_WORD_CHANGE, widgetId
+            )
         }
 
         root.invalidate()

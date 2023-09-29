@@ -14,13 +14,14 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import fr.berliat.hskwidget.R
-import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.domain.FlashcardManager
+import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.ui.flashcard.FlashcardConfigureActivity
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 internal const val ACTION_SPEAK = "fr.berliat.hskwidget.ACTION_WIDGET_SPEAK"
+internal const val ACTION_DICTIONARY = "fr.berliat.hskwidget.ACTION_DICTIONARY"
 
 /**
  * Implementation of App Widget functionality.
@@ -45,9 +46,10 @@ class FlashcardWidgetProvider : AppWidgetProvider() {
         Log.i("WidgetProvider", "onDeleted")
 
         // When the user deletes the widget, delete the preference associated with it.
-        for (appWidgetId in appWidgetIds) {
-            FlashcardManager.getInstance(context, appWidgetId).
-                getPreferenceStore(appWidgetId).clear()
+        for (widgetId in appWidgetIds) {
+            Utils.logAnalyticsWidgetAction(context, Utils.ANALYTICS_EVENTS.WIGDET_REMOVE, widgetId)
+
+            FlashcardManager.getInstance(context, widgetId).getPreferenceStore().clear()
         }
     }
 
@@ -71,14 +73,33 @@ class FlashcardWidgetProvider : AppWidgetProvider() {
 
             ACTION_SPEAK -> {
                 FlashcardManager.getInstance(context, widgetId).playWidgetWord()
+
+                Utils.logAnalyticsWidgetAction(
+                    context,
+                    Utils.ANALYTICS_EVENTS.WIDGET_PLAY_WORD, widgetId
+                )
+            }
+
+            ACTION_DICTIONARY -> {
+                FlashcardManager.getInstance(context, widgetId).openDictionary()
             }
 
             AppWidgetManager.ACTION_APPWIDGET_UPDATE -> {
                 var widgetIds = IntArray(1)
                 if (widgetId == -1) {
                     widgetIds = getWidgetIds(context)
+
+                    Utils.logAnalyticsEvent(
+                        context,
+                        Utils.ANALYTICS_EVENTS.AUTO_WORD_CHANGE
+                    )
                 } else {
                     widgetIds[0] = widgetId
+
+                    Utils.logAnalyticsWidgetAction(
+                        context,
+                        Utils.ANALYTICS_EVENTS.WIDGET_MANUAL_WORD_CHANGE, widgetId
+                    )
                 }
 
                 widgetIds.forEach {
@@ -98,6 +119,7 @@ class FlashcardWidgetProvider : AppWidgetProvider() {
     ) {
         Log.i("WidgetProvider", "onAppWidgetOptionsChanged")
         super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions)
+        Utils.logAnalyticsWidgetAction(context!!, Utils.ANALYTICS_EVENTS.WIGDET_RESIZE, appWidgetId)
     }
 
     override fun onEnabled(context: Context) {
@@ -142,7 +164,7 @@ class FlashcardWidgetProvider : AppWidgetProvider() {
         val word = flashcardsMfr.getCurrentWord()
         Log.i("WidgetProvider", "updateFlashCardWidget ID $appWidgetId with word $word")
 
-        val searchWordIntent = flashcardsMfr.getOpenDictionaryIntent(word.simplified)
+        val searchWordIntent = getPendingSelfIntent(context, ACTION_DICTIONARY, appWidgetId)
         // Get the layout for the widget and attach an on-click listener
         // to the button.
         val views: RemoteViews = RemoteViews(

@@ -1,6 +1,6 @@
 <resources>
 
-    <style name="Widget.HSKFlashcardsWidget.AppWidget.Container" parent="android:Widget">
+    <style name="Widget.HSKFlashcardsWidget.AppWidget.Container" parent="Theme.Material3.DynamicColors.DayNight">
         <item name="android:id">@android:id/background</item>
         <item name="android:padding">?attr/appWidgetPadding</item>
         <item name="android:background">@drawable/app_widget_background</item>
