@@ -28,7 +28,7 @@
         </receiver>
 
         <activity
-            android:name=".ui.widget.FlashcardConfigureActivity"
+            android:name=".ui.flashcard.FlashcardConfigureActivity"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />

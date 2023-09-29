@@ -1,4 +1,4 @@
-package fr.berliat.hskwidget.ui.widgets
+package fr.berliat.hskwidget.ui.flashcard
 
 import android.os.Bundle
 import android.util.Log
@@ -11,8 +11,7 @@ import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.domain.FlashcardManager
 import java.util.Locale
 
-private const val ARG_WIDGETID = "WIDGETID"
-
+const val ARG_WIDGETID = "WIDGETID"
 class FlashcardFragment : Fragment() {
     private var _widgetId: Int? = null
     private var _root : View? = null

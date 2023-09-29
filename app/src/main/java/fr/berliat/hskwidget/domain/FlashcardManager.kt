@@ -10,7 +10,7 @@ import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.store.ChineseWordsStore
 import fr.berliat.hskwidget.data.store.FlashcardPreferencesStore
 import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
-import fr.berliat.hskwidget.ui.widgets.FlashcardFragment
+import fr.berliat.hskwidget.ui.flashcard.FlashcardFragment
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 
@@ -19,6 +19,7 @@ class FlashcardManager private constructor(private val context: Context,
     private val dict = ChineseWordsStore.getInstance(context)
     private val fragments = mutableMapOf<Int, MutableSet<FlashcardFragment>>()
     private val flashCardPrefs =  getPreferenceStore(widgetId)
+    private val appWidgetMgr = AppWidgetManager.getInstance(context)
 
     fun getPreferenceStore(widgetId: Int) : FlashcardPreferencesStore {
         return FlashcardPreferencesStore(context, widgetId)
@@ -54,8 +55,7 @@ class FlashcardManager private constructor(private val context: Context,
 
         Log.i("FlashcardManager", "Now calling for widgets' update")
         GlobalScope.async {
-            FlashcardWidgetProvider().updateFlashCardWidget(context,
-                AppWidgetManager.getInstance(context), widgetId)
+            FlashcardWidgetProvider().updateFlashCardWidget(context, appWidgetMgr, widgetId)
         }
     }
 

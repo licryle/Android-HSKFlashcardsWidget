@@ -23,6 +23,22 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/widgets_demoflashcard_fragment"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_gravity="center"
+        android:layout_margin="10dp" />
+
+    <Button
+        android:id="@+id/widgets_add_new_widget"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="@string/widgets_add_widget">
+    </Button>
+
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/widgets_tabs"
         android:layout_width="match_parent"

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
-    android:configure="fr.berliat.hskwidget.ui.widget.FlashcardConfigureActivity"
+    android:configure="fr.berliat.hskwidget.ui.flashcard.FlashcardConfigureActivity"
     android:description="@string/app_widget_description"
     android:initialKeyguardLayout="@layout/flashcard_widget"
 

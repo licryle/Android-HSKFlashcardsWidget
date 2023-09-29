@@ -1,4 +1,4 @@
-package fr.berliat.hskwidget.ui.widget
+package fr.berliat.hskwidget.ui.flashcard
 
 import android.appwidget.AppWidgetManager
 import android.content.Intent

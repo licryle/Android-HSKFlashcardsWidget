@@ -1,4 +1,4 @@
-package fr.berliat.hskwidget.ui.widget
+package fr.berliat.hskwidget.ui.flashcard
 
 import android.os.Bundle
 import androidx.preference.Preference
@@ -7,8 +7,6 @@ import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.store.FlashcardPreferencesStore
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
-
-private const val ARG_WIDGETID = "WIDGETID"
 
 class FlashcardConfigureFragment() : PreferenceFragmentCompat() {
     private var _widgetId: Int? = null
@@ -79,5 +77,3 @@ class FlashcardConfigureFragment() : PreferenceFragmentCompat() {
         fun onWidgetPreferenceChange(widgetId: Int, preference: Preference, newValue: Any)
     }
 }
-
-

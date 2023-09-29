@@ -11,7 +11,8 @@ import androidx.fragment.app.Fragment
 import androidx.preference.Preference
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.domain.FlashcardManager
-import fr.berliat.hskwidget.ui.widget.FlashcardConfigureFragment
+import fr.berliat.hskwidget.ui.flashcard.FlashcardConfigureFragment
+import fr.berliat.hskwidget.ui.flashcard.FlashcardFragment
 
 
 private const val ARG_WIDGETID = "WIDGETID"

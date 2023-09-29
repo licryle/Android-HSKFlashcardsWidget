@@ -16,6 +16,7 @@ import androidx.work.WorkManager
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.domain.FlashcardManager
+import fr.berliat.hskwidget.ui.flashcard.FlashcardConfigureActivity
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
@@ -53,13 +54,13 @@ class FlashcardWidgetProvider : AppWidgetProvider() {
     override fun onReceive(context: Context?, intent: Intent?) {
         Log.i("WidgetProvider", "onReceive (action: ${intent?.action})")
 
+        if (context == null) return
+
         val widgetId = intent?.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, -1) ?: -1
-        val appMgr = AppWidgetManager.getInstance(context!!)
 
         when (intent!!.action) {
             ACTION_CONFIGURE_LATEST -> {
-                val latestWidgetId = appMgr.getAppWidgetIds(
-                    ComponentName(context, FlashcardWidgetProvider::class.java)).last()
+                val latestWidgetId = getWidgetIds(context).last()
 
                 val confIntent = Intent(context, FlashcardConfigureActivity::class.java)
                 confIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, latestWidgetId)
@@ -75,8 +76,7 @@ class FlashcardWidgetProvider : AppWidgetProvider() {
             AppWidgetManager.ACTION_APPWIDGET_UPDATE -> {
                 var widgetIds = IntArray(1)
                 if (widgetId == -1) {
-                    widgetIds = appMgr.getAppWidgetIds(
-                        ComponentName(context, FlashcardWidgetProvider::class.java))
+                    widgetIds = getWidgetIds(context)
                 } else {
                     widgetIds[0] = widgetId
                 }
@@ -117,8 +117,7 @@ class FlashcardWidgetProvider : AppWidgetProvider() {
         )
 
         val appMgr = AppWidgetManager.getInstance(context)
-        onUpdate(context, appMgr, appMgr.getAppWidgetIds(
-            ComponentName(context, FlashcardWidgetProvider::class.java)))
+        onUpdate(context, appMgr, getWidgetIds(context))
     }
 
     override fun onDisabled(context: Context) {
@@ -171,6 +170,13 @@ class FlashcardWidgetProvider : AppWidgetProvider() {
 
         // Tell the AppWidgetManager to perform an update on the current widget.
         appWidgetManager.updateAppWidget(appWidgetId, views)
+    }
+
+    fun getWidgetIds(context: Context) : IntArray {
+        val appWidgetMgr = AppWidgetManager.getInstance(context)
+
+        return appWidgetMgr.getAppWidgetIds(
+            ComponentName(context, FlashcardWidgetProvider::class.java))
     }
 
     companion object {
