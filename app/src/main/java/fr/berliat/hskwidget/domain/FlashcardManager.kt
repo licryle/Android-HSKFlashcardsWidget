@@ -11,7 +11,6 @@ import fr.berliat.hskwidget.data.store.ChineseWordsStore
 import fr.berliat.hskwidget.ui.widget.FlashcardWidget
 import fr.berliat.hskwidget.ui.widget.getWidgetPreferences
 import fr.berliat.hskwidget.ui.widgets.WidgetsWidgetFragment
-import kotlinx.coroutines.runBlocking
 
 class FlashcardManager private constructor(private val context: Context,
                                            private val widgetId: Int) {
@@ -86,8 +85,7 @@ class FlashcardManager private constructor(private val context: Context,
             context,
             0,
             Intent(
-                Intent.ACTION_VIEW, Uri.parse("https://www.omgchinese.com/dictionary/chinese/"
-                        + word)),
+                Intent.ACTION_VIEW, Uri.parse("https://www.wordsense.eu/$word")),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
     }
