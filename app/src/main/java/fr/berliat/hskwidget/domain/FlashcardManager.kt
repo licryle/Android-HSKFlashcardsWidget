@@ -11,6 +11,8 @@ import fr.berliat.hskwidget.data.store.ChineseWordsStore
 import fr.berliat.hskwidget.ui.widget.FlashcardWidget
 import fr.berliat.hskwidget.ui.widget.getWidgetPreferences
 import fr.berliat.hskwidget.ui.widgets.FlashcardFragment
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 
 class FlashcardManager private constructor(private val context: Context,
                                            private val widgetId: Int) {
@@ -48,8 +50,10 @@ class FlashcardManager private constructor(private val context: Context,
             fragments[widgetId]!!.forEach{it.updateFlashcardView() }
 
         Log.i("FlashcardManager", "Now calling for widgets' update")
-        FlashcardWidget().updateFlashCardWidget(context,
-            AppWidgetManager.getInstance(context), widgetId)
+        GlobalScope.async {
+            FlashcardWidget().updateFlashCardWidget(context,
+                AppWidgetManager.getInstance(context), widgetId)
+        }
     }
 
     fun registerFragment(frag: FlashcardFragment) : Boolean {
