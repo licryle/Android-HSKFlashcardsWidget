@@ -19,19 +19,21 @@ private const val ARG_WIDGETID = "WIDGETID"
 
 /**
  * Handles a Widget at a time, with preview + configuration Fragment in the main app.
- * Use the [WidgetsWidgetFragment.newInstance] factory method to
+ * Use the [WidgetsWidgetConfPreviewFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class WidgetsWidgetFragment : Fragment() {
+class WidgetsWidgetConfPreviewFragment : Fragment() {
     private var _widgetId: Int? = null
-    private var _root : View ? = null
-    private var _confFragment : FlashcardConfigureFragment? = null
-    private var _prefChangeCallback : WidgetPrefListener? = null
+    private var _root: View ? = null
+    private var _confFragment: FlashcardConfigureFragment? = null
+    private var _previewFragment: FlashcardFragment? = null
+    private var _prefChangeCallback: WidgetPrefListener? = null
 
     // Properties only valid between onCreateView and onDestroyView.
     private val widgetId get() = _widgetId!!
     private val root get() = _root!!
     private val confFragment get() = _confFragment!!
+    private val previewFragment get() = _previewFragment!!
     private val prefChangeCallback get() = _prefChangeCallback!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,10 +42,27 @@ class WidgetsWidgetFragment : Fragment() {
         arguments?.let {
             _widgetId = it.getInt(ARG_WIDGETID)
         }
+
+        _confFragment = FlashcardConfigureFragment.newInstance(widgetId)
+        _prefChangeCallback = WidgetPrefListener(requireActivity(), requireContext())
+        confFragment.addWidgetPreferenceListener(prefChangeCallback)
+        _previewFragment = FlashcardFragment.newInstance(widgetId)
+
+        with(childFragmentManager.beginTransaction()) {
+            add(R.id.widgets_flashcard_fragment, previewFragment)
+            add(R.id.widgets_widgetconf_fragment, confFragment)
+            commit()
+        }
     }
 
     override fun onDestroy() {
         confFragment.removeWidgetPreferenceListener(prefChangeCallback)
+
+        with(childFragmentManager.beginTransaction()) {
+            remove(confFragment)
+            remove(previewFragment)
+            commitAllowingStateLoss()
+        }
 
         super.onDestroy()
     }
@@ -55,17 +74,6 @@ class WidgetsWidgetFragment : Fragment() {
         // Inflate the layout for this fragment
         _root = inflater.inflate(R.layout.fragment_widgets_widget, container, false)
 
-        _confFragment = FlashcardConfigureFragment.newInstance(widgetId)
-        _prefChangeCallback = WidgetPrefListener(requireActivity(), requireContext())
-        confFragment.addWidgetPreferenceListener(prefChangeCallback)
-
-        with(childFragmentManager.beginTransaction()) {
-            add(R.id.widgets_flashcard_fragment,
-                FlashcardFragment.newInstance(widgetId))
-            add(R.id.widgets_widgetconf_fragment, confFragment)
-            commit()
-        }
-
         return root
     }
 
@@ -75,11 +83,11 @@ class WidgetsWidgetFragment : Fragment() {
          * this fragment using the provided parameters.
          *
          * @param widgetId The id the widget to configure
-         * @return A new instance of fragment WidgetsWidgetFragment.
+         * @return A new instance of fragment WidgetsWidgetConfPreviewFragment.
          */
         @JvmStatic
         fun newInstance(widgetId: Int) =
-            WidgetsWidgetFragment().apply {
+            WidgetsWidgetConfPreviewFragment().apply {
                 arguments = Bundle().apply {
                     putInt(ARG_WIDGETID, widgetId)
                 }

@@ -1,6 +1,9 @@
 package fr.berliat.hskwidget.domain
 
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.work.OneTimeWorkRequestBuilder
@@ -12,6 +15,7 @@ import androidx.work.workDataOf
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.model.ChineseWord
 import java.util.Locale
+
 
 class Utils {
     class DummyWorker(context: Context, workerParams: WorkerParameters)
@@ -29,6 +33,24 @@ class Utils {
                 ChineseWord.HSK_Level.HSK1,
                 ChineseWord.Pinyins(context.getString(R.string.widget_default_pinyin))
             )
+        }
+
+        fun getOpenURLPendingIntent(context: Context, url: String): PendingIntent {
+            return PendingIntent.getActivity(
+                context,
+                0,
+                getOpenURLIntent(url),
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+        }
+
+        fun getOpenURLIntent(url: String): Intent {
+            return Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        }
+
+        fun sendEmail(context: Context, address: String, subject: String = "", body: String = "") {
+            context.startActivity(getOpenURLIntent(
+                "mailto:$address?subject=" + Uri.encode(subject) + "&body=" + Uri.encode(body)))
         }
 
         fun playWordInBackground(context: Context, word: String) {

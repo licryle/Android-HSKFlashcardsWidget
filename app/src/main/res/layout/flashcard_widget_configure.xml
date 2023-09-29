@@ -3,25 +3,29 @@
     android:layout_height="match_parent"
     android:layout_width="match_parent"
     android:orientation="vertical">
-
-    <TextView
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:textSize="20dp"
-        android:textColor="@color/dark_primary_color"
-        android:text="@string/add_widget_title" />
+        android:theme="@style/Theme.HSKFlashcardsWidget.AppBarOverlay">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize" />
+
+    </com.google.android.material.appbar.AppBarLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:id="@+id/flashcard_configure_container" />
 
     <Button
         android:id="@+id/flashcard_widget_configure_addwidget"
+        style="@style/Widget.Material3.Button.ElevatedButton.Icon"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        android:text="@string/add_widget_btn" />
-
+        android:text="@string/add_widget_btn"/>
 </LinearLayout>

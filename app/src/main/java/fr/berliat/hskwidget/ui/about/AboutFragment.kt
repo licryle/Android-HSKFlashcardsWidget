@@ -4,11 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
-import com.google.android.material.snackbar.Snackbar
 import fr.berliat.hskwidget.databinding.FragmentAboutBinding
+import fr.berliat.hskwidget.domain.Utils
 
 class AboutFragment : Fragment() {
 
@@ -23,20 +21,16 @@ class AboutFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val aboutViewModel =
-            ViewModelProvider(this).get(AboutViewModel::class.java)
-
         _binding = FragmentAboutBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val textView: TextView = binding.textSlideshow
-        aboutViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
-        }
+        val emailMeIntent: () -> Unit =
+            { Utils.sendEmail(requireContext(), "cyrille.berliat+hsk@gmail.com") }
+        binding.aboutBtnEmail.setOnClickListener { emailMeIntent() }
+        binding.aboutBtnEmail2.setOnClickListener { emailMeIntent() }
 
-        binding.fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
+        binding.aboutBtnViewSource.setOnClickListener {
+            startActivity(Utils.getOpenURLIntent("https://github.com/licryle/Android-HSKFlashcardsWidget"))
         }
 
         return root

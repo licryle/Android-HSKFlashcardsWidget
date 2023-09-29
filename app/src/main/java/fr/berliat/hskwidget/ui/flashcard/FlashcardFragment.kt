@@ -29,11 +29,14 @@ class FlashcardFragment : Fragment() {
             _widgetId = it.getInt(ARG_WIDGETID)
         }
 
+        Log.i("FlashcardFragment", "Creating a new Flashcard Fragment for widget $widgetId")
+
         _flashcardsMfr = FlashcardManager.getInstance(requireContext(), widgetId)
         flashcardsMfr.registerFragment(this)
     }
 
     override fun onDestroy() {
+        Log.i("FlashcardFragment", "Destroying a new Flashcard Fragment")
         flashcardsMfr.deregisterFragment(this)
 
         super.onDestroy()
@@ -41,7 +44,7 @@ class FlashcardFragment : Fragment() {
 
     fun updateFlashcardView() {
         val currentWord = flashcardsMfr.getCurrentWord()
-        Log.i("WidgetsWidgetFragment", "Updating Fragment view with $currentWord")
+        Log.i("FlashcardFragment", "Updating Fragment view with $currentWord")
 
         with(root.findViewById<TextView>(R.id.flashcard_chinese)) {
             setOnClickListener{ flashcardsMfr.openDictionary() }
@@ -91,7 +94,7 @@ class FlashcardFragment : Fragment() {
          * this fragment using the provided parameters.
          *
          * @param widgetId The id the widget to configure
-         * @return A new instance of fragment WidgetsWidgetFragment.
+         * @return A new instance of fragment WidgetsWidgetConfPreviewFragment.
          */
         @JvmStatic
         fun newInstance(widgetId: Int) =

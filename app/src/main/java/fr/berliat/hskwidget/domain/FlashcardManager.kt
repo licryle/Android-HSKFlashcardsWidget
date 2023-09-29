@@ -3,8 +3,6 @@ package fr.berliat.hskwidget.domain
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.util.Log
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.store.ChineseWordsStore
@@ -88,13 +86,7 @@ class FlashcardManager private constructor(private val context: Context,
     }
 
     fun getOpenDictionaryIntent(word : String) : PendingIntent {
-        return PendingIntent.getActivity(
-            context,
-            0,
-            Intent(
-                Intent.ACTION_VIEW, Uri.parse("https://www.wordsense.eu/$word/")),
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+        return Utils.getOpenURLPendingIntent(context, "https://www.wordsense.eu/$word/")
     }
 
     companion object {

@@ -23,11 +23,13 @@ import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
 class WidgetsListFragment : Fragment() {
     private var _binding: FragmentWidgetsBinding? = null
     private var _viewModel: WidgetsListViewModel? = null
+    private val _previewFragment: FlashcardFragment? = null
 
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
     private val viewModel get() = _viewModel!!
+    private val previewFragment get() = _previewFragment!!
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,6 +40,13 @@ class WidgetsListFragment : Fragment() {
         _viewModel = ViewModelProvider(this)[WidgetsListViewModel::class.java]
 
         binding.widgetsTabs.addOnTabSelectedListener(TabChangeListener(viewModel))
+        binding.widgetsAddNewWidget.setOnClickListener { addNewWidget() }
+
+        return binding.root
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
         with(childFragmentManager.beginTransaction()) {
             add(
@@ -45,10 +54,12 @@ class WidgetsListFragment : Fragment() {
                 FlashcardFragment.newInstance(0))
             commit()
         }
+    }
 
-        binding.widgetsAddNewWidget.setOnClickListener { addNewWidget() }
+    override fun onDestroy() {
+        childFragmentManager.beginTransaction().remove(previewFragment).commitAllowingStateLoss()
 
-        return binding.root
+        super.onDestroy()
     }
 
     override fun onResume() {
@@ -115,7 +126,7 @@ class WidgetsListFragment : Fragment() {
         }
 
         override fun createFragment(position: Int): Fragment {
-            return WidgetsWidgetFragment.newInstance(widgetIds[position])
+            return WidgetsWidgetConfPreviewFragment.newInstance(widgetIds[position])
         }
 
     }

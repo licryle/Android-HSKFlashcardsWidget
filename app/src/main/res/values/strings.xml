@@ -28,7 +28,7 @@
     <string name="flashcard_widget_configure_hsk4">HSK 4 words</string>
     <string name="flashcard_widget_configure_hsk5">HSK 5 words</string>
     <string name="flashcard_widget_configure_hsk6">HSK 6 words</string>
-    <string name="add_widget_title">Add a new HSK Widget</string>
+    <string name="add_widget_title">Configure your HSK Flashcard Widget</string>
     <string name="flashcard_widget_configure_toggle_on">%1$s words will now show up on this widget</string>
     <string name="flashcard_widget_configure_toggle_off">%1$s words will no longer show up on this widget</string>
 
@@ -37,8 +37,19 @@
     <string name="widget_default_english">Hello</string>
     <string name="widget_default_pinyin">nĭ hăo</string>
     <string name="widget_default_loading">…Loading…</string>
-    <string name="widgets_intro"><![CDATA[Find below & reconfigure all existing widgets]]></string>
+    <string name="widgets_intro"><![CDATA[Welcome to HSK Flashcard Widget!
+\n
+\nThis app enables you to set up as many widgets on your phone, and select which HSK words you want to see.
+We recommend to choose the level your at plus the one below, or above depending on your learning path.
+\n
+\nYou can come back to this screen at any time to set up a new widget, or reconfigure existing ones.]]></string>
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="widgets_add_widget">Add a new widget</string>
+    <string name="about_btn_view_source">View source code</string>
+    <string name="about_intro1">HSK Flashcard Widget is an open source project by Cyrille Berliat that stems from a personal need to learn Mandarin. \n \nIf you purchased it via Google Play - Thank you! You\'ve contributed to Open Software and my countless hours of development.</string>
+    <string name="about_intro2">If you have any suggestions, feedback or issues, feel free to email me.</string>
+    <string name="about_intro3">Privacy policy: I use Google Analytics to track usage, such as which tab is visited the most on which device class (Tablet, Smartphone). \nNo Personal Identifiable Information (PII) data should be collected nor sent to me or Google Analytics.
+\n
+\nLicense: GNU GPLv3. In a nutshell, you can do whatever you want with it, but must display credit for the work and use the same license downstream. This project uses the HSK list from https://github.com/plaktos/hsk_csv/.</string>
+    <string name="about_btn_email2">Email me</string>
 </resources>

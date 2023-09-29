@@ -1,6 +1,7 @@
 package fr.berliat.hskwidget.ui.flashcard
 
 import android.os.Bundle
+import android.util.Log
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import fr.berliat.hskwidget.R
@@ -30,13 +31,17 @@ class FlashcardConfigureFragment() : PreferenceFragmentCompat() {
 
         GlobalScope.async {
             store.getAllKeys(true).forEach() {
-                preferenceManager.findPreference<Preference>(it)!!.onPreferenceChangeListener =
-                    Preference.OnPreferenceChangeListener { preference, newValue ->
+                val pref = preferenceManager.findPreference<Preference>(it)
 
-                        fireWidgetPreferenceChange(preference, newValue)
+                if (pref != null) {
+                    Log.d("FlashcardConfigureFragment", "Attaching listener to ${pref.key}")
+                    pref.onPreferenceChangeListener =
+                        Preference.OnPreferenceChangeListener { preference, newValue ->
+                            fireWidgetPreferenceChange(preference, newValue)
 
-                        // Reflect the newValue to Preference?
-                        true
+                            // Reflect the newValue to Preference?
+                            true
+                        }
                 }
             }
         }
@@ -62,7 +67,7 @@ class FlashcardConfigureFragment() : PreferenceFragmentCompat() {
          * this fragment using the provided parameters.
          *
          * @param widgetId The id the widget to configure
-         * @return A new instance of fragment WidgetsWidgetFragment.
+         * @return A new instance of fragment WidgetsWidgetConfPreviewFragment.
          */
         @JvmStatic
         fun newInstance(widgetId: Int) =

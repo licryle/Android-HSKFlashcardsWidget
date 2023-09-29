@@ -4,7 +4,7 @@ import android.appwidget.AppWidgetManager
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import androidx.fragment.app.FragmentActivity
+import androidx.appcompat.app.AppCompatActivity
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.databinding.FlashcardWidgetConfigureBinding
 import fr.berliat.hskwidget.domain.FlashcardManager
@@ -13,8 +13,11 @@ import fr.berliat.hskwidget.domain.FlashcardManager
 /**
  * The configuration screen for the [FlashcardWidgetProvider] AppWidget.
  */
-class FlashcardConfigureActivity : FragmentActivity() {
+class FlashcardConfigureActivity : AppCompatActivity() {
+    private var _confFragment: FlashcardConfigureFragment? = null
+
     private var appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID
+    private val confFragment get() = _confFragment!!
 
     private var addWidgetClick = View.OnClickListener {
         val context = this@FlashcardConfigureActivity
@@ -51,18 +54,25 @@ class FlashcardConfigureActivity : FragmentActivity() {
             finish()
             return
         }
-        //If you want to insert data in your settings
-        val fragment = FlashcardConfigureFragment.newInstance(appWidgetId)
-        //frag.preferenceManager.
 
+        _confFragment = FlashcardConfigureFragment.newInstance(appWidgetId)
         supportFragmentManager
             .beginTransaction()
-            .replace(R.id.flashcard_configure_container, fragment)
+            .replace(R.id.flashcard_configure_container, confFragment)
             .commit()
 
         binding = FlashcardWidgetConfigureBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        setSupportActionBar(binding.toolbar)
+        supportActionBar!!.title = applicationContext.getString(R.string.add_widget_title)
+
         binding.flashcardWidgetConfigureAddwidget.setOnClickListener(addWidgetClick)
+    }
+
+    override fun onDestroy() {
+        supportFragmentManager.beginTransaction().remove(confFragment).commitAllowingStateLoss()
+
+        super.onDestroy()
     }
 }
