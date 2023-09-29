@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import fr.berliat.hskwidget.R
-import fr.berliat.hskwidget.data.store.WidgetPreferencesStore
+import fr.berliat.hskwidget.data.store.FlashcardPreferencesStore
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 
@@ -25,7 +25,7 @@ class FlashcardConfigureFragment() : PreferenceFragmentCompat() {
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        val store = WidgetPreferencesStore(requireContext(), widgetId)
+        val store = FlashcardPreferencesStore(requireContext(), widgetId)
         preferenceManager.preferenceDataStore = store
 
         setPreferencesFromResource(R.xml.flashcard_widget_configure, rootKey)

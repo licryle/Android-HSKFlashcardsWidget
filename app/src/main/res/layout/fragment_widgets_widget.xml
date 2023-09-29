@@ -6,7 +6,6 @@
     android:orientation="vertical"
     tools:context=".ui.widgets.WidgetsWidgetFragment">
 
-
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/widgets_flashcard_fragment"
         android:layout_width="150dp"

@@ -9,7 +9,7 @@ import fr.berliat.hskwidget.domain.Utils
 
 internal val Context.dataStore: DataStore<Preferences> by preferencesDataStore("WidgetPreferenceStore")
 
-class WidgetPreferencesStore(private val context: Context, widgetId: Int):
+class FlashcardPreferencesStore(private val context: Context, widgetId: Int):
     PrefixedPreferenceDataStoreBridge(context.dataStore, widgetId.toString()) {
 
     fun showHSK(hskLevel: ChineseWord.HSK_Level) : Boolean {

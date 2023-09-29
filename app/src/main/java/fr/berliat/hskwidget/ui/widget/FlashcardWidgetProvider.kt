@@ -9,23 +9,23 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.RemoteViews
+import androidx.core.content.ContextCompat.startActivity
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import fr.berliat.hskwidget.R
-import fr.berliat.hskwidget.data.store.WidgetPreferencesStore
 import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.domain.FlashcardManager
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
+internal const val ACTION_SPEAK = "fr.berliat.hskwidget.ACTION_WIDGET_SPEAK"
+
 /**
  * Implementation of App Widget functionality.
  * App Widget Configuration implemented in [FlashcardConfigureActivity]
  */
-
-internal const val ACTION_SPEAK = "fr.berliat.hskwidget.ACTION_WIDGET_SPEAK"
-class FlashcardWidget : AppWidgetProvider() {
+class FlashcardWidgetProvider : AppWidgetProvider() {
 
     override fun onUpdate(
         context: Context,
@@ -45,17 +45,29 @@ class FlashcardWidget : AppWidgetProvider() {
 
         // When the user deletes the widget, delete the preference associated with it.
         for (appWidgetId in appWidgetIds) {
-            getWidgetPreferences(context, appWidgetId).clear()
+            FlashcardManager.getInstance(context, appWidgetId).
+                getPreferenceStore(appWidgetId).clear()
         }
     }
 
     override fun onReceive(context: Context?, intent: Intent?) {
-        Log.i("WidgetProvider", "onReceive (action: " + intent?.action + ")")
+        Log.i("WidgetProvider", "onReceive (action: ${intent?.action})")
 
         val widgetId = intent?.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, -1) ?: -1
         val appMgr = AppWidgetManager.getInstance(context!!)
 
         when (intent!!.action) {
+            ACTION_CONFIGURE_LATEST -> {
+                val latestWidgetId = appMgr.getAppWidgetIds(
+                    ComponentName(context, FlashcardWidgetProvider::class.java)).last()
+
+                val confIntent = Intent(context, FlashcardConfigureActivity::class.java)
+                confIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, latestWidgetId)
+                confIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+
+                startActivity(context, confIntent, null)
+            }
+
             ACTION_SPEAK -> {
                 FlashcardManager.getInstance(context, widgetId).playWidgetWord()
             }
@@ -64,7 +76,7 @@ class FlashcardWidget : AppWidgetProvider() {
                 var widgetIds = IntArray(1)
                 if (widgetId == -1) {
                     widgetIds = appMgr.getAppWidgetIds(
-                        ComponentName(context, FlashcardWidget::class.java))
+                        ComponentName(context, FlashcardWidgetProvider::class.java))
                 } else {
                     widgetIds[0] = widgetId
                 }
@@ -106,7 +118,7 @@ class FlashcardWidget : AppWidgetProvider() {
 
         val appMgr = AppWidgetManager.getInstance(context)
         onUpdate(context, appMgr, appMgr.getAppWidgetIds(
-            ComponentName(context, FlashcardWidget::class.java)))
+            ComponentName(context, FlashcardWidgetProvider::class.java)))
     }
 
     override fun onDisabled(context: Context) {
@@ -160,19 +172,19 @@ class FlashcardWidget : AppWidgetProvider() {
         // Tell the AppWidgetManager to perform an update on the current widget.
         appWidgetManager.updateAppWidget(appWidgetId, views)
     }
-}
 
-internal fun getWidgetPreferences(context: Context, widgetId: Int) : WidgetPreferencesStore {
-    return WidgetPreferencesStore(context, widgetId)
-}
+    companion object {
+        const val ACTION_CONFIGURE_LATEST = "fr.berliat.hskwidget.APPWIDGET_CONFIGURE_LATEST"
 
-/** Thanks to https://gist.github.com/manishcm/bd05dff09b5b1640d25f **/
-internal fun getPendingSelfIntent(context: Context?, action: String?, widgetId: Int)
-    : PendingIntent? {
-    val intent = Intent(context, FlashcardWidget::class.java)
-    intent.action = action
-    intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
+        /** Thanks to https://gist.github.com/manishcm/bd05dff09b5b1640d25f **/
+        internal fun getPendingSelfIntent(context: Context?, action: String?, widgetId: Int)
+                : PendingIntent? {
+            val intent = Intent(context, FlashcardWidgetProvider::class.java)
+            intent.action = action
+            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
 
-    return PendingIntent.getBroadcast(context, widgetId, intent,
-        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+            return PendingIntent.getBroadcast(context, widgetId, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        }
+    }
 }

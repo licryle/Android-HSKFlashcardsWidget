@@ -8,8 +8,8 @@ import android.net.Uri
 import android.util.Log
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.store.ChineseWordsStore
-import fr.berliat.hskwidget.ui.widget.FlashcardWidget
-import fr.berliat.hskwidget.ui.widget.getWidgetPreferences
+import fr.berliat.hskwidget.data.store.FlashcardPreferencesStore
+import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
 import fr.berliat.hskwidget.ui.widgets.FlashcardFragment
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
@@ -18,25 +18,28 @@ class FlashcardManager private constructor(private val context: Context,
                                            private val widgetId: Int) {
     private val dict = ChineseWordsStore.getInstance(context)
     private val fragments = mutableMapOf<Int, MutableSet<FlashcardFragment>>()
+    private val flashCardPrefs =  getPreferenceStore(widgetId)
+
+    fun getPreferenceStore(widgetId: Int) : FlashcardPreferencesStore {
+        return FlashcardPreferencesStore(context, widgetId)
+    }
 
     fun getCurrentWord() : ChineseWord {
-        val preferences = getWidgetPreferences(context, widgetId)
-        var currentWord = dict.findWordFromSimplified(preferences.getCurrentSimplified())
+        var currentWord = dict.findWordFromSimplified(flashCardPrefs.getCurrentSimplified())
 
         if (currentWord == null) currentWord = Utils.getDefaultWord(context)
 
         return currentWord
     }
     fun getNewWord(): ChineseWord {
-        val preferences = getWidgetPreferences(context, widgetId)
-        val currentWord = dict.findWordFromSimplified(preferences.getCurrentSimplified())
+        val currentWord = dict.findWordFromSimplified(flashCardPrefs.getCurrentSimplified())
 
-        var newWord = dict.getRandomWord(preferences.getAllowedHSK(), arrayListOf(currentWord!!))
+        var newWord = dict.getRandomWord(flashCardPrefs.getAllowedHSK(), arrayListOf(currentWord!!))
 
         if (newWord == null) newWord = Utils.getDefaultWord(context)
 
         // Persist it in preferences for cross-App convenience
-        preferences.putCurrentSimplified(newWord.simplified)
+        flashCardPrefs.putCurrentSimplified(newWord.simplified)
 
         return newWord
     }
@@ -51,7 +54,7 @@ class FlashcardManager private constructor(private val context: Context,
 
         Log.i("FlashcardManager", "Now calling for widgets' update")
         GlobalScope.async {
-            FlashcardWidget().updateFlashCardWidget(context,
+            FlashcardWidgetProvider().updateFlashCardWidget(context,
                 AppWidgetManager.getInstance(context), widgetId)
         }
     }
@@ -69,7 +72,7 @@ class FlashcardManager private constructor(private val context: Context,
     }
 
     fun playWidgetWord() : Boolean {
-        val word = getWidgetPreferences(context, widgetId).getCurrentSimplified()
+        val word = flashCardPrefs.getCurrentSimplified()
 
         if (word == "") return false
 
@@ -79,7 +82,7 @@ class FlashcardManager private constructor(private val context: Context,
     }
 
     fun openDictionary() {
-        val word = getWidgetPreferences(context, widgetId).getCurrentSimplified()
+        val word = flashCardPrefs.getCurrentSimplified()
 
         getOpenDictionaryIntent(word).send()
     }

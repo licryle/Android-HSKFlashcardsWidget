@@ -7,10 +7,11 @@ import android.view.View
 import androidx.fragment.app.FragmentActivity
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.databinding.FlashcardWidgetConfigureBinding
+import fr.berliat.hskwidget.domain.FlashcardManager
 
 
 /**
- * The configuration screen for the [FlashcardWidget] AppWidget.
+ * The configuration screen for the [FlashcardWidgetProvider] AppWidget.
  */
 class FlashcardConfigureActivity : FragmentActivity() {
     private var appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID
@@ -19,8 +20,7 @@ class FlashcardConfigureActivity : FragmentActivity() {
         val context = this@FlashcardConfigureActivity
 
         // It is the responsibility of the configuration activity to update the app widget
-        val appWidgetManager = AppWidgetManager.getInstance(context)
-        FlashcardWidget().onUpdate(context, appWidgetManager, intArrayOf(appWidgetId))
+        FlashcardManager.getInstance(context, appWidgetId).updateWord()
 
         // Make sure we pass back the original appWidgetId
         val resultValue = Intent()
@@ -65,5 +65,4 @@ class FlashcardConfigureActivity : FragmentActivity() {
 
         binding.flashcardWidgetConfigureAddwidget.setOnClickListener(addWidgetClick)
     }
-
 }

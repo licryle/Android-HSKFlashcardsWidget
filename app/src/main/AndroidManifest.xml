@@ -16,7 +16,7 @@
         android:theme="@style/Theme.HSKFlashcardsWidget"
         tools:targetApi="31">
         <receiver
-            android:name=".ui.widget.FlashcardWidget"
+            android:name=".ui.widget.FlashcardWidgetProvider"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />

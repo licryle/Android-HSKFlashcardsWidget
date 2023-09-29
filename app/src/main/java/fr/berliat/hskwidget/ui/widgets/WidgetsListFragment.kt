@@ -14,7 +14,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import fr.berliat.hskwidget.databinding.FragmentWidgetsBinding
-import fr.berliat.hskwidget.ui.widget.FlashcardWidget
+import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
 
 class WidgetsListFragment : Fragment() {
 
@@ -62,7 +62,7 @@ class WidgetsListFragment : Fragment() {
         val context = requireActivity().applicationContext
         val appMgr = AppWidgetManager.getInstance(context!!)
         val widgetIds = appMgr.getAppWidgetIds(
-            ComponentName(context, FlashcardWidget::class.java)
+            ComponentName(context, FlashcardWidgetProvider::class.java)
         )
 
         val widgetPager = binding.widgetsTabsConfigure
