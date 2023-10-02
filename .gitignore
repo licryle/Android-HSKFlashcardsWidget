@@ -13,6 +13,7 @@
 .externalNativeBuild
 .cxx
 local.properties
+/app/build.gradle.kts
 /app/google-services.json
 /app/release
 /PlayStoreAssets
