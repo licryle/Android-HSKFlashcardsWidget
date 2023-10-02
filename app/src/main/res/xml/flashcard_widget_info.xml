@@ -8,7 +8,7 @@
     android:initialLayout="@layout/flashcard_widget_loading"
     android:previewLayout="@layout/flashcard_widget"
 
-    android:updatePeriodMillis="600000"
+    android:updatePeriodMillis="1800000"
     android:widgetCategory="home_screen"
     android:widgetFeatures="reconfigurable"
 

@@ -51,5 +51,5 @@ We recommend to choose the level your at plus the one below, or above depending 
     <string name="about_intro3">Privacy policy: I use Google Analytics to track usage, such as which tab is visited the most on which device class (Tablet, Smartphone). \nNo Personal Identifiable Information (PII) data should be collected nor sent to me or Google Analytics.
 \n
 \nLicense: GNU GPLv3. In a nutshell, you can do whatever you want with it, but must display credit for the work and use the same license downstream. This project uses the HSK list from https://github.com/plaktos/hsk_csv/.</string>
-    <string name="about_btn_email2">Email me</string>
+    <string name="about_btn_email2">Email the developer</string>
 </resources>

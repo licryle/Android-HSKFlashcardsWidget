@@ -75,7 +75,8 @@ class FlashcardConfigureActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        supportFragmentManager.beginTransaction().remove(confFragment).commitAllowingStateLoss()
+        if (_confFragment != null)
+            supportFragmentManager.beginTransaction().remove(confFragment).commitAllowingStateLoss()
 
         super.onDestroy()
     }

@@ -58,7 +58,9 @@ class WidgetsListFragment : Fragment() {
     }
 
     override fun onDestroy() {
-        childFragmentManager.beginTransaction().remove(previewFragment).commitAllowingStateLoss()
+        if (_previewFragment != null)
+            childFragmentManager.beginTransaction().remove(previewFragment)
+                .commitAllowingStateLoss()
 
         super.onDestroy()
     }

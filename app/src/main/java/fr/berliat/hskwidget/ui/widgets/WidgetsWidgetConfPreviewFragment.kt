@@ -60,8 +60,11 @@ class WidgetsWidgetConfPreviewFragment : Fragment() {
         confFragment.removeWidgetPreferenceListener(prefChangeCallback)
 
         with(childFragmentManager.beginTransaction()) {
-            remove(confFragment)
-            remove(previewFragment)
+            if (_confFragment != null)
+                remove(confFragment)
+
+            if (_previewFragment != null)
+                remove(previewFragment)
             commitAllowingStateLoss()
         }
 
