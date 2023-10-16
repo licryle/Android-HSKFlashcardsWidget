@@ -70,21 +70,45 @@ class Utils {
             val workMgr = WorkManager.getInstance(context)
             workMgr.getWorkInfoByIdLiveData(speechRequest.id).observeForever(
                 object: Observer<WorkInfo> {
-                override fun onChanged(workInfo: WorkInfo) {
-                    if (workInfo.state == WorkInfo.State.SUCCEEDED
-                        || workInfo.state == WorkInfo.State.FAILED) {
+                    override fun onChanged(workInfo: WorkInfo) {
+                        if (workInfo.state == WorkInfo.State.SUCCEEDED
+                            || workInfo.state == WorkInfo.State.FAILED
+                        ) {
 
-                        if (workInfo.state == WorkInfo.State.FAILED
-                            && workInfo.outputData.getString(BackgroundSpeechService.FAILURE_REASON) == BackgroundSpeechService.FAILURE_MUTED) {
-                            Toast.makeText(context, "Unmute to hear the word", Toast.LENGTH_LONG).show()
+                            var errStringId = R.string.speech_failure_toast_unknown
+                            if (workInfo.state == WorkInfo.State.FAILED) {
+                                var errId =
+                                    workInfo.outputData.getString(BackgroundSpeechService.FAILURE_REASON)
+                                when (errId) {
+                                    BackgroundSpeechService.FAILURE_MUTED
+                                    -> errStringId = R.string.speech_failure_toast_muted
+
+                                    BackgroundSpeechService.FAILURE_INIT_FAILED
+                                    -> errStringId = R.string.speech_failure_toast_init
+
+                                    BackgroundSpeechService.FAILURE_LANG_UNSUPPORTED
+                                    -> errStringId =
+                                        R.string.speech_failure_toast_chinese_unsupported
+
+                                    else -> {
+                                        errStringId = R.string.speech_failure_toast_unknown
+                                        errId = BackgroundSpeechService.FAILURE_UNKNOWN
+                                    }
+                                }
+
+                                logAnalyticsError(context, "SPEECH", errId, "")
+                                Toast.makeText(
+                                    context, context.getString(errStringId),
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+
+                            workMgr.getWorkInfoByIdLiveData(speechRequest.id)
+                                .removeObserver(this)
                         }
-
-                        workMgr.getWorkInfoByIdLiveData(speechRequest.id)
-                            .removeObserver(this)
                     }
-
                 }
-                })
+            )
 
             workMgr.enqueue(speechRequest)
         }
@@ -109,6 +133,17 @@ class Utils {
             }
 
             Firebase.analytics.logEvent(event.name, bundle)
+        }
+
+        fun logAnalyticsError(context: Context, module: String, error: String, details: String) {
+            logAnalyticsEvent(
+                context, ANALYTICS_EVENTS.ERROR,
+                mapOf(
+                    "MODULE" to module,
+                    "ERROR_ID" to error,
+                    "DETAILS" to details
+                )
+            )
         }
 
         fun logAnalyticsWidgetAction(context: Context, event: ANALYTICS_EVENTS, widgetId: Int) {
@@ -144,6 +179,7 @@ class Utils {
     enum class ANALYTICS_EVENTS {
         SCREEN_VIEW,
         AUTO_WORD_CHANGE,
+        ERROR,
         WIDGET_PLAY_WORD,
         WIDGET_MANUAL_WORD_CHANGE,
         WIDGET_RECONFIGURE,

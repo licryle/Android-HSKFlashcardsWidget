@@ -15,8 +15,8 @@ android {
         minSdk = 26
         //noinspection EditedTargetSdkVersion
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 7
+        versionName = "1.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -40,6 +40,7 @@ android {
     buildFeatures {
         viewBinding = true
     }
+    buildToolsVersion = "34.0.0"
 }
 
 dependencies {
@@ -47,13 +48,13 @@ dependencies {
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0-alpha03")
-    implementation("androidx.compose.material:material-icons-extended:1.6.0-alpha06")
-    implementation("androidx.compose.material:material-ripple:1.6.0-alpha06")
+    implementation("androidx.compose.material:material-icons-extended:1.6.0-alpha07")
+    implementation("androidx.compose.material:material-ripple:1.6.0-alpha07")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.2")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
-    implementation("androidx.navigation:navigation-fragment-ktx:2.7.3")
-    implementation("androidx.navigation:navigation-ui-ktx:2.7.3")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.7.4")
+    implementation("androidx.navigation:navigation-ui-ktx:2.7.4")
     implementation("androidx.work:work-runtime-ktx:2.8.1")
     implementation("com.opencsv:opencsv:4.6")
     implementation("androidx.preference:preference-ktx:1.2.1")
@@ -66,7 +67,9 @@ dependencies {
     implementation("androidx.datastore:datastore-rxjava2:1.0.0")
     implementation("androidx.datastore:datastore-rxjava3:1.0.0")
     implementation("androidx.datastore:datastore-preferences:1.0.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.2.0-alpha12")
+    implementation("androidx.constraintlayout:constraintlayout:2.2.0-alpha13")
+    implementation("androidx.activity:activity-ktx:1.8.0")
+    implementation("androidx.fragment:fragment-ktx:1.7.0-alpha06")
 
     // Import the BoM for the Firebase platform
     implementation(platform("com.google.firebase:firebase-bom:32.3.1"))

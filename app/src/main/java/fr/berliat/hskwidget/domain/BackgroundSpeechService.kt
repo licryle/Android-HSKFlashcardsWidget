@@ -18,32 +18,40 @@ class BackgroundSpeechService(val context: Context, workerParams: WorkerParamete
     private val word = inputData.getString("word")
 
     companion object {
+        const val FAILURE_UNKNOWN = "FAILURE_UNKNOWN"
         const val FAILURE_REASON = "FAILURE_REASON"
         const val FAILURE_MUTED = "FAILURE_MUTED"
+        const val FAILURE_INIT_FAILED = "FAILURE_INITFAILED"
+        const val FAILURE_LANG_UNSUPPORTED = "FAILURE_LANG_UNSUPPORTED"
     }
 
     @SuppressLint("RestrictedApi")
     override fun doWork(): Result {
-        Log.i("BackgroundSpeechService", "Starting to play  ${word} out loud.")
+        Log.i("BackgroundSpeechService", "Readying to play  ${word} out loud.")
         if (isMuted()) {
             Log.i("BackgroundSpeechService", "But volume is muted. Aborting.")
             return Result.failure(Data(mapOf(FAILURE_REASON to FAILURE_MUTED)))
         }
 
-        while (initStatus == null) { sleep(10); }
+        while (initStatus == null) {
+            Log.i("BackgroundSpeechService", "Not (yet) ready to play  ${word} out loud.")
+            sleep(10)
+        }
 
         if (initStatus != TextToSpeech.SUCCESS) {
             Log.e("BackgroundSpeechService", "Initialization Failed!")
             return Result.failure()
         }
 
+        Log.i("BackgroundSpeechService", "Setting language to play  ${word} out loud.")
         val result = textToSpeech.setLanguage(Locale.SIMPLIFIED_CHINESE)
         if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-            Log.e("BackgroundSpeechService","Simplified_chinese not supported on this phone.")
+            Log.e("BackgroundSpeechService", "Simplified_chinese not supported on this phone.")
             return Result.failure()
         }
 
-        textToSpeech.speak(word, TextToSpeech.QUEUE_FLUSH, null,"")
+        Log.i("BackgroundSpeechService", "Starting to play  ${word} out loud.")
+        textToSpeech.speak(word, TextToSpeech.QUEUE_FLUSH, null, "")
         Log.i("BackgroundSpeechService", "Finishing to play  ${word} out loud.")
 
         return Result.success()
