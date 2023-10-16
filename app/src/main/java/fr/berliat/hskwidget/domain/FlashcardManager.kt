@@ -97,11 +97,10 @@ class FlashcardManager private constructor(private val context: Context,
     companion object {
         private var instances = mutableMapOf<Int, FlashcardManager>()
 
-        fun getInstance(context: Context, widgetId: Int): FlashcardManager {
-            if (instances[widgetId] == null)
-                instances[widgetId] = FlashcardManager(context, widgetId)
-
-            return instances[widgetId]!!
-        }
+        fun getInstance(context: Context, widgetId: Int) =
+            instances[widgetId] ?: synchronized(this) {
+                instances[widgetId] ?: FlashcardManager(context, widgetId)
+                    .also { instances[widgetId] = it }
+            }
     }
 }

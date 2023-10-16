@@ -1,35 +1,66 @@
 package fr.berliat.hskwidget.data.store
 
 import android.content.Context
+import android.database.Cursor
 import android.util.Log
-import com.opencsv.CSVReader
 import fr.berliat.hskwidget.data.model.ChineseWord
 import java.util.Locale
 
-class ChineseWordsStore private constructor(val context: Context) {
-    private val fullDict = mutableListOf<ChineseWord>()
 
-    init {
-        Log.i("ChineseWordsStore", "A new dictionary is being loaded")
-        ChineseWord.HSK_Level.values().forEach {
-            addFromCSVResource(it, getHSKFile(it))
-        }
+class ChineseWordsStore private constructor(val context: Context) {
+    private val dbHelper = ChineseWordsDBHelper(context)
+    private val database = dbHelper.readableDatabase
+
+    private val projection = arrayOf(
+        ChineseWordsDBHelper.SIMPLIFIED,
+        ChineseWordsDBHelper.PINYINS,
+        ChineseWordsDBHelper.HSK,
+        ChineseWordsDBHelper.DEFINITION_EN
+    )
+
+    fun getOnlyHSKLevels(levels: Set<ChineseWord.HSK_Level>): Array<ChineseWord> {
+        return _getOnlyHSKLevels(levels, arrayListOf(), "", "")
     }
 
-    fun getOnlyHSKLevels(levels: Set<ChineseWord.HSK_Level>) : List<ChineseWord> {
-        return fullDict.filter {
-            levels.contains(it.HSK)
+    private fun _getOnlyHSKLevels(
+        levels: Set<ChineseWord.HSK_Level>, bannedWord: ArrayList<ChineseWord>,
+        orderBy: String, limit: String
+    ): Array<ChineseWord> {
+        // Filter results WHERE "title" = 'My Title'
+        val sel =
+            "${ChineseWordsDBHelper.HSK} IN (" + levels.map { it.level }.joinToString() + ") " +
+                    "AND ${ChineseWordsDBHelper.SIMPLIFIED} NOT IN (?)"
+
+        val cursor = database.query(
+            ChineseWordsDBHelper.TABLE_NAME,             // The table to query
+            projection,                                  // The array of columns to return (pass null to get all)
+            sel,                                         // The columns for the WHERE clause
+            bannedWord.map { it.simplified }.toTypedArray(), // The values for the WHERE clause
+            null,                                // don't group the rows
+            null,                                 // don't filter by row groups
+            orderBy,
+            limit
+        )
+
+        val dict = mutableSetOf<ChineseWord>()
+        with(cursor) {
+            while (moveToNext()) {
+                dict.add(cursorToWord(cursor))
+            }
         }
+        cursor.close()
+
+        return dict.toTypedArray()
     }
 
     fun getRandomWord(
         levels: Set<ChineseWord.HSK_Level>,
         bannedWords: ArrayList<ChineseWord>
     ) : ChineseWord? {
-        val dict = getOnlyHSKLevels(levels)
-        if (dict.isEmpty() || dict.size == bannedWords.size) return null
+        val dict = _getOnlyHSKLevels(levels, bannedWords, "RANDOM()", "1")
+        if (dict.isEmpty()) return null
 
-        var word : ChineseWord
+        var word: ChineseWord
         do {
             word = dict.random()
         } while (bannedWords.contains(word))
@@ -39,47 +70,60 @@ class ChineseWordsStore private constructor(val context: Context) {
     }
 
     fun findWordFromSimplified(simplifiedWord: String?): ChineseWord? {
-        val word = fullDict.filter {
-            it.simplified == simplifiedWord
-        }
+        // Filter results WHERE "title" = 'My Title'
+        val simpSel = "${ChineseWordsDBHelper.SIMPLIFIED} IN (?)"
 
-        if (word.isEmpty())
+        val cursor = database.query(
+            ChineseWordsDBHelper.TABLE_NAME,             // The table to query
+            projection,                                  // The array of columns to return (pass null to get all)
+            simpSel,                                     // The columns for the WHERE clause
+            arrayOf(simplifiedWord),                     // The values for the WHERE clause
+            null,                                // don't group the rows
+            null,                                 // don't filter by row groups
+            ""
+        )
+
+        if (!cursor.moveToNext())
             return null
 
-        return word.first()
+        val word = cursorToWord(cursor)
+        cursor.close()
+
+        return word
     }
 
-    private fun addFromCSVResource(hsk: ChineseWord.HSK_Level, reader: CSVReader) {
-        var nextLine: Array<String>?
-        nextLine = reader.readNext()
-        while (nextLine != null) {
-            fullDict.add(
-                ChineseWord(
-                    nextLine[0],
-                    "",
-                    mapOf(Locale.ENGLISH to nextLine[2]),
-                    hsk,
-                    ChineseWord.Pinyins(nextLine[1])
+    private fun cursorToWord(cursor: Cursor): ChineseWord {
+        with(ChineseWordsDBHelper) {
+            return ChineseWord(
+                cursor.getString(cursor.getColumnIndexOrThrow(SIMPLIFIED)),
+                "",
+                mapOf(
+                    Locale.ENGLISH to cursor.getString(
+                        cursor.getColumnIndexOrThrow(DEFINITION_EN)
+                    )
+                ),
+                ChineseWord.HSK_Level.from(
+                    cursor.getInt(
+                        cursor.getColumnIndexOrThrow(HSK)
+                    )
+                ),
+                ChineseWord.Pinyins(
+                    cursor.getString(
+                        cursor.getColumnIndexOrThrow(PINYINS)
+                    )
                 )
             )
-
-            nextLine = reader.readNext()
         }
-    }
-
-    private fun getHSKFile(hskLevel: ChineseWord.HSK_Level) : CSVReader {
-        //ToDo: optimize into a database to avoid loading all just to pull a random word
-        return CSVReader(context.assets.open("hsk_csk/hsk${hskLevel.level}.csv").reader())
     }
 
     companion object {
-        // @Todo: monitor for possible memory leak
+        //Todo: Monitor for memory leak.
+        @Volatile
         private var instance: ChineseWordsStore? = null
 
-        fun getInstance(context: Context) : ChineseWordsStore {
-            if (instance == null) instance = ChineseWordsStore(context)
-
-            return instance!!
-        }
+        fun getInstance(context: Context) =
+            instance ?: synchronized(this) {
+                instance ?: ChineseWordsStore(context).also { instance = it }
+            }
     }
 }
