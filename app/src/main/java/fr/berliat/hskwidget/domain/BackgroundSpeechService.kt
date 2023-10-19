@@ -2,17 +2,21 @@ package fr.berliat.hskwidget.domain
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
+import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.media.AudioManager
 import android.os.SystemClock.sleep
 import android.speech.tts.TextToSpeech
 import android.util.Log
+import androidx.core.content.ContextCompat
 import androidx.work.Data
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import java.util.Locale
 
-class BackgroundSpeechService(val context: Context, workerParams: WorkerParameters)
-    : Worker(context, workerParams), TextToSpeech.OnInitListener {
+
+class BackgroundSpeechService(val context: Context, workerParams: WorkerParameters) :
+    Worker(context, workerParams), TextToSpeech.OnInitListener {
     private val textToSpeech = TextToSpeech(context, this)
     private var initStatus: Int? = null
     private val word = inputData.getString("word")
@@ -40,14 +44,20 @@ class BackgroundSpeechService(val context: Context, workerParams: WorkerParamete
 
         if (initStatus != TextToSpeech.SUCCESS) {
             Log.e("BackgroundSpeechService", "Initialization Failed!")
-            return Result.failure()
+            return Result.failure(Data(mapOf(FAILURE_REASON to FAILURE_INIT_FAILED)))
         }
 
         Log.i("BackgroundSpeechService", "Setting language to play  ${word} out loud.")
         val result = textToSpeech.setLanguage(Locale.SIMPLIFIED_CHINESE)
         if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
             Log.e("BackgroundSpeechService", "Simplified_chinese not supported on this phone.")
-            return Result.failure()
+
+            val installIntent = Intent()
+            installIntent.action = TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA
+            installIntent.flags = FLAG_ACTIVITY_NEW_TASK
+            ContextCompat.startActivity(context, installIntent, null)
+
+            return Result.failure(Data(mapOf(FAILURE_REASON to FAILURE_LANG_UNSUPPORTED)))
         }
 
         Log.i("BackgroundSpeechService", "Starting to play  ${word} out loud.")
