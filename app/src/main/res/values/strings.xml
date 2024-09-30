@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">HSK Widget</string>
+    <string name="app_name">HSK Helper</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">HSK Widget</string>
@@ -56,4 +56,5 @@ We recommend to choose the level your at plus the one below, or above depending 
     <string name="speech_failure_toast_muted">Unmute to hear the word</string>
     <string name="speech_failure_toast_chinese_unsupported">Please install the "Chinese (China)" voice</string>
     <string name="speech_failure_toast_init">www</string>
+    <string name="menu_dictionary">Dictionary</string>
 </resources>

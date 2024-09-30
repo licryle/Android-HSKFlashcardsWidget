@@ -56,7 +56,7 @@ class ChineseWordsStore private constructor(val context: Context) {
     fun getRandomWord(
         levels: Set<ChineseWord.HSK_Level>,
         bannedWords: ArrayList<ChineseWord>
-    ) : ChineseWord? {
+    ): ChineseWord? {
         val dict = _getOnlyHSKLevels(levels, bannedWords, "RANDOM()", "1")
         if (dict.isEmpty()) return null
 
@@ -70,7 +70,6 @@ class ChineseWordsStore private constructor(val context: Context) {
     }
 
     fun findWordFromSimplified(simplifiedWord: String?): ChineseWord? {
-        // Filter results WHERE "title" = 'My Title'
         val simpSel = "${ChineseWordsDBHelper.SIMPLIFIED} IN (?)"
 
         val cursor = database.query(
@@ -90,6 +89,31 @@ class ChineseWordsStore private constructor(val context: Context) {
         cursor.close()
 
         return word
+    }
+
+    fun findWordFromStrLike(str: String?, page: Int = 0, pageSize: Int = 10): List<ChineseWord> {
+        val simpSel =
+            "${ChineseWordsDBHelper.DEFINITION_EN} || ${ChineseWordsDBHelper.SIMPLIFIED} || " +
+            "${ChineseWordsDBHelper.PINYINS} LIKE ?"
+
+        val offset = page * pageSize
+
+        val cursor = database.query(
+            ChineseWordsDBHelper.TABLE_NAME,             // The table to query
+            projection,                                  // The array of columns to return (pass null to get all)
+            simpSel,                                     // The columns for the WHERE clause
+            arrayOf("%$str%"),                           // The values for the WHERE clause
+            null,                                // don't group the rows
+            null,                                 // don't filter by row groups
+            "${ChineseWordsDBHelper.HSK} ASC",
+            "$offset, $pageSize"
+        )
+
+        val words: MutableList<ChineseWord> = mutableListOf()
+        while (cursor.moveToNext())
+            words.add(cursorToWord(cursor))
+
+        return words
     }
 
     private fun cursorToWord(cursor: Cursor): ChineseWord {

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="0dp"
+    android:padding="0dp"
+    android:background="@drawable/search_item_border">
+
+    <!-- Bookmark Icon -->
+    <ImageView
+        android:id="@+id/star_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="0dp"
+        android:padding="0dp"
+        android:src="@drawable/bookmark_24px"
+        android:contentDescription="Favorite"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:padding="16dp">
+
+
+        <!-- Pinyin -->
+        <TextView
+            android:id="@+id/pinyin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="hànzì"
+            android:textSize="27sp"
+            android:textColor="@android:color/darker_gray"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/hanzi"
+            app:layout_constraintRight_toLeftOf="@id/pinyin"  />
+
+        <!-- Chinese Word (characters) -->
+        <TextView
+            android:id="@+id/hanzi"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="汉字"
+            android:textSize="36sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            app:layout_constraintStart_toStartOf="@id/pinyin"
+            app:layout_constraintTop_toBottomOf="@id/pinyin"
+            app:layout_constraintRight_toLeftOf="@id/pinyin" />
+
+
+        <!-- English Definition -->
+        <TextView
+            android:id="@+id/definition"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Chinese characters"
+            android:padding="5dp"
+            android:textSize="18sp"
+            android:textColor="@android:color/black"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toRightOf="@id/hanzi"
+            app:layout_constraintRight_toLeftOf="@id/hsk_level" />
+
+        <!-- HSK Level -->
+        <TextView
+            android:id="@+id/hsk_level"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="HSK 3"
+            android:textSize="16sp"
+            android:textColor="@android:color/holo_blue_dark"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
