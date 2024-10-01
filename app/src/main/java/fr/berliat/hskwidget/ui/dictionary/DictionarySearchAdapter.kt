@@ -48,9 +48,9 @@ class DictionarySearchAdapter : RecyclerView.Adapter<DictionarySearchAdapter.Sea
 
         fun bind(result: ChineseWord) {
             hanziView.text = result.simplified
-            hskView.text = result.HSK.toString()
+            hskView.text = result.hskLevel.toString()
             pinyinView.text = result.pinyins.toString()
-            definitionView.text = result.definition[Locale.ENGLISH]
+            definitionView.text = result.definition?.get(Locale.ENGLISH) ?: ""
         }
     }
 }

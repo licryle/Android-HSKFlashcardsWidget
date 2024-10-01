@@ -1,48 +1,78 @@
 package fr.berliat.hskwidget.data.model
 
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.Index
+import androidx.room.PrimaryKey
+import androidx.room.TypeConverter
+import java.text.Normalizer
+
 import java.util.Locale
 
+@Entity(indices = [Index(value = ["searchable_text"])])
 data class ChineseWord(
-    val simplified: String,
-    val traditional: String,
-
-    val definition: Map<Locale, String>,
-    val HSK: HSK_Level,
-
-    val pinyins: Pinyins
+    @PrimaryKey val simplified: String,
+    @ColumnInfo(name = "traditional") val traditional: String?,
+    @ColumnInfo(name = "definition") val definition: Map<Locale, String>,
+    @ColumnInfo(name = "hsk_level") val hskLevel: HSK_Level?,
+    @ColumnInfo(name = "pinyins") val pinyins: Pinyins?,
+    @ColumnInfo(name = "popularity") val popularity: Int?,
 ) {
+    @ColumnInfo(name = "searchable_text") var searchable_text: String =
+        Normalizer.normalize(pinyins.toString() + " " + definition + " "
+                + traditional + " " + simplified,
+            Normalizer.Form.NFD).replace("\\p{Mn}+".toRegex(), "")
+
     class Pinyins: ArrayList<Pinyin> {
+        constructor(s: String) : this(fromString(s)) {
+        }
 
-        constructor(s: String) {
-            val pinStrings = s.split(" ").toTypedArray()
-            val pinyins = ArrayList<Pinyin>()
-
-            var tone : Pinyin.Tone = Pinyin.Tone.NEUTRAL
-            pinStrings.forEach { syllable ->
-                if (syllable.contains(Regex("[àèìòùǜ]"))) {
-                    tone = Pinyin.Tone.FALLING
-                } else if (syllable.contains(Regex("[áéíóúǘ]"))) {
-                    tone = Pinyin.Tone.RISING
-                } else if (syllable.contains(Regex("[ǎěǐǒǔǚ]"))) {
-                    tone = Pinyin.Tone.FALLING_RISING
-                } else if (syllable.contains(Regex("[āēīōūǖ]"))) {
-                    tone = Pinyin.Tone.FLAT
-                }
-
-                pinyins.add(Pinyin(syllable, tone))
-            }
-
+        constructor(pinyins: ArrayList<Pinyin>) {
             this.addAll(pinyins)
         }
 
-        override fun toString(): String {
-            var s = ""
+        override fun toString() = toString(this)
 
-            this.forEach() { pinyin ->
-                s += pinyin.syllable + ' '
+        companion object {
+            @TypeConverter
+            @JvmStatic
+            fun fromString(value: String?): Pinyins {
+                val pinyins = ArrayList<Pinyin>()
+                if (value == null)
+                    return Pinyins(pinyins)
+
+                val pinStrings = value.split(" ").toTypedArray()
+                var tone: Pinyin.Tone = Pinyin.Tone.NEUTRAL
+                pinStrings.forEach { syllable ->
+                    if (syllable.contains(Regex("[àèìòùǜ]"))) {
+                        tone = Pinyin.Tone.FALLING
+                    } else if (syllable.contains(Regex("[áéíóúǘ]"))) {
+                        tone = Pinyin.Tone.RISING
+                    } else if (syllable.contains(Regex("[ǎěǐǒǔǚ]"))) {
+                        tone = Pinyin.Tone.FALLING_RISING
+                    } else if (syllable.contains(Regex("[āēīōūǖ]"))) {
+                        tone = Pinyin.Tone.FLAT
+                    }
+
+                    pinyins.add(Pinyin(syllable, tone))
+                }
+
+                return Pinyins(pinyins)
             }
 
-            return s.dropLast(1)
+            @TypeConverter
+            @JvmStatic
+            fun toString(pinyins: Pinyins?): String {
+                if (pinyins == null) return ""
+
+                var s = ""
+
+                pinyins.forEach() { pinyin ->
+                    s += pinyin.syllable + ' '
+                }
+
+                return s.dropLast(1)
+            }
         }
     }
 
@@ -61,9 +91,18 @@ data class ChineseWord(
         HSK3(3),
         HSK4(4),
         HSK5(5),
-        HSK6(6);
+        HSK6(6),
+        HSK7(7),
+        HSK8(8),
+        HSK9(9),
+        NOT_HSK(10);
         companion object {
-            infix fun from(findValue: Int): HSK_Level = HSK_Level.valueOf("HSK$findValue")
+            fun from(findValue: Int): HSK_Level {
+                if (findValue == 10)
+                    return NOT_HSK
+                else
+                    return HSK_Level.valueOf("HSK$findValue")
+            }
         }
     }
 }

@@ -37,7 +37,8 @@ class Utils {
                 "",
                 mapOf(Locale.ENGLISH to context.getString(R.string.widget_default_english)),
                 ChineseWord.HSK_Level.HSK1,
-                ChineseWord.Pinyins(context.getString(R.string.widget_default_pinyin))
+                ChineseWord.Pinyins(context.getString(R.string.widget_default_pinyin)),
+                0
             )
         }
 

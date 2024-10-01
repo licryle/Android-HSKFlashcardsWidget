@@ -11,6 +11,10 @@ import androidx.fragment.app.Fragment
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.domain.FlashcardManager
 import fr.berliat.hskwidget.domain.Utils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Locale
 
 const val ARG_WIDGETID = "WIDGETID"
@@ -50,50 +54,59 @@ class FlashcardFragment : Fragment() {
     }
 
     fun updateFlashcardView() {
-        val currentWord = flashcardsMfr.getCurrentWord()
-        Log.i("FlashcardFragment", "Updating Fragment view with $currentWord")
+        GlobalScope.launch {
+            // Switch to the IO dispatcher to perform background work
+            val currentWord = withContext(Dispatchers.IO) {
+                flashcardsMfr.getCurrentWord()
+            }
 
-        val openDictionary: () -> Unit = {
-            flashcardsMfr.openDictionary()
+            // Switch back to the main thread to update UI
+            withContext(Dispatchers.Main) {
+                Log.i("FlashcardFragment", "Updating Fragment view with $currentWord")
+
+                val openDictionary: () -> Unit = {
+                    flashcardsMfr.openDictionary()
+                }
+
+                with(root.findViewById<TextView>(R.id.flashcard_chinese)) {
+                    setOnClickListener { openDictionary() }
+                    text = currentWord.simplified
+                }
+
+                with(root.findViewById<TextView>(R.id.flashcard_definition)) {
+                    setOnClickListener { openDictionary() }
+                    text = currentWord.definition[Locale.ENGLISH]
+                }
+
+                with(root.findViewById<TextView>(R.id.flashcard_pinyin)) {
+                    setOnClickListener { openDictionary() }
+                    text = currentWord.pinyins.toString()
+                }
+
+                with(root.findViewById<TextView>(R.id.flashcard_hsklevel)) {
+                    setOnClickListener { openDictionary() }
+                    text = currentWord.hskLevel.toString()
+                }
+
+                root.findViewById<View>(R.id.flashcard_speak).setOnClickListener{
+                    flashcardsMfr.playWidgetWord()
+                    Utils.logAnalyticsWidgetAction(
+                        context,
+                        Utils.ANALYTICS_EVENTS.WIDGET_PLAY_WORD, widgetId
+                    )
+                }
+
+                root.findViewById<View>(R.id.flashcard_reload).setOnClickListener{
+                    flashcardsMfr.updateWord()
+                    Utils.logAnalyticsWidgetAction(
+                        context,
+                        Utils.ANALYTICS_EVENTS.WIDGET_MANUAL_WORD_CHANGE, widgetId
+                    )
+                }
+
+                root.invalidate()
+            }
         }
-
-        with(root.findViewById<TextView>(R.id.flashcard_chinese)) {
-            setOnClickListener { openDictionary() }
-            text = currentWord.simplified
-        }
-
-        with(root.findViewById<TextView>(R.id.flashcard_definition)) {
-            setOnClickListener { openDictionary() }
-            text = currentWord.definition[Locale.ENGLISH]
-        }
-
-        with(root.findViewById<TextView>(R.id.flashcard_pinyin)) {
-            setOnClickListener { openDictionary() }
-            text = currentWord.pinyins.toString()
-        }
-
-        with(root.findViewById<TextView>(R.id.flashcard_hsklevel)) {
-            setOnClickListener { openDictionary() }
-            text = currentWord.HSK.toString()
-        }
-
-        root.findViewById<View>(R.id.flashcard_speak).setOnClickListener{
-            flashcardsMfr.playWidgetWord()
-            Utils.logAnalyticsWidgetAction(
-                context,
-                Utils.ANALYTICS_EVENTS.WIDGET_PLAY_WORD, widgetId
-            )
-        }
-
-        root.findViewById<View>(R.id.flashcard_reload).setOnClickListener{
-            flashcardsMfr.updateWord()
-            Utils.logAnalyticsWidgetAction(
-                context,
-                Utils.ANALYTICS_EVENTS.WIDGET_MANUAL_WORD_CHANGE, widgetId
-            )
-        }
-
-        root.invalidate()
     }
 
     override fun onCreateView(

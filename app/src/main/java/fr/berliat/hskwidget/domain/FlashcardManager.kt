@@ -5,16 +5,19 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import fr.berliat.hskwidget.data.model.ChineseWord
-import fr.berliat.hskwidget.data.store.ChineseWordsStore
+import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.data.store.FlashcardPreferencesStore
 import fr.berliat.hskwidget.ui.flashcard.FlashcardFragment
 import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class FlashcardManager private constructor(private val context: Context,
                                            private val widgetId: Int) {
-    private val dict = ChineseWordsStore.getInstance(context)
+    private val dict = ChineseWordsDatabase.getInstance(context).chineseWordDAO()
     private val fragments = mutableMapOf<Int, MutableSet<FlashcardFragment>>()
     private val flashCardPrefs = getPreferenceStore()
     private val appWidgetMgr = AppWidgetManager.getInstance(context)
@@ -23,17 +26,18 @@ class FlashcardManager private constructor(private val context: Context,
         return FlashcardPreferencesStore(context, widgetId)
     }
 
-    fun getCurrentWord() : ChineseWord {
+    suspend fun getCurrentWord() : ChineseWord {
         var currentWord = dict.findWordFromSimplified(flashCardPrefs.getCurrentSimplified())
 
         if (currentWord == null) currentWord = Utils.getDefaultWord(context)
 
         return currentWord
     }
-    fun getNewWord(): ChineseWord {
+
+    suspend fun getNewWord(): ChineseWord {
         val currentWord = dict.findWordFromSimplified(flashCardPrefs.getCurrentSimplified())
 
-        var newWord = dict.getRandomWord(flashCardPrefs.getAllowedHSK(), arrayListOf(currentWord!!))
+        var newWord = dict.getRandomHSKWord(flashCardPrefs.getAllowedHSK(), setOf(currentWord!!))
 
         if (newWord == null) newWord = Utils.getDefaultWord(context)
 
@@ -45,15 +49,23 @@ class FlashcardManager private constructor(private val context: Context,
 
     fun updateWord() {
         Log.i("FlashcardManager", "Word update requested")
-        getNewWord()
+        GlobalScope.launch {
+            // Switch to the IO dispatcher to perform background work
+            val result = withContext(Dispatchers.IO) {
+                getNewWord()
+            }
 
-        Log.i("FlashcardManager", "Now calling for fragments' update")
-        if (fragments[widgetId] != null)
-            fragments[widgetId]!!.forEach{it.updateFlashcardView() }
+            // Switch back to the main thread to update UI
+            withContext(Dispatchers.Main) {
+                Log.i("FlashcardManager", "Now calling for fragments' update")
+                if (fragments[widgetId] != null)
+                    fragments[widgetId]!!.forEach{it.updateFlashcardView() }
 
-        Log.i("FlashcardManager", "Now calling for widgets' update")
-        GlobalScope.async {
-            FlashcardWidgetProvider().updateFlashCardWidget(context, appWidgetMgr, widgetId)
+                Log.i("FlashcardManager", "Now calling for widgets' update")
+                GlobalScope.async {
+                    FlashcardWidgetProvider().updateFlashCardWidget(context, appWidgetMgr, widgetId)
+                }
+            }
         }
     }
 
