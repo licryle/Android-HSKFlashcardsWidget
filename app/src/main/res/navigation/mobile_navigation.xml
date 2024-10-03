@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/nav_dictionary">
+    app:startDestination="@+id/nav_widgets">
 
     <fragment
         android:id="@+id/nav_dictionary"
@@ -16,11 +16,20 @@
         android:name="fr.berliat.hskwidget.ui.dictionary.AnnotateFragment"
         android:label="@string/menu_dictionary"
         tools:layout="@layout/fragment_widgets" />
+
     <action
         android:id="@+id/annotateWord"
         app:destination="@id/nav_annotate">
         <argument
             android:name="simplifiedWord"
+            app:argType="string" />
+    </action>
+
+    <action
+        android:id="@+id/search"
+        app:destination="@id/nav_dictionary">
+        <argument
+            android:name="query"
             app:argType="string" />
     </action>
 

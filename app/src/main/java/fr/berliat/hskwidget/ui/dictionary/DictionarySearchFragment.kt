@@ -10,28 +10,24 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.dao.AnnotatedChineseWord
-import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class DictionarySearchFragment : Fragment() {
-
-    private lateinit var searchView: SearchView
     private lateinit var recyclerView: RecyclerView
     private lateinit var searchAdapter: DictionarySearchAdapter
 
     private var isLoading = false
     private var currentPage = 0
-    private var itemsPerPage = 50
+    private var itemsPerPage = 20
     private var currentSearch = ""
 
     override fun onCreateView(
@@ -40,11 +36,9 @@ class DictionarySearchFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_dictionary_search, container, false)
 
-        searchView = view.findViewById(R.id.search_view)
         recyclerView = view.findViewById(R.id.recycler_view)
 
         setupRecyclerView()
-        setupSearchView()
 
         return view
     }
@@ -74,31 +68,8 @@ class DictionarySearchFragment : Fragment() {
         })
     }
 
-    private fun setupSearchView() {
-        // Set listener to handle search queries
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            // Triggered when the search button is pressed (or search query submitted)
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                hideKeyboard()
-
-                query?.let {
-                    performSearch(it) // Call search method
-                }
-                return true
-            }
-
-            // Triggered when the query text is changed
-            override fun onQueryTextChange(newText: String?): Boolean {
-                newText?.let {
-                    performSearch(it) // Call search method
-                }
-                return true
-            }
-        })
-    }
-
     // Search logic: Fetch new data based on the search query
-    private fun performSearch(query: String) {
+    fun performSearch(query: String) {
         // Clear current results and reset pagination
         searchAdapter.clearData()
         currentPage = 0
@@ -115,6 +86,7 @@ class DictionarySearchFragment : Fragment() {
                 // Update the UI with the result
                 searchAdapter.addData(result)
                 isLoading = false
+                recyclerView.scrollToPosition(0) // @TODO(Licryle): chase down the bug that keeps the screen blank, sometimes.
             }
         }
     }

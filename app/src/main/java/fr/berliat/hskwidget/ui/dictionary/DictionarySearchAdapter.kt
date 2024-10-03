@@ -2,16 +2,13 @@ package fr.berliat.hskwidget.ui.dictionary
 
 import android.content.Context
 import android.content.res.ColorStateList
-import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import fr.berliat.hsktextviews.views.HSKWordView
@@ -19,7 +16,6 @@ import fr.berliat.hsktextviews.views.HSKWordView
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.dao.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWord
-import fr.berliat.hskwidget.data.model.ChineseWordAnnotation
 import java.util.Locale
 
 class DictionarySearchAdapter(private val context: Context,
@@ -58,16 +54,16 @@ class DictionarySearchAdapter(private val context: Context,
     class SearchViewHolder(private val context: Context,
                            private val fragment: Fragment,
                            itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val hanziView: HSKWordView = itemView.findViewById(R.id.HSKWord)
-        private val hskView: TextView = itemView.findViewById(R.id.hsk_level)
-        private val definitionView: TextView = itemView.findViewById(R.id.definition)
-        private val favView: ImageView = itemView.findViewById(R.id.fav_btn)
+        private val hanziView: HSKWordView = itemView.findViewById(R.id.dictionary_item_chinese)
+        private val hskView: TextView = itemView.findViewById(R.id.dictionary_item_hsk_level)
+        private val definitionView: TextView = itemView.findViewById(R.id.dictionary_item_definition)
+        private val favView: ImageView = itemView.findViewById(R.id.dictionary_item_favorite)
 
         fun bind(result: AnnotatedChineseWord) {
             hanziView.hanziText = result.simplified.toString()
 
             var hskViz = View.VISIBLE
-            if (result.word?.hskLevel == null || result.word?.hskLevel == ChineseWord.HSK_Level.NOT_HSK)
+            if (result.word?.hskLevel == null || result.word.hskLevel == ChineseWord.HSK_Level.NOT_HSK)
                 hskViz = View.INVISIBLE
             hskView.visibility = hskViz
             hskView.text = result.word?.hskLevel.toString()
