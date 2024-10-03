@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="HSKWordView">
+        <attr name="pinyin" format="string" />
+        <attr name="pinyinSize" format="dimension" />
+        <attr name="pinyinStyle" format="enum">
+            <enum name="normal" value="0" />
+            <enum name="bold" value="1" />
+            <enum name="italic" value="2" />
+        </attr>
+        <attr name="pinyinColor" format="color" />
+
+        <!-- Attributes for Hanzi TextView -->
+        <attr name="hanzi" format="string" />
+        <attr name="hanziSize" format="dimension" />
+        <attr name="hanziStyle" format="enum">
+            <enum name="normal" value="0" />
+            <enum name="bold" value="1" />
+            <enum name="italic" value="2" />
+        </attr>
+        <attr name="hanziColor" format="color" />
+    </declare-styleable>
+
+    <declare-styleable name="HSKTextView">
+        <attr name="text" format="string"/>
+    </declare-styleable>
+</resources>
