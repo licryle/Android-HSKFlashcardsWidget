@@ -5,7 +5,10 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
+import fr.berliat.hskwidget.data.model.ChineseWordAnnotation.ClassLevel
+import fr.berliat.hskwidget.data.model.ChineseWordAnnotation.ClassType
 import java.text.Normalizer
+import java.util.Date
 
 import java.util.Locale
 
@@ -18,7 +21,7 @@ data class ChineseWord(
     @ColumnInfo(name = "pinyins") val pinyins: Pinyins?,
     @ColumnInfo(name = "popularity") val popularity: Int?,
 ) {
-    @ColumnInfo(name = "searchable_text") var searchable_text: String =
+    @ColumnInfo(name = "searchable_text", defaultValue = "") var searchable_text: String =
         Normalizer.normalize(pinyins.toString() + " " + definition + " "
                 + traditional + " " + simplified,
             Normalizer.Form.NFD).replace("\\p{Mn}+".toRegex(), "")
@@ -103,6 +106,13 @@ data class ChineseWord(
                 else
                     return HSK_Level.valueOf("HSK$findValue")
             }
+        }
+    }
+
+    companion object {
+        fun getBlank(simplified: String = ""): ChineseWord {
+            return ChineseWord(simplified, "", mapOf<Locale, String>(), HSK_Level.NOT_HSK,
+                null, null)
         }
     }
 }

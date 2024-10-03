@@ -35,8 +35,8 @@ interface ChineseWordDAO {
     suspend fun getOnlyHSKLevels(hskLevels: Array<String>, bannedWords: Array<String>, limit: Int): Array<ChineseWord>
 
     @Insert
-    suspend fun insertAll(vararg users: ChineseWord)
+    suspend fun insertAll(vararg words: ChineseWord)
 
     @Delete
-    suspend fun delete(user: ChineseWord)
+    suspend fun delete(word: ChineseWord)
 }

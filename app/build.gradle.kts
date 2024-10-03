@@ -1,10 +1,9 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-
+    id("androidx.navigation.safeargs.kotlin") // Safe Args plugin
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
-
     id("com.google.devtools.ksp")
 }
 

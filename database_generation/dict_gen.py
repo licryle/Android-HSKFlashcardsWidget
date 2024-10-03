@@ -135,14 +135,17 @@ def build_dictionary(cedict_file: str, other_files: List[str], db_file: str):
     cursor = conn.cursor()
 
     # Create the table for Chinese words
-    cursor.execute("CREATE TABLE IF NOT EXISTS `AnnotatedChineseWord` (`simplified` TEXT NOT NULL, `pinyins` TEXT, `notes` TEXT, `class` TEXT, `level` TEXT, `themes` TEXT, `first_seen` INTEGER, `is_exam` INTEGER, PRIMARY KEY(`simplified`))");
-    cursor.execute("CREATE TABLE IF NOT EXISTS `ChineseWord` (`simplified` TEXT NOT NULL, `traditional` TEXT, `definition` TEXT NOT NULL, `hsk_level` TEXT, `pinyins` TEXT, `popularity` INTEGER, `searchable_text` TEXT NOT NULL, PRIMARY KEY(`simplified`))");
+    cursor.execute("DROP TABLE IF EXISTS ChineseWordAnnotation")
+    cursor.execute("DROP TABLE IF EXISTS ChineseWord")
+    cursor.execute("CREATE TABLE IF NOT EXISTS `ChineseWordAnnotation` (`a_simplified` TEXT NOT NULL, `a_pinyins` TEXT, `notes` TEXT, `class_level` TEXT, `class_type` TEXT, `themes` TEXT, `first_seen` INTEGER, `is_exam` INTEGER, `a_searchable_text` TEXT DEFAULT '' NOT NULL, PRIMARY KEY(`a_simplified`))");
+    cursor.execute("CREATE TABLE IF NOT EXISTS `ChineseWord` (`simplified` TEXT NOT NULL, `traditional` TEXT, `definition` TEXT NOT NULL, `hsk_level` TEXT, `pinyins` TEXT, `popularity` INTEGER, `searchable_text` TEXT DEFAULT '' NOT NULL, PRIMARY KEY(`simplified`))");
     cursor.execute("CREATE INDEX IF NOT EXISTS `index_ChineseWord_searchable_text` ON `ChineseWord` (`searchable_text`)");
+    cursor.execute("CREATE INDEX IF NOT EXISTS `index_ChineseWordAnnotation_searchable_text` ON `ChineseWordAnnotation` (`a_searchable_text`)");
     cursor.execute("CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)");
     cursor.execute("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a9ad28dc3f7678cb0054d25aebcc6010')");
     
     cursor.execute("DELETE FROM ChineseWord")
-    print("Truncated ChineseWord table")
+    print("Truncated tables")
 
     for word in cedict_words.values():
         cursor.execute('''

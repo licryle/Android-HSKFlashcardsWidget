@@ -61,4 +61,20 @@ We recommend to choose the level your at plus the one below, or above depending 
     <string name="speech_failure_toast_chinese_unsupported">Please install the "Chinese (China)" voice</string>
     <string name="speech_failure_toast_init">www</string>
     <string name="menu_dictionary">Dictionary</string>
+    <string name="menu_annotate">Annotate a word</string>
+    <string name="annotation_edit_save">Save</string>
+    <string name="annotation_edit_delete">Delete</string>
+    <string name="annotation_edit_is_exam_hint">Is it at the exam?</string>
+    <string name="annotation_edit_themes_hint">Themes covered:</string>
+    <string name="annotation_edit_class_level_hint">Class level:</string>
+    <string name="annotation_edit_class_type_hint">Class type:</string>
+    <string name="annotation_edit_notes_hint">Enter your notes:</string>
+    <string name="annotation_edit_delete_success">%1$s successfully deleted</string>
+    <string name="annotation_edit_delete_failure">Couldn\'t delete %1$s: %2$s</string>
+    <string name="annotation_edit_save_success">%1$s successfully saved</string>
+    <string name="annotation_edit_save_failure">Couldn\'t save %1$s: %2$s</string>
+    <string name="annotation_edit_delete_confirm_title">Confirm deletion</string>
+    <string name="annotation_edit_delete_confirm_message">Are you sure you want to *delete* this annotation?</string>
+    <string name="annotation_edit_delete_confirm_no">Cancel</string>
+    <string name="annotation_edit_delete_confirm_yes">Delete</string>
 </resources>

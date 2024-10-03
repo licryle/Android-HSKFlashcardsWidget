@@ -1,0 +1,155 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="10">
+
+        <!-- Display fields from ChineseWord -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/annotation_edit_pinyins"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="nihao"
+                android:layout_gravity="center" />
+
+            <TextView
+                android:id="@+id/annotation_edit_simplified"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="你好"
+                android:layout_gravity="center" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/annotation_edit_definition"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="wrap_content"
+            android:layout_height="2dp"
+            android:background="@color/material_dynamic_secondary0">
+        </View>
+
+        <!-- Editable fields from ChineseWordAnnotation -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="@string/annotation_edit_notes_hint"/>
+            <EditText
+                android:id="@+id/annotation_edit_notes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Notes" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="wrap_content"
+            android:layout_height="2dp"
+            android:background="@color/material_dynamic_secondary0">
+        </View>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="@string/annotation_edit_class_type_hint"/>
+            <Spinner
+                android:id="@+id/annotation_edit_class_type"
+                android:layout_width="@dimen/annotation_edit_rightcol"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="@string/annotation_edit_class_level_hint"/>
+            <Spinner
+                android:id="@+id/annotation_edit_class_level"
+                android:layout_width="@dimen/annotation_edit_rightcol"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="@string/annotation_edit_themes_hint"/>
+            <EditText
+                android:id="@+id/annotation_edit_themes"
+                android:layout_width="@dimen/annotation_edit_rightcol"
+                android:layout_height="wrap_content"
+                android:hint="Themes" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:text="@string/annotation_edit_is_exam_hint"/>
+
+            <com.google.android.material.materialswitch.MaterialSwitch xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/annotation_edit_is_exam"
+                android:layout_width="@dimen/annotation_edit_rightcol"
+                android:layout_height="wrap_content"
+                android:focusable="false"
+                android:clickable="true"
+                app:thumbIcon="@drawable/ic_done_24dp"
+                android:background="@null" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <Button
+            android:id="@+id/annotation_edit_delete"
+            style="@style/Widget.Material3.Button.ElevatedButton.Icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:text="@string/annotation_edit_delete" />
+
+        <Button
+            android:id="@+id/annotation_edit_save"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:text="@string/annotation_edit_save" />
+    </LinearLayout>
+</LinearLayout>

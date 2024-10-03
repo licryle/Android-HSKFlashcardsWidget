@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 import fr.berliat.hskwidget.R
+import fr.berliat.hskwidget.data.dao.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import kotlinx.coroutines.Dispatchers
@@ -49,7 +50,7 @@ class DictionarySearchFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        searchAdapter = DictionarySearchAdapter()
+        searchAdapter = DictionarySearchAdapter(requireContext(), requireParentFragment())
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = searchAdapter
 
@@ -57,7 +58,9 @@ class DictionarySearchFragment : Fragment() {
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
-                hideKeyboard()
+
+                if (dx >= 10 || dy >= 10)
+                    hideKeyboard()
 
                 val layoutManager = recyclerView.layoutManager as LinearLayoutManager
                 val totalItemCount = layoutManager.itemCount
@@ -126,10 +129,10 @@ class DictionarySearchFragment : Fragment() {
     }
 
     // Simulate fetching search results based on the query and current page
-    private suspend fun fetchResultsForPage(query: String): List<ChineseWord> {
+    private suspend fun fetchResultsForPage(query: String): List<AnnotatedChineseWord> {
         Log.d("DictionarySearchFragment", "Searching for $query")
         val db = ChineseWordsDatabase.getInstance(requireContext())
-        val dao = db.chineseWordDAO()
+        val dao = db.annotatedChineseWordDAO()
         try {
             val results = dao.findWordFromStrLike(query, currentPage, itemsPerPage)
             Log.d("DictionarySearchFragment", "Search returned for $query")
