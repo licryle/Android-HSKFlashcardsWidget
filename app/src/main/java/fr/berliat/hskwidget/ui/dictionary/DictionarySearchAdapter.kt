@@ -21,17 +21,17 @@ import java.util.Locale
 class DictionarySearchAdapter(private val context: Context,
                               private val fragment: Fragment
 )  :
-    RecyclerView.Adapter<DictionarySearchAdapter.SearchViewHolder>() {
+    RecyclerView.Adapter<DictionarySearchAdapter.SearchResultItem>() {
 
     private val results = mutableListOf<AnnotatedChineseWord>()
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchResultItem {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.fragment_dictionary_search_item, parent, false)
-        return SearchViewHolder(context, fragment, view)
+        return SearchResultItem(context, fragment, view)
     }
 
-    override fun onBindViewHolder(holder: SearchViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: SearchResultItem, position: Int) {
         holder.bind(results[position])
     }
 
@@ -51,7 +51,7 @@ class DictionarySearchAdapter(private val context: Context,
         notifyDataSetChanged()
     }
 
-    class SearchViewHolder(private val context: Context,
+    class SearchResultItem(private val context: Context,
                            private val fragment: Fragment,
                            itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val hanziView: HSKWordView = itemView.findViewById(R.id.dictionary_item_chinese)

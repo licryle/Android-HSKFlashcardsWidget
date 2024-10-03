@@ -26,8 +26,9 @@ class HSKWordView @JvmOverloads constructor(
         pinyinView = findViewById(R.id.pinyin)
         hanziView = findViewById(R.id.hanzi)
 
-        pinyinView.setOnClickListener { clickListener?.onWordClick(this) }
-        hanziView.setOnClickListener { clickListener?.onWordClick(this) }
+        rootView.setOnClickListener { clickListener?.onWordClick(this) }
+        /*pinyinView.setOnClickListener { clickListener?.onWordClick(this) }
+        hanziView.setOnClickListener { clickListener?.onWordClick(this) }*/
 
         attrs?.let {
             val typedArray = context.obtainStyledAttributes(it, R.styleable.HSKWordView, 0, 0)
@@ -49,7 +50,7 @@ class HSKWordView @JvmOverloads constructor(
         }
     }
 
-    fun setOnClickListener(listener: OnHSKWordClickListener) {
+    fun setOnWordClickListener(listener: OnHSKWordClickListener) {
         clickListener = listener
     }
 

@@ -2,64 +2,73 @@ package fr.berliat.hsktextviews.views
 
 import android.content.Context
 import android.util.AttributeSet
-import android.widget.LinearLayout
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.flexbox.FlexboxLayoutManager
+import com.google.android.flexbox.FlexDirection
+import com.google.android.flexbox.JustifyContent
+import com.google.android.flexbox.FlexWrap
+
+import org.ansj.splitWord.analysis.ToAnalysis
+
 import fr.berliat.hsktextviews.R
 
-interface OnHSKTextClickListener {
-    fun onWordClick(wordView: HSKWordView)
-}
-
-// @todo(Licryle): finish implementing, so abstract for now
-abstract class HSKTextView @JvmOverloads constructor(
+class HSKTextView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
-) : LinearLayout(context, attrs, defStyleAttr), OnHSKWordClickListener {
-    private var clickListener: OnHSKTextClickListener? = null
+) : RecyclerView(context, attrs, defStyleAttr), OnHSKWordClickListener {
+    private lateinit var clickListener: (HSKWordView) -> Unit?
+    private lateinit var wordsAdapter: HSKWordsAdapter
+    private var originalText : String = ""
+    private val loManager: FlexboxLayoutManager = FlexboxLayoutManager(context)
 
     init {
-        inflate(context, R.layout.hsk_text_view, this)
+        loManager.flexDirection = FlexDirection.ROW
+        loManager.flexWrap = FlexWrap.WRAP
+        loManager.justifyContent = JustifyContent.FLEX_START
+        layoutManager = loManager
+        wordsAdapter = HSKWordsAdapter(this)
+        adapter = wordsAdapter
+
 
         attrs?.let {
             val typedArray = context.obtainStyledAttributes(it, R.styleable.HSKTextView, 0, 0)
-            val hskText = typedArray.getString(R.styleable.HSKTextView_text)
+            //text = typedArray.getString(R.styleable.HSKTextView_text).toString()
             typedArray.recycle()
-
-            if (hskText != null)
-                setText(hskText)
         }
     }
 
-    fun addWord(hanzi: String, pinyin: String) {
-        val wordView = this
+    var text: String
+        get() = originalText
+        set(value) {
+            originalText = value
+            //val result = ToAnalysis.parse(value)
 
-        val itemView = HSKWordView(context).apply {
-            hanziText = hanzi
-            pinyinText = pinyin
-            setOnClickListener(wordView)
-        }
-        addView(itemView)
-    }
+            println(value)
+            //println(result)
 
-    fun setText(text: String) {
-        // @todo(Licryle): break text properly
-        text.chunked(1)?.forEach {
-            val hanzi = it
-            val pinyin = hanziToPinyin(hanzi)
-            addWord(hanzi, pinyin)
+            val words = mutableListOf<Pair<String, String>>()
+            //result.terms.forEach {
+
+            // @todo(Licryle): find a way to split words
+            value.chunked(2).forEach {
+                words.add(Pair(it, hanziToPinyin(it)))
+            }
+
+            wordsAdapter.addData(words)
         }
-    }
 
     fun hanziToPinyin(hanzi: String): String {
         // @todo(Licryle): look up pinyin
-        return hanzi
+        return "hanzi"
     }
 
-    fun setOnClickListener(listener: OnHSKTextClickListener) {
+    fun setOnWordClickListener(listener: (HSKWordView) -> Unit) {
         clickListener = listener
     }
 
     override fun onWordClick(wordView: HSKWordView) {
-        clickListener?.onWordClick(wordView)
+        if (clickListener != null)
+            clickListener(wordView)
     }
 }

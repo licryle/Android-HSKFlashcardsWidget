@@ -61,6 +61,8 @@ dependencies {
     implementation("androidx.preference:preference-ktx:1.2.1")
     implementation("androidx.datastore:datastore-preferences-core:1.0.0")
     implementation("androidx.databinding:adapters:3.2.0-alpha11")
+    implementation("androidx.core:core:1.12.0")
+    implementation("com.google.android.gms:play-services-mlkit-text-recognition:19.0.1")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -109,4 +111,20 @@ dependencies {
     implementation("androidx.room:room-paging:$room_version")
 
     implementation(project(":hsktextviews"))
+
+    val camerax_version = "1.2.2"
+    implementation("androidx.camera:camera-core:${camerax_version}")
+    implementation("androidx.camera:camera-camera2:${camerax_version}")
+    implementation("androidx.camera:camera-lifecycle:${camerax_version}")
+    implementation("androidx.camera:camera-video:${camerax_version}")
+
+    implementation("androidx.camera:camera-view:${camerax_version}")
+    implementation("androidx.camera:camera-extensions:${camerax_version}")
+
+    // Text features
+    implementation("com.google.mlkit:text-recognition-chinese:16.0.0")
+
+    implementation("com.github.yalantis:ucrop:2.2.9-native")
+
+    implementation("org.ansj:ansj_seg:5.1.6")
 }

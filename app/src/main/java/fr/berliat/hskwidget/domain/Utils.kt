@@ -7,6 +7,8 @@ import android.content.Intent
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.net.Uri
 import android.os.Bundle
+import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.work.OneTimeWorkRequestBuilder
@@ -112,6 +114,13 @@ class Utils {
             )
 
             workMgr.enqueue(speechRequest)
+        }
+
+        fun hideKeyboard(context: Context, view: View) {
+            val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            view.let {
+                imm.hideSoftInputFromWindow(it.windowToken, 0)
+            }
         }
 
         fun logAnalyticsEvent(
@@ -227,4 +236,5 @@ class Utils {
         private fun Context.dip(value: Int): Int =
             (value * resources.displayMetrics.density).toInt()
     }
+
 }

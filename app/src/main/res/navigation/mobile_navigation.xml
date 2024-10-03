@@ -3,27 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/nav_widgets">
+    app:startDestination="@+id/nav_ocr_read">
 
     <fragment
         android:id="@+id/nav_dictionary"
         android:name="fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragment"
         android:label="@string/menu_dictionary"
-        tools:layout="@layout/fragment_widgets" />
-
-    <fragment
-        android:id="@+id/nav_annotate"
-        android:name="fr.berliat.hskwidget.ui.dictionary.AnnotateFragment"
-        android:label="@string/menu_dictionary"
-        tools:layout="@layout/fragment_widgets" />
-
-    <action
-        android:id="@+id/annotateWord"
-        app:destination="@id/nav_annotate">
-        <argument
-            android:name="simplifiedWord"
-            app:argType="string" />
-    </action>
+        tools:layout="@layout/fragment_dictionary_search" />
 
     <action
         android:id="@+id/search"
@@ -33,6 +19,49 @@
             app:argType="string" />
     </action>
 
+    <fragment
+        android:id="@+id/nav_annotate"
+        android:name="fr.berliat.hskwidget.ui.dictionary.AnnotateFragment"
+        android:label="@string/menu_dictionary"
+        tools:layout="@layout/fragment_annotation_edit" />
+
+    <action
+        android:id="@+id/annotateWord"
+        app:destination="@id/nav_annotate">
+        <argument
+            android:name="simplifiedWord"
+            app:argType="string" />
+    </action>
+
+    <fragment
+        android:id="@+id/nav_ocr_capture"
+        android:name="fr.berliat.hskwidget.ui.OCR.CaptureImageFragment"
+        android:label="@string/menu_ocr"
+        tools:layout="@layout/fragment_ocr_capture" />
+    <action
+        android:id="@+id/incrementalOCR"
+        app:destination="@id/nav_ocr_capture">
+        <argument
+            android:name="incrementalOCR"
+            app:argType="boolean" />
+    </action>
+
+    <fragment
+        android:id="@+id/nav_ocr_read"
+        android:name="fr.berliat.hskwidget.ui.OCR.DisplayOCRFragment"
+        android:label="@string/menu_ocr"
+        tools:layout="@layout/fragment_ocr_display" />
+
+    <action
+        android:id="@+id/displayOCR"
+        app:destination="@id/nav_ocr_read">
+        <argument
+            android:name="text"
+            app:argType="string" />
+        <argument
+            android:name="incrementalOCR"
+            app:argType="boolean" />
+    </action>
 
     <fragment
         android:id="@+id/nav_widgets"

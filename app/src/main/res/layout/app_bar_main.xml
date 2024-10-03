@@ -14,16 +14,24 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize">
 
+            <ImageView
+                android:id="@+id/appbar_ocr"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:src="@drawable/photo_camera_24px"
+                android:layout_margin="10dp" />
+
             <!-- Search Bar at the Top -->
             <androidx.appcompat.widget.SearchView
-                android:id="@+id/search_view"
+                android:id="@+id/appbar_search"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
                 android:layout_weight="1"
                 android:iconifiedByDefault="true"
                 android:queryHint="@string/search_hint"
-                android:layout_margin="16dp" />
+                android:layout_margin="0dp" />
         </androidx.appcompat.widget.Toolbar>
 
     </com.google.android.material.appbar.AppBarLayout>

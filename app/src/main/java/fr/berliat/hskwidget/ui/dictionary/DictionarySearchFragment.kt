@@ -1,6 +1,5 @@
 package fr.berliat.hskwidget.ui.dictionary
 
-import android.content.Context
 import kotlinx.coroutines.async
 import kotlinx.coroutines.GlobalScope
 
@@ -9,7 +8,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -17,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.dao.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
+import fr.berliat.hskwidget.domain.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -40,12 +39,11 @@ class DictionarySearchFragment : Fragment() {
 
         setupRecyclerView()
 
-        return view
-    }
+        arguments?.let {
+            performSearch(arguments?.getString("query") ?: "")
+        }
 
-    override fun onStart() {
-        super.onStart()
-        performSearch("")
+        return view
     }
 
     private fun setupRecyclerView() {
@@ -59,7 +57,7 @@ class DictionarySearchFragment : Fragment() {
                 super.onScrolled(recyclerView, dx, dy)
 
                 if (dx >= 10 || dy >= 10)
-                    hideKeyboard()
+                    Utils.hideKeyboard(requireContext(), requireView())
 
                 val layoutManager = recyclerView.layoutManager as LinearLayoutManager
                 val totalItemCount = layoutManager.itemCount
@@ -123,11 +121,6 @@ class DictionarySearchFragment : Fragment() {
         }
 
         return emptyList()
-    }
-
-    fun hideKeyboard() {
-        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(requireView().windowToken , 0)
     }
 }
 

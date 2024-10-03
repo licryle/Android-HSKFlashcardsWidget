@@ -1,9 +1,8 @@
 package fr.berliat.hskwidget
 
-import android.content.Context
 import android.os.Bundle
 import android.view.Menu
-import android.view.inputmethod.InputMethodManager
+import android.widget.ImageView
 import com.google.android.material.navigation.NavigationView
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -13,15 +12,19 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import fr.berliat.hskwidget.databinding.ActivityMainBinding
+import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragment
 import fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragmentDirections
+import org.ansj.splitWord.analysis.ToAnalysis
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
+    private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,7 +36,7 @@ class MainActivity : AppCompatActivity() {
 
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
+        navController = findNavController(R.id.nav_host_fragment_content_main)
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(
@@ -44,16 +47,23 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
-        setupSearchView()
+        setupSearchBtn()
+        setupOCRBtn()
     }
 
-    private fun setupSearchView() {
-        val searchView: SearchView = findViewById(R.id.search_view)
+    private fun setupOCRBtn() {
+        val ocrBtnView: ImageView = findViewById(R.id.appbar_ocr)
+
+        ocrBtnView.setOnClickListener { navController.navigate(R.id.nav_ocr_capture) }
+    }
+
+    private fun setupSearchBtn() {
+        val searchBtnView: SearchView = findViewById(R.id.appbar_search)
         // Set listener to handle search queries
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+        searchBtnView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             // Triggered when the search button is pressed (or search query submitted)
             override fun onQueryTextSubmit(query: String?): Boolean {
-                hideKeyboard()
+                Utils.hideKeyboard(applicationContext, currentFocus!!)
 
                 return onQueryTextChange(query)
             }
@@ -67,7 +77,6 @@ class MainActivity : AppCompatActivity() {
                 if (currentFragment is DictionarySearchFragment) {
                     currentFragment.performSearch(query.toString())
                 } else {
-                    val navController = findNavController(R.id.nav_host_fragment_content_main)
                     val action = DictionarySearchFragmentDirections.search(query.toString())
                     navController.navigate(action)
                 }
@@ -86,12 +95,5 @@ class MainActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
-    }
-
-    fun hideKeyboard() {
-        val imm = applicationContext.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        currentFocus?.let {
-            imm.hideSoftInputFromWindow(it.windowToken, 0)
-        }
     }
 }
