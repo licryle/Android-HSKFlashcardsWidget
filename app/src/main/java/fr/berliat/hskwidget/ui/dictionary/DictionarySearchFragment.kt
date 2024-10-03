@@ -43,6 +43,11 @@ class DictionarySearchFragment : Fragment() {
         return view
     }
 
+    override fun onStart() {
+        super.onStart()
+        performSearch("")
+    }
+
     private fun setupRecyclerView() {
         searchAdapter = DictionarySearchAdapter(requireContext(), requireParentFragment())
         recyclerView.layoutManager = LinearLayoutManager(context)
@@ -84,8 +89,8 @@ class DictionarySearchFragment : Fragment() {
             // Switch back to the main thread to update UI
             withContext(Dispatchers.Main) {
                 // Update the UI with the result
-                searchAdapter.addData(result)
                 isLoading = false
+                searchAdapter.addData(result)
                 recyclerView.scrollToPosition(0) // @TODO(Licryle): chase down the bug that keeps the screen blank, sometimes.
             }
         }
@@ -96,8 +101,8 @@ class DictionarySearchFragment : Fragment() {
         isLoading = true
 
         val newResults = fetchResultsForPage(currentSearch)
-        searchAdapter.addData(newResults)
         isLoading = false
+        searchAdapter.addData(newResults)
     }
 
     // Simulate fetching search results based on the query and current page
