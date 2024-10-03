@@ -20,6 +20,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
                 android:src="@drawable/photo_camera_24px"
+                android:contentDescription="@string/appbar_ocr"
                 android:layout_margin="10dp" />
 
             <!-- Search Bar at the Top -->

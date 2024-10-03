@@ -18,7 +18,7 @@ class HSKTextView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : RecyclerView(context, attrs, defStyleAttr), OnHSKWordClickListener {
     private lateinit var clickListener: (HSKWordView) -> Unit?
-    private lateinit var wordsAdapter: HSKWordsAdapter
+    private val wordsAdapter: HSKWordsAdapter
     private var originalText : String = ""
     private val loManager: FlexboxLayoutManager = FlexboxLayoutManager(context)
 

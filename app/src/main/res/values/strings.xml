@@ -81,4 +81,6 @@ We recommend to choose the level your at plus the one below, or above depending 
     <string name="dictionary_item_hsk">HSK3</string>
     <string name="search_hint">Search pinyin, definition, hanzi</string>
     <string name="menu_ocr">OCR</string>
+    <string name="image_capture_button" />
+    <string name="appbar_ocr">Start OCR</string>
 </resources>

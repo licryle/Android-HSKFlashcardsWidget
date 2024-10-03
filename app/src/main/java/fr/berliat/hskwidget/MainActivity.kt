@@ -18,7 +18,6 @@ import fr.berliat.hskwidget.databinding.ActivityMainBinding
 import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragment
 import fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragmentDirections
-import org.ansj.splitWord.analysis.ToAnalysis
 
 class MainActivity : AppCompatActivity() {
 
