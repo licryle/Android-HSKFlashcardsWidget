@@ -129,8 +129,13 @@ class AnnotateFragment: Fragment() {
 
         view.findViewById<Button>(R.id.annotation_edit_save).setOnClickListener(
             { onSaveClick() })
-        view.findViewById<Button>(R.id.annotation_edit_delete).setOnClickListener(
-            { showDeleteConfirmationDialog() })
+
+        val delBtn = view.findViewById<Button>(R.id.annotation_edit_delete)
+        if (annotatedWord.hasAnnotation()) {
+            delBtn.setOnClickListener({ showDeleteConfirmationDialog() })
+        } else {
+            delBtn.visibility = View.GONE
+        }
 
         return view
     }

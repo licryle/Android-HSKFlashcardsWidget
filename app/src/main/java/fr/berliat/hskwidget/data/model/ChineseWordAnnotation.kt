@@ -53,7 +53,7 @@ data class ChineseWordAnnotation (
     companion object {
         fun getBlank(simplified: String = ""): ChineseWordAnnotation {
             return ChineseWordAnnotation(simplified, null, "", ClassType.NotFromClass,
-                ClassLevel.NotFromClass, "", Date(), false)
+                ClassLevel.NotFromClass, "", null, false)
         }
     }
 }
