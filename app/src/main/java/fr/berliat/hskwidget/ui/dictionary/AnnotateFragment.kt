@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.materialswitch.MaterialSwitch
+import fr.berliat.hsktextviews.views.HSKWordView
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.dao.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWordAnnotation
@@ -31,8 +32,7 @@ class AnnotateFragment: Fragment() {
     private lateinit var viewModel: AnnotateViewModel
     private lateinit var view : View
 
-    private lateinit var simplifiedTextView: TextView
-    private lateinit var pinyinsTextView: TextView
+    private lateinit var chineseTextView: HSKWordView
     private lateinit var definitionTextText: TextView
     private lateinit var notesEditText: EditText
     private lateinit var classTypeSpinner: Spinner
@@ -58,8 +58,7 @@ class AnnotateFragment: Fragment() {
         val factory = AnnotateViewModelFactory(requireContext())
         viewModel = ViewModelProvider(this, factory).get(AnnotateViewModel::class.java)
 
-        simplifiedTextView = view.findViewById(R.id.annotation_edit_simplified)
-        pinyinsTextView = view.findViewById(R.id.annotation_edit_pinyins)
+        chineseTextView = view.findViewById(R.id.annotation_edit_chinese)
         notesEditText = view.findViewById(R.id.annotation_edit_notes)
         definitionTextText = view.findViewById(R.id.annotation_edit_definition)
         classTypeSpinner = view.findViewById(R.id.annotation_edit_class_type)
@@ -79,7 +78,7 @@ class AnnotateFragment: Fragment() {
                 }
                 // Switch back to the main thread to update UI
                 withContext(Dispatchers.Main) {
-                    if (annotatedWord?.hasAnnotation() == false) { // failure or new word
+                    if (!annotatedWord.hasAnnotation()) { // failure or new word
                         annotatedWord = AnnotatedChineseWord(
                             annotatedWord.word,
                             ChineseWordAnnotation.getBlank(simplifiedWord)
@@ -98,7 +97,7 @@ class AnnotateFragment: Fragment() {
         viewModel = ViewModelProvider(this).get(AnnotateViewModel::class.java)
 
         // Populate the ClassType Spinner programmatically
-        val classTypes = ChineseWordAnnotation.ClassType.values().map { it.type }  // Convert enum to list of strings
+        val classTypes = ChineseWordAnnotation.ClassType.entries.map { it.type }  // Convert enum to list of strings
         val classTypeAdapter = ArrayAdapter(
             requireContext(),
             android.R.layout.simple_spinner_item,
@@ -108,7 +107,7 @@ class AnnotateFragment: Fragment() {
         classTypeSpinner.adapter = classTypeAdapter
 
         // Populate the ClassLevel Spinner programmatically
-        val classLevels = ChineseWordAnnotation.ClassLevel.values().map { it.lvl }
+        val classLevels = ChineseWordAnnotation.ClassLevel.entries.map { it.lvl }
         val classLevelAdapter = ArrayAdapter(
             requireContext(),
             android.R.layout.simple_spinner_item,
@@ -118,8 +117,8 @@ class AnnotateFragment: Fragment() {
         classLevelSpinner.adapter = classLevelAdapter
 
         // Update UI with ChineseWord fields
-        simplifiedTextView.text = annotatedWord.word?.simplified
-        pinyinsTextView.text = annotatedWord.word?.pinyins.toString()
+        chineseTextView.hanziText = annotatedWord.word?.simplified.toString()
+        chineseTextView.pinyinText = annotatedWord.word?.pinyins.toString()
 
         // Populate fields from ChineseWordAnnotation
         notesEditText.setText(annotatedWord.annotation?.notes)
@@ -187,8 +186,8 @@ class AnnotateFragment: Fragment() {
             simplified = simplifiedWord,
             pinyins = null,  // Assume pinyins are handled elsewhere
             notes = notesEditText.text.toString(),
-            classType = ChineseWordAnnotation.ClassType.values()[classTypeSpinner.selectedItemPosition],
-            level = ChineseWordAnnotation.ClassLevel.values()[classLevelSpinner.selectedItemPosition],
+            classType = ChineseWordAnnotation.ClassType.entries[classTypeSpinner.selectedItemPosition],
+            level = ChineseWordAnnotation.ClassLevel.entries[classLevelSpinner.selectedItemPosition],
             themes = themesEditText.text.toString(),
             firstSeen = firstSeen,  // Handle date logic
             isExam = isExamSwitch.isChecked

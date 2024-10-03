@@ -10,13 +10,13 @@
 
     <!-- Bookmark Icon -->
     <ImageView
-        android:id="@+id/fav_btn"
+        android:id="@+id/dictionary_item_favorite"
         android:layout_width="45dp"
         android:layout_height="45dp"
         android:layout_margin="0dp"
         android:padding="0dp"
         android:src="@drawable/bookmark_24px"
-        android:contentDescription="Favorite"
+        android:contentDescription="@string/dictionary_item_favorite"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -30,27 +30,29 @@
 
         <!-- Chinese Character -->
         <fr.berliat.hsktextviews.views.HSKWordView
-            android:id="@+id/HSKWord"
+            android:id="@+id/dictionary_item_chinese"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
             app:pinyin="@string/widget_default_pinyin"
-            app:pinyinSize="10sp"
+            app:pinyinSize="8sp"
             app:pinyinColor="@android:color/darker_gray"
 
             app:hanzi="@string/widget_default_chinese"
-            app:hanziSize="15sp"
+            app:hanziSize="13sp"
             app:hanziColor="@android:color/black"
             app:hanziStyle="bold"
 
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintRight_toLeftOf="@id/definition"/>
+            app:layout_constraintRight_toLeftOf="@id/dictionary_item_definition"
+            android:paddingStart="0dp"
+            android:paddingEnd="5dp"/>
 
 
         <!-- English Definition -->
         <TextView
-            android:id="@+id/definition"
+            android:id="@+id/dictionary_item_definition"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@string/widget_default_english"
@@ -59,15 +61,15 @@
             android:textColor="@android:color/black"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toRightOf="@id/HSKWord"
-            app:layout_constraintRight_toLeftOf="@id/hsk_level" />
+            app:layout_constraintLeft_toRightOf="@id/dictionary_item_chinese"
+            app:layout_constraintRight_toLeftOf="@id/dictionary_item_hsk_level" />
 
         <!-- HSK Level -->
         <TextView
-            android:id="@+id/hsk_level"
+            android:id="@+id/dictionary_item_hsk_level"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="HSK 3"
+            android:text="@string/dictionary_item_hsk"
             android:textSize="16sp"
             android:textColor="@android:color/holo_blue_dark"
             app:layout_constraintEnd_toEndOf="parent"

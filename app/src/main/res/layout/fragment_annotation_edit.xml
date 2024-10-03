@@ -1,5 +1,6 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -7,7 +8,7 @@
 
     <LinearLayout android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_weight="10">
 
         <!-- Display fields from ChineseWord -->
@@ -15,25 +16,29 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/annotation_edit_pinyins"
+            <fr.berliat.hsktextviews.views.HSKWordView
+                android:id="@+id/annotation_edit_chinese"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="nihao"
-                android:layout_gravity="center" />
 
-            <TextView
-                android:id="@+id/annotation_edit_simplified"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="你好"
-                android:layout_gravity="center" />
+                app:pinyin="@string/widget_default_pinyin"
+                app:pinyinSize="8sp"
+                app:pinyinColor="@android:color/darker_gray"
+
+                app:hanzi="@string/widget_default_chinese"
+                app:hanziSize="13sp"
+                app:hanziColor="@android:color/black"
+                app:hanziStyle="bold"
+
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintRight_toLeftOf="@id/dictionary_item_definition"
+                android:layout_gravity="center"/>
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="0dp">
             <TextView
                 android:id="@+id/annotation_edit_definition"
                 android:layout_width="match_parent"
@@ -59,7 +64,9 @@
                 android:id="@+id/annotation_edit_notes"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Notes" />
+                android:inputType="textAutoComplete"
+                android:autofillHints=""
+                android:hint="@string/annotation_edit_notes_hint" />
         </LinearLayout>
 
         <View
@@ -72,7 +79,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="@string/annotation_edit_class_type_hint"/>
@@ -86,7 +93,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="@string/annotation_edit_class_level_hint"/>
@@ -100,15 +107,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
+                android:autofillHints=""
                 android:layout_weight="1"
                 android:text="@string/annotation_edit_themes_hint"/>
             <EditText
                 android:id="@+id/annotation_edit_themes"
                 android:layout_width="@dimen/annotation_edit_rightcol"
                 android:layout_height="wrap_content"
-                android:hint="Themes" />
+                android:inputType="textAutoCorrect"
+                android:hint="@string/annotation_edit_themes_hint" />
         </LinearLayout>
 
 
@@ -116,14 +125,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:gravity="center_vertical"
                 android:text="@string/annotation_edit_is_exam_hint"/>
 
-            <com.google.android.material.materialswitch.MaterialSwitch xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
+            <com.google.android.material.materialswitch.MaterialSwitch
                 android:id="@+id/annotation_edit_is_exam"
                 android:layout_width="@dimen/annotation_edit_rightcol"
                 android:layout_height="wrap_content"
