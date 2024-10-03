@@ -25,34 +25,27 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:padding="16dp">
+        android:padding="3dp">
 
 
-        <!-- Pinyin -->
-        <TextView
-            android:id="@+id/pinyin"
+        <!-- Chinese Character -->
+        <fr.berliat.hsktextviews.views.HSKWordView
+            android:id="@+id/HSKWord"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="hànzì"
-            android:textSize="27sp"
-            android:textColor="@android:color/darker_gray"
+
+            app:pinyin="@string/widget_default_pinyin"
+            app:pinyinSize="10sp"
+            app:pinyinColor="@android:color/darker_gray"
+
+            app:hanzi="@string/widget_default_chinese"
+            app:hanziSize="15sp"
+            app:hanziColor="@android:color/black"
+            app:hanziStyle="bold"
+
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/hanzi"
-            app:layout_constraintRight_toLeftOf="@id/pinyin"  />
-
-        <!-- Chinese Word (characters) -->
-        <TextView
-            android:id="@+id/hanzi"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="汉字"
-            android:textSize="36sp"
-            android:textStyle="bold"
-            android:textColor="@android:color/black"
-            app:layout_constraintStart_toStartOf="@id/pinyin"
-            app:layout_constraintTop_toBottomOf="@id/pinyin"
-            app:layout_constraintRight_toLeftOf="@id/pinyin" />
+            app:layout_constraintRight_toLeftOf="@id/definition"/>
 
 
         <!-- English Definition -->
@@ -60,12 +53,13 @@
             android:id="@+id/definition"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Chinese characters"
+            android:text="@string/widget_default_english"
             android:padding="5dp"
             android:textSize="18sp"
             android:textColor="@android:color/black"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toRightOf="@id/hanzi"
+            app:layout_constraintLeft_toRightOf="@id/HSKWord"
             app:layout_constraintRight_toLeftOf="@id/hsk_level" />
 
         <!-- HSK Level -->

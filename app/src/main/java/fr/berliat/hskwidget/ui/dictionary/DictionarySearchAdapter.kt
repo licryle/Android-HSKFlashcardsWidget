@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
+import fr.berliat.hsktextviews.views.HSKWordView
 
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.dao.AnnotatedChineseWord
@@ -57,21 +58,20 @@ class DictionarySearchAdapter(private val context: Context,
     class SearchViewHolder(private val context: Context,
                            private val fragment: Fragment,
                            itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val hanziView: TextView = itemView.findViewById(R.id.hanzi)
+        private val hanziView: HSKWordView = itemView.findViewById(R.id.HSKWord)
         private val hskView: TextView = itemView.findViewById(R.id.hsk_level)
-        private val pinyinView: TextView = itemView.findViewById(R.id.pinyin)
         private val definitionView: TextView = itemView.findViewById(R.id.definition)
         private val favView: ImageView = itemView.findViewById(R.id.fav_btn)
 
         fun bind(result: AnnotatedChineseWord) {
-            hanziView.text = result.simplified
+            hanziView.hanziText = result.simplified.toString()
 
             var hskViz = View.VISIBLE
             if (result.word?.hskLevel == null || result.word?.hskLevel == ChineseWord.HSK_Level.NOT_HSK)
                 hskViz = View.INVISIBLE
             hskView.visibility = hskViz
             hskView.text = result.word?.hskLevel.toString()
-            pinyinView.text = result.word?.pinyins.toString()
+            hanziView.pinyinText = result.word?.pinyins.toString()
             definitionView.text = result.word?.definition?.get(Locale.ENGLISH) ?: ""
 
             if (result.hasAnnotation()) {

@@ -15,4 +15,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "HSKFlashcardsWidget"
 include(":app")
- 
+include(":hsktextviews")
