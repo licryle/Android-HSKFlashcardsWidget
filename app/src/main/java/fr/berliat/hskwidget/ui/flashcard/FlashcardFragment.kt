@@ -6,9 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.fragment.app.Fragment
-import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.domain.FlashcardManager
 import fr.berliat.hskwidget.domain.Utils
 import kotlinx.coroutines.Dispatchers
@@ -17,16 +15,17 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
 
+import fr.berliat.hskwidget.databinding.FlashcardWidgetBinding
+
 const val ARG_WIDGETID = "WIDGETID"
 class FlashcardFragment : Fragment() {
     private var _widgetId: Int? = null
-    private var _root: View? = null
+    private lateinit var bindings: FlashcardWidgetBinding
     private var _flashcardsMfr: FlashcardManager? = null
     private var _context: Context? = null
 
     // Properties only valid between onCreateView and onDestroyView.
     private val widgetId get() = _widgetId!!
-    private val root get() = _root!!
     private val flashcardsMfr get() = _flashcardsMfr!!
 
     @get:JvmName("getContext2")
@@ -44,6 +43,17 @@ class FlashcardFragment : Fragment() {
         _context = requireContext()
         _flashcardsMfr = FlashcardManager.getInstance(context, widgetId)
         flashcardsMfr.registerFragment(this)
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        bindings = FlashcardWidgetBinding.inflate(layoutInflater)
+
+        updateFlashcardView()
+
+        return bindings.root
     }
 
     override fun onDestroy() {
@@ -68,27 +78,27 @@ class FlashcardFragment : Fragment() {
                     flashcardsMfr.openDictionary()
                 }
 
-                with(root.findViewById<TextView>(R.id.flashcard_chinese)) {
+                with(bindings.flashcardChinese) {
                     setOnClickListener { openDictionary() }
                     text = currentWord.simplified
                 }
 
-                with(root.findViewById<TextView>(R.id.flashcard_definition)) {
+                with(bindings.flashcardDefinition) {
                     setOnClickListener { openDictionary() }
                     text = currentWord.definition[Locale.ENGLISH]
                 }
 
-                with(root.findViewById<TextView>(R.id.flashcard_pinyin)) {
+                with(bindings.flashcardPinyin) {
                     setOnClickListener { openDictionary() }
                     text = currentWord.pinyins.toString()
                 }
 
-                with(root.findViewById<TextView>(R.id.flashcard_hsklevel)) {
+                with(bindings.flashcardHsklevel) {
                     setOnClickListener { openDictionary() }
                     text = currentWord.hskLevel.toString()
                 }
 
-                root.findViewById<View>(R.id.flashcard_speak).setOnClickListener{
+                bindings.flashcardSpeak.setOnClickListener{
                     flashcardsMfr.playWidgetWord()
                     Utils.logAnalyticsWidgetAction(
                         context,
@@ -96,7 +106,7 @@ class FlashcardFragment : Fragment() {
                     )
                 }
 
-                root.findViewById<View>(R.id.flashcard_reload).setOnClickListener{
+                bindings.flashcardReload.setOnClickListener{
                     flashcardsMfr.updateWord()
                     Utils.logAnalyticsWidgetAction(
                         context,
@@ -104,20 +114,9 @@ class FlashcardFragment : Fragment() {
                     )
                 }
 
-                root.invalidate()
+                bindings.root.invalidate()
             }
         }
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _root = inflater.inflate(R.layout.flashcard_widget, container, false)
-
-        updateFlashcardView()
-
-        return root
     }
 
     companion object {

@@ -6,7 +6,6 @@
     android:layout_height="wrap_content"
     android:layout_margin="0dp"
     android:padding="0dp"
-    android:backgroundTint="@android:color/white"
     android:background="@drawable/search_item_border">
 
     <!-- Bookmark Icon -->

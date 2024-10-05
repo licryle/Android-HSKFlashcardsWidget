@@ -63,6 +63,7 @@ dependencies {
     implementation("androidx.databinding:adapters:3.2.0-alpha11")
     implementation("androidx.core:core:1.12.0")
     implementation("com.google.android.gms:play-services-mlkit-text-recognition:19.0.1")
+    implementation("androidx.fragment:fragment:1.8.4")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")

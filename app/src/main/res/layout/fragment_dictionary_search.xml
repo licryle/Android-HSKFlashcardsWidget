@@ -39,6 +39,8 @@
         android:clipToPadding="false"
         android:padding="5dp"
         app:layout_constraintTop_toBottomOf="@id/dictionary_search_filters"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
         tools:listitem="@layout/fragment_dictionary_search_item" />
 
         <LinearLayout

@@ -63,12 +63,17 @@
         android:label="@string/menu_about"
         tools:layout="@layout/fragment_about" />
 
+    <fragment
+        android:id="@+id/flashcardFragment"
+        android:name="fr.berliat.hskwidget.ui.flashcard.FlashcardFragment"
+        android:label="Flashcard Fragment" />
+
 
     <action
         android:id="@+id/displayOCR"
         app:destination="@id/nav_ocr_read">
         <argument
-            android:name="text"
+            android:name="imageUri"
             app:argType="string" />
         <argument
             android:name="incrementalOCR"

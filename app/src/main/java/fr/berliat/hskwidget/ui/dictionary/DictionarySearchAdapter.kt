@@ -4,10 +4,11 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 
-import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.dao.AnnotatedChineseWord
+import fr.berliat.hskwidget.databinding.FragmentDictionarySearchItemBinding
 
 
 class DictionarySearchAdapter(private val context: Context,
@@ -19,9 +20,10 @@ class DictionarySearchAdapter(private val context: Context,
     private lateinit var dataChangedListener : SearchResultChangedListener
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DictionarySearchFragment.SearchResultItem {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.fragment_dictionary_search_item, parent, false)
-        return DictionarySearchFragment.SearchResultItem(context, fragment, view)
+        val binding = FragmentDictionarySearchItemBinding.inflate(
+            LayoutInflater.from(parent.context), parent, false)
+
+        return DictionarySearchFragment.SearchResultItem(binding, fragment.findNavController())
     }
 
     override fun onBindViewHolder(holder: DictionarySearchFragment.SearchResultItem, position: Int) {

@@ -13,6 +13,7 @@ import androidx.appcompat.widget.SearchView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -29,6 +30,7 @@ import kotlinx.coroutines.launch
 import java.util.Locale
 
 import fr.berliat.hskwidget.databinding.FragmentDictionarySearchBinding
+import fr.berliat.hskwidget.databinding.FragmentDictionarySearchItemBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
@@ -60,9 +62,12 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
 
         setupRecyclerView()
 
-        performSearch()
-
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        performSearch()
     }
 
     override fun onStop() {
@@ -71,8 +76,8 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
     }
 
     private fun setupRecyclerView() {
-        searchAdapter = DictionarySearchAdapter(requireContext(), requireParentFragment())
         binding.dictionarySearchResults.layoutManager = LinearLayoutManager(context)
+        searchAdapter = DictionarySearchAdapter(requireContext(), requireParentFragment())
         searchAdapter.setSearchResultsChangeListener(this)
         binding.dictionarySearchResults.adapter = searchAdapter
 
@@ -165,7 +170,7 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
                 binding.dictionarySearchNoresults.visibility = View.GONE
                 binding.dictionarySearchResults.visibility = View.GONE
             } else {
-                val text = binding.dictionarySearchNoresults.findViewById<TextView>(R.id.dictionary_noresult_text)
+                val text = binding.dictionaryNoresultText
                 text.text = getString(R.string.dictionary_noresult_text).format(searchQuery)
 
                 binding.dictionarySearchNoresults.setOnClickListener {
@@ -190,40 +195,43 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
         evaluateEmptyView()
     }
 
-    class SearchResultItem(private val context: Context,
-                           private val fragment: Fragment,
-                           itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val hanziView: HSKWordView = itemView.findViewById(R.id.dictionary_item_chinese)
-        private val hskView: TextView = itemView.findViewById(R.id.dictionary_item_hsk_level)
-        private val definitionView: TextView = itemView.findViewById(R.id.dictionary_item_definition)
-        private val favView: ImageView = itemView.findViewById(R.id.dictionary_item_favorite)
+    class SearchResultItem(private val binding: FragmentDictionarySearchItemBinding,
+                           private val navController: NavController) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(result: AnnotatedChineseWord) {
-            hanziView.hanziText = result.simplified.toString()
+            with(binding.dictionaryItemChinese) {
+                hanziText = result.simplified.toString()
+                pinyinText = result.word?.pinyins.toString()
+            }
 
             var hskViz = View.VISIBLE
             if (result.word?.hskLevel == null || result.word.hskLevel == ChineseWord.HSK_Level.NOT_HSK)
                 hskViz = View.INVISIBLE
-            hskView.visibility = hskViz
-            hskView.text = result.word?.hskLevel.toString()
-            hanziView.pinyinText = result.word?.pinyins.toString()
-            definitionView.text = result.word?.definition?.get(Locale.ENGLISH) ?: ""
+            binding.dictionaryItemHskLevel.visibility = hskViz
+            binding.dictionaryItemHskLevel.text = result.word?.hskLevel.toString()
 
-            if (result.hasAnnotation()) {
-                favView.setImageResource(R.drawable.bookmark_heart_24px)
-                favView.imageTintList = ColorStateList.valueOf(
-                    ContextCompat.getColor(context, R.color.md_theme_dark_inversePrimary))
-            } else {
-                favView.setImageResource(R.drawable.bookmark_24px)
-                favView.imageTintList = ColorStateList.valueOf(
-                    ContextCompat.getColor(context, R.color.md_theme_dark_surface))
+            binding.dictionaryItemDefinition.text = result.word?.definition?.get(Locale.ENGLISH) ?: ""
+
+            with(binding.dictionaryItemFavorite) {
+                if (result.hasAnnotation()) {
+                    setImageResource(R.drawable.bookmark_heart_24px)
+                    imageTintList = ColorStateList.valueOf(
+                        ContextCompat.getColor(context, R.color.md_theme_dark_inversePrimary)
+                    )
+                } else {
+                    setImageResource(R.drawable.bookmark_24px)
+                    imageTintList = ColorStateList.valueOf(
+                        ContextCompat.getColor(context, R.color.md_theme_dark_surface)
+                    )
+                }
+
+                setOnClickListener {
+                    val action = DictionarySearchFragmentDirections.annotateWord(result.simplified!!, false)
+
+                    navController.navigate(action)
+                }
             }
 
-            favView.setOnClickListener {
-                val action = DictionarySearchFragmentDirections.annotateWord(result.simplified!!, false)
-
-                fragment.findNavController().navigate(action)
-            }
         }
     }
 }
