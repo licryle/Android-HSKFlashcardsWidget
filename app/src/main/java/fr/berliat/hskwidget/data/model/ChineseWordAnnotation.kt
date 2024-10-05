@@ -31,6 +31,7 @@ data class ChineseWordAnnotation (
         Speaking("口语"),
         Writing("写作"),
         Reading("精读"),
+        Listening("听力"),
         FastReading("阅读"),
         NotFromClass("其他");
         companion object {

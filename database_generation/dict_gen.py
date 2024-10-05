@@ -6,11 +6,72 @@
 import json
 import re
 import sqlite3
+import csv 
+from datetime import datetime
 from typing import List, Optional
 from unidecode import unidecode
 
+# Define ChineseWordAnotation
+class ChineseWordAnnotation:
+    class_level_conv = {
+        "初一": "Elementary1",
+        "初二": "Elementary2",
+        "初三": "Elementary3",
+        "初四": "Elementary4",
+        "中一": "Intermediate1",
+        "中二": "Intermediate2",
+        "中B": "Intermediate2",
+        "中三": "Intermediate3",
+        "高一": "Advanced1",
+        "高二": "Advanced2",
+        "高三": "Advanced3",
+        "其他": "NotFromClass",
+        "不课": "NotFromClass"
+    }
+
+    class_type_conv = {
+        "口语": "Speaking",
+        "写作": "Writing",
+        "读书": "Reading",
+        "精读": "Reading",
+        "听力": "Listening",
+        "阅读": "FastReading",
+        "其他": "NotFromClass",
+        "不课": "NotFromClass"
+    }
+
+    def __init__(self, simplified, pinyins, notes, class_type, class_level, themes, first_seen, is_exam):
+        self.a_simplified = simplified
+        self.a_pinyins = pinyins
+        self.notes = notes
+        self.class_level = self.class_level_conv[class_level]
+        self.class_type = self.class_type_conv[class_type]
+        self.themes = themes
+        self.first_seen = datetime.strptime(first_seen, "%Y-%m-%d").timestamp() * 1000
+        self.is_exam = is_exam
+        self.searchable_text = unidecode(pinyins).replace(" ", "")  + ' ' + notes + ' ' + themes + ' ' + simplified
+
+
+def load_annotations(csv_file):
+# Open the CSV file
+    with open(csv_file, mode='r', newline='') as file:
+        # Create a CSV reader object
+        reader = csv.reader(file)
+        words = []
+        
+        # Loop through each row in the CSV file
+        for row in reader:
+            if (row[0] == ''):
+                return words
+            
+            # row is a dictionary where the keys are the headers
+            annotation = ChineseWordAnnotation(row[0], row[1], row[2], row[3], row[7], row[5],row[4],0)
+            words.append(annotation)
+        
+        return words
+
 # Define the ChineseWord class
-class ChineseWord:
+class ChineseWord:    
     def __init__(self, simplified, traditional, definition, pinyins, hsk_level=None, popularity=0):
         self.simplified = simplified
         self.traditional = traditional
@@ -137,6 +198,9 @@ def build_dictionary(cedict_file: str, other_files: List[str], db_file: str):
             cedict_words[w].hsk_level = hsk_words[w]['hsk_level']
             cedict_words[w].popularity = hsk_words[w]['popularity']
 
+    annotations = load_annotations('annotations.csv')
+    print(f'Loaded {len(annotations)} annotations')
+
     # Set up SQLite database
     conn = sqlite3.connect(db_file)
     cursor = conn.cursor()
@@ -162,11 +226,20 @@ def build_dictionary(cedict_file: str, other_files: List[str], db_file: str):
               word.pinyins, json.dumps(word.definition), word.popularity,
               word.searchable_text))
 
+    for word in annotations:
+        cursor.execute('''
+        INSERT INTO ChineseWordAnnotation (a_simplified, a_pinyins,  notes, class_level, class_type, themes, first_seen, is_exam, a_searchable_text)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (word.a_simplified, word.a_pinyins,  word.notes, 
+              word.class_level, word.class_type, word.themes, word.first_seen,
+              0, word.searchable_text))
+
     # Commit and close
     conn.commit()
     conn.close()
 
     print(f'Wrote {len(cedict_words)} rows into Truncated ChineseWord')
+    print(f'Wrote {len(annotations)} rows into Truncated ChineseWordAnnotations')
 
 # Example usage
 cedict_file = 'cedict_ts.u8'
