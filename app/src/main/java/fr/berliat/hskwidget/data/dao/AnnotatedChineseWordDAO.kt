@@ -49,24 +49,29 @@ interface AnnotatedChineseWordDAO {
     @Query("$select_outer_join WHERE w.searchable_text LIKE '%' || :str || '%' ORDER BY w.popularity DESC LIMIT :pageSize OFFSET (:page * :pageSize)")
     suspend fun findWordFromStrLike(str: String?, page: Int = 0, pageSize: Int = 30): List<AnnotatedChineseWord>
 **/
-    @Query("$select_left_join WHERE a.a_searchable_text LIKE '%' || :str || '%'" +
+     @Query("$select_left_join WHERE a.a_searchable_text LIKE '%' || :str || '%'" +
+            " AND (0=:hasAnnotation OR (1=:hasAnnotation AND a.first_seen IS NOT NULL))" +
             " UNION " +
             "$select_right_join WHERE w.searchable_text LIKE '%' || :str || '%'" +
+            " AND (0=:hasAnnotation OR (1=:hasAnnotation AND a.first_seen IS NOT NULL))" +
             " ORDER BY w.popularity DESC LIMIT :pageSize OFFSET (:page * :pageSize)")
-    suspend fun _findWordFromStrLike(str: String?, page: Int = 0, pageSize: Int = 30): Map<ChineseWordAnnotation, List<ChineseWord>>
+     suspend fun _searchFromStrLike(str: String?, hasAnnotation: Boolean, page: Int = 0, pageSize: Int = 30): Map<ChineseWordAnnotation, List<ChineseWord>>
 
-    suspend fun findWordFromStrLike(str: String?, page: Int = 0, pageSize: Int = 30) : List<AnnotatedChineseWord> {
-        return TypeConverters.AnnotatedChineseWordsConverter.fromMap(_findWordFromStrLike(str, page, pageSize))
+    suspend fun searchFromStrLike(str: String, hasAnnotation: Boolean,
+                                    page: Int = 0, pageSize: Int = 30
+    ) : List<AnnotatedChineseWord> {
+        return TypeConverters.AnnotatedChineseWordsConverter.fromMap(
+            _searchFromStrLike(str, hasAnnotation, page, pageSize))
     }
 
     @Query("$select_left_join WHERE a_simplified = :simplifiedWord" +
             " UNION " +
             "$select_right_join WHERE simplified = :simplifiedWord" +
             " LIMIT 1")
-    suspend fun _findWordFromSimplified(simplifiedWord: String?): Map<ChineseWordAnnotation, List<ChineseWord>>
+    suspend fun _getFromSimplified(simplifiedWord: String?): Map<ChineseWordAnnotation, List<ChineseWord>>
 
-    suspend fun findWordFromSimplified(simplifiedWord: String?) : AnnotatedChineseWord? {
-        val list = TypeConverters.AnnotatedChineseWordsConverter.fromMap(_findWordFromSimplified(simplifiedWord))
+    suspend fun getFromSimplified(simplifiedWord: String?) : AnnotatedChineseWord? {
+        val list = TypeConverters.AnnotatedChineseWordsConverter.fromMap(_getFromSimplified(simplifiedWord))
 
         return if (list.isEmpty())
             null

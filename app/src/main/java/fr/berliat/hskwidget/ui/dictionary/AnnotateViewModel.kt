@@ -25,7 +25,7 @@ class AnnotateViewModel(context: Context) : ViewModel() {
         ChineseWordsDatabase.getInstance(context).chineseWordAnnotationDAO()
 
     suspend fun getAnnotatedChineseWord(simplified: String): AnnotatedChineseWord? {
-        return annotatedWordsDAO.findWordFromSimplified(simplified)
+        return annotatedWordsDAO.getFromSimplified(simplified)
     }
 
     suspend fun updateAnnotation(annotation: ChineseWordAnnotation): Exception? {

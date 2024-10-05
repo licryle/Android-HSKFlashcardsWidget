@@ -77,7 +77,7 @@ class DisplayOCRFragment : Fragment() {
         val db = ChineseWordsDatabase.getInstance(requireContext())
         val dao = db.annotatedChineseWordDAO()
         try {
-            val word = dao.findWordFromSimplified(hanzi)
+            val word = dao.getFromSimplified(hanzi)
             Log.d("DictionarySearchFragment", "Search returned for ${hanzi}")
 
             return word

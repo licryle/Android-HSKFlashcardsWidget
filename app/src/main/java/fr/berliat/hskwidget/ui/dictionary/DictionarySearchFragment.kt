@@ -21,6 +21,7 @@ import fr.berliat.hsktextviews.views.HSKWordView
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.dao.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWord
+import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.domain.Utils
 import kotlinx.coroutines.Dispatchers
@@ -36,6 +37,7 @@ import kotlin.coroutines.CoroutineContext
 class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResultChangedListener {
     private lateinit var searchAdapter: DictionarySearchAdapter
     private lateinit var binding: FragmentDictionarySearchBinding
+    private lateinit var appConfig: AppPreferencesStore
 
     private var isLoading = false
     private var currentPage = 0
@@ -48,11 +50,13 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
     private val coContext: CoroutineContext = Dispatchers.Main
     private var coScope = CoroutineScope(coContext + SupervisorJob())
 
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentDictionarySearchBinding.inflate(layoutInflater)
+        appConfig = AppPreferencesStore(requireContext())
 
         setupRecyclerView()
 
@@ -72,6 +76,8 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
         searchAdapter.setSearchResultsChangeListener(this)
         binding.dictionarySearchResults.adapter = searchAdapter
 
+        binding.dictionarySearchFilterHasannotation.isChecked = appConfig.searchFilterHasAnnotation
+
         // Infinite scroll for pagination
         binding.dictionarySearchResults.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -90,6 +96,12 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
                 }
             }
         })
+
+        binding.dictionarySearchFilterHasannotation.setOnClickListener {
+            appConfig.searchFilterHasAnnotation = binding.dictionarySearchFilterHasannotation.isChecked
+            print(appConfig.searchFilterHasAnnotation)
+            performSearch()
+        }
     }
 
     // Search logic: Fetch new data based on the search query
@@ -105,7 +117,7 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
 
         coScope.launch {
             // Here we executed in the coRoutine Scope
-            val result = fetchResultsForPage(searchQuery)
+            val result = fetchResultsForPage()
 
             // Switch back to the main thread to update UI
             // Update the UI with the result
@@ -120,18 +132,19 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
         isLoading = true
 
         Log.d("DictionarySearchFragment", "Load more results for currentSearch: $searchQuery")
-        val newResults = fetchResultsForPage(searchQuery)
+        val newResults = fetchResultsForPage()
         searchAdapter.addData(newResults)
     }
 
     // Simulate fetching search results based on the query and current page
-    private suspend fun fetchResultsForPage(query: String): List<AnnotatedChineseWord> {
-        Log.d("DictionarySearchFragment", "Searching for $query")
+    private suspend fun fetchResultsForPage(): List<AnnotatedChineseWord> {
+        Log.d("DictionarySearchFragment", "Searching for $searchQuery")
         val db = ChineseWordsDatabase.getInstance(requireContext())
         val dao = db.annotatedChineseWordDAO()
         try {
-            val results = dao.findWordFromStrLike(query, currentPage, itemsPerPage)
-            Log.d("DictionarySearchFragment", "Search returned for $query")
+            val annotatedOnly = binding.dictionarySearchFilterHasannotation.isChecked
+            val results = dao.searchFromStrLike(searchQuery, annotatedOnly, currentPage, itemsPerPage)
+            Log.d("DictionarySearchFragment", "Search returned for $searchQuery")
 
             currentPage++
 

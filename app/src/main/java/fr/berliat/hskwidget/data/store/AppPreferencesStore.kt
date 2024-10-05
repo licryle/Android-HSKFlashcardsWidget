@@ -6,6 +6,14 @@ import fr.berliat.hskwidget.data.model.ChineseWordAnnotation.ClassType
 
 class AppPreferencesStore(private val context: Context):
     PrefixedPreferenceDataStoreBridge(context.dataStore, "app") {
+    var searchFilterHasAnnotation: Boolean
+        get() {
+            return getBoolean("search_filter_hasAnnotation", false)
+        }
+        set(hasAnnotation: Boolean) {
+            putBoolean("search_filter_hasAnnotation", hasAnnotation)
+        }
+
     var lastAnnotatedClassLevel : ClassLevel
         get() {
             val field = getString("class_level", "其他") ?: return ClassLevel.NotFromClass
