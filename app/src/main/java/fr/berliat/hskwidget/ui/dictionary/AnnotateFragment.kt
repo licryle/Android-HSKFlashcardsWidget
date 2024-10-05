@@ -15,6 +15,7 @@ import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.dao.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWordAnnotation
+import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.databinding.FragmentAnnotationEditBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -99,10 +100,16 @@ class AnnotateFragment: Fragment() {
         binding.annotationEditChinese.hanziText = annotatedWord?.word?.simplified.toString()
         binding.annotationEditChinese.pinyinText = annotatedWord?.word?.pinyins.toString()
 
+        val prefStore = AppPreferencesStore(requireContext())
         // Populate fields from ChineseWordAnnotation
         binding.annotationEditNotes.setText(annotatedWord?.annotation?.notes)
-        binding.annotationEditClassType.setSelection(annotatedWord?.annotation?.classType?.ordinal ?: 0)
-        binding.annotationEditClassLevel.setSelection(annotatedWord?.annotation?.level?.ordinal ?: 0)
+        if (annotatedWord?.hasAnnotation() == true) {
+            binding.annotationEditClassType.setSelection(annotatedWord!!.annotation!!.classType!!.ordinal)
+            binding.annotationEditClassLevel.setSelection(annotatedWord!!.annotation!!.level!!.ordinal)
+        } else {
+            binding.annotationEditClassType.setSelection(prefStore.lastAnnotatedClassType.ordinal)
+            binding.annotationEditClassLevel.setSelection(prefStore.lastAnnotatedClassLevel.ordinal)
+        }
         binding.annotationEditThemes.setText(annotatedWord?.annotation?.themes)
         binding.annotationEditIsExam.isChecked = annotatedWord?.annotation?.isExam ?: false
 
@@ -136,7 +143,7 @@ class AnnotateFragment: Fragment() {
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle(getString(R.string.annotation_edit_delete_confirm_title))
             .setMessage(getString(R.string.annotation_edit_delete_confirm_message))
-            .setPositiveButton(getString(R.string.annotation_edit_delete_confirm_yes)) { dialog, which ->
+            .setPositiveButton(getString(R.string.annotation_edit_delete_confirm_yes)) { dialog, _ ->
                 // Handle positive action (e.g., save annotation)
                 GlobalScope.launch {
                     val err = viewModel.deleteAnnotation(simplifiedWord)
@@ -148,7 +155,7 @@ class AnnotateFragment: Fragment() {
 
                 dialog.dismiss() // Dismiss the dialog
             }
-            .setNegativeButton(getString(R.string.annotation_edit_delete_confirm_no)) { dialog, which ->
+            .setNegativeButton(getString(R.string.annotation_edit_delete_confirm_no)) { dialog, _ ->
                 // Handle negative action (e.g., cancel)
                 dialog.dismiss() // Dismiss the dialog
             }
@@ -180,6 +187,9 @@ class AnnotateFragment: Fragment() {
                 handleIOResult(ACTION.UPDATE, err)
             }
         }
+
+        AppPreferencesStore(requireContext()).lastAnnotatedClassType = updatedAnnotation.classType!!
+        AppPreferencesStore(requireContext()).lastAnnotatedClassLevel = updatedAnnotation.level!!
     }
 
     enum class ACTION {
