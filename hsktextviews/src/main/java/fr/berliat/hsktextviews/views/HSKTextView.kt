@@ -8,8 +8,6 @@ import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.JustifyContent
 import com.google.android.flexbox.FlexWrap
 
-import org.ansj.splitWord.analysis.ToAnalysis
-
 import fr.berliat.hsktextviews.R
 
 class HSKTextView @JvmOverloads constructor(
@@ -70,5 +68,19 @@ class HSKTextView @JvmOverloads constructor(
     override fun onWordClick(wordView: HSKWordView) {
         if (clickListener != null)
             clickListener(wordView)
+    }
+
+    class HSKWordsHolder(private val itemView: HSKWordView,
+                         private val listener: OnHSKWordClickListener)
+        : ViewHolder(itemView) {
+
+        fun bind(word: Pair<String, String>) {
+            val view = (itemView as HSKWordView)
+            view.hanziText = word.first
+            view.pinyinText = word.second
+            //pinyinSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 20f, resources.displayMetrics)
+
+            view.setOnWordClickListener(listener)
+        }
     }
 }

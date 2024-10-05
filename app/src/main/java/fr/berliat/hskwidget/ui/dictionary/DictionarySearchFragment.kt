@@ -1,58 +1,80 @@
 package fr.berliat.hskwidget.ui.dictionary
 
-import kotlinx.coroutines.async
-import kotlinx.coroutines.GlobalScope
+import android.content.Context
+import android.content.res.ColorStateList
 
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import androidx.appcompat.widget.SearchView
+import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import fr.berliat.hsktextviews.views.HSKWordView
 
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.dao.AnnotatedChineseWord
+import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.domain.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import java.util.Locale
 
-class DictionarySearchFragment : Fragment() {
-    private lateinit var recyclerView: RecyclerView
+import fr.berliat.hskwidget.databinding.FragmentDictionarySearchBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlin.coroutines.CoroutineContext
+
+class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResultChangedListener {
     private lateinit var searchAdapter: DictionarySearchAdapter
+    private lateinit var binding: FragmentDictionarySearchBinding
 
     private var isLoading = false
     private var currentPage = 0
     private var itemsPerPage = 20
     private var currentSearch = ""
 
+    private val coContext: CoroutineContext = Dispatchers.Main
+    private var coScope = CoroutineScope(coContext + SupervisorJob())
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_dictionary_search, container, false)
-
-        recyclerView = view.findViewById(R.id.recycler_view)
+    ): View {
+        binding = FragmentDictionarySearchBinding.inflate(layoutInflater)
 
         setupRecyclerView()
 
+        val query = activity?.findViewById<SearchView>(R.id.appbar_search)?.query.toString()
+
         arguments?.let {
-            performSearch(arguments?.getString("query") ?: "")
+            performSearch(query)
         }
 
-        return view
+        return binding.root
+    }
+
+    override fun onStop() {
+        super.onStop()
+        coScope.cancel()
     }
 
     private fun setupRecyclerView() {
         searchAdapter = DictionarySearchAdapter(requireContext(), requireParentFragment())
-        recyclerView.layoutManager = LinearLayoutManager(context)
-        recyclerView.adapter = searchAdapter
+        binding.dictionarySearchResults.layoutManager = LinearLayoutManager(context)
+        searchAdapter.setSearchResultsChangeListener(this)
+        binding.dictionarySearchResults.adapter = searchAdapter
 
         // Infinite scroll for pagination
-        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        binding.dictionarySearchResults.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
 
@@ -65,7 +87,7 @@ class DictionarySearchFragment : Fragment() {
 
                 // Load more if at the bottom and not already loading
                 if (!isLoading && totalItemCount <= (lastVisibleItem + 2)) {
-                    GlobalScope.async { loadMoreResults() }
+                    coScope.launch { loadMoreResults() }
                 }
             }
         })
@@ -74,23 +96,24 @@ class DictionarySearchFragment : Fragment() {
     // Search logic: Fetch new data based on the search query
     fun performSearch(query: String) {
         // Clear current results and reset pagination
+        isLoading = true
         searchAdapter.clearData()
         currentPage = 0
+        Log.d("DictionarySearchFragment", "New search requested: $query")
         currentSearch = query
 
-        GlobalScope.launch {
-            // Switch to the IO dispatcher to perform background work
-            val result = withContext(Dispatchers.IO) {
-                fetchResultsForPage(query)
-            }
+        coScope.cancel() // avoid a slower search to return and override result!
+        coScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+
+        coScope.launch {
+            // Here we executed in the coRoutine Scope
+            val result = fetchResultsForPage(query)
 
             // Switch back to the main thread to update UI
-            withContext(Dispatchers.Main) {
-                // Update the UI with the result
-                isLoading = false
-                searchAdapter.addData(result)
-                recyclerView.scrollToPosition(0) // @TODO(Licryle): chase down the bug that keeps the screen blank, sometimes.
-            }
+            // Update the UI with the result
+            isLoading = false
+            searchAdapter.addData(result)
+            binding.dictionarySearchResults.scrollToPosition(0) // @TODO(Licryle): chase down the bug that keeps the screen blank, sometimes.
         }
     }
 
@@ -98,8 +121,8 @@ class DictionarySearchFragment : Fragment() {
     private suspend fun loadMoreResults() {
         isLoading = true
 
+        Log.d("DictionarySearchFragment", "Load more results for currentSearch: $currentSearch")
         val newResults = fetchResultsForPage(currentSearch)
-        isLoading = false
         searchAdapter.addData(newResults)
     }
 
@@ -121,6 +144,76 @@ class DictionarySearchFragment : Fragment() {
         }
 
         return emptyList()
+    }
+
+    private fun evaluateEmptyView() {
+        // Show/hide empty view based on data
+        if (searchAdapter.itemCount == 0) {
+            if (isLoading) {
+                binding.dictionarySearchLoading.visibility = View.VISIBLE
+                binding.dictionarySearchNoresults.visibility = View.GONE
+                binding.dictionarySearchResults.visibility = View.GONE
+            } else {
+                val text = binding.dictionarySearchNoresults.findViewById<TextView>(R.id.dictionary_noresult_text)
+                text.text = getString(R.string.dictionary_noresult_text).format(currentSearch)
+
+                binding.dictionarySearchNoresults.setOnClickListener {
+                    val action =
+                        DictionarySearchFragmentDirections.annotateWord(currentSearch, true)
+
+                    findNavController().navigate(action)
+                }
+
+                binding.dictionarySearchLoading.visibility = View.GONE
+                binding.dictionarySearchNoresults.visibility = View.VISIBLE
+                binding.dictionarySearchResults.visibility = View.GONE
+            }
+        } else {
+            binding.dictionarySearchLoading.visibility = View.GONE
+            binding.dictionarySearchNoresults.visibility = View.GONE
+            binding.dictionarySearchResults.visibility = View.VISIBLE
+        }
+    }
+
+    override fun onDataChanged(newData: List<AnnotatedChineseWord>) {
+        evaluateEmptyView()
+    }
+
+    class SearchResultItem(private val context: Context,
+                           private val fragment: Fragment,
+                           itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val hanziView: HSKWordView = itemView.findViewById(R.id.dictionary_item_chinese)
+        private val hskView: TextView = itemView.findViewById(R.id.dictionary_item_hsk_level)
+        private val definitionView: TextView = itemView.findViewById(R.id.dictionary_item_definition)
+        private val favView: ImageView = itemView.findViewById(R.id.dictionary_item_favorite)
+
+        fun bind(result: AnnotatedChineseWord) {
+            hanziView.hanziText = result.simplified.toString()
+
+            var hskViz = View.VISIBLE
+            if (result.word?.hskLevel == null || result.word.hskLevel == ChineseWord.HSK_Level.NOT_HSK)
+                hskViz = View.INVISIBLE
+            hskView.visibility = hskViz
+            hskView.text = result.word?.hskLevel.toString()
+            hanziView.pinyinText = result.word?.pinyins.toString()
+            definitionView.text = result.word?.definition?.get(Locale.ENGLISH) ?: ""
+
+            if (result.hasAnnotation()) {
+                favView.setImageResource(R.drawable.bookmark_heart_24px)
+                favView.imageTintList = ColorStateList.valueOf(
+                    ContextCompat.getColor(context, R.color.md_theme_dark_inversePrimary))
+            } else {
+                favView.setImageResource(R.drawable.bookmark_24px)
+                favView.imageTintList = ColorStateList.valueOf(
+                    ContextCompat.getColor(context, R.color.md_theme_dark_surface))
+            }
+
+            favView.setOnClickListener {
+                val action = DictionarySearchFragmentDirections.annotateWord(result.simplified!!, false)
+
+                fragment.findNavController().navigate(action)
+            }
+        }
     }
 }
 

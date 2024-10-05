@@ -67,41 +67,10 @@ interface AnnotatedChineseWordDAO {
 
     suspend fun findWordFromSimplified(simplifiedWord: String?) : AnnotatedChineseWord? {
         val list = TypeConverters.AnnotatedChineseWordsConverter.fromMap(_findWordFromSimplified(simplifiedWord))
-        return list[0]
+
+        return if (list.isEmpty())
+            null
+        else
+            list[0]
     }
-    /**
-    @Transaction
-    suspend fun findWordFromStrLike(context: Context, str: String?, page: Int = 0, pageSize: Int = 30): List<AnnotatedChineseWord> {
-        val db = ChineseWordsDatabase.getInstance(context)
-        val words = db.chineseWordDAO().findWordFromStrLike(str, page, pageSize)
-        val annotations = db.chineseWordAnnotationDAO().findWordFromStrLike(str, page, pageSize)
-
-        // Perform your merging logic here
-        return fullOuterJoin(words, annotations)
-    }
-
-    private fun fullOuterJoin(words: List<ChineseWord>, annotations: List<ChineseWordAnnotation>): List<AnnotatedChineseWord> {
-        // Your merge logic here
-        var indexAnnotations = mutableMapOf<String, ChineseWordAnnotation>()
-        annotations.forEach {
-            indexAnnotations[it.simplified] = it
-        }
-
-        var results = mutableListOf<AnnotatedChineseWord>()
-        words.forEach {
-            if (it.simplified in indexAnnotations) {
-                results.add(AnnotatedChineseWord(it, indexAnnotations[it.simplified]))
-                indexAnnotations.remove(it.simplified)
-            }
-        }
-
-        annotations.forEach {
-            results.add(AnnotatedChineseWord(null, it))
-        }
-
-        return results
-    }**/
-/**
-    @Query("$select_outer_join WHERE COALESCE(a.simplified, w.simplified) = :simplifiedWord")
-    suspend fun findWordFromSimplified(simplifiedWord: String?): List<AnnotatedChineseWord>**/
 }

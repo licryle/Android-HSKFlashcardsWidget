@@ -5,10 +5,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
-import fr.berliat.hskwidget.data.model.ChineseWordAnnotation.ClassLevel
-import fr.berliat.hskwidget.data.model.ChineseWordAnnotation.ClassType
 import java.text.Normalizer
-import java.util.Date
 
 import java.util.Locale
 
@@ -20,11 +17,14 @@ data class ChineseWord(
     @ColumnInfo(name = "hsk_level") val hskLevel: HSK_Level?,
     @ColumnInfo(name = "pinyins") val pinyins: Pinyins?,
     @ColumnInfo(name = "popularity") val popularity: Int?,
+    @ColumnInfo(name = "searchable_text", defaultValue = "") var searchable_text: String = ""
 ) {
-    @ColumnInfo(name = "searchable_text", defaultValue = "") var searchable_text: String =
-        Normalizer.normalize(pinyins.toString() + " " + definition + " "
-                + traditional + " " + simplified,
+
+    fun updateSearchable() {
+        val cleanPinyins = pinyins.toString().replace(" ", "")
+        searchable_text = Normalizer.normalize("$cleanPinyins $definition $traditional $simplified",
             Normalizer.Form.NFD).replace("\\p{Mn}+".toRegex(), "")
+    }
 
     class Pinyins: ArrayList<Pinyin> {
         constructor(s: String) : this(fromString(s)) {

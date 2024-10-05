@@ -81,14 +81,14 @@ class MainActivity : AppCompatActivity() {
 
             // Triggered when the query text is changed
             override fun onQueryTextChange(query: String?): Boolean {
-                val navHostFragment = supportFragmentManager.
-                findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment
+                val navHostFragment = supportFragmentManager
+                    .findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment
                 val currentFragment = navHostFragment.childFragmentManager.fragments.firstOrNull()
 
                 if (currentFragment is DictionarySearchFragment) {
                     currentFragment.performSearch(query.toString())
                 } else {
-                    val action = DictionarySearchFragmentDirections.search(query.toString())
+                    val action = DictionarySearchFragmentDirections.search()
                     navController.navigate(action)
                 }
 

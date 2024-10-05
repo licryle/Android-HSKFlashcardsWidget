@@ -4,13 +4,13 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 
-class HSKWordsAdapter(private val listener: OnHSKWordClickListener) : RecyclerView.Adapter<HSKWordsAdapter.HSKWordsHolder>() {
+class HSKWordsAdapter(private val listener: OnHSKWordClickListener) : RecyclerView.Adapter<HSKTextView.HSKWordsHolder>() {
     private val words = mutableListOf<Pair<String, String>>()
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HSKWordsHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HSKTextView.HSKWordsHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(fr.berliat.hsktextviews.R.layout.hsk_word_holder, parent, false)
-        return HSKWordsHolder((view as HSKWordView), listener)
+        return HSKTextView.HSKWordsHolder((view as HSKWordView), listener)
     }
 
     override fun getItemCount(): Int {
@@ -29,21 +29,7 @@ class HSKWordsAdapter(private val listener: OnHSKWordClickListener) : RecyclerVi
         notifyDataSetChanged()
     }
 
-    override fun onBindViewHolder(holder: HSKWordsHolder, position: Int) {
+    override fun onBindViewHolder(holder: HSKTextView.HSKWordsHolder, position: Int) {
         holder.bind(words[position])
-    }
-
-    class HSKWordsHolder(private val itemView: HSKWordView,
-                         private val listener: OnHSKWordClickListener)
-        : RecyclerView.ViewHolder(itemView) {
-
-        fun bind(word: Pair<String, String>) {
-            val view = (itemView as HSKWordView)
-            view.hanziText = word.first
-            view.pinyinText = word.second
-            //pinyinSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 20f, resources.displayMetrics)
-
-            view.setOnWordClickListener(listener)
-        }
     }
 }

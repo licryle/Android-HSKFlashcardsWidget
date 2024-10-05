@@ -1,18 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ui.dictionary.DictionarySearchFragment">
 
     <!-- Scrollable Search Results -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view"
+        android:id="@+id/dictionary_search_results"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
         android:padding="16dp"
         tools:listitem="@layout/fragment_dictionary_search_item" />
+
+    <LinearLayout
+        android:id="@+id/dictionary_search_noresults"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        android:padding="16dp"
+        android:visibility="visible"
+        android:gravity="center">
+        <ImageView
+            android:id="@+id/dictionary_noresult_icon"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_marginTop="10dp"
+            android:src="@drawable/bookmark_add_24px"
+            android:contentDescription="@string/dictionary_noresult_icon"/>
+        <TextView
+            android:id="@+id/dictionary_noresult_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:layout_marginTop="10dp"
+            android:text="@string/dictionary_noresult_text" />  <!-- Initially hidden -->
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/dictionary_search_loading"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        android:padding="16dp"
+        android:visibility="visible"
+        android:gravity="center">
+        <ImageView
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_marginTop="10dp"
+            android:src="@drawable/hourglass_empty_24px"
+            android:contentDescription="@string/dictionary_search_loading"/>
+        <TextView
+            android:id="@+id/dictionary_loading_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:layout_marginTop="10dp"
+            android:text="@string/dictionary_loading_text" />  <!-- Initially hidden -->
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

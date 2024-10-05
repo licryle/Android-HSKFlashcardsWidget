@@ -83,4 +83,8 @@ We recommend to choose the level your at plus the one below, or above depending 
     <string name="menu_ocr">OCR</string>
     <string name="image_capture_button" />
     <string name="appbar_ocr">Start OCR</string>
+    <string name="dictionary_noresult_text">%s not found, add annotation?</string>
+    <string name="dictionary_loading_text">Loading results - standby!\nIf you can read this, consider upgrading your device :)</string>
+    <string name="dictionary_noresult_icon">No result!</string>
+    <string name="dictionary_search_loading">Loading results</string>
 </resources>

@@ -9,7 +9,7 @@ import java.util.Date
 
 @Entity(indices = [Index(value = ["a_searchable_text"])])
 data class ChineseWordAnnotation (
-    @PrimaryKey @ColumnInfo(name = "a_simplified") val simplified: String,
+    @PrimaryKey @ColumnInfo(name = "a_simplified") val simplified: String = "",
     @ColumnInfo(name = "a_pinyins") val pinyins: ChineseWord.Pinyins?,
     @ColumnInfo(name = "notes") val notes: String?,
     @ColumnInfo(name = "class_type") val classType: ClassType?,
@@ -19,9 +19,13 @@ data class ChineseWordAnnotation (
     @ColumnInfo(name = "first_seen") val firstSeen: Date?,
     @ColumnInfo(name = "is_exam") val isExam: Boolean?,
 ) {
-    @ColumnInfo(name = "a_searchable_text", defaultValue = "") var a_searchable_text: String =
-        Normalizer.normalize(pinyins.toString() + " " + notes + " " + themes,
+    @ColumnInfo(name = "a_searchable_text", defaultValue = "") var a_searchable_text: String = ""
+
+    fun updateSearchable() {
+        val cleanPinyins = pinyins.toString().replace(" ", "")
+        a_searchable_text = Normalizer.normalize("$cleanPinyins $notes $themes $simplified",
             Normalizer.Form.NFD).replace("\\p{Mn}+".toRegex(), "")
+    }
 
     enum class ClassType (val type: String) {
         Speaking("口语"),

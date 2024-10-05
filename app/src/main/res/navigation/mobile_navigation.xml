@@ -14,9 +14,7 @@
     <action
         android:id="@+id/search"
         app:destination="@id/nav_dictionary">
-        <argument
-            android:name="query"
-            app:argType="string" />
+        <!-- Pulled automatically from the search box. -->
     </action>
 
     <fragment
@@ -31,6 +29,9 @@
         <argument
             android:name="simplifiedWord"
             app:argType="string" />
+        <argument
+            android:name="newWord"
+            app:argType="boolean" />
     </action>
 
     <fragment

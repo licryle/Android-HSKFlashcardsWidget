@@ -17,10 +17,23 @@ interface ChineseWordAnnotationDAO {
     fun findBySimplified(simplified: String): ChineseWordAnnotation
 
     @Insert
-    fun insertAll(vararg users: ChineseWordAnnotation)
+    fun _insertAll(vararg annotations: ChineseWordAnnotation)
+
+    fun insertAll(annotations: Array<ChineseWordAnnotation>) {
+        annotations.forEach {
+            it.updateSearchable()
+        }
+
+        _insertAll(*annotations)
+    }
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertOrUpdate(annotation: ChineseWordAnnotation)
+    suspend fun _insertOrUpdate(annotation: ChineseWordAnnotation)
+
+    suspend fun insertOrUpdate(annotation: ChineseWordAnnotation) {
+        annotation.updateSearchable()
+        _insertOrUpdate(annotation)
+    }
 
     @Delete
     fun delete(annotation: ChineseWordAnnotation)
