@@ -11,6 +11,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.lifecycle.Observer
+import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
@@ -23,6 +24,7 @@ import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 
 class Utils {
@@ -121,6 +123,29 @@ class Utils {
             view.let {
                 imm.hideSoftInputFromWindow(it.windowToken, 0)
             }
+        }
+
+        /**
+         * This is a workaround for a Bug in handling system wide events.
+         * An empty WorkManager queue will trigger an APPWIGET_UPDATE event, which is undesired.
+         * Read more at: https://www.reddit.com/r/android_devs/comments/llq2mw/question_why_should_it_be_expected_that/
+         */
+        fun preventUnnecessaryAppWidgetUpdates(context: Context): Boolean {
+            val workInfos = WorkManager.getInstance(context).getWorkInfosByTag("always_pending_work")
+            if (workInfos.get().size > 0) return false
+
+            val alwaysPendingWork = OneTimeWorkRequestBuilder<DummyWorker>()
+                .setInitialDelay(5000L, TimeUnit.DAYS)
+                .addTag("always_pending_work")
+                .build()
+
+            WorkManager.getInstance(context).enqueueUniqueWork(
+                "always_pending_work",
+                ExistingWorkPolicy.KEEP,
+                alwaysPendingWork
+            )
+
+            return true
         }
 
         fun logAnalyticsEvent(

@@ -10,8 +10,6 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.RemoteViews
 import androidx.core.content.ContextCompat.startActivity
-import androidx.work.ExistingWorkPolicy
-import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.domain.FlashcardManager
@@ -43,7 +41,7 @@ class FlashcardWidgetProvider : AppWidgetProvider() {
         for (appWidgetId in appWidgetIds) {
             GlobalScope.launch {
                 // Switch to the IO dispatcher to perform background work
-                val result = withContext(Dispatchers.IO) {
+                withContext(Dispatchers.IO) {
                     FlashcardManager.getInstance(context, appWidgetId).getNewWord()
                 }
 
@@ -98,6 +96,8 @@ class FlashcardWidgetProvider : AppWidgetProvider() {
             }
 
             AppWidgetManager.ACTION_APPWIDGET_UPDATE -> {
+                if (Utils.preventUnnecessaryAppWidgetUpdates(context)) return
+
                 var widgetIds = IntArray(1)
                 if (widgetId == -1) {
                     widgetIds = getWidgetIds(context)
@@ -140,16 +140,7 @@ class FlashcardWidgetProvider : AppWidgetProvider() {
         // Enter relevant functionality for when the first widget is created
         super.onEnabled(context)
 
-        // Thanks to https://stackoverflow.com/questions/70654474/starting-workmanager-task-from-appwidgetprovider-results-in-endless-onupdate-cal
-        val alwaysPendingWork = OneTimeWorkRequestBuilder<Utils.DummyWorker>()
-            .setInitialDelay(5000L, TimeUnit.DAYS)
-            .build()
-
-        WorkManager.getInstance(context).enqueueUniqueWork(
-            "always_pending_work",
-            ExistingWorkPolicy.KEEP,
-            alwaysPendingWork
-        )
+        Utils.preventUnnecessaryAppWidgetUpdates(context)
 
         val appMgr = AppWidgetManager.getInstance(context)
         onUpdate(context, appMgr, getWidgetIds(context))
