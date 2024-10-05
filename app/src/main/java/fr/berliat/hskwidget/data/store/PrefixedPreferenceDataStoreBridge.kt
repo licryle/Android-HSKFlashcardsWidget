@@ -25,9 +25,9 @@ import kotlinx.coroutines.runBlocking
 open class PrefixedPreferenceDataStoreBridge(private val dataStore: DataStore<Preferences>, private val prefix: String) :
     PreferenceDataStore(), CoroutineScope by CoroutineScope(Dispatchers.IO + SupervisorJob()) {
 
-    fun getPrefix(): String { return prefixKey("") }
+    private fun getPrefix(): String { return prefixKey("") }
 
-    fun prefixKey(key: String): String { return prefix + '_' + key }
+    private fun prefixKey(key: String): String { return prefix + '_' + key }
 
     override fun putString(key: String, value: String?) {
         putPreference(stringPreferencesKey(prefixKey(key)), value)
@@ -82,7 +82,7 @@ open class PrefixedPreferenceDataStoreBridge(private val dataStore: DataStore<Pr
         dataStore.data.map { it[booleanPreferencesKey(prefixKey(key))] ?: defValue }.first()
     }
 
-    protected fun <T> putPreference(key: Preferences.Key<T>, value: T?): Deferred<Preferences> {
+    private fun <T> putPreference(key: Preferences.Key<T>, value: T?): Deferred<Preferences> {
         return GlobalScope.async {
             dataStore.edit {
                 if (value == null) {

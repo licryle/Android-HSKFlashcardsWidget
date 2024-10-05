@@ -29,7 +29,7 @@ class FlashcardManager private constructor(private val context: Context,
     }
 
     suspend fun getCurrentWord() : ChineseWord {
-        var currentWord = dict.findWordFromSimplified(flashCardPrefs.getCurrentSimplified())
+        var currentWord = dict.findWordFromSimplified(flashCardPrefs.currentSimplified)
 
         if (currentWord == null) currentWord = Utils.getDefaultWord(context)
 
@@ -37,14 +37,14 @@ class FlashcardManager private constructor(private val context: Context,
     }
 
     suspend fun getNewWord(): ChineseWord {
-        val currentWord = dict.findWordFromSimplified(flashCardPrefs.getCurrentSimplified())
+        val currentWord = dict.findWordFromSimplified(flashCardPrefs.currentSimplified)
 
         var newWord = dict.getRandomHSKWord(flashCardPrefs.getAllowedHSK(), setOf(currentWord!!))
 
         if (newWord == null) newWord = Utils.getDefaultWord(context)
 
         // Persist it in preferences for cross-App convenience
-        flashCardPrefs.putCurrentSimplified(newWord.simplified)
+        flashCardPrefs.currentSimplified = newWord.simplified
 
         return newWord
     }
@@ -84,7 +84,7 @@ class FlashcardManager private constructor(private val context: Context,
     }
 
     fun playWidgetWord() : Boolean {
-        val word = flashCardPrefs.getCurrentSimplified()
+        val word = flashCardPrefs.currentSimplified
 
         if (word == "") return false
 
@@ -94,7 +94,7 @@ class FlashcardManager private constructor(private val context: Context,
     }
 
     fun openDictionary() {
-        val word = flashCardPrefs.getCurrentSimplified()
+        val word = flashCardPrefs.currentSimplified
 
         val confIntent = Intent(context, MainActivity::class.java)
         confIntent.putExtra(MainActivity.INTENT_SEARCH_WORD, word)

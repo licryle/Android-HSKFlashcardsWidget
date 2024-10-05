@@ -12,18 +12,19 @@ internal val Context.dataStore: DataStore<Preferences> by preferencesDataStore("
 class FlashcardPreferencesStore(private val context: Context, widgetId: Int):
     PrefixedPreferenceDataStoreBridge(context.dataStore, widgetId.toString()) {
 
-    fun showHSK(hskLevel: ChineseWord.HSK_Level) : Boolean {
+    var currentSimplified : String
+        get() {
+            return this.getString(
+                PREFERENCE_CURRENT_SIMPLIFIED,
+                Utils.getDefaultWord(context).simplified) ?: return ""
+
+        }
+        set(word: String) {
+            this.putStringBlocking(PREFERENCE_CURRENT_SIMPLIFIED, word)
+        }
+
+    private fun showHSK(hskLevel: ChineseWord.HSK_Level) : Boolean {
         return getBoolean("hsk" + hskLevel.level.toString(), false)
-    }
-
-    fun getCurrentSimplified() : String {
-        return this.getString(
-            PREFERENCE_CURRENT_SIMPLIFIED,
-            Utils.getDefaultWord(context).simplified) ?: return ""
-    }
-
-    fun putCurrentSimplified(word: String) {
-        this.putStringBlocking(PREFERENCE_CURRENT_SIMPLIFIED, word)
     }
 
     fun getAllowedHSK(): Set<ChineseWord.HSK_Level> {
