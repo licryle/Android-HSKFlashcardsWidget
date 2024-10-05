@@ -1,7 +1,6 @@
 package fr.berliat.hskwidget
 
 import android.os.Bundle
-import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.drawerlayout.widget.DrawerLayout
@@ -38,7 +37,11 @@ class MainActivity : AppCompatActivity() {
 
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
-        navController = findNavController(R.id.nav_host_fragment_content_main)
+
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment
+        navController = navHostFragment.navController
+
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(
@@ -61,15 +64,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupOCRBtn() {
-        val ocrBtnView: ImageView = findViewById(R.id.appbar_ocr)
-
-        ocrBtnView.setOnClickListener { navController.navigate(R.id.nav_ocr_capture) }
+        binding.appBarMain.appbarOcr.setOnClickListener { navController.navigate(R.id.nav_ocr_capture) }
     }
 
     private fun setupSearchBtn() {
-        val searchBtnView: SearchView = findViewById(R.id.appbar_search)
         // Set listener to handle search queries
-        searchBtnView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+        binding.appBarMain.appbarSearch.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             // Triggered when the search button is pressed (or search query submitted)
             override fun onQueryTextSubmit(query: String?): Boolean {
                 if (currentFocus != null)
