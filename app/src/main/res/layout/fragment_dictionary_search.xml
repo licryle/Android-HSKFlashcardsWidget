@@ -49,7 +49,7 @@
         android:orientation="vertical"
         app:layout_constraintTop_toTopOf="parent"
         android:padding="16dp"
-        android:visibility="visible"
+        android:visibility="gone"
         android:gravity="center">
         <ImageView
             android:layout_width="45dp"

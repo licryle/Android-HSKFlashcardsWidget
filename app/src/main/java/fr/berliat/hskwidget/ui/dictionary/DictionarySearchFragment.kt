@@ -40,7 +40,10 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
     private var isLoading = false
     private var currentPage = 0
     private var itemsPerPage = 20
-    private var currentSearch = ""
+    private val searchQuery: String
+        get() {
+            return activity?.findViewById<SearchView>(R.id.appbar_search)?.query.toString()
+        }
 
     private val coContext: CoroutineContext = Dispatchers.Main
     private var coScope = CoroutineScope(coContext + SupervisorJob())
@@ -53,11 +56,7 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
 
         setupRecyclerView()
 
-        val query = activity?.findViewById<SearchView>(R.id.appbar_search)?.query.toString()
-
-        arguments?.let {
-            performSearch(query)
-        }
+        performSearch()
 
         return binding.root
     }
@@ -94,20 +93,19 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
     }
 
     // Search logic: Fetch new data based on the search query
-    fun performSearch(query: String) {
+    fun performSearch() {
         // Clear current results and reset pagination
         isLoading = true
         searchAdapter.clearData()
         currentPage = 0
-        Log.d("DictionarySearchFragment", "New search requested: $query")
-        currentSearch = query
+        Log.d("DictionarySearchFragment", "New search requested: $searchQuery")
 
         coScope.cancel() // avoid a slower search to return and override result!
         coScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
         coScope.launch {
             // Here we executed in the coRoutine Scope
-            val result = fetchResultsForPage(query)
+            val result = fetchResultsForPage(searchQuery)
 
             // Switch back to the main thread to update UI
             // Update the UI with the result
@@ -121,8 +119,8 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
     private suspend fun loadMoreResults() {
         isLoading = true
 
-        Log.d("DictionarySearchFragment", "Load more results for currentSearch: $currentSearch")
-        val newResults = fetchResultsForPage(currentSearch)
+        Log.d("DictionarySearchFragment", "Load more results for currentSearch: $searchQuery")
+        val newResults = fetchResultsForPage(searchQuery)
         searchAdapter.addData(newResults)
     }
 
@@ -155,11 +153,11 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
                 binding.dictionarySearchResults.visibility = View.GONE
             } else {
                 val text = binding.dictionarySearchNoresults.findViewById<TextView>(R.id.dictionary_noresult_text)
-                text.text = getString(R.string.dictionary_noresult_text).format(currentSearch)
+                text.text = getString(R.string.dictionary_noresult_text).format(searchQuery)
 
                 binding.dictionarySearchNoresults.setOnClickListener {
                     val action =
-                        DictionarySearchFragmentDirections.annotateWord(currentSearch, true)
+                        DictionarySearchFragmentDirections.annotateWord(searchQuery, true)
 
                     findNavController().navigate(action)
                 }

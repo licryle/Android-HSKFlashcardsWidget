@@ -86,7 +86,7 @@ class MainActivity : AppCompatActivity() {
                 val currentFragment = navHostFragment.childFragmentManager.fragments.firstOrNull()
 
                 if (currentFragment is DictionarySearchFragment) {
-                    currentFragment.performSearch(query.toString())
+                    currentFragment.performSearch()
                 } else {
                     val action = DictionarySearchFragmentDirections.search()
                     navController.navigate(action)
