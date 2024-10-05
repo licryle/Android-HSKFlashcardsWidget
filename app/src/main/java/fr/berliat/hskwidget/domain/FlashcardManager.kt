@@ -4,6 +4,8 @@ import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import androidx.core.content.ContextCompat.startActivity
+import fr.berliat.hskwidget.MainActivity
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.data.store.FlashcardPreferencesStore
@@ -51,7 +53,7 @@ class FlashcardManager private constructor(private val context: Context,
         Log.i("FlashcardManager", "Word update requested")
         GlobalScope.launch {
             // Switch to the IO dispatcher to perform background work
-            val result = withContext(Dispatchers.IO) {
+            withContext(Dispatchers.IO) {
                 getNewWord()
             }
 
@@ -94,16 +96,11 @@ class FlashcardManager private constructor(private val context: Context,
     fun openDictionary() {
         val word = flashCardPrefs.getCurrentSimplified()
 
-        context.startActivity(getOpenDictionaryIntent(word))
+        val confIntent = Intent(context, MainActivity::class.java)
+        confIntent.putExtra(MainActivity.INTENT_SEARCH_WORD, word)
+        confIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
 
-        Utils.logAnalyticsWidgetAction(
-            context,
-            Utils.ANALYTICS_EVENTS.WIDGET_OPEN_DICTIONARY, widgetId
-        )
-    }
-
-    fun getOpenDictionaryIntent(word: String): Intent {
-        return Utils.getOpenURLIntent("https://www.wordsense.eu/$word/")
+        startActivity(context, confIntent, null)
     }
 
     companion object {

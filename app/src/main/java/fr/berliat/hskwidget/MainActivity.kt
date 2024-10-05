@@ -3,27 +3,31 @@ package fr.berliat.hskwidget
 import android.os.Bundle
 import android.view.Menu
 import android.widget.ImageView
-import com.google.android.material.navigation.NavigationView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
+import androidx.drawerlayout.widget.DrawerLayout
+import androidx.navigation.NavController
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import androidx.drawerlayout.widget.DrawerLayout
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.SearchView
-import androidx.navigation.NavController
-import androidx.navigation.fragment.NavHostFragment
+import com.google.android.material.navigation.NavigationView
 import fr.berliat.hskwidget.databinding.ActivityMainBinding
 import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragment
 import fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragmentDirections
 
 class MainActivity : AppCompatActivity() {
+    companion object {
+        const val INTENT_SEARCH_WORD: String = "search_word"
+    }
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,6 +52,13 @@ class MainActivity : AppCompatActivity() {
 
         setupSearchBtn()
         setupOCRBtn()
+
+        intent?.let {
+            val searchWord = it.getStringExtra(INTENT_SEARCH_WORD)
+            if (searchWord != null) {
+                binding.appBarMain.appbarSearch.setQuery(searchWord, true)
+            }
+        }
     }
 
     private fun setupOCRBtn() {
@@ -62,7 +73,8 @@ class MainActivity : AppCompatActivity() {
         searchBtnView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             // Triggered when the search button is pressed (or search query submitted)
             override fun onQueryTextSubmit(query: String?): Boolean {
-                Utils.hideKeyboard(applicationContext, currentFocus!!)
+                if (currentFocus != null)
+                    Utils.hideKeyboard(applicationContext, currentFocus!!)
 
                 return onQueryTextChange(query)
             }
