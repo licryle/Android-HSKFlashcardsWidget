@@ -16,7 +16,7 @@ class AppPreferencesStore(context: Context):
 
     var lastAnnotatedClassLevel : ClassLevel
         get() {
-            val lvl = getString("class_level", "其他") ?: return ClassLevel.NotFromClass
+            val lvl = getString("class_level", "NotFromClass") ?: return ClassLevel.NotFromClass
 
             return ClassLevel.from(lvl)
         }
@@ -26,7 +26,7 @@ class AppPreferencesStore(context: Context):
 
     var lastAnnotatedClassType : ClassType
         get() {
-            val type = getString("class_type", "其他") ?: return ClassType.NotFromClass
+            val type = getString("class_type", "NotFromClass") ?: return ClassType.NotFromClass
 
             return ClassType.from(type)
         }

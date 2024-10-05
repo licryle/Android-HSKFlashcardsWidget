@@ -1,19 +1,26 @@
 package fr.berliat.hsktextviews.views
 
+import com.huaban.analysis.jieba.JiebaSegmenter
+
 import android.content.Context
 import android.graphics.Color
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.FlexDirection
-import com.google.android.flexbox.JustifyContent
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayout
-
+import com.google.android.flexbox.FlexboxLayoutManager
+import com.google.android.flexbox.JustifyContent
 import fr.berliat.hsktextviews.R
 import fr.berliat.hsktextviews.databinding.HskTextViewBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.math.ceil
+
 
 class HSKTextView @JvmOverloads constructor(
     context: Context,
@@ -22,7 +29,7 @@ class HSKTextView @JvmOverloads constructor(
 ) : RecyclerView(context, attrs, defStyleAttr), OnHSKWordClickListener {
     private lateinit var clickListener: (HSKWordView) -> Unit?
     private val wordsAdapter: HSKWordsAdapter
-    private var originalText : String = ""
+    private var originalText: String = ""
 
     var hanziTextSize: Int
         get() {
@@ -73,24 +80,30 @@ class HSKTextView @JvmOverloads constructor(
             cleanText = cleanText.replace("(\\n|\\n\\r)".toRegex(), "\n")
 
             originalText = cleanText
-            //val result = ToAnalysis.parse(value)
 
-            println(cleanText)
-            //println(result)
+            GlobalScope.launch {
+                Log.d(TAG, "Loading JiebaSegmenter")
+                val segmenter = JiebaSegmenter()
+                Log.d(TAG, "Finished Loading JiebaSegmenter")
+                Log.d(TAG, "Start parsing")
 
-            val words = mutableListOf<Pair<String, String>>()
-            //result.terms.forEach {
 
-            cleanText.split("\n").forEach { paragraph ->
-                // @todo(Licryle): find a way to split words
-                paragraph.chunked(2).forEach {
-                    words.add(Pair(it, hanziToPinyin(it)))
+                val words = mutableListOf<Pair<String, String>>()
+                cleanText.split("\n").forEach { paragraph ->
+                    segmenter.process(paragraph, JiebaSegmenter.SegMode.INDEX).forEach { word ->
+                        words.add(Pair(word.word, ""))
+                        word.word
+                    }
+                    words.add(Pair("\n", ""))
                 }
 
-                words.add(Pair("\n", ""))
+                Log.d(TAG, "Finished parsing")
+                withContext(Dispatchers.Main) {
+                    Log.d(TAG, "Start rendering parsing")
+                    wordsAdapter.addData(words)
+                    Log.d(TAG, "Finished rendering parsing")
+                }
             }
-
-            wordsAdapter.addData(words)
         }
 
     private fun hanziToPinyin(hanzi: String): String {
@@ -140,5 +153,9 @@ class HSKTextView @JvmOverloads constructor(
 
             wordView.rootView.layoutParams = layoutParams
         }
+    }
+
+    companion object {
+        const val TAG = "HSKTextView"
     }
 }

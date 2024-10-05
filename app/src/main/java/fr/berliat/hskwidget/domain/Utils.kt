@@ -214,9 +214,17 @@ class Utils {
 
         fun populateDictionaryEntryView(binding: FragmentDictionarySearchItemBinding,
                                         word: AnnotatedChineseWord, navController: NavController) {
+            var pinyins = word.word?.pinyins.toString() ?: ""
+            if (pinyins == "")
+                pinyins = word.annotation?.pinyins?.toString() ?: ""
+
+            var definition = word.word?.definition?.get(Locale.ENGLISH) ?: ""
+            if (definition == "")
+                definition = word.annotation?.notes ?: ""
+
             with(binding.dictionaryItemChinese) {
                 hanziText = word.simplified.toString()
-                pinyinText = word.word?.pinyins.toString()
+                pinyinText = pinyins
             }
             var hskViz = View.VISIBLE
             if (word.word?.hskLevel == null || word.word.hskLevel == ChineseWord.HSK_Level.NOT_HSK)
@@ -224,7 +232,7 @@ class Utils {
             binding.dictionaryItemHskLevel.visibility = hskViz
             binding.dictionaryItemHskLevel.text = word.word?.hskLevel.toString()
 
-            binding.dictionaryItemDefinition.text = word.word?.definition?.get(Locale.ENGLISH) ?: ""
+            binding.dictionaryItemDefinition.text = definition
 
             with(binding.dictionaryItemFavorite) {
                 if (word.hasAnnotation()) {

@@ -40,10 +40,11 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.recyclerview:recyclerview:1.3.2")
+    implementation("androidx.activity:activity-ktx:1.8.1")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
 
-    implementation("org.ansj:ansj_seg:5.1.6")
     implementation("com.google.android.flexbox:flexbox:3.0.0")
+    implementation("io.github.yrjyrj123:jieba-analysis:1.0.3")
 }
