@@ -88,4 +88,8 @@ We recommend to choose the level your at plus the one below, or above depending 
     <string name="dictionary_noresult_icon">No result!</string>
     <string name="dictionary_search_loading">Loading results</string>
     <string name="dictionary_search_filter_hasannotation_hint">Annotated only </string>
+    <string name="ocr_display_add">Analyze more text and add below</string>
+    <string name="ocr_display_loading">Processing your image</string>
+    <string name="ocr_display_conf_smaller">Decrease Text Size</string>
+    <string name="ocr_display_conf_bigger">Increase Text Size</string>
 </resources>

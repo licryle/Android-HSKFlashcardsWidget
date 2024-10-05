@@ -1,33 +1,24 @@
 package fr.berliat.hskwidget.ui.dictionary
 
-import android.content.Context
-import android.content.res.ColorStateList
-
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.appcompat.widget.SearchView
-import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import fr.berliat.hsktextviews.views.HSKWordView
 
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.dao.AnnotatedChineseWord
-import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.domain.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.Locale
 
 import fr.berliat.hskwidget.databinding.FragmentDictionarySearchBinding
 import fr.berliat.hskwidget.databinding.FragmentDictionarySearchItemBinding
@@ -52,6 +43,10 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
     private val coContext: CoroutineContext = Dispatchers.Main
     private var coScope = CoroutineScope(coContext + SupervisorJob())
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        searchAdapter = DictionarySearchAdapter(requireParentFragment(), this)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -77,8 +72,6 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
 
     private fun setupRecyclerView() {
         binding.dictionarySearchResults.layoutManager = LinearLayoutManager(context)
-        searchAdapter = DictionarySearchAdapter(requireContext(), requireParentFragment())
-        searchAdapter.setSearchResultsChangeListener(this)
         binding.dictionarySearchResults.adapter = searchAdapter
 
         binding.dictionarySearchFilterHasannotation.isChecked = appConfig.searchFilterHasAnnotation
@@ -199,39 +192,7 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
                            private val navController: NavController) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(result: AnnotatedChineseWord) {
-            with(binding.dictionaryItemChinese) {
-                hanziText = result.simplified.toString()
-                pinyinText = result.word?.pinyins.toString()
-            }
-
-            var hskViz = View.VISIBLE
-            if (result.word?.hskLevel == null || result.word.hskLevel == ChineseWord.HSK_Level.NOT_HSK)
-                hskViz = View.INVISIBLE
-            binding.dictionaryItemHskLevel.visibility = hskViz
-            binding.dictionaryItemHskLevel.text = result.word?.hskLevel.toString()
-
-            binding.dictionaryItemDefinition.text = result.word?.definition?.get(Locale.ENGLISH) ?: ""
-
-            with(binding.dictionaryItemFavorite) {
-                if (result.hasAnnotation()) {
-                    setImageResource(R.drawable.bookmark_heart_24px)
-                    imageTintList = ColorStateList.valueOf(
-                        ContextCompat.getColor(context, R.color.md_theme_dark_inversePrimary)
-                    )
-                } else {
-                    setImageResource(R.drawable.bookmark_24px)
-                    imageTintList = ColorStateList.valueOf(
-                        ContextCompat.getColor(context, R.color.md_theme_dark_surface)
-                    )
-                }
-
-                setOnClickListener {
-                    val action = DictionarySearchFragmentDirections.annotateWord(result.simplified!!, false)
-
-                    navController.navigate(action)
-                }
-            }
-
+            Utils.populateDictionaryEntryView(binding, result, navController)
         }
     }
 }

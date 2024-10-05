@@ -11,13 +11,12 @@ import fr.berliat.hskwidget.data.dao.AnnotatedChineseWord
 import fr.berliat.hskwidget.databinding.FragmentDictionarySearchItemBinding
 
 
-class DictionarySearchAdapter(private val context: Context,
-                              private val fragment: Fragment
+class DictionarySearchAdapter(private val fragment: Fragment,
+                              private val dataChangedListener: SearchResultChangedListener
 )  :
     RecyclerView.Adapter<DictionarySearchFragment.SearchResultItem>() {
 
     private val results = mutableListOf<AnnotatedChineseWord>()
-    private lateinit var dataChangedListener : SearchResultChangedListener
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DictionarySearchFragment.SearchResultItem {
         val binding = FragmentDictionarySearchItemBinding.inflate(
@@ -44,10 +43,6 @@ class DictionarySearchAdapter(private val context: Context,
     fun clearData() {
         results.clear()
         notifySearchResultsChange()
-    }
-
-    fun setSearchResultsChangeListener(listener: SearchResultChangedListener) {
-        dataChangedListener = listener
     }
 
     private fun notifySearchResultsChange() {

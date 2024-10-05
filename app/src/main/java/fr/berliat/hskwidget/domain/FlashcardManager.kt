@@ -98,7 +98,7 @@ class FlashcardManager private constructor(private val context: Context,
 
         val confIntent = Intent(context, MainActivity::class.java)
         confIntent.putExtra(MainActivity.INTENT_SEARCH_WORD, word)
-        confIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        confIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
 
         startActivity(context, confIntent, null)
     }

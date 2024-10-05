@@ -1,16 +1,24 @@
 package fr.berliat.hsktextviews.views
 
-import android.view.LayoutInflater
+import android.content.Context
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 
-class HSKWordsAdapter(private val listener: OnHSKWordClickListener) : RecyclerView.Adapter<HSKTextView.HSKWordsHolder>() {
+class HSKWordsAdapter(private val context: Context,
+                      private val listener: OnHSKWordClickListener,
+                      hanziTextSize: Int
+) : RecyclerView.Adapter<HSKTextView.HSKWordsHolder>() {
     private val words = mutableListOf<Pair<String, String>>()
+    var hanziSize: Int = hanziTextSize
+        set(size) {
+            field = size
+            notifyDataSetChanged()
+        }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HSKTextView.HSKWordsHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(fr.berliat.hsktextviews.R.layout.hsk_word_holder, parent, false)
-        return HSKTextView.HSKWordsHolder((view as HSKWordView), listener)
+        val hskWord = HSKWordView(context)
+
+        return HSKTextView.HSKWordsHolder(hskWord, listener)
     }
 
     override fun getItemCount(): Int {
@@ -30,6 +38,6 @@ class HSKWordsAdapter(private val listener: OnHSKWordClickListener) : RecyclerVi
     }
 
     override fun onBindViewHolder(holder: HSKTextView.HSKWordsHolder, position: Int) {
-        holder.bind(words[position])
+        holder.bind(words[position], hanziSize)
     }
 }

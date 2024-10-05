@@ -1,10 +1,10 @@
 package fr.berliat.hskwidget.ui.OCR
 
-
 import android.Manifest
 import android.app.Activity
 import android.content.ContentValues
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.icu.text.SimpleDateFormat
 import android.net.Uri
 import android.os.Build
@@ -16,9 +16,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.OptIn
 import androidx.camera.core.CameraSelector
-import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
@@ -26,13 +24,9 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.google.mlkit.vision.common.InputImage
-import com.google.mlkit.vision.text.Text
-import com.google.mlkit.vision.text.TextRecognition
-import com.google.mlkit.vision.text.TextRecognizer
-import com.google.mlkit.vision.text.chinese.ChineseTextRecognizerOptions
 import com.yalantis.ucrop.UCrop
 import fr.berliat.hskwidget.databinding.FragmentOcrCaptureBinding
+import fr.berliat.hskwidget.domain.Utils
 import java.io.File
 import java.util.Locale
 import java.util.concurrent.ExecutorService
@@ -87,6 +81,11 @@ class CaptureImageFragment : Fragment() {
         return viewBinding.root // Return the root view of the binding
     }
 
+    override fun onResume() {
+        super.onResume()
+        Utils.hideKeyboard(requireContext(), viewBinding.root)
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         cameraExecutor.shutdown()
@@ -115,6 +114,7 @@ class CaptureImageFragment : Fragment() {
                 Toast.makeText(requireContext(),
                     "Permission request denied",
                     Toast.LENGTH_SHORT).show()
+                Log.e(TAG, "Permission request denied")
             } else {
                 startCamera()
             }
@@ -148,8 +148,9 @@ class CaptureImageFragment : Fragment() {
                 cameraProvider.bindToLifecycle(
                     this, cameraSelector, preview, imageCapture)
 
+                Log.d(TAG, "Camera started")
             } catch(exc: Exception) {
-                Log.e(TAG, "Use case binding failed", exc)
+                Log.e(TAG, "Couldn't start camera: binding failed", exc)
             }
 
         }, ContextCompat.getMainExecutor(requireContext()))
@@ -188,8 +189,7 @@ class CaptureImageFragment : Fragment() {
                 }
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                    val msg = "Photo capture succeeded: ${output.savedUri}, starting recognition"
-                    Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+                    val msg = "Photo capture succeeded: ${output.savedUri}"
                     Log.d(TAG, msg)
                     startCropActivity(output.savedUri!!)
                 }
@@ -201,72 +201,28 @@ class CaptureImageFragment : Fragment() {
         val destinationUri = Uri.fromFile(File(requireContext().cacheDir, "cropped_image.jpg"))
         val options = UCrop.Options().apply {
             setCompressionQuality(100)
+            setCompressionFormat(Bitmap.CompressFormat.PNG)
+            setFreeStyleCropEnabled(true)
+            setShowCropFrame(true)
         }
 
         val uCrop = UCrop.of(sourceUri, destinationUri)
-            .withAspectRatio(16f, 9f) // Set your desired aspect ratio
-            .withMaxResultSize(1080, 1920) // Set max size for cropped image
             .withOptions(options)
 
+        Log.i(TAG, "Starting uCrop cropping activity")
         cropActivityResultLauncher.launch(uCrop.getIntent(requireContext()))
     }
 
     fun handleCroppedImage(uri: Uri) {
-        Toast.makeText(requireContext(), "Cropped image: $uri", Toast.LENGTH_SHORT).show()
+        Log.i(TAG, "Crop succeeded to image path $uri")
 
         try {
-            // Convert the Uri to InputImage for OCR
-            val inputImage = InputImage.fromFilePath(requireContext(), uri)
-
-            // Call your OCR function
-            recognizeText(inputImage)
-
-            Toast.makeText(requireContext(), "Cropped image ready for OCR: $uri", Toast.LENGTH_SHORT).show()
+            val action = CaptureImageFragmentDirections.displayOCR(uri.toString(), arguments?.getString("preText") ?: "")
+            findNavController().navigate(action)
         } catch (e: Exception) {
             e.printStackTrace()
             Toast.makeText(requireContext(), "Error processing cropped image", Toast.LENGTH_SHORT).show()
         }
-    }
-
-    @OptIn(ExperimentalGetImage::class)
-    private fun recognizeText(image: InputImage) {
-        val options = ChineseTextRecognizerOptions.Builder()
-            .build()
-
-        val recognizer: TextRecognizer = TextRecognition.getClient(options)
-
-        recognizer.process(image)
-            .addOnSuccessListener { visionText ->
-                processTextRecognitionResult(visionText)
-                Log.d(TAG, "Recognized text: ${visionText.text}")
-            }
-            .addOnFailureListener { e ->
-                e.printStackTrace()
-            }
-    }
-
-    private fun processTextRecognitionResult(texts: Text) {
-        val blocks: List<Text.TextBlock> = texts.textBlocks
-        if (blocks.isEmpty()) {
-            Toast.makeText(requireContext(), "No text found", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        var concatText = ""
-        for (i in blocks.indices) {
-            val lines: List<Text.Line> = blocks[i].lines
-            for (j in lines.indices) {
-                val elements: List<Text.Element> = lines[j].elements
-                for (k in elements.indices) {
-                    Log.d(TAG, elements[k].text)
-                    concatText += elements[k].text
-                }
-            }
-            concatText += "\n\n"
-        }
-
-        val action = DisplayOCRFragmentDirections.displayOCR(concatText, incrementalOCR)
-        findNavController().navigate(action)
     }
 
     companion object {

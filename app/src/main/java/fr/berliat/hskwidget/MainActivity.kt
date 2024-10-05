@@ -1,5 +1,6 @@
 package fr.berliat.hskwidget
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
@@ -55,10 +56,22 @@ class MainActivity : AppCompatActivity() {
         setupSearchBtn()
         setupOCRBtn()
 
+        handleSearchIntent(intent)
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+
+        handleSearchIntent(intent)
+    }
+
+    fun handleSearchIntent(intent: Intent?) {
         intent?.let {
-            val searchWord = it.getStringExtra(INTENT_SEARCH_WORD)
-            if (searchWord != null) {
-                binding.appBarMain.appbarSearch.setQuery(searchWord, true)
+            if (it.hasExtra(INTENT_SEARCH_WORD)) {
+                val searchWord = it.getStringExtra(INTENT_SEARCH_WORD)
+                if (searchWord != null) {
+                    binding.appBarMain.appbarSearch.setQuery(searchWord, true)
+                }
             }
         }
     }
@@ -84,7 +97,7 @@ class MainActivity : AppCompatActivity() {
                     .findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment
                 val currentFragment = navHostFragment.childFragmentManager.fragments.firstOrNull()
 
-                if (currentFragment is DictionarySearchFragment) {
+                if (currentFragment is DictionarySearchFragment && currentFragment.isAdded && currentFragment.view != null) {
                     currentFragment.performSearch()
                 } else {
                     val action = DictionarySearchFragmentDirections.search()

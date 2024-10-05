@@ -11,6 +11,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.lifecycle.Observer
+import androidx.navigation.NavController
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
@@ -21,7 +22,9 @@ import androidx.work.workDataOf
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.ktx.Firebase
 import fr.berliat.hskwidget.R
+import fr.berliat.hskwidget.data.dao.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWord
+import fr.berliat.hskwidget.databinding.FragmentDictionarySearchItemBinding
 import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
 import java.util.Locale
 import java.util.concurrent.TimeUnit
@@ -207,6 +210,41 @@ class Utils {
                 context, ANALYTICS_EVENTS.SCREEN_VIEW,
                 mapOf("SCREEN_NAME" to screenName)
             )
+        }
+
+        fun populateDictionaryEntryView(binding: FragmentDictionarySearchItemBinding,
+                                        word: AnnotatedChineseWord, navController: NavController) {
+            with(binding.dictionaryItemChinese) {
+                hanziText = word.simplified.toString()
+                pinyinText = word.word?.pinyins.toString()
+            }
+            var hskViz = View.VISIBLE
+            if (word.word?.hskLevel == null || word.word.hskLevel == ChineseWord.HSK_Level.NOT_HSK)
+                hskViz = View.INVISIBLE
+            binding.dictionaryItemHskLevel.visibility = hskViz
+            binding.dictionaryItemHskLevel.text = word.word?.hskLevel.toString()
+
+            binding.dictionaryItemDefinition.text = word.word?.definition?.get(Locale.ENGLISH) ?: ""
+
+            with(binding.dictionaryItemFavorite) {
+                if (word.hasAnnotation()) {
+                    setImageResource(R.drawable.bookmark_heart_24px)
+                    imageTintList = android.content.res.ColorStateList.valueOf(
+                        androidx.core.content.ContextCompat.getColor(context, R.color.md_theme_dark_inversePrimary)
+                    )
+                } else {
+                    setImageResource(R.drawable.bookmark_24px)
+                    imageTintList = android.content.res.ColorStateList.valueOf(
+                        androidx.core.content.ContextCompat.getColor(context, R.color.md_theme_dark_surface)
+                    )
+                }
+
+                setOnClickListener {
+                    val action = fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragmentDirections.annotateWord(word.simplified!!, false)
+
+                    navController.navigate(action)
+                }
+            }
         }
 
     }

@@ -7,39 +7,88 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <LinearLayout
+        android:id="@+id/ocr_display_conf"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/ocr_display_text"  >
+        <ImageView
+            android:id="@+id/ocr_display_conf_smaller"
+            android:layout_width="35dp"
+            android:layout_height="30dp"
+            android:layout_gravity="bottom"
+            android:contentDescription="@string/ocr_display_conf_smaller"
+            android:src="@drawable/text_decrease_24px" />
+        <ImageView
+            android:id="@+id/ocr_display_conf_bigger"
+            android:layout_width="45dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="5dp"
+            android:contentDescription="@string/ocr_display_conf_bigger"
+            android:src="@drawable/text_increase_24px" />
+    </LinearLayout>
+
     <fr.berliat.hsktextviews.views.HSKTextView
         android:id="@+id/ocr_display_text"
-        android:inputType="textMultiLine"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:text="你好，我的名字是希睿"
+        app:layout_constraintTop_toBottomOf="@id/ocr_display_conf"
         app:layout_constraintBottom_toTopOf="@id/ocr_display_add"
         android:layout_width="match_parent"/>
 
-    <ImageView
+    <LinearLayout
         android:id="@+id/ocr_display_add"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
-        android:src="@drawable/photo_camera_24px"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:orientation="vertical"
         app:layout_constraintTop_toBottomOf="@id/ocr_display_text"
-        android:layout_marginBottom="00dp"
-        android:layout_marginEnd="-35dp"
-        android:contentDescription="Add more text below"
-        app:layout_constraintEnd_toStartOf="@id/vertical_centerline" />
+        app:layout_constraintBottom_toTopOf="@id/ocr_display_loading"  >
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:contentDescription="@string/ocr_display_add"
+            android:src="@drawable/photo_camera_24px" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:text="@string/ocr_display_add" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ocr_display_loading"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@id/ocr_display_add"
+        app:layout_constraintBottom_toBottomOf="@id/ocr_display_definition"  >
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:contentDescription="@string/ocr_display_loading"
+            android:src="@drawable/baseline_refresh_24" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:text="@string/ocr_display_loading" />
+    </LinearLayout>
+
 
     <include
         android:id="@+id/ocr_display_definition"
         layout="@layout/fragment_dictionary_search_item"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/ocr_display_loading"
         app:layout_constraintBottom_toBottomOf="parent"
-
-        android:visibility="gone"/>
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/vertical_centerline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent=".50" />
+        android:visibility="visible"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
