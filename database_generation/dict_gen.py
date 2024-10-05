@@ -1,7 +1,13 @@
+# python -m venv env
+#
+# source env/bin/activate
+# pip install -r requirements.txt
+# python3 dict_gen.py
 import json
 import re
 import sqlite3
 from typing import List, Optional
+from unidecode import unidecode
 
 # Define the ChineseWord class
 class ChineseWord:
@@ -12,6 +18,7 @@ class ChineseWord:
         self.pinyins = pinyins
         self.popularity = popularity
         self.hsk_level = hsk_level
+        self.searchable_text = simplified + ' ' + traditional + ' ' + unidecode(pinyins).replace(" ", "") + ' ' + json.dumps(definition)
 
 # Function to extract ChineseWord from a line in cedict_ts.u8
 def extract_chinese_entry(entry: str) -> Optional[ChineseWord]:
@@ -153,7 +160,7 @@ def build_dictionary(cedict_file: str, other_files: List[str], db_file: str):
         VALUES (?, ?, ?, ?, ?, ?, ?)
         ''', (word.simplified, word.traditional,  word.hsk_level, 
               word.pinyins, json.dumps(word.definition), word.popularity,
-              word.simplified + ' ' + word.traditional + ' ' + word.pinyins + ' ' + json.dumps(word.definition)))
+              word.searchable_text))
 
     # Commit and close
     conn.commit()
