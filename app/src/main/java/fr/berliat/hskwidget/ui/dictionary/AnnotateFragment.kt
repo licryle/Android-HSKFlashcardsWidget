@@ -17,6 +17,7 @@ import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWordAnnotation
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.databinding.FragmentAnnotationEditBinding
+import fr.berliat.hskwidget.domain.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -69,6 +70,7 @@ class AnnotateFragment: Fragment() {
             }
         }
 
+        Utils.hideKeyboard(requireContext(), binding.root)
         return binding.root
     }
 
