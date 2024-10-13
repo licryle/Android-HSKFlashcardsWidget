@@ -1,7 +1,5 @@
 package fr.berliat.hsktextviews.views
 
-import com.huaban.analysis.jieba.JiebaSegmenter
-
 import android.content.Context
 import android.graphics.Color
 import android.util.AttributeSet
@@ -27,9 +25,23 @@ class HSKTextView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : RecyclerView(context, attrs, defStyleAttr), OnHSKWordClickListener {
-    private lateinit var clickListener: (HSKWordView) -> Unit?
+    interface HSKTextSegmenter {
+        fun segment(text: String): Array<String>?
+    }
+
+    interface HSKTextListener {
+        fun onWordClick(word: HSKWordView)
+        fun onTextAnalysisStart()
+        fun onTextAnalysisSuccess()
+        fun onTextAnalysisFailure(e: Error)
+    }
+
+    lateinit var listener: HSKTextListener
+    var segmenter: HSKTextSegmenter? = null
+
     private val wordsAdapter: HSKWordsAdapter
     private var originalText: String = ""
+
 
     var hanziTextSize: Int
         get() {
@@ -80,25 +92,32 @@ class HSKTextView @JvmOverloads constructor(
             cleanText = cleanText.replace("(\\n|\\n\\r)".toRegex(), "\n")
 
             originalText = cleanText
+            listener.onTextAnalysisStart()
 
             GlobalScope.launch {
-                Log.d(TAG, "Loading JiebaSegmenter")
-                val segmenter = JiebaSegmenter()
-                Log.d(TAG, "Finished Loading JiebaSegmenter")
                 Log.d(TAG, "Start parsing")
 
-
                 val words = mutableListOf<Pair<String, String>>()
-                cleanText.split("\n").forEach { paragraph ->
-                    segmenter.process(paragraph, JiebaSegmenter.SegMode.INDEX).forEach { word ->
-                        words.add(Pair(word.word, ""))
-                        word.word
+                var success = false
+                if (segmenter?.segment("") == null) {
+                    Log.e(TAG, "Segmenter not ready")
+                } else {
+                    cleanText.split("\n").forEach { paragraph ->
+                        segmenter!!.segment(paragraph)?.forEach { word ->
+                            words.add(Pair(word, ""))
+                        }
+                        words.add(Pair("\n", ""))
                     }
-                    words.add(Pair("\n", ""))
+                    success = true
                 }
 
                 Log.d(TAG, "Finished parsing")
                 withContext(Dispatchers.Main) {
+                    if (success)
+                        listener.onTextAnalysisSuccess()
+                    else
+                        listener.onTextAnalysisFailure(Error("Segmenter is null"))
+
                     Log.d(TAG, "Start rendering parsing")
                     wordsAdapter.addData(words)
                     Log.d(TAG, "Finished rendering parsing")
@@ -115,12 +134,8 @@ class HSKTextView @JvmOverloads constructor(
         }
     }
 
-    fun setOnWordClickListener(listener: (HSKWordView) -> Unit) {
-        clickListener = listener
-    }
-
     override fun onWordClick(wordView: HSKWordView) {
-        clickListener(wordView)
+        listener.onWordClick(wordView)
     }
 
     class HSKWordsHolder(private val wordView: HSKWordView,

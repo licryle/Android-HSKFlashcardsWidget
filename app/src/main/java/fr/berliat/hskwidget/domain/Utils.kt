@@ -28,6 +28,8 @@ import fr.berliat.hskwidget.data.dao.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.databinding.FragmentDictionarySearchItemBinding
 import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -143,34 +145,37 @@ class Utils {
         }
 
         suspend fun copyFileUsingSAF(context: Context, sourcePath: String, destinationDir: Uri, fileName: String): Boolean {
-            try {
-                // Open InputStream from source file
-                val file = File(sourcePath)
+            return withContext(Dispatchers.IO) {
+                try {
+                    // Open InputStream from source file
+                    val file = File(sourcePath)
 
-                // Open input stream for the source database file
-                val inputStream: InputStream = FileInputStream(file)
+                    // Open input stream for the source database file
+                    val inputStream: InputStream = FileInputStream(file)
 
-                val dir = DocumentFile.fromTreeUri(context, destinationDir)
-                val destinationFile = dir?.createFile("application/octet-stream", fileName)
+                    val dir = DocumentFile.fromTreeUri(context, destinationDir)
+                    val destinationFile = dir?.createFile("application/octet-stream", fileName)
 
-                // Open OutputStream to the destination file
-                context.contentResolver.openFileDescriptor(destinationFile!!.uri, "w")?.use { parcelFileDescriptor ->
-                    FileOutputStream(parcelFileDescriptor.fileDescriptor).use { output ->
-                        // Copy data from source to destination
-                        inputStream.use { input ->
-                            val buffer = ByteArray(1024)
-                            var length: Int
-                            while (input.read(buffer).also { length = it } > 0) {
-                                output.write(buffer, 0, length)
+                    // Open OutputStream to the destination file
+                    context.contentResolver.openFileDescriptor(destinationFile!!.uri, "w")
+                        ?.use { parcelFileDescriptor ->
+                            FileOutputStream(parcelFileDescriptor.fileDescriptor).use { output ->
+                                // Copy data from source to destination
+                                inputStream.use { input ->
+                                    val buffer = ByteArray(1024)
+                                    var length: Int
+                                    while (input.read(buffer).also { length = it } > 0) {
+                                        output.write(buffer, 0, length)
+                                    }
+                                }
                             }
                         }
-                    }
-                }
 
-                return true
-            } catch (e: Exception) {
-                e.printStackTrace()
-                return false
+                    true
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    false
+                }
             }
         }
 

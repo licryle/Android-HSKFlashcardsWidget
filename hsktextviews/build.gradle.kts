@@ -46,5 +46,4 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
 
     implementation("com.google.android.flexbox:flexbox:3.0.0")
-    implementation("io.github.yrjyrj123:jieba-analysis:1.0.3")
 }

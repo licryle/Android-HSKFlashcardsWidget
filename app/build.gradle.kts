@@ -127,5 +127,5 @@ dependencies {
 
     implementation("com.github.yalantis:ucrop:2.2.9-native")
 
-    implementation("org.ansj:ansj_seg:5.1.6")
+    implementation("io.github.yrjyrj123:jieba-analysis:1.0.3")
 }

@@ -18,6 +18,7 @@ import com.google.android.material.navigation.NavigationView
 import fr.berliat.hskwidget.databinding.ActivityMainBinding
 import fr.berliat.hskwidget.domain.DatabaseBackup
 import fr.berliat.hskwidget.domain.DatabaseBackupFolderUriCallbacks
+import fr.berliat.hskwidget.domain.SharedViewModel
 import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragment
 import fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragmentDirections
@@ -38,6 +39,7 @@ class MainActivity : AppCompatActivity(), DatabaseBackupFolderUriCallbacks {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setupSharedViewModel()
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -93,6 +95,7 @@ class MainActivity : AppCompatActivity(), DatabaseBackupFolderUriCallbacks {
     }
 
     private fun handleBackUp() {
+        // @TODO(Licryle): handle properly in a config screen
         DatabaseBackup(this, this).getFolder()
     }
 
@@ -105,6 +108,10 @@ class MainActivity : AppCompatActivity(), DatabaseBackupFolderUriCallbacks {
                 }
             }
         }
+    }
+
+    private fun setupSharedViewModel() {
+        SharedViewModel.getInstance(this)
     }
 
     private fun setupOCRBtn() {

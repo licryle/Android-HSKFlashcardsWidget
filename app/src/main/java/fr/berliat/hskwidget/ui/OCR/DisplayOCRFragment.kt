@@ -11,17 +11,22 @@ import android.widget.Toast
 import androidx.annotation.OptIn
 import androidx.camera.core.ExperimentalGetImage
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.Text
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.TextRecognizer
 import com.google.mlkit.vision.text.chinese.ChineseTextRecognizerOptions
+import fr.berliat.hsktextviews.views.HSKTextView
+import fr.berliat.hsktextviews.views.HSKWordView
+import fr.berliat.hskwidget.R
 
 import fr.berliat.hskwidget.data.dao.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.databinding.FragmentOcrDisplayBinding
+import fr.berliat.hskwidget.domain.SharedViewModel
 import fr.berliat.hskwidget.domain.Utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -29,11 +34,8 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
-class DisplayOCRFragment : Fragment() {
+class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener {
     private lateinit var viewBinding: FragmentOcrDisplayBinding
-
-    private val coContext: CoroutineContext = Dispatchers.Main
-    private var coScope = CoroutineScope(coContext + SupervisorJob())
 
     private var isProcessing = false
 
@@ -54,26 +56,10 @@ class DisplayOCRFragment : Fragment() {
         viewBinding.ocrDisplayConfBigger.setOnClickListener { updateTextSize(2) }
         viewBinding.ocrDisplayConfSmaller.setOnClickListener { updateTextSize(-2) }
 
+        // @TODO(Llicryle): add case when segmenter is not ready yet with a proper callback on load
+        viewBinding.ocrDisplayText.segmenter = SharedViewModel.getInstance(this).segmenter
         viewBinding.ocrDisplayText.hanziTextSize = appConfig.readerTextSize
-        viewBinding.ocrDisplayText.setOnWordClickListener { word ->
-            word.setBackgroundColor(Color.CYAN)
-
-            coScope.launch {
-                // Switch to the IO dispatcher to perform background work
-                val result = fetchWord(word.hanziText)
-
-                // Update the UI with the result
-                if (result == null)
-                    Toast.makeText(context, "Couldn't find ${word.hanziText}", Toast.LENGTH_LONG).show()
-                else {
-                    word.pinyinText = result.word?.pinyins.toString()
-
-                    Utils.populateDictionaryEntryView(viewBinding.ocrDisplayDefinition,result,
-                                                      findNavController())
-                    viewBinding.root.visibility = View.VISIBLE
-                }
-            }
-        }
+        viewBinding.ocrDisplayText.listener = this
 
         return viewBinding.root // Return the root view of the binding
     }
@@ -154,7 +140,6 @@ class DisplayOCRFragment : Fragment() {
             viewBinding.ocrDisplayText.text += concatText
         else
             viewBinding.ocrDisplayText.text = concatText
-        toggleProcessing(false)
     }
 
     private suspend fun fetchWord(hanzi: String): AnnotatedChineseWord? {
@@ -189,5 +174,39 @@ class DisplayOCRFragment : Fragment() {
 
     companion object {
         private const val TAG = "DisplayOCRFragment"
+    }
+
+    override fun onWordClick(word: HSKWordView) {
+        word.setBackgroundColor(Color.CYAN)
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            // Switch to the IO dispatcher to perform background work
+            val result = fetchWord(word.hanziText)
+
+            // Update the UI with the result
+            if (result == null)
+                Toast.makeText(context, "Couldn't find ${word.hanziText}", Toast.LENGTH_LONG).show()
+            else {
+                word.pinyinText = result.word?.pinyins.toString()
+
+                Utils.populateDictionaryEntryView(viewBinding.ocrDisplayDefinition,result,
+                    findNavController())
+                viewBinding.root.visibility = View.VISIBLE
+            }
+        }
+    }
+
+    override fun onTextAnalysisStart() {
+        toggleProcessing(true)
+    }
+
+    override fun onTextAnalysisSuccess() {
+        toggleProcessing(false)
+    }
+
+    override fun onTextAnalysisFailure(e: Error) {
+        toggleProcessing(false)
+        Toast.makeText(context, getString(R.string.ocr_display_analysis_failure), Toast.LENGTH_LONG).show()
+        Log.d(TAG, "onTextAnalysisFailure: $e")
     }
 }
