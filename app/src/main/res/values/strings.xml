@@ -92,4 +92,8 @@ We recommend to choose the level your at plus the one below, or above depending 
     <string name="ocr_display_loading">Processing your image</string>
     <string name="ocr_display_conf_smaller">Decrease Text Size</string>
     <string name="ocr_display_conf_bigger">Increase Text Size</string>
+
+    <string name="dbbackup_success">Successfully backed-up the full database</string>
+    <string name="dbbackup_failure_write">Couldn\'t write / back-up the full database</string>
+    <string name="dbbackup_failure_folderpermission">No folder permission to backup database</string>
 </resources>

@@ -1,11 +1,20 @@
 package fr.berliat.hskwidget.data.store
 
 import android.content.Context
+import android.net.Uri
 import fr.berliat.hskwidget.data.model.ChineseWordAnnotation.ClassLevel
 import fr.berliat.hskwidget.data.model.ChineseWordAnnotation.ClassType
 
 class AppPreferencesStore(context: Context):
     PrefixedPreferenceDataStoreBridge(context.dataStore, "app") {
+    var dbBackUpDirectory: Uri
+        get() {
+            return Uri.parse(getString("database_backup_directory", ""))
+        }
+        set(dir) {
+            putString("database_backup_directory", dir.toString())
+        }
+
     var searchFilterHasAnnotation: Boolean
         get() {
             return getBoolean("search_filter_hasAnnotation", false)

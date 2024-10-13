@@ -7,9 +7,11 @@ import android.content.Intent
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.net.Uri
 import android.os.Bundle
+import android.provider.DocumentsContract
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import androidx.work.ExistingWorkPolicy
@@ -26,6 +28,10 @@ import fr.berliat.hskwidget.data.dao.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.databinding.FragmentDictionarySearchItemBinding
 import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.InputStream
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
@@ -121,10 +127,100 @@ class Utils {
             workMgr.enqueue(speechRequest)
         }
 
+        fun hasFolderWritePermission(context: Context, uri: Uri): Boolean {
+            if (uri.toString() == "") return false
+            if (!DocumentsContract.isTreeUri(uri)) return false
+
+            val resolver = context.contentResolver
+            val persistedUris = resolver.persistedUriPermissions
+
+            for (permission in persistedUris) {
+                if (permission.uri == uri && permission.isWritePermission) {
+                    return true
+                }
+            }
+            return false
+        }
+
+        suspend fun copyFileUsingSAF(context: Context, sourcePath: String, destinationDir: Uri, fileName: String): Boolean {
+            try {
+                // Open InputStream from source file
+                val file = File(sourcePath)
+
+                // Open input stream for the source database file
+                val inputStream: InputStream = FileInputStream(file)
+
+                val dir = DocumentFile.fromTreeUri(context, destinationDir)
+                val destinationFile = dir?.createFile("application/octet-stream", fileName)
+
+                // Open OutputStream to the destination file
+                context.contentResolver.openFileDescriptor(destinationFile!!.uri, "w")?.use { parcelFileDescriptor ->
+                    FileOutputStream(parcelFileDescriptor.fileDescriptor).use { output ->
+                        // Copy data from source to destination
+                        inputStream.use { input ->
+                            val buffer = ByteArray(1024)
+                            var length: Int
+                            while (input.read(buffer).also { length = it } > 0) {
+                                output.write(buffer, 0, length)
+                            }
+                        }
+                    }
+                }
+
+                return true
+            } catch (e: Exception) {
+                e.printStackTrace()
+                return false
+            }
+        }
+
         fun hideKeyboard(context: Context, view: View) {
             val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             view.let {
                 imm.hideSoftInputFromWindow(it.windowToken, 0)
+            }
+        }
+
+        fun populateDictionaryEntryView(binding: FragmentDictionarySearchItemBinding,
+                                        word: AnnotatedChineseWord, navController: NavController) {
+            var pinyins = word.word?.pinyins.toString()
+            if (pinyins == "")
+                pinyins = word.annotation?.pinyins?.toString() ?: ""
+
+            var definition = word.word?.definition?.get(Locale.ENGLISH) ?: ""
+            if (definition == "")
+                definition = word.annotation?.notes ?: ""
+
+            with(binding.dictionaryItemChinese) {
+                hanziText = word.simplified.toString()
+                pinyinText = pinyins
+            }
+            var hskViz = View.VISIBLE
+            if (word.word?.hskLevel == null || word.word.hskLevel == ChineseWord.HSK_Level.NOT_HSK)
+                hskViz = View.INVISIBLE
+            binding.dictionaryItemHskLevel.visibility = hskViz
+            binding.dictionaryItemHskLevel.text = word.word?.hskLevel.toString()
+
+            binding.dictionaryItemDefinition.text = definition
+
+            with(binding.dictionaryItemFavorite) {
+                if (word.hasAnnotation()) {
+                    setImageResource(R.drawable.bookmark_heart_24px)
+                    imageTintList = android.content.res.ColorStateList.valueOf(
+                        androidx.core.content.ContextCompat.getColor(context, R.color.md_theme_dark_inversePrimary)
+                    )
+                } else {
+                    setImageResource(R.drawable.bookmark_24px)
+                    imageTintList = android.content.res.ColorStateList.valueOf(
+                        androidx.core.content.ContextCompat.getColor(context, R.color.md_theme_dark_surface)
+                    )
+                }
+
+                setOnClickListener {
+                    val action = fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragmentDirections.annotateWord(word.simplified!!, false)
+
+                    navController.navigate(action)
+                }
             }
         }
 
@@ -210,49 +306,6 @@ class Utils {
                 context, ANALYTICS_EVENTS.SCREEN_VIEW,
                 mapOf("SCREEN_NAME" to screenName)
             )
-        }
-
-        fun populateDictionaryEntryView(binding: FragmentDictionarySearchItemBinding,
-                                        word: AnnotatedChineseWord, navController: NavController) {
-            var pinyins = word.word?.pinyins.toString() ?: ""
-            if (pinyins == "")
-                pinyins = word.annotation?.pinyins?.toString() ?: ""
-
-            var definition = word.word?.definition?.get(Locale.ENGLISH) ?: ""
-            if (definition == "")
-                definition = word.annotation?.notes ?: ""
-
-            with(binding.dictionaryItemChinese) {
-                hanziText = word.simplified.toString()
-                pinyinText = pinyins
-            }
-            var hskViz = View.VISIBLE
-            if (word.word?.hskLevel == null || word.word.hskLevel == ChineseWord.HSK_Level.NOT_HSK)
-                hskViz = View.INVISIBLE
-            binding.dictionaryItemHskLevel.visibility = hskViz
-            binding.dictionaryItemHskLevel.text = word.word?.hskLevel.toString()
-
-            binding.dictionaryItemDefinition.text = definition
-
-            with(binding.dictionaryItemFavorite) {
-                if (word.hasAnnotation()) {
-                    setImageResource(R.drawable.bookmark_heart_24px)
-                    imageTintList = android.content.res.ColorStateList.valueOf(
-                        androidx.core.content.ContextCompat.getColor(context, R.color.md_theme_dark_inversePrimary)
-                    )
-                } else {
-                    setImageResource(R.drawable.bookmark_24px)
-                    imageTintList = android.content.res.ColorStateList.valueOf(
-                        androidx.core.content.ContextCompat.getColor(context, R.color.md_theme_dark_surface)
-                    )
-                }
-
-                setOnClickListener {
-                    val action = fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragmentDirections.annotateWord(word.simplified!!, false)
-
-                    navController.navigate(action)
-                }
-            }
         }
 
     }

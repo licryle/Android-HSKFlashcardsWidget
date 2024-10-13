@@ -31,6 +31,8 @@ abstract class ChineseWordsDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: ChineseWordsDatabase? = null
 
+        const val DATABASE_FILE = "chinese_words.db"
+
         fun getInstance(context: Context): ChineseWordsDatabase =
             INSTANCE ?: synchronized(this) {
                 INSTANCE ?: buildDatabase(context).also { INSTANCE = it }
@@ -38,9 +40,9 @@ abstract class ChineseWordsDatabase : RoomDatabase() {
 
         private fun buildDatabase(context: Context) =
             Room.databaseBuilder(context.applicationContext,
-                    ChineseWordsDatabase::class.java, "chinese_words.db")
-                .createFromAsset("databases/chinese_words.db")
-                .setQueryCallback(RoomDatabase.QueryCallback { sqlQuery, bindArgs ->
+                    ChineseWordsDatabase::class.java, DATABASE_FILE)
+                .createFromAsset("databases/$DATABASE_FILE")
+                .setQueryCallback({ sqlQuery, bindArgs ->
                     Log.d("ChineseWordsDatabase", "SQL Query: $sqlQuery SQL Args: $bindArgs")
                 }, Executors.newSingleThreadExecutor())
                 .build()

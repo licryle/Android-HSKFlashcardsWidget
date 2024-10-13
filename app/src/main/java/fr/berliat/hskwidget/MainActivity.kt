@@ -1,7 +1,9 @@
 package fr.berliat.hskwidget
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.drawerlayout.widget.DrawerLayout
@@ -14,11 +16,17 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
 import fr.berliat.hskwidget.databinding.ActivityMainBinding
+import fr.berliat.hskwidget.domain.DatabaseBackup
+import fr.berliat.hskwidget.domain.DatabaseBackupFolderUriCallbacks
 import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragment
 import fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragmentDirections
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), DatabaseBackupFolderUriCallbacks {
     companion object {
         const val INTENT_SEARCH_WORD: String = "search_word"
     }
@@ -57,6 +65,7 @@ class MainActivity : AppCompatActivity() {
         setupOCRBtn()
 
         handleSearchIntent(intent)
+        handleBackUp()
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -65,7 +74,29 @@ class MainActivity : AppCompatActivity() {
         handleSearchIntent(intent)
     }
 
-    fun handleSearchIntent(intent: Intent?) {
+    override fun onUriPermissionGranted(uri: Uri) {
+        val activity = this
+        GlobalScope.launch {
+            val success = DatabaseBackup(activity, activity).backUp(uri)
+
+            withContext(Dispatchers.Main) {
+                if (success)
+                    Toast.makeText(applicationContext, getString(R.string.dbbackup_success), Toast.LENGTH_LONG).show()
+                else
+                    Toast.makeText(applicationContext, getString(R.string.dbbackup_failure_write), Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    override fun onUriPermissionDenied() {
+        Toast.makeText(applicationContext, getString(R.string.dbbackup_failure_folderpermission), Toast.LENGTH_LONG).show()
+    }
+
+    private fun handleBackUp() {
+        DatabaseBackup(this, this).getFolder()
+    }
+
+    private fun handleSearchIntent(intent: Intent?) {
         intent?.let {
             if (it.hasExtra(INTENT_SEARCH_WORD)) {
                 val searchWord = it.getStringExtra(INTENT_SEARCH_WORD)
