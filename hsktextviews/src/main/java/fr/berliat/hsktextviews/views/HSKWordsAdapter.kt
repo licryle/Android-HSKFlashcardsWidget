@@ -6,12 +6,20 @@ import androidx.recyclerview.widget.RecyclerView
 
 class HSKWordsAdapter(private val context: Context,
                       private val listener: OnHSKWordClickListener,
-                      hanziTextSize: Int
+                      hanziTextSize: Int,
+                      wordEndSeparator: String
 ) : RecyclerView.Adapter<HSKTextView.HSKWordsHolder>() {
     private val words = mutableListOf<Pair<String, String>>()
+
     var hanziSize: Int = hanziTextSize
         set(size) {
             field = size
+            notifyDataSetChanged()
+        }
+
+    var wordSeparator: String = wordEndSeparator
+        set(separator) {
+            field = separator
             notifyDataSetChanged()
         }
 
@@ -38,6 +46,6 @@ class HSKWordsAdapter(private val context: Context,
     }
 
     override fun onBindViewHolder(holder: HSKTextView.HSKWordsHolder, position: Int) {
-        holder.bind(words[position], hanziSize)
+        holder.bind(words[position], hanziSize, wordSeparator)
     }
 }

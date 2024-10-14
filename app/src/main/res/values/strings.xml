@@ -97,4 +97,5 @@ We recommend to choose the level your at plus the one below, or above depending 
     <string name="dbbackup_failure_write">Couldn\'t write / back-up the full database</string>
     <string name="dbbackup_failure_folderpermission">No folder permission to backup database</string>
     <string name="ocr_display_analysis_failure">Text Analysis failed - try again</string>
+    <string name="ocr_display_separator">Separate words</string>
 </resources>

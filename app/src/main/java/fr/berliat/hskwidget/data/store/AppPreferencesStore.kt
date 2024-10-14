@@ -7,6 +7,15 @@ import fr.berliat.hskwidget.data.model.ChineseWordAnnotation.ClassType
 
 class AppPreferencesStore(context: Context):
     PrefixedPreferenceDataStoreBridge(context.dataStore, "app") {
+
+    var readerSeparateWords: Boolean
+        get() {
+            return getBoolean("reader_separate_word", false)
+        }
+        set(wordSeparator) {
+            putBoolean("reader_separate_word", wordSeparator)
+        }
+
     var dbBackUpDirectory: Uri
         get() {
             return Uri.parse(getString("database_backup_directory", ""))

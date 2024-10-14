@@ -1,5 +1,6 @@
 package fr.berliat.hsktextviews.views
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface
@@ -45,6 +46,8 @@ class HSKWordView @JvmOverloads constructor(
             pinyinStyle = typedArray.getInt(R.styleable.HSKWordView_pinyinStyle, Typeface.NORMAL)
             hanziStyle = typedArray.getInt(R.styleable.HSKWordView_hanziStyle, Typeface.BOLD)
 
+            endSeparator = typedArray.getString(R.styleable.HSKWordView_endSeparator) ?: ""
+
             typedArray.recycle()
         }
     }
@@ -53,16 +56,27 @@ class HSKWordView @JvmOverloads constructor(
         clickListener = listener
     }
 
+    @SuppressLint("SetTextI18n")
+    private fun updateHanziText() {
+        bindings.hanzi.text = hanziText + endSeparator
+    }
+
     var pinyinText: String
         get() = bindings.pinyin.text.toString()
         set(value) {
             bindings.pinyin.text = value
         }
 
-    var hanziText: String
-        get() = bindings.hanzi.text.toString()
+    var hanziText: String = ""
         set(value) {
-            bindings.hanzi.text = value
+            field = value
+            updateHanziText()
+        }
+
+    var endSeparator: String = ""
+        set(value) {
+            field = value
+            updateHanziText()
         }
 
     var pinyinSize: Int

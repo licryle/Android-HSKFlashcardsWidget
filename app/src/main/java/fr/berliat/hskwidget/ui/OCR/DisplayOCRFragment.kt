@@ -38,6 +38,8 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
 
     private lateinit var appConfig: AppPreferencesStore
 
+    private val DEFAULT_WORD_SEPARATOR = "/"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         segmenter = SharedViewModel.getInstance(this).segmenter
@@ -62,6 +64,7 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
 
             viewBinding.ocrDisplayText.segmenter = segmenter
             viewBinding.ocrDisplayText.hanziTextSize = appConfig.readerTextSize
+            toggleWordSeparator(appConfig.readerSeparateWords)
 
         //    SharedViewModel.getInstance(this).ocr_view_binding = viewBinding
         //}
@@ -69,6 +72,12 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
         viewBinding.ocrDisplayConfBigger.setOnClickListener { updateTextSize(2) }
         viewBinding.ocrDisplayConfSmaller.setOnClickListener { updateTextSize(-2) }
         viewBinding.ocrDisplayText.listener = this
+
+        viewBinding.ocrDisplaySeparator.isChecked = appConfig.readerSeparateWords
+        viewBinding.ocrDisplaySeparator.setOnClickListener {
+            appConfig.readerSeparateWords = viewBinding.ocrDisplaySeparator.isChecked
+            toggleWordSeparator(viewBinding.ocrDisplaySeparator.isChecked)
+        }
 
         setupSegmenter()
 
@@ -85,6 +94,13 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
             Log.d(TAG, "Segmenter ready: let's process arguments")
             processFromArguments()
         }
+    }
+
+    private fun toggleWordSeparator(separate: Boolean) {
+        viewBinding.ocrDisplayText.wordSeparator = if (separate)
+            DEFAULT_WORD_SEPARATOR
+        else
+            ""
     }
 
     private fun updateTextSize(increment: Int) {

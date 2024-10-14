@@ -43,12 +43,47 @@ class HSKTextView @JvmOverloads constructor(
         fun onTextAnalysisFailure(e: Error)
     }
 
-    lateinit var listener: HSKTextListener
+    var listener: HSKTextListener? = null
     var segmenter: HSKTextSegmenter? = null
 
     private val wordsAdapter: HSKWordsAdapter
     private var originalText: String = ""
 
+    private val DEFAULT_HANZI_SIZE = 20
+    private val DEFAULT_WORD_SEPARATOR = ""
+
+    init {
+        val loManager = FlexboxLayoutManager(context)
+        loManager.flexDirection = FlexDirection.ROW
+        loManager.flexWrap = FlexWrap.WRAP
+        loManager.justifyContent = JustifyContent.FLEX_START
+        layoutManager = loManager
+
+        wordsAdapter = HSKWordsAdapter(context, this, DEFAULT_HANZI_SIZE, DEFAULT_WORD_SEPARATOR)
+        adapter = wordsAdapter
+
+        HskTextViewBinding.inflate(
+            LayoutInflater.from(context),
+            this,
+            false
+        )
+
+        attrs?.let {
+            val typedArray = context.obtainStyledAttributes(it, R.styleable.HSKTextView, 0, 0)
+
+            text = typedArray.getString(R.styleable.HSKTextView_text) ?: ""
+            wordSeparator = typedArray.getString(R.styleable.HSKTextView_wordSeparator) ?: ""
+            hanziTextSize = typedArray.getDimensionPixelSize(R.styleable.HSKTextView_hanziTextSize, wordsAdapter.hanziSize)
+
+            typedArray.recycle()
+        }
+    }
+
+    var wordSeparator: String
+        get() = wordsAdapter.wordSeparator
+        set(value) {
+            wordsAdapter.wordSeparator = value
+        }
 
     var hanziTextSize: Int
         get() {
@@ -61,29 +96,6 @@ class HSKTextView @JvmOverloads constructor(
                 wordsAdapter.hanziSize = value
             }
         }
-
-    init {
-        val loManager = FlexboxLayoutManager(context)
-        loManager.flexDirection = FlexDirection.ROW
-        loManager.flexWrap = FlexWrap.WRAP
-        loManager.justifyContent = JustifyContent.FLEX_START
-        layoutManager = loManager
-
-        wordsAdapter = HSKWordsAdapter(context, this, 20)
-        adapter = wordsAdapter
-
-        HskTextViewBinding.inflate(
-            LayoutInflater.from(context),
-            this,
-            false
-        )
-
-        attrs?.let {
-            val typedArray = context.obtainStyledAttributes(it, R.styleable.HSKTextView, 0, 0)
-            //text = typedArray.getString(R.styleable.HSKTextView_text).toString()
-            typedArray.recycle()
-        }
-    }
 
     var displayPinYin: Boolean
         get() = false
@@ -99,35 +111,33 @@ class HSKTextView @JvmOverloads constructor(
             cleanText = cleanText.replace("(\\n|\\n\\r)".toRegex(), "\n")
 
             originalText = cleanText
-            listener.onTextAnalysisStart()
 
-            GlobalScope.launch {
-                Log.d(TAG, "Start parsing")
+            if (originalText != "") {
+                listener?.onTextAnalysisStart()
 
-                val words = mutableListOf<Pair<String, String>>()
-                var success = false
-                if (segmenter?.segment("") == null) {
-                    Log.e(TAG, "Segmenter not ready")
-                } else {
+                GlobalScope.launch {
+                    Log.d(TAG, "Start parsing")
+
+                    val words = mutableListOf<Pair<String, String>>()
+
                     cleanText.split("\n").forEach { paragraph ->
-                        segmenter!!.segment(paragraph)?.forEach { word ->
+                        segmenter?.segment(paragraph)?.forEach { word ->
                             words.add(Pair(word, ""))
                         }
                         words.add(Pair("\n", ""))
                     }
-                    success = true
-                }
 
-                Log.d(TAG, "Finished parsing")
-                withContext(Dispatchers.Main) {
-                    if (success)
-                        listener.onTextAnalysisSuccess()
-                    else
-                        listener.onTextAnalysisFailure(Error("Segmenter is null"))
+                    Log.d(TAG, "Finished parsing")
+                    withContext(Dispatchers.Main) {
+                        if (words.size > 1)
+                            listener?.onTextAnalysisSuccess()
+                        else
+                            listener?.onTextAnalysisFailure(Error("Segmenter is null"))
 
-                    Log.d(TAG, "Start rendering parsing")
-                    wordsAdapter.addData(words)
-                    Log.d(TAG, "Finished rendering parsing")
+                        Log.d(TAG, "Start rendering parsing")
+                        wordsAdapter.addData(words)
+                        Log.d(TAG, "Finished rendering parsing")
+                    }
                 }
             }
         }
@@ -142,19 +152,19 @@ class HSKTextView @JvmOverloads constructor(
     }
 
     override fun onWordClick(wordView: HSKWordView) {
-        listener.onWordClick(wordView)
+        listener?.onWordClick(wordView)
     }
 
     class HSKWordsHolder(private val wordView: HSKWordView,
                          private val listener: OnHSKWordClickListener)
         : ViewHolder(wordView.rootView) {
 
-        fun bind(word: Pair<String, String>, hanziSize: Int) {
+        fun bind(word: Pair<String, String>, hanziSize: Int, wordSeparator: String) {
             wordView.hanziText = word.first
             wordView.hanziSize = hanziSize
             wordView.pinyinText = word.second
             wordView.pinyinSize = ceil((hanziSize * 3 / 4).toDouble()).toInt()
-            //pinyinSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 20f, resources.displayMetrics)
+            wordView.endSeparator = wordSeparator
 
             var layoutParams = FlexboxLayoutManager.LayoutParams(
                 FlexboxLayout.LayoutParams.WRAP_CONTENT,
@@ -169,6 +179,7 @@ class HSKTextView @JvmOverloads constructor(
                     flexGrow = 1f // Allow it to grow and push items down
                 }
                 wordView.setBackgroundColor(Color.RED)
+                wordView.endSeparator = "LALALA"
             } else {
                 wordView.setOnWordClickListener(listener)
             }

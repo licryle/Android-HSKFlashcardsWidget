@@ -9,6 +9,7 @@
             <enum name="italic" value="2" />
         </attr>
         <attr name="pinyinColor" format="color" />
+        <attr name="endSeparator" format="string" />
 
         <!-- Attributes for Hanzi TextView -->
         <attr name="hanzi" format="string" />
@@ -23,5 +24,7 @@
 
     <declare-styleable name="HSKTextView">
         <attr name="text" format="string"/>
+        <attr name="wordSeparator" format="string" />
+        <attr name="hanziTextSize" format="dimension" />
     </declare-styleable>
 </resources>
