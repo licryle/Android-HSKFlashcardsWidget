@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,15 +18,10 @@ import fr.berliat.hskwidget.data.dao.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.domain.Utils
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 import fr.berliat.hskwidget.databinding.FragmentDictionarySearchBinding
 import fr.berliat.hskwidget.databinding.FragmentDictionarySearchItemBinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
-import kotlin.coroutines.CoroutineContext
 
 class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResultChangedListener {
     private lateinit var searchAdapter: DictionarySearchAdapter
@@ -39,9 +35,6 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
         get() {
             return activity?.findViewById<SearchView>(R.id.appbar_search)?.query.toString()
         }
-
-    private val coContext: CoroutineContext = Dispatchers.Main
-    private var coScope = CoroutineScope(coContext + SupervisorJob())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,11 +58,6 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
         performSearch()
     }
 
-    override fun onStop() {
-        super.onStop()
-        coScope.cancel()
-    }
-
     private fun setupRecyclerView() {
         binding.dictionarySearchResults.layoutManager = LinearLayoutManager(context)
         binding.dictionarySearchResults.adapter = searchAdapter
@@ -90,14 +78,13 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
 
                 // Load more if at the bottom and not already loading
                 if (!isLoading && totalItemCount <= (lastVisibleItem + 2)) {
-                    coScope.launch { loadMoreResults() }
+                    viewLifecycleOwner.lifecycleScope.launch { loadMoreResults() }
                 }
             }
         })
 
         binding.dictionarySearchFilterHasannotation.setOnClickListener {
             appConfig.searchFilterHasAnnotation = binding.dictionarySearchFilterHasannotation.isChecked
-            print(appConfig.searchFilterHasAnnotation)
             performSearch()
         }
     }
@@ -110,10 +97,7 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
         currentPage = 0
         Log.d("DictionarySearchFragment", "New search requested: $searchQuery")
 
-        coScope.cancel() // avoid a slower search to return and override result!
-        coScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
-
-        coScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             // Here we executed in the coRoutine Scope
             val result = fetchResultsForPage()
 
