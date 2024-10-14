@@ -48,6 +48,11 @@ class HSKWordView @JvmOverloads constructor(
 
             endSeparator = typedArray.getString(R.styleable.HSKWordView_endSeparator) ?: ""
 
+            isClicked = typedArray.getBoolean(R.styleable.HSKWordView_isClicked, false)
+            clickedBackgroundColor = typedArray.getColor(R.styleable.HSKWordView_clickedBackgroundColor, Color.BLACK)
+            clickedHanziColor = typedArray.getColor(R.styleable.HSKWordView_clickedHanziColor, Color.WHITE)
+            clickedPinyinColor = typedArray.getColor(R.styleable.HSKWordView_clickedPinyinColor, Color.WHITE)
+
             typedArray.recycle()
         }
     }
@@ -91,16 +96,18 @@ class HSKWordView @JvmOverloads constructor(
             bindings.hanzi.textSize = value.toFloat()
         }
 
-    var pinyinColor: Int
-        get() = bindings.pinyin.currentTextColor
+    var pinyinColor: Int = Color.DKGRAY
         set(value) {
-            bindings.pinyin.setTextColor(value)
+            field = value
+            if (!isClicked)
+                bindings.pinyin.setTextColor(value)
         }
 
-    var hanziColor: Int
-        get() = bindings.hanzi.currentTextColor
+    var hanziColor: Int = Color.BLACK
         set(value) {
-            bindings.hanzi.setTextColor(value)
+            field = value
+            if (!isClicked)
+                bindings.hanzi.setTextColor(value)
         }
 
     var pinyinStyle: Int
@@ -113,5 +120,41 @@ class HSKWordView @JvmOverloads constructor(
         get() = bindings.hanzi.typeface.style
         set(value) {
             bindings.hanzi.setTypeface(null, value)
+        }
+
+    var isClicked: Boolean = false
+        set(value) {
+            field = value
+
+            if (value) {
+                setBackgroundColor(clickedBackgroundColor)
+                bindings.pinyin.setTextColor(clickedPinyinColor)
+                bindings.hanzi.setTextColor(clickedHanziColor)
+            } else {
+                setBackgroundColor(Color.TRANSPARENT)
+                bindings.pinyin.setTextColor(pinyinColor)
+                bindings.hanzi.setTextColor(hanziColor)
+            }
+        }
+
+    var clickedBackgroundColor: Int = Color.BLACK
+        set(value) {
+            field = value
+            if (isClicked)
+                bindings.root.setBackgroundColor(value)
+        }
+
+    var clickedHanziColor: Int = Color.WHITE
+        set(value) {
+            field = value
+            if (isClicked)
+                bindings.hanzi.setTextColor(value)
+        }
+
+    var clickedPinyinColor: Int = Color.WHITE
+        set(value) {
+            field = value
+            if (isClicked)
+                bindings.pinyin.setTextColor(value)
         }
 }

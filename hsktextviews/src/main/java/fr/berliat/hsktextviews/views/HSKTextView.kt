@@ -52,6 +52,9 @@ class HSKTextView @JvmOverloads constructor(
     private val DEFAULT_HANZI_SIZE = 20
     private val DEFAULT_WORD_SEPARATOR = ""
 
+    private val DEFAULT_CLICKED_BG_COLOR = Color.BLACK
+    private val DEFAULT_CLICKED_TXT_COLOR = Color.WHITE
+
     init {
         val loManager = FlexboxLayoutManager(context)
         loManager.flexDirection = FlexDirection.ROW
@@ -59,7 +62,7 @@ class HSKTextView @JvmOverloads constructor(
         loManager.justifyContent = JustifyContent.FLEX_START
         layoutManager = loManager
 
-        wordsAdapter = HSKWordsAdapter(context, this, DEFAULT_HANZI_SIZE, DEFAULT_WORD_SEPARATOR)
+        wordsAdapter = HSKWordsAdapter(context, this)
         adapter = wordsAdapter
 
         HskTextViewBinding.inflate(
@@ -75,9 +78,18 @@ class HSKTextView @JvmOverloads constructor(
             wordSeparator = typedArray.getString(R.styleable.HSKTextView_wordSeparator) ?: ""
             hanziTextSize = typedArray.getDimensionPixelSize(R.styleable.HSKTextView_hanziTextSize, wordsAdapter.hanziSize)
 
+            clickedBackgroundColor = typedArray.getColor(R.styleable.HSKTextView_clickedWordBackgroundColor, Color.BLACK)
+            clickedHanziColor = typedArray.getColor(R.styleable.HSKTextView_clickedWordHanziColor, Color.WHITE)
+            clickedPinyinColor = typedArray.getColor(R.styleable.HSKTextView_clickedWordPinyinColor, Color.WHITE)
+
             typedArray.recycle()
         }
     }
+
+    var clickedWords: MutableMap<String, String> = mutableMapOf()
+        set(value) {
+            wordsAdapter.clickedWords = value
+        }
 
     var wordSeparator: String
         get() = wordsAdapter.wordSeparator
@@ -86,9 +98,7 @@ class HSKTextView @JvmOverloads constructor(
         }
 
     var hanziTextSize: Int
-        get() {
-            return wordsAdapter.hanziSize
-        }
+        get() = wordsAdapter.hanziSize
         set(value) {
             if (value < 8)
                 throw UnsupportedOperationException("Text Too Small")
@@ -102,6 +112,24 @@ class HSKTextView @JvmOverloads constructor(
         set(value) {
             if (value)
                 throw UnsupportedOperationException("Not implemented yet")
+        }
+
+    var clickedBackgroundColor: Int
+        get() = wordsAdapter.clickedBackgroundColor
+        set(value) {
+            wordsAdapter.clickedBackgroundColor = value
+        }
+
+    var clickedHanziColor: Int
+        get() = wordsAdapter.clickedHanziColor
+        set(value) {
+            wordsAdapter.clickedHanziColor = value
+        }
+
+    var clickedPinyinColor: Int
+        get() = wordsAdapter.clickedPinyinColor
+        set(value) {
+            wordsAdapter.clickedPinyinColor = value
         }
 
     var text: String
@@ -159,12 +187,18 @@ class HSKTextView @JvmOverloads constructor(
                          private val listener: OnHSKWordClickListener)
         : ViewHolder(wordView.rootView) {
 
-        fun bind(word: Pair<String, String>, hanziSize: Int, wordSeparator: String) {
+        fun bind(word: Pair<String, String>, hanziSize: Int, wordSeparator: String,
+                 clickedBackgroundColor: Int, clickedHanziColor: Int, clickedPinyinColor: Int,
+                 isClicked: Boolean) {
             wordView.hanziText = word.first
             wordView.hanziSize = hanziSize
             wordView.pinyinText = word.second
             wordView.pinyinSize = ceil((hanziSize * 3 / 4).toDouble()).toInt()
             wordView.endSeparator = wordSeparator
+            wordView.clickedBackgroundColor = clickedBackgroundColor
+            wordView.clickedHanziColor = clickedHanziColor
+            wordView.clickedPinyinColor = clickedPinyinColor
+            wordView.isClicked = isClicked
 
             var layoutParams = FlexboxLayoutManager.LayoutParams(
                 FlexboxLayout.LayoutParams.WRAP_CONTENT,
@@ -179,7 +213,6 @@ class HSKTextView @JvmOverloads constructor(
                     flexGrow = 1f // Allow it to grow and push items down
                 }
                 wordView.setBackgroundColor(Color.RED)
-                wordView.endSeparator = "LALALA"
             } else {
                 wordView.setOnWordClickListener(listener)
             }

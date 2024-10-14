@@ -20,11 +20,20 @@
             <enum name="italic" value="2" />
         </attr>
         <attr name="hanziColor" format="color" />
+
+        <attr name="isClicked" format="boolean" />
+        <attr name="clickedBackgroundColor" format="color" />
+        <attr name="clickedPinyinColor" format="color" />
+        <attr name="clickedHanziColor" format="color" />
     </declare-styleable>
 
     <declare-styleable name="HSKTextView">
         <attr name="text" format="string"/>
         <attr name="wordSeparator" format="string" />
         <attr name="hanziTextSize" format="dimension" />
+
+        <attr name="clickedWordBackgroundColor" format="color" />
+        <attr name="clickedWordPinyinColor" format="color" />
+        <attr name="clickedWordHanziColor" format="color" />
     </declare-styleable>
 </resources>
