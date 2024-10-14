@@ -28,44 +28,68 @@ import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.databinding.FragmentOcrDisplayBinding
 import fr.berliat.hskwidget.domain.SharedViewModel
 import fr.berliat.hskwidget.domain.Utils
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import kotlin.coroutines.CoroutineContext
 
-class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener {
+class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.HSKTextSegmenterListener {
     private lateinit var viewBinding: FragmentOcrDisplayBinding
+    private lateinit var segmenter: HSKTextView.HSKTextSegmenter
 
     private var isProcessing = false
 
     private lateinit var appConfig: AppPreferencesStore
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        segmenter = SharedViewModel.getInstance(this).segmenter
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        viewBinding = FragmentOcrDisplayBinding.inflate(inflater, container, false) // Inflate here
-        appConfig = AppPreferencesStore(requireContext())
+        //if (SharedViewModel.getInstance(this).ocr_view_binding != null) {
+        //    viewBinding = SharedViewModel.getInstance(this).ocr_view_binding!!
+        //} else {
+            viewBinding =
+                FragmentOcrDisplayBinding.inflate(inflater, container, false) // Inflate here
+            appConfig = AppPreferencesStore(requireContext())
 
-        viewBinding.ocrDisplayAdd.setOnClickListener {
-            val action = CaptureImageFragmentDirections.processOCR(viewBinding.ocrDisplayText.text)
-            findNavController().navigate(action)
-        }
+            viewBinding.ocrDisplayAdd.setOnClickListener {
+                val action =
+                    CaptureImageFragmentDirections.processOCR(viewBinding.ocrDisplayText.text)
+                findNavController().navigate(action)
+            }
+
+            viewBinding.ocrDisplayText.segmenter = segmenter
+            viewBinding.ocrDisplayText.hanziTextSize = appConfig.readerTextSize
+
+        //    SharedViewModel.getInstance(this).ocr_view_binding = viewBinding
+        //}
 
         viewBinding.ocrDisplayConfBigger.setOnClickListener { updateTextSize(2) }
         viewBinding.ocrDisplayConfSmaller.setOnClickListener { updateTextSize(-2) }
-
-        // @TODO(Llicryle): add case when segmenter is not ready yet with a proper callback on load
-        viewBinding.ocrDisplayText.segmenter = SharedViewModel.getInstance(this).segmenter
-        viewBinding.ocrDisplayText.hanziTextSize = appConfig.readerTextSize
         viewBinding.ocrDisplayText.listener = this
+
+        setupSegmenter()
 
         return viewBinding.root // Return the root view of the binding
     }
 
+    private fun setupSegmenter() {
+        toggleProcessing(true)
+
+        if (! segmenter.isReady()) {
+            Log.d(TAG, "Segmenter not ready, setting up listener")
+            segmenter.listener = this
+        } else {
+            Log.d(TAG, "Segmenter ready: let's process arguments")
+            processFromArguments()
+        }
+    }
+
     private fun updateTextSize(increment: Int) {
-        val textSize = Math.max(appConfig.readerTextSize + increment, 10)
+        Log.d(TAG, "updateTextSize to $increment")
+        val textSize = (appConfig.readerTextSize + increment).coerceAtLeast(10)
 
         if (textSize <= 10) {
             Toast.makeText(context, "Smaller text available", Toast.LENGTH_LONG).show()
@@ -75,9 +99,8 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener {
         viewBinding.ocrDisplayText.hanziTextSize = textSize
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
+    private fun processFromArguments() {
+        Log.d(TAG, "processFromArguments")
         viewBinding.ocrDisplayText.text = arguments?.getString("preText") ?: ""
 
         val imageUri = arguments?.getString("imageUri") ?: ""
@@ -91,6 +114,7 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener {
 
     @OptIn(ExperimentalGetImage::class)
     private fun recognizeText(uri: Uri) {
+        Log.d(TAG, "recognizeText starting")
         // Convert the Uri to InputImage for OCR
         val image = InputImage.fromFilePath(requireContext(), uri)
 
@@ -113,6 +137,7 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener {
     }
 
     private fun processTextRecognitionResult(texts: Text) {
+        Log.d(TAG, "processTextRecognitionResult")
         val blocks: List<Text.TextBlock> = texts.textBlocks
         if (blocks.isEmpty()) {
             toggleProcessing(false)
@@ -177,6 +202,7 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener {
     }
 
     override fun onWordClick(word: HSKWordView) {
+        Log.d(TAG, "onWordClick ${word.hanziText}")
         word.setBackgroundColor(Color.CYAN)
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -205,8 +231,14 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener {
     }
 
     override fun onTextAnalysisFailure(e: Error) {
+        Log.d(TAG, "onTextAnalysisFailure: $e")
+
         toggleProcessing(false)
         Toast.makeText(context, getString(R.string.ocr_display_analysis_failure), Toast.LENGTH_LONG).show()
-        Log.d(TAG, "onTextAnalysisFailure: $e")
+    }
+
+    override fun onIsSegmenterReady() {
+        Log.d(TAG, "onIsSegmenterReady")
+        processFromArguments()
     }
 }

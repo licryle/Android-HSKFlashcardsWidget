@@ -7,11 +7,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class JiebaHSKTextSegmenter: HSKTextView.HSKTextSegmenter {
+    override var listener: HSKTextView.HSKTextSegmenterListener? = null
     var segmenter: JiebaSegmenter? = null
-        protected set
+        private set
 
     suspend fun preload() {
         var seg: JiebaSegmenter?
+
         withContext(Dispatchers.IO) {
             Log.d(TAG, "Loading JiebaSegmenter")
             seg = JiebaSegmenter()
@@ -20,11 +22,16 @@ class JiebaHSKTextSegmenter: HSKTextView.HSKTextSegmenter {
 
         withContext(Dispatchers.Main) {
             segmenter = seg
+            listener?.onIsSegmenterReady()
         }
     }
 
+    override fun isReady(): Boolean {
+        return segmenter != null
+    }
+
     override fun segment(text: String): Array<String>? {
-        if (segmenter == null)
+        if (! isReady())
             return null
         else {
             val words = mutableListOf<String>()

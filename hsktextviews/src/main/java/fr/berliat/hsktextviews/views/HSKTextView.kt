@@ -26,7 +26,14 @@ class HSKTextView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : RecyclerView(context, attrs, defStyleAttr), OnHSKWordClickListener {
     interface HSKTextSegmenter {
+        var listener: HSKTextSegmenterListener?
+
         fun segment(text: String): Array<String>?
+        fun isReady(): Boolean
+    }
+
+    interface HSKTextSegmenterListener {
+        fun onIsSegmenterReady()
     }
 
     interface HSKTextListener {
@@ -157,7 +164,7 @@ class HSKTextView @JvmOverloads constructor(
             if (word.first == "\n") {
                 layoutParams = FlexboxLayoutManager.LayoutParams(
                     FlexboxLayout.LayoutParams.MATCH_PARENT,
-                    0 // Height of 0 to act as a spacer
+                    5 // Height of 0 to act as a spacer
                 ).apply {
                     flexGrow = 1f // Allow it to grow and push items down
                 }
