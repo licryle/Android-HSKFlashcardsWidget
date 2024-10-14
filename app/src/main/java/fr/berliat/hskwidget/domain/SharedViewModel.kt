@@ -19,11 +19,11 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
 
     companion object {
         fun getInstance(activity: AppCompatActivity): SharedViewModel {
-            return ViewModelProvider(activity).get(SharedViewModel::class.java)
+            return ViewModelProvider(activity)[SharedViewModel::class.java]
         }
 
         fun getInstance(fragment: Fragment): SharedViewModel {
-            return ViewModelProvider(fragment.requireActivity()).get(SharedViewModel::class.java)
+            return ViewModelProvider(fragment.requireActivity())[SharedViewModel::class.java]
         }
     }
 }
