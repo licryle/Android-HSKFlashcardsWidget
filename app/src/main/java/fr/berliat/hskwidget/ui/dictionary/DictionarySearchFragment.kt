@@ -103,8 +103,8 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
 
             // Switch back to the main thread to update UI
             // Update the UI with the result
-            searchAdapter.addData(result)
             isLoading = false
+            searchAdapter.addData(result)
             binding.dictionarySearchResults.scrollToPosition(0) // @TODO(Licryle): chase down the bug that keeps the screen blank, sometimes.
         }
     }
@@ -115,9 +115,8 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
 
         Log.d("DictionarySearchFragment", "Load more results for currentSearch: $searchQuery")
         val newResults = fetchResultsForPage()
-        searchAdapter.addData(newResults)
-
         isLoading = false
+        searchAdapter.addData(newResults)
     }
 
     // Simulate fetching search results based on the query and current page
