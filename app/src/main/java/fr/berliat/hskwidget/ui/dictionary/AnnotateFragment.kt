@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -23,6 +24,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Date
+
 
 class AnnotateFragment: Fragment() {
     private lateinit var simplifiedWord: String
@@ -71,6 +73,8 @@ class AnnotateFragment: Fragment() {
         }
 
         Utils.hideKeyboard(requireContext(), binding.root)
+        requireActivity().window
+            .setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE or WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN)
         return binding.root
     }
 
