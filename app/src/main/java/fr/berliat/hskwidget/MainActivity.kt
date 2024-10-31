@@ -3,6 +3,7 @@ package fr.berliat.hskwidget
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
@@ -10,6 +11,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -20,6 +22,7 @@ import fr.berliat.hskwidget.domain.DatabaseBackup
 import fr.berliat.hskwidget.domain.DatabaseBackupFolderUriCallbacks
 import fr.berliat.hskwidget.domain.SharedViewModel
 import fr.berliat.hskwidget.domain.Utils
+import fr.berliat.hskwidget.ui.OCR.CaptureImageFragmentDirections
 import fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragment
 import fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragmentDirections
 import kotlinx.coroutines.Dispatchers
@@ -30,6 +33,7 @@ import kotlinx.coroutines.withContext
 class MainActivity : AppCompatActivity(), DatabaseBackupFolderUriCallbacks {
     companion object {
         const val INTENT_SEARCH_WORD: String = "search_word"
+        private const val TAG = "MainActivity"
     }
 
     private lateinit var appBarConfiguration: AppBarConfiguration
@@ -67,6 +71,8 @@ class MainActivity : AppCompatActivity(), DatabaseBackupFolderUriCallbacks {
         setupOCRBtn()
 
         handleSearchIntent(intent)
+        handleTextSearchIntent(intent)
+        handleImageOCRIntent(intent)
         handleBackUp()
     }
 
@@ -74,6 +80,8 @@ class MainActivity : AppCompatActivity(), DatabaseBackupFolderUriCallbacks {
         super.onNewIntent(intent)
 
         handleSearchIntent(intent)
+        handleTextSearchIntent(intent)
+        handleImageOCRIntent(intent)
     }
 
     override fun onUriPermissionGranted(uri: Uri) {
@@ -103,11 +111,34 @@ class MainActivity : AppCompatActivity(), DatabaseBackupFolderUriCallbacks {
         intent?.let {
             if (it.hasExtra(INTENT_SEARCH_WORD)) {
                 val searchWord = it.getStringExtra(INTENT_SEARCH_WORD)
-                if (searchWord != null) {
+                Log.i(TAG, "Received a search intent: $searchWord")
+                if (searchWord != null && searchWord != "") {
                     binding.appBarMain.appbarSearch.setQuery(searchWord, true)
                 }
             }
         }
+    }
+
+    private fun handleTextSearchIntent(intent: Intent?) {
+        if (intent?.action == Intent.ACTION_PROCESS_TEXT && intent.type == "text/plain") {
+            val sharedText = intent.getStringExtra(Intent.EXTRA_PROCESS_TEXT)
+            Log.i(TAG, "Received a shared text intent: $sharedText")
+            if (sharedText != null) {
+                binding.appBarMain.appbarSearch.setQuery(sharedText, true)
+            }
+        }
+    }
+
+    private fun handleImageOCRIntent(intent: Intent?) {
+        if (intent?.action == Intent.ACTION_SEND && intent.type?.startsWith("image/") == true) {
+            Log.i(TAG, "Received a shared image intent")
+            (intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM))?.let { imageUri ->
+                // Handle the image URI here
+                val action = CaptureImageFragmentDirections.displayOCR(imageUri.toString(), "")
+                navController.navigate(action)
+            }
+        }
+
     }
 
     private fun setupSharedViewModel() {

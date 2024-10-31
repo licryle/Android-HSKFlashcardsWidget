@@ -35,17 +35,6 @@
         android:name="fr.berliat.hskwidget.ui.OCR.CaptureImageFragment"
         android:label="@string/menu_ocr"
         tools:layout="@layout/fragment_ocr_capture">
-
-        <action
-            android:id="@+id/displayOCR"
-            app:destination="@id/nav_ocr_read">
-            <argument
-                android:name="imageUri"
-                app:argType="string" />
-            <argument
-                android:name="preText"
-                app:argType="string" />
-        </action>
     </fragment>
 
     <fragment
@@ -107,5 +96,16 @@
         android:id="@+id/see_about"
         app:destination="@id/nav_about">
         <!-- Query pulled automatically from the search box. -->
+    </action>
+
+    <action
+        android:id="@+id/displayOCR"
+        app:destination="@id/nav_ocr_read">
+        <argument
+            android:name="imageUri"
+            app:argType="string" />
+        <argument
+            android:name="preText"
+            app:argType="string" />
     </action>
 </navigation>

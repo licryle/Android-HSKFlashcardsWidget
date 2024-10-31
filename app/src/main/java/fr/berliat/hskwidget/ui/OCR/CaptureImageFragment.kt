@@ -213,11 +213,11 @@ class CaptureImageFragment : Fragment() {
         cropActivityResultLauncher.launch(uCrop.getIntent(requireContext()))
     }
 
-    fun handleCroppedImage(uri: Uri) {
-        Log.i(TAG, "Crop succeeded to image path $uri")
+    fun handleCroppedImage(imageUri: Uri) {
+        Log.i(TAG, "Crop succeeded to image path $imageUri")
 
         try {
-            val action = CaptureImageFragmentDirections.displayOCR(uri.toString(), arguments?.getString("preText") ?: "")
+            val action = CaptureImageFragmentDirections.displayOCR(imageUri.toString(), arguments?.getString("preText") ?: "")
             findNavController().navigate(action)
         } catch (e: Exception) {
             e.printStackTrace()
