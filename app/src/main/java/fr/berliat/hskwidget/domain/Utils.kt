@@ -2,6 +2,7 @@ package fr.berliat.hskwidget.domain
 
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
+import android.content.ClipData
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
@@ -203,6 +204,7 @@ class Utils {
             var hskViz = View.VISIBLE
             if (word.word?.hskLevel == null || word.word.hskLevel == ChineseWord.HSK_Level.NOT_HSK)
                 hskViz = View.INVISIBLE
+
             binding.dictionaryItemHskLevel.visibility = hskViz
             binding.dictionaryItemHskLevel.text = word.word?.hskLevel.toString()
 
@@ -227,6 +229,25 @@ class Utils {
                     navController.navigate(action)
                 }
             }
+
+            val context = navController.context
+            binding.dictionaryItemSpeak.setOnClickListener {
+                playWordInBackground(context, word.simplified!!)
+            }
+            binding.dictionaryItemCopy.setOnClickListener { copyToClipBoard(context, word.simplified!!) }
+        }
+
+        private fun copyToClipBoard(context: Context, s: String) {
+            // https://stackoverflow.com/a/28780585/3059536
+            val clipboard =
+                context.getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+            val clip = ClipData.newPlainText("Copied Text", s)
+            clipboard.setPrimaryClip(clip)
+            Toast.makeText(
+                context,
+                String.format(context.getString(R.string.copied_to_clipboard), s),
+                Toast.LENGTH_SHORT
+            ).show()
         }
 
         /**

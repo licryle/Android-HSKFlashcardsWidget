@@ -65,6 +65,7 @@ dependencies {
     implementation("com.google.android.gms:play-services-mlkit-text-recognition:19.0.1")
     implementation("androidx.fragment:fragment:1.8.4")
     implementation("com.google.android.flexbox:flexbox:3.0.0")
+    implementation("androidx.cardview:cardview:1.0.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")

@@ -1,78 +1,104 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_margin="0dp"
-    android:padding="0dp"
-    android:background="@drawable/search_item_border">
-
-    <!-- Bookmark Icon -->
-    <ImageView
-        android:id="@+id/dictionary_item_favorite"
-        android:layout_width="45dp"
-        android:layout_height="45dp"
-        android:layout_margin="0dp"
-        android:padding="0dp"
-        android:src="@drawable/bookmark_24px"
-        android:contentDescription="@string/dictionary_item_favorite"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
+    android:layout_height="wrap_content">
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:padding="3dp">
+        android:layout_margin="0dp"
+        android:padding="0dp"
+        android:background="@drawable/search_item_border">
 
+        <!-- Bookmark Icon -->
+        <ImageView
+            android:id="@+id/dictionary_item_favorite"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_margin="0dp"
+            android:padding="0dp"
+            android:src="@drawable/bookmark_24px"
+            android:contentDescription="@string/dictionary_item_favorite"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Chinese Character -->
-        <fr.berliat.hsktextviews.views.HSKWordView
-            android:id="@+id/dictionary_item_chinese"
-            android:layout_width="wrap_content"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-
-            app:pinyin="@string/widget_default_pinyin"
-            app:pinyinSize="8sp"
-            app:pinyinColor="@android:color/darker_gray"
-
-            app:hanzi="@string/widget_default_chinese"
-            app:hanziSize="13sp"
-            app:hanziColor="@android:color/black"
-            app:hanziStyle="bold"
-
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintRight_toLeftOf="@id/dictionary_item_definition"
-            android:paddingStart="0dp"
-            android:paddingEnd="5dp"/>
+            android:padding="3dp">
 
 
-        <!-- English Definition -->
-        <TextView
-            android:id="@+id/dictionary_item_definition"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="@string/widget_default_english"
-            android:padding="5dp"
-            android:textSize="18sp"
-            android:textColor="@android:color/black"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toRightOf="@id/dictionary_item_chinese"
-            app:layout_constraintRight_toLeftOf="@id/dictionary_item_hsk_level" />
+            <!-- Chinese Character -->
+            <fr.berliat.hsktextviews.views.HSKWordView
+                android:id="@+id/dictionary_item_chinese"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
 
-        <!-- HSK Level -->
-        <TextView
-            android:id="@+id/dictionary_item_hsk_level"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/dictionary_item_hsk"
-            android:textSize="16sp"
-            android:textColor="@android:color/holo_blue_dark"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
+                app:pinyin="@string/widget_default_pinyin"
+                app:pinyinSize="8sp"
+                app:pinyinColor="@android:color/darker_gray"
+
+                app:hanzi="@string/widget_default_chinese"
+                app:hanziSize="13sp"
+                app:hanziColor="@android:color/black"
+                app:hanziStyle="bold"
+
+                app:layout_constraintStart_toEndOf="@id/dictionary_item_speak"
+                app:layout_constraintTop_toTopOf="parent"
+                android:paddingStart="0dp"
+                android:paddingEnd="5dp"/>
+
+
+            <ImageView
+                android:id="@+id/dictionary_item_speak"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                style="@style/Widget.HSKFlashCardsWidget.Icons"
+                android:contentDescription="@string/widget_btn_speak"
+                android:foreground="@drawable/round_foreground"
+                android:foregroundTint="?android:attr/colorBackground"
+                android:src="@drawable/baseline_volume_up_24"
+                android:paddingBottom="5dp"
+                android:paddingEnd="5dp"/>
+
+
+            <ImageView
+                android:id="@+id/dictionary_item_copy"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="@id/dictionary_item_chinese"
+                style="@style/Widget.HSKFlashCardsWidget.Icons"
+                android:contentDescription="@string/widget_btn_speak"
+                android:foreground="@drawable/round_foreground"
+                android:foregroundTint="?android:attr/colorBackground"
+                android:src="@drawable/content_copy_24px" />
+
+            <!-- English Definition -->
+            <TextView
+                android:id="@+id/dictionary_item_definition"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/widget_default_english"
+                android:padding="5dp"
+                android:textSize="18sp"
+                android:textColor="@android:color/black"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toRightOf="@id/dictionary_item_chinese"
+                app:layout_constraintRight_toLeftOf="@id/dictionary_item_hsk_level" />
+
+            <!-- HSK Level -->
+            <TextView
+                android:id="@+id/dictionary_item_hsk_level"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/dictionary_item_hsk"
+                android:textSize="16sp"
+                android:textColor="@android:color/holo_blue_dark"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

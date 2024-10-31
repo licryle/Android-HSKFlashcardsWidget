@@ -194,8 +194,10 @@ class AnnotateFragment: Fragment() {
             }
         }
 
-        AppPreferencesStore(requireContext()).lastAnnotatedClassType = updatedAnnotation.classType!!
-        AppPreferencesStore(requireContext()).lastAnnotatedClassLevel = updatedAnnotation.level!!
+        if (annotatedWord?.hasAnnotation() == false) {
+            AppPreferencesStore(requireContext()).lastAnnotatedClassType = updatedAnnotation.classType!!
+            AppPreferencesStore(requireContext()).lastAnnotatedClassLevel = updatedAnnotation.level!!
+        }
     }
 
     enum class ACTION {
