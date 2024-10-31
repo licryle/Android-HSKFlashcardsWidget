@@ -4,13 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.dao.AnnotatedChineseWord
@@ -54,7 +54,7 @@ class AnnotateFragment: Fragment() {
         if (simplifiedWord == "") {
             annotatedWord = AnnotatedChineseWord.getBlank(simplifiedWord)
         } else {
-            GlobalScope.launch {
+            viewLifecycleOwner.lifecycleScope.launch {
                 // Switch to the IO dispatcher to perform background work
                 annotatedWord = withContext(Dispatchers.IO) {
                     viewModel.getAnnotatedChineseWord(simplifiedWord) // Checked just below
@@ -73,8 +73,7 @@ class AnnotateFragment: Fragment() {
         }
 
         Utils.hideKeyboard(requireContext(), binding.root)
-        requireActivity().window
-            .setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE or WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN)
+
         return binding.root
     }
 
