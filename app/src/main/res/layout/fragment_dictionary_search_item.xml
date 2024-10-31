@@ -4,32 +4,28 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="0dp"
-        android:padding="0dp"
+        android:orientation="vertical"
         android:background="@drawable/search_item_border">
-
-        <!-- Bookmark Icon -->
-        <ImageView
-            android:id="@+id/dictionary_item_favorite"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
-            android:layout_margin="0dp"
-            android:padding="0dp"
-            android:src="@drawable/bookmark_24px"
-            android:contentDescription="@string/dictionary_item_favorite"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:padding="3dp">
+            android:layout_margin="0dp"
+            android:padding="0dp">
 
+            <!-- Bookmark Icon -->
+            <ImageView
+                android:id="@+id/dictionary_item_favorite"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_margin="0dp"
+                android:src="@drawable/bookmark_24px"
+                android:contentDescription="@string/dictionary_item_favorite"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:padding="3dp" />
 
             <!-- Chinese Character -->
             <fr.berliat.hsktextviews.views.HSKWordView
@@ -98,7 +94,22 @@
                 android:textSize="16sp"
                 android:textColor="@android:color/holo_blue_dark"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" />
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginEnd="5dp"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/dictionary_item_annotation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:layout_margin="5dp"
+                android:textAlignment="viewStart"
+                android:textColor="@android:color/holo_green_dark" />
+        </LinearLayout>
+    </LinearLayout>
 </androidx.cardview.widget.CardView>

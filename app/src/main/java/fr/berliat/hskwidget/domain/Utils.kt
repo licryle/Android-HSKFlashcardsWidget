@@ -12,6 +12,7 @@ import android.provider.DocumentsContract
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.collection.emptyLongSet
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.Observer
 import androidx.navigation.NavController
@@ -194,8 +195,11 @@ class Utils {
                 pinyins = word.annotation?.pinyins?.toString() ?: ""
 
             var definition = word.word?.definition?.get(Locale.ENGLISH) ?: ""
-            if (definition == "")
+            var annotation = word.annotation?.notes ?: ""
+            if (definition == "") {
                 definition = word.annotation?.notes ?: ""
+                annotation = ""
+            }
 
             with(binding.dictionaryItemChinese) {
                 hanziText = word.simplified.toString()
@@ -209,6 +213,12 @@ class Utils {
             binding.dictionaryItemHskLevel.text = word.word?.hskLevel.toString()
 
             binding.dictionaryItemDefinition.text = definition
+            binding.dictionaryItemAnnotation.text = annotation
+
+            if (annotation == "")
+                binding.dictionaryItemAnnotation.visibility = View.GONE
+            else
+                binding.dictionaryItemAnnotation.visibility = View.VISIBLE
 
             with(binding.dictionaryItemFavorite) {
                 if (word.hasAnnotation()) {
