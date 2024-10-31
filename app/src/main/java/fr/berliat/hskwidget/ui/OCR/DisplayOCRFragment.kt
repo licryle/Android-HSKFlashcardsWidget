@@ -160,6 +160,10 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
             viewBinding.ocrDisplayText.clickedWords = viewModel.clickedWords
             viewBinding.ocrDisplayText.text = viewModel.text!!
             viewModel.text = null // consume condition
+
+            if (viewModel.selectedWord != null) {
+                fetchWordForDisplay(viewModel.selectedWord!!)
+            }
         } else {
             viewBinding.ocrDisplayText.text = ""
             Toast.makeText(requireContext(), "Oops - nothing to display", Toast.LENGTH_LONG).show()
@@ -250,6 +254,24 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
         isProcessing = itIs
     }
 
+    private fun fetchWordForDisplay(hanzi: String) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            // Switch to the IO dispatcher to perform background work
+            val result = fetchWord(hanzi)
+
+            // Update the UI with the result
+            if (result == null)
+                Toast.makeText(context, "Couldn't find ${hanzi}", Toast.LENGTH_LONG).show()
+            else {
+                viewModel.clickedWords[hanzi] = result.word?.pinyins.toString()
+
+                Utils.populateDictionaryEntryView(viewBinding.ocrDisplayDefinition,result,
+                    findNavController())
+                viewBinding.ocrDisplayDefinition.root.visibility = View.VISIBLE
+            }
+        }
+    }
+
 
     companion object {
         private const val TAG = "DisplayOCRFragment"
@@ -257,25 +279,11 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
 
     override fun onWordClick(word: HSKWordView) {
         Log.d(TAG, "onWordClick ${word.hanziText}")
+        viewModel.selectedWord = word.hanziText
         word.isClicked = true
         viewModel.clickedWords[word.hanziText] = word.pinyinText
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            // Switch to the IO dispatcher to perform background work
-            val result = fetchWord(word.hanziText)
-
-            // Update the UI with the result
-            if (result == null)
-                Toast.makeText(context, "Couldn't find ${word.hanziText}", Toast.LENGTH_LONG).show()
-            else {
-                word.pinyinText = result.word?.pinyins.toString()
-                viewModel.clickedWords[word.hanziText] = word.pinyinText
-
-                Utils.populateDictionaryEntryView(viewBinding.ocrDisplayDefinition,result,
-                    findNavController())
-                viewBinding.root.visibility = View.VISIBLE
-            }
-        }
+        fetchWordForDisplay(word.hanziText)
     }
 
     override fun onTextAnalysisStart() {

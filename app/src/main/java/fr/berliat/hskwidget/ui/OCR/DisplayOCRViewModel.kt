@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 class DisplayOCRViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel() {
 
     val clickedWords: MutableMap<String, String> = mutableMapOf()
+    var selectedWord: String? = null
 
     // Key for scroll position
     private val SCROLL_POSITION_KEY = "scroll_position"
@@ -22,6 +23,7 @@ class DisplayOCRViewModel(private val savedStateHandle: SavedStateHandle) : View
     fun resetText() {
         scrollPosition = 0
         text = ""
+        selectedWord = null
         clickedWords.clear()
     }
 }
