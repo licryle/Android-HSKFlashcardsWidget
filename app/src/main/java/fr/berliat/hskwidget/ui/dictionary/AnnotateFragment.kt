@@ -48,7 +48,7 @@ class AnnotateFragment: Fragment() {
         binding = FragmentAnnotationEditBinding.inflate(inflater, container, false)
 
         val factory = AnnotateViewModelFactory(requireContext())
-        viewModel = ViewModelProvider(this, factory).get(AnnotateViewModel::class.java)
+        viewModel = ViewModelProvider(this, factory)[AnnotateViewModel::class.java]
 
         simplifiedWord = arguments?.getString("simplifiedWord") ?: ""
         if (simplifiedWord == "") {
@@ -77,9 +77,15 @@ class AnnotateFragment: Fragment() {
         return binding.root
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        Utils.logAnalyticsScreenView(requireContext(), "Annotate")
+    }
+
     private fun updateUI() {
         // Initialize ViewModel (you might want to use a ViewModelFactory)
-        viewModel = ViewModelProvider(this).get(AnnotateViewModel::class.java)
+        viewModel = ViewModelProvider(this)[AnnotateViewModel::class.java]
 
         // Populate the ClassType Spinner programmatically
         val classTypes = ChineseWordAnnotation.ClassType.entries.map { it.type }  // Convert enum to list of strings

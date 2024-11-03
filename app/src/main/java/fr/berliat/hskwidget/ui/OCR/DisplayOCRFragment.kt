@@ -90,6 +90,12 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
         viewModel.scrollPosition = (viewBinding.ocrDisplayText.layoutManager as FlexboxLayoutManager).findFirstVisibleItemPosition()
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        Utils.logAnalyticsScreenView(requireContext(), "DisplayOCR")
+    }
+
     private fun setupSegmenter() {
         toggleProcessing(true)
 

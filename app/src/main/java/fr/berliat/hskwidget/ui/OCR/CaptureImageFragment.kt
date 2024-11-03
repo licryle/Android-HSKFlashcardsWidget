@@ -84,6 +84,7 @@ class CaptureImageFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         Utils.hideKeyboard(requireContext(), viewBinding.root)
+        Utils.logAnalyticsScreenView(requireContext(), "CaptureImage")
     }
 
     override fun onDestroy() {

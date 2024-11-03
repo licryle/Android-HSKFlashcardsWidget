@@ -58,6 +58,12 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
         performSearch()
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        Utils.logAnalyticsScreenView(requireContext(), "DictionarySearch")
+    }
+
     private fun setupRecyclerView() {
         binding.dictionarySearchResults.layoutManager = LinearLayoutManager(context)
         binding.dictionarySearchResults.adapter = searchAdapter

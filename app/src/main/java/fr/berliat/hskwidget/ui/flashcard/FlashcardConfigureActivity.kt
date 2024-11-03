@@ -15,6 +15,7 @@ import fr.berliat.hskwidget.domain.Utils
  * The configuration screen for the [FlashcardWidgetProvider] AppWidget.
  */
 class FlashcardConfigureActivity : AppCompatActivity() {
+    private lateinit var binding: FlashcardWidgetConfigureBinding
     private var _confFragment: FlashcardConfigureFragment? = null
 
     private var widgetId = AppWidgetManager.INVALID_APPWIDGET_ID
@@ -35,7 +36,6 @@ class FlashcardConfigureActivity : AppCompatActivity() {
 
         finish()
     }
-    private lateinit var binding: FlashcardWidgetConfigureBinding
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
