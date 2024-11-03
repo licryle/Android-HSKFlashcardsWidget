@@ -47,6 +47,15 @@ class HSKWordsAdapter(private val context: Context,
             notifyDataSetChanged()
         }
 
+    val wordsFrequency: Map<String, Int>
+        get() {
+            val freq = mutableMapOf<String, Int>()
+            for (word in words) {
+                freq[word.first] = freq.getOrDefault(word.first, 0) + 1
+            }
+            return freq.toMap() // Return the immutable map
+        }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HSKTextView.HSKWordsHolder {
         val hskWord = HSKWordView(context)
 

@@ -34,7 +34,7 @@ class TypeConverters {
         companion object {
             @TypeConverter
             @JvmStatic
-            fun fromMap(m: Map<ChineseWordAnnotation, List<ChineseWord>>): List<AnnotatedChineseWord> {
+            fun fromMapToList(m: Map<ChineseWordAnnotation, List<ChineseWord>>): List<AnnotatedChineseWord> {
                 val words = mutableSetOf<AnnotatedChineseWord>()
 
                 m.forEach {
@@ -42,6 +42,30 @@ class TypeConverters {
                 }
 
                 return words.toList()
+            }
+
+            @TypeConverter
+            @JvmStatic
+            fun fromMapToFirst(m: Map<ChineseWordAnnotation, List<ChineseWord>>): AnnotatedChineseWord? {
+                val words = fromMapToList(m)
+
+                if (words.isEmpty())
+                    return null
+
+                return words.first()
+            }
+
+            @TypeConverter
+            @JvmStatic
+            fun fromListToMap(l: List<Map<ChineseWordAnnotation, List<ChineseWord>>>): Map<String, AnnotatedChineseWord> {
+                val words = mutableMapOf<String, AnnotatedChineseWord>()
+
+                l.forEach {
+                    words[it.keys.first().simplified] =
+                        AnnotatedChineseWord(it.values.first()[0], it.keys.first())
+                }
+
+                return words
             }
         }
     }

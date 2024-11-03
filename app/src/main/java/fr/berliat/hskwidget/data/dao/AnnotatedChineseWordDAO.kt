@@ -1,13 +1,19 @@
 package fr.berliat.hskwidget.data.dao
 
 import androidx.room.Dao
+import androidx.room.Embedded
 import androidx.room.Query
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWordAnnotation
-import fr.berliat.hskwidget.data.store.TypeConverters
 
-data class AnnotatedChineseWord(val word: ChineseWord?, val annotation: ChineseWordAnnotation?) {
-    val simplified = word?.simplified ?: annotation?.simplified
+data class AnnotatedChineseWord(
+    @Embedded val word: ChineseWord?,
+    @Embedded val annotation: ChineseWordAnnotation?) {
+
+    val simplified: String
+        get() {
+            return word?.simplified ?: annotation?.simplified!!
+        }
 
     companion object {
         fun getBlank(simplified: String = ""): AnnotatedChineseWord {
@@ -52,27 +58,16 @@ interface AnnotatedChineseWordDAO {
             " AND (0=:hasAnnotation OR (1=:hasAnnotation AND a.first_seen IS NOT NULL))" +
             " ORDER BY is_first_seen_null, a.first_seen DESC, w.popularity DESC " +
             " LIMIT :pageSize OFFSET (:page * :pageSize)")
-    suspend fun _searchFromStrLike(str: String?, hasAnnotation: Boolean, page: Int = 0, pageSize: Int = 30): Map<ChineseWordAnnotation, List<ChineseWord>>
-
-    suspend fun searchFromStrLike(str: String, hasAnnotation: Boolean,
-                                    page: Int = 0, pageSize: Int = 30
-    ) : List<AnnotatedChineseWord> {
-        return TypeConverters.AnnotatedChineseWordsConverter.fromMap(
-            _searchFromStrLike(str, hasAnnotation, page, pageSize))
-    }
+    suspend fun searchFromStrLike(str: String?, hasAnnotation: Boolean, page: Int = 0, pageSize: Int = 30): List<AnnotatedChineseWord>
 
     @Query("$select_left_join WHERE a_simplified = :simplifiedWord" +
             " UNION " +
             "$select_right_join WHERE simplified = :simplifiedWord" +
             " LIMIT 1")
-    suspend fun _getFromSimplified(simplifiedWord: String?): Map<ChineseWordAnnotation, List<ChineseWord>>
+    suspend fun getFromSimplified(simplifiedWord: String?): AnnotatedChineseWord?
 
-    suspend fun getFromSimplified(simplifiedWord: String?) : AnnotatedChineseWord? {
-        val list = TypeConverters.AnnotatedChineseWordsConverter.fromMap(_getFromSimplified(simplifiedWord))
-
-        return if (list.isEmpty())
-            null
-        else
-            list[0]
-    }
+    @Query("$select_left_join WHERE a_simplified IN (:simplifiedWords)" +
+            " UNION " +
+            "$select_right_join WHERE simplified IN (:simplifiedWords)")
+    suspend fun getFromSimplified(simplifiedWords: List<String>): List<AnnotatedChineseWord>
 }

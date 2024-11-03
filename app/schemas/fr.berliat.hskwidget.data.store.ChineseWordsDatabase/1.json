@@ -1,0 +1,160 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "11832783e1cea31acff61d5a7a154c83",
+    "entities": [
+      {
+        "tableName": "ChineseWordAnnotation",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`a_simplified` TEXT NOT NULL, `a_pinyins` TEXT, `notes` TEXT, `class_type` TEXT, `class_level` TEXT, `themes` TEXT, `first_seen` INTEGER, `is_exam` INTEGER, `a_searchable_text` TEXT NOT NULL DEFAULT '', PRIMARY KEY(`a_simplified`))",
+        "fields": [
+          {
+            "fieldPath": "simplified",
+            "columnName": "a_simplified",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pinyins",
+            "columnName": "a_pinyins",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "classType",
+            "columnName": "class_type",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "level",
+            "columnName": "class_level",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "themes",
+            "columnName": "themes",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "firstSeen",
+            "columnName": "first_seen",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "isExam",
+            "columnName": "is_exam",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "a_searchable_text",
+            "columnName": "a_searchable_text",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "a_simplified"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_ChineseWordAnnotation_a_searchable_text",
+            "unique": false,
+            "columnNames": [
+              "a_searchable_text"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_ChineseWordAnnotation_a_searchable_text` ON `${TABLE_NAME}` (`a_searchable_text`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "ChineseWord",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`simplified` TEXT NOT NULL, `traditional` TEXT, `definition` TEXT NOT NULL, `hsk_level` TEXT, `pinyins` TEXT, `popularity` INTEGER, `searchable_text` TEXT NOT NULL DEFAULT '', PRIMARY KEY(`simplified`))",
+        "fields": [
+          {
+            "fieldPath": "simplified",
+            "columnName": "simplified",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "traditional",
+            "columnName": "traditional",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "definition",
+            "columnName": "definition",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hskLevel",
+            "columnName": "hsk_level",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "pinyins",
+            "columnName": "pinyins",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "popularity",
+            "columnName": "popularity",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "searchable_text",
+            "columnName": "searchable_text",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "simplified"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_ChineseWord_searchable_text",
+            "unique": false,
+            "columnNames": [
+              "searchable_text"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_ChineseWord_searchable_text` ON `${TABLE_NAME}` (`searchable_text`)"
+          }
+        ],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '11832783e1cea31acff61d5a7a154c83')"
+    ]
+  }
+}

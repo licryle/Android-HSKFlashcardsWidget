@@ -157,18 +157,21 @@ class HSKTextView @JvmOverloads constructor(
 
                     Log.d(TAG, "Finished parsing")
                     withContext(Dispatchers.Main) {
+                        Log.d(TAG, "Start rendering parsing")
+                        wordsAdapter.addData(words)
+                        Log.d(TAG, "Finished rendering parsing")
+
                         if (words.size > 1)
                             listener?.onTextAnalysisSuccess()
                         else
                             listener?.onTextAnalysisFailure(Error("Segmenter is null"))
-
-                        Log.d(TAG, "Start rendering parsing")
-                        wordsAdapter.addData(words)
-                        Log.d(TAG, "Finished rendering parsing")
                     }
                 }
             }
         }
+
+    val wordsFrequency: Map<String, Int>
+        get() = wordsAdapter.wordsFrequency
 
     private fun hanziToPinyin(hanzi: String): String {
         // @todo(Licryle): look up pinyin

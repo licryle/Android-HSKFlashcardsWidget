@@ -12,6 +12,7 @@ import androidx.annotation.OptIn
 import androidx.camera.core.ExperimentalGetImage
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.coroutineScope
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.flexbox.FlexboxLayoutManager
@@ -25,6 +26,8 @@ import fr.berliat.hsktextviews.views.HSKWordView
 import fr.berliat.hskwidget.R
 
 import fr.berliat.hskwidget.data.dao.AnnotatedChineseWord
+import fr.berliat.hskwidget.data.dao.ChineseWordFrequencyDAO
+import fr.berliat.hskwidget.data.repo.ChineseWordFrequencyRepo
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.databinding.FragmentOcrDisplayBinding
@@ -37,6 +40,8 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
     private lateinit var segmenter: HSKTextView.HSKTextSegmenter
     private lateinit var viewModel: DisplayOCRViewModel
 
+    private lateinit var frequencyWordsRepo: ChineseWordFrequencyRepo
+
     private var isProcessing = false
 
     private lateinit var appConfig: AppPreferencesStore
@@ -47,6 +52,12 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
         super.onCreate(savedInstanceState)
         segmenter = SharedViewModel.getInstance(this).segmenter
         viewModel = ViewModelProvider(this)[DisplayOCRViewModel::class.java]
+
+        val db = ChineseWordsDatabase.getInstance(requireContext())
+        frequencyWordsRepo = ChineseWordFrequencyRepo(
+            db.chineseWordFrequencyDAO(),
+            db.annotatedChineseWordDAO()
+        )
     }
 
     override fun onCreateView(
@@ -290,6 +301,11 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
         viewModel.clickedWords[word.hanziText] = word.pinyinText
 
         fetchWordForDisplay(word.hanziText)
+
+        lifecycle.coroutineScope.launch {
+            Log.d(TAG, "Augmenting Consulted Count for ${word.hanziText} by 1, if word exists")
+            frequencyWordsRepo.incrementConsulted(word.hanziText)
+        }
     }
 
     override fun onTextAnalysisStart() {
@@ -305,6 +321,12 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
 
     override fun onTextAnalysisSuccess() {
         toggleProcessing(false)
+
+        lifecycle.coroutineScope.launch {
+            val wordFreq = viewBinding.ocrDisplayText.wordsFrequency
+            Log.d(TAG, "Augmenting Appeared Count for ${wordFreq.size} words (if they exist): $wordFreq")
+            frequencyWordsRepo.incrementAppeared(wordFreq)
+        }
     }
 
     override fun onIsSegmenterReady() {

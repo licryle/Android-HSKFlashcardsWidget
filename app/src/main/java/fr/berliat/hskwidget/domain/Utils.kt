@@ -28,9 +28,13 @@ import com.google.firebase.ktx.Firebase
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.dao.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWord
+import fr.berliat.hskwidget.data.repo.ChineseWordFrequencyRepo
+import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.databinding.FragmentDictionarySearchItemBinding
 import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileInputStream
@@ -129,6 +133,20 @@ class Utils {
             )
 
             workMgr.enqueue(speechRequest)
+
+            incrementConsultedWord(context, word)
+        }
+
+        fun incrementConsultedWord(context: Context, word: String) {
+            val db = ChineseWordsDatabase.getInstance(context)
+            val frequencyWordsRepo = ChineseWordFrequencyRepo(
+                db.chineseWordFrequencyDAO(),
+                db.annotatedChineseWordDAO()
+            )
+
+            GlobalScope.launch {
+                frequencyWordsRepo.incrementConsulted(word)
+            }
         }
 
         fun hasFolderWritePermission(context: Context, uri: Uri): Boolean {
@@ -253,11 +271,14 @@ class Utils {
                 context.getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
             val clip = ClipData.newPlainText("Copied Text", s)
             clipboard.setPrimaryClip(clip)
+
             Toast.makeText(
                 context,
                 String.format(context.getString(R.string.copied_to_clipboard), s),
                 Toast.LENGTH_SHORT
             ).show()
+
+            incrementConsultedWord(context, s)
         }
 
         /**
