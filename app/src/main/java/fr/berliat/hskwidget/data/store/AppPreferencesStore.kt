@@ -16,6 +16,14 @@ class AppPreferencesStore(context: Context):
             putBoolean("reader_separate_word", wordSeparator)
         }
 
+    var dbBackUpActive: Boolean
+        get() {
+            return getBoolean("database_backup_active", false)
+        }
+        set(active) {
+            putBoolean("database_backup_active", active)
+        }
+
     var dbBackUpDirectory: Uri
         get() {
             return Uri.parse(getString("database_backup_directory", ""))

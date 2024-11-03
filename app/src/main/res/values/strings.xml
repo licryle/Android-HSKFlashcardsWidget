@@ -99,4 +99,12 @@ We recommend to choose the level your at plus the one below, or above depending 
     <string name="ocr_display_analysis_failure">Text Analysis failed - try again</string>
     <string name="ocr_display_separator">Separate words</string>
     <string name="copied_to_clipboard">Copied %s to clipboard</string>
+    <string name="config_backup_title">Backup</string>
+    <string name="config_backup_activate">Activate backup</string>
+    <string name="config_backup_frequency">Backup frequency</string>
+    <string name="config_backup_frequency_options">When app starts</string>
+    <string name="config_backup_location">Backup directory</string>
+    <string name="config_backup_directory_choose">Choose directory</string>
+    <string name="config_backup_icon_alt">Database upload</string>
+    <string name="menu_config">Settings</string>
 </resources>

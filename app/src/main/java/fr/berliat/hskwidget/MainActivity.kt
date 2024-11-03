@@ -11,12 +11,12 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
+import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.databinding.ActivityMainBinding
 import fr.berliat.hskwidget.domain.DatabaseBackup
 import fr.berliat.hskwidget.domain.DatabaseBackupFolderUriCallbacks
@@ -39,6 +39,8 @@ class MainActivity : AppCompatActivity(), DatabaseBackupFolderUriCallbacks {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
+    private lateinit var appConfig: AppPreferencesStore
+    private lateinit var databaseBackup: DatabaseBackup
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,6 +49,10 @@ class MainActivity : AppCompatActivity(), DatabaseBackupFolderUriCallbacks {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        databaseBackup = DatabaseBackup(this, this, this)
+
+        appConfig = AppPreferencesStore(applicationContext)
 
         setSupportActionBar(binding.appBarMain.toolbar)
 
@@ -85,9 +91,8 @@ class MainActivity : AppCompatActivity(), DatabaseBackupFolderUriCallbacks {
     }
 
     override fun onUriPermissionGranted(uri: Uri) {
-        val activity = this
         GlobalScope.launch {
-            val success = DatabaseBackup(activity, activity).backUp(uri)
+            val success = databaseBackup.backUp(uri)
 
             withContext(Dispatchers.Main) {
                 if (success)
@@ -103,8 +108,8 @@ class MainActivity : AppCompatActivity(), DatabaseBackupFolderUriCallbacks {
     }
 
     private fun handleBackUp() {
-        // @TODO(Licryle): handle properly in a config screen
-        DatabaseBackup(this, this).getFolder()
+        if (appConfig.dbBackUpActive)
+            databaseBackup.getFolder()
     }
 
     private fun handleSearchIntent(intent: Intent?) {

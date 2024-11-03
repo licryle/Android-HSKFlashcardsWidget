@@ -13,6 +13,10 @@
             android:icon="@drawable/baseline_widgets_24"
             android:title="@string/menu_widgets" />
         <item
+            android:id="@+id/nav_config"
+            android:icon="@drawable/settings_24px"
+            android:title="@string/menu_config" />
+        <item
             android:id="@+id/nav_about"
             android:icon="@drawable/baseline_info_24"
             android:title="@string/menu_about" />
