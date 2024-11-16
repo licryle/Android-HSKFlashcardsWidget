@@ -107,4 +107,8 @@ We recommend to choose the level your at plus the one below, or above depending 
     <string name="config_backup_directory_choose">Choose directory</string>
     <string name="config_backup_icon_alt">Database upload</string>
     <string name="menu_config">Settings</string>
+    <string name="about_stats_title">Statistics</string>
+    <string name="about_terms_conditions_title"><![CDATA[Privacy Policy & Licences]]></string>
+    <string name="about_stats">Loading...</string>
+    <string name="about_stats_text">%1$s words in dictionary.\n%2$s annotations.</string>
 </resources>

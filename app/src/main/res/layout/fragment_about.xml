@@ -53,7 +53,40 @@
             android:text="@string/about_btn_email2"/>
 
         <TextView
-            android:id="@+id/text_slideshow"
+            android:id="@+id/text_stats_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:justificationMode="inter_word"
+            android:text="@string/about_stats_title"/>
+
+        <TextView
+            android:id="@+id/text_stats"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:justificationMode="inter_word"
+            android:text="@string/about_stats"/>
+
+        <TextView
+            android:id="@+id/text_terms_conditions_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:justificationMode="inter_word"
+            android:text="@string/about_terms_conditions_title"/>
+
+        <TextView
+            android:id="@+id/text_terms_conditions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"

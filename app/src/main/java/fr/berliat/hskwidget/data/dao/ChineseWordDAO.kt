@@ -25,4 +25,7 @@ interface ChineseWordDAO {
 
     @Query("SELECT * FROM chineseword WHERE hsk_level IN (:hskLevels) AND simplified NOT IN (:bannedWords) ORDER BY RANDOM() LIMIT :limit")
     suspend fun getOnlyHSKLevels(hskLevels: Array<String>, bannedWords: Array<String>, limit: Int): Array<ChineseWord>
+
+    @Query("SELECT COUNT(*) FROM ChineseWord")
+    suspend fun getCount(): Int
 }

@@ -10,16 +10,16 @@ import fr.berliat.hskwidget.data.model.ChineseWordAnnotation
 @Dao
 interface ChineseWordAnnotationDAO {
     @Query("SELECT * FROM chinesewordannotation")
-    fun getAll(): List<ChineseWordAnnotation>
+    suspend fun getAll(): List<ChineseWordAnnotation>
 
     @Query("SELECT * FROM chinesewordannotation WHERE " +
             "a_simplified = :simplified LIMIT 1")
-    fun findBySimplified(simplified: String): ChineseWordAnnotation
+    suspend fun findBySimplified(simplified: String): ChineseWordAnnotation
 
     @Insert
-    fun _insertAll(vararg annotations: ChineseWordAnnotation)
+    suspend fun _insertAll(vararg annotations: ChineseWordAnnotation)
 
-    fun insertAll(annotations: Array<ChineseWordAnnotation>) {
+    suspend fun insertAll(annotations: Array<ChineseWordAnnotation>) {
         annotations.forEach {
             it.updateSearchable()
         }
@@ -36,8 +36,11 @@ interface ChineseWordAnnotationDAO {
     }
 
     @Delete
-    fun delete(annotation: ChineseWordAnnotation)
+    suspend fun delete(annotation: ChineseWordAnnotation)
 
     @Query("DELETE FROM chinesewordannotation WHERE a_simplified = :simplified")
-    fun deleteBySimplified(simplified: String): Int
+    suspend fun deleteBySimplified(simplified: String): Int
+
+    @Query("SELECT COUNT(*) FROM ChineseWordAnnotation")
+    suspend fun getCount(): Int
 }
