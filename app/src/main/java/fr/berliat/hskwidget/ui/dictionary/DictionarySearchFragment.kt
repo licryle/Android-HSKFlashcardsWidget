@@ -36,6 +36,8 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
             return activity?.findViewById<SearchView>(R.id.appbar_search)?.query.toString()
         }
 
+    private var lastFullSearchStartTime = System.currentTimeMillis()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         searchAdapter = DictionarySearchAdapter(requireParentFragment(), this)
@@ -101,16 +103,25 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
         isLoading = true
         searchAdapter.clearData()
         currentPage = 0
-        Log.d("DictionarySearchFragment", "New search requested: $searchQuery")
 
         viewLifecycleOwner.lifecycleScope.launch {
             // Here we executed in the coRoutine Scope
-            val result = fetchResultsForPage()
+            val result: Pair<Long, List<AnnotatedChineseWord>> = Pair(
+                System.currentTimeMillis(),
+                fetchResultsForPage()
+            )
 
             // Switch back to the main thread to update UI
+            // Protecting against concurrent searches (typing fast etc)
+            if (result.first >= lastFullSearchStartTime) {
+                lastFullSearchStartTime = result.first
+                searchAdapter.clearData()
+                currentPage = 1
+            }
+
             // Update the UI with the result
             isLoading = false
-            searchAdapter.addData(result)
+            searchAdapter.addData(result.second)
             binding.dictionarySearchResults.scrollToPosition(0) // @TODO(Licryle): chase down the bug that keeps the screen blank, sometimes.
         }
     }
