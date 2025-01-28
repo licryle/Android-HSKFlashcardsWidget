@@ -2,9 +2,11 @@ package fr.berliat.hskwidget.ui.config
 
 import android.net.Uri
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import fr.berliat.hskwidget.R
@@ -48,6 +50,24 @@ class ConfigFragment : Fragment(), DatabaseBackupFolderUriCallbacks {
             binding.configBtnBackupChangedir.text = bkDir
 
         binding.configBtnBackupChangedir.setOnClickListener { databaseBackup.selectFolder() }
+
+        binding.configWriteassistGroqkey.setText(appConfig.groqAPIKey)
+
+        binding.configWriteassistGroqkey.setOnKeyListener { v, keyCode, event ->
+            if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN) {
+                binding.configWriteassistGroqkey.clearFocus()
+                true  // Indicate that the action was handled
+            } else {
+                false
+            }
+        }
+
+        binding.configWriteassistGroqkey.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus)
+                appConfig.groqAPIKey = binding.configWriteassistGroqkey.text.toString()
+
+            Toast.makeText(requireContext(), getString(R.string.config_groqkey_saved), Toast.LENGTH_SHORT).show()
+        }
 
         return binding.root
     }

@@ -49,7 +49,7 @@ class AboutFragment : Fragment() {
 
     @SuppressLint("StringFormatMatches")
     private fun fetchAndDisplayStats() {
-        Log.d("AboutFragment", "fetching stats")
+        Log.d(TAG, "fetching stats")
         val db = ChineseWordsDatabase.getInstance(requireContext())
         val words = db.chineseWordDAO()
         val annotations = db.chineseWordAnnotationDAO()
@@ -61,8 +61,12 @@ class AboutFragment : Fragment() {
 
             // Switch back to the main thread to update UI
             // Update the UI with the result
-            Log.d("AboutFragment", "stats fetched")
+            Log.d(TAG, "stats fetched")
             binding.textStats.text = getString(R.string.about_stats_text, wordsCnt, annotationsCnt)
         }
+    }
+
+    companion object {
+        private const val TAG = "AboutFragment"
     }
 }

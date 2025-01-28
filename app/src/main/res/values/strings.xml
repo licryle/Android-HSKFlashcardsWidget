@@ -111,4 +111,10 @@ We recommend to choose the level your at plus the one below, or above depending 
     <string name="about_terms_conditions_title"><![CDATA[Privacy Policy & Licences]]></string>
     <string name="about_stats">Loading...</string>
     <string name="about_stats_text">%1$s words in dictionary.\n%2$s annotations.</string>
+    <string name="config_writeassist_icon_alt">Writing assistant</string>
+    <string name="config_writeassist_title">Writing assistant</string>
+    <string name="config_writeassist_groqkey">Groq API Key</string>
+    <string name="config_groqkey_saved">Groq Key Saved</string>
+    <string name="menu_writeassist">Writing Assistant</string>
+    <string name="writeassist_sendbox_text">Write a sentence and press enter</string>
 </resources>

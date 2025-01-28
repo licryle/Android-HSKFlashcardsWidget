@@ -8,6 +8,14 @@ import fr.berliat.hskwidget.data.model.ChineseWordAnnotation.ClassType
 class AppPreferencesStore(context: Context):
     PrefixedPreferenceDataStoreBridge(context.dataStore, "app") {
 
+    var groqAPIKey: String
+        get() {
+            return getString("groq_api_key", "").toString()
+        }
+        set(groq_api_key) {
+            putString("groq_api_key", groq_api_key)
+        }
+
     var readerSeparateWords: Boolean
         get() {
             return getBoolean("reader_separate_word", false)

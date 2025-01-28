@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".ui.assistant.WriteAssistFragment"
+    android:orientation="vertical">
+
+    <!-- Scrollable Search Results -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/writeassist_assists"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:padding="5dp"
+        tools:listitem="@layout/fragment_write_assist_item" />
+
+        <LinearLayout
+            android:id="@+id/writeassist_loading"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintTop_toTopOf="parent"
+            android:padding="16dp"
+            android:visibility="gone"
+            android:gravity="center">
+            <ProgressBar
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_marginTop="10dp"
+                android:layout_gravity="center"
+                android:indeterminate="true" />
+            <TextView
+                android:id="@+id/writeassist_loading_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:layout_marginTop="10dp"
+                android:text="@string/dictionary_loading_text" />  <!-- Initially hidden -->
+        </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:id="@+id/writeassist_sendbox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="5dp"
+        android:paddingEnd="5dp">
+
+        <EditText
+            android:id="@+id/writeassist_sendbox_text"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:hint="@string/writeassist_sendbox_text" />
+
+        <ImageView
+            android:id="@+id/writeassist_sendbox_send"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:src="@drawable/spellcheck_24px"
+            app:layout_constraintStart_toEndOf="@+id/writeassist_sendbox_text" />
+    </LinearLayout>
+
+</LinearLayout>

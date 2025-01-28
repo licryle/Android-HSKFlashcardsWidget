@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/search_item_border">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="0dp"
+            android:padding="0dp">
+
+            <!-- Bookmark Icon -->
+            <TextView
+                android:id="@+id/writeassist_grade"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_margin="0dp"
+                android:text=""
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:padding="3dp" />
+
+            <ImageView
+                android:id="@+id/writeassist_item_speak"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                style="@style/Widget.HSKFlashCardsWidget.Icons"
+                android:contentDescription="@string/widget_btn_speak"
+                android:foreground="@drawable/round_foreground"
+                android:foregroundTint="?android:attr/colorBackground"
+                android:src="@drawable/baseline_volume_up_24"
+                android:paddingBottom="5dp"
+                android:paddingEnd="5dp"/>
+
+
+            <ImageView
+                android:id="@+id/writeassist_item_copy"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="@id/writeassist_container"
+                style="@style/Widget.HSKFlashCardsWidget.Icons"
+                android:contentDescription="@string/widget_btn_speak"
+                android:foreground="@drawable/round_foreground"
+                android:foregroundTint="?android:attr/colorBackground"
+                android:src="@drawable/content_copy_24px" />
+
+            <LinearLayout
+                android:id="@+id/writeassist_container"
+                android:orientation="vertical"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toEndOf="@id/writeassist_item_speak"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/writeassist_grade"
+                app:layout_constraintHorizontal_weight="1"
+                android:textAlignment="viewStart"
+                android:gravity="start">
+                <!-- Original -->
+                <TextView
+                    android:id="@+id/writeassist_original_cn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/widget_default_english"
+                    android:padding="5dp"
+                    android:textSize="18sp"
+                    android:textColor="@android:color/black" />
+
+                <!-- Original - Translation -->
+                <TextView
+                    android:id="@+id/writeassist_original_en"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/widget_default_english"
+                    android:padding="5dp"
+                    android:textSize="18sp"
+                    android:textColor="@android:color/black" />
+
+                <!-- Correction -->
+                <TextView
+                    android:id="@+id/writeassist_fixed_cn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/widget_default_english"
+                    android:padding="5dp"
+                    android:textSize="18sp"
+                    android:textColor="@android:color/black" />
+
+                <!-- Correction -->
+                <TextView
+                    android:id="@+id/writeassist_fixed_en"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/widget_default_english"
+                    android:padding="5dp"
+                    android:textSize="18sp"
+                    android:textColor="@android:color/black" />
+
+                <!-- Explanations -->
+                <TextView
+                    android:id="@+id/writeassist_explanations"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/widget_default_english"
+                    android:padding="5dp"
+                    android:textSize="18sp"
+                    android:textColor="@android:color/black" />
+
+            </LinearLayout>
+
+            <!-- Explanations -->
+            <TextView
+                android:id="@+id/writeassist_confidence"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/dictionary_item_hsk"
+                android:textSize="16sp"
+                android:textColor="@android:color/holo_blue_dark"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginEnd="5dp"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/dictionary_item_annotation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:layout_margin="5dp"
+                android:textAlignment="viewStart"
+                android:textColor="@android:color/holo_green_dark" />
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

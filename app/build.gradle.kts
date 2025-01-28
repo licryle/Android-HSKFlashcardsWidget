@@ -133,4 +133,9 @@ dependencies {
     implementation("com.github.yalantis:ucrop:2.2.9-native")
 
     implementation("io.github.yrjyrj123:jieba-analysis:1.0.3")
+
+    implementation("io.ktor:ktor-client-core:2.3.2")
+    implementation("io.ktor:ktor-client-cio:2.3.2") // Or other engines like OkHttp
+    implementation("io.ktor:ktor-client-content-negotiation:2.3.2")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.2")
 }

@@ -13,6 +13,10 @@
             android:icon="@drawable/baseline_widgets_24"
             android:title="@string/menu_widgets" />
         <item
+            android:id="@+id/nav_writeassist"
+            android:icon="@drawable/chat_24px"
+            android:title="@string/menu_writeassist" />
+        <item
             android:id="@+id/nav_config"
             android:icon="@drawable/settings_24px"
             android:title="@string/menu_config" />
