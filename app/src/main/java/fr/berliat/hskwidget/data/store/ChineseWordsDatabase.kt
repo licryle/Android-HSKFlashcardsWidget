@@ -16,6 +16,7 @@ import fr.berliat.hskwidget.data.dao.ChineseWordFrequencyDAO
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWordAnnotation
 import fr.berliat.hskwidget.data.model.ChineseWordFrequency
+import java.io.File
 
 import java.util.concurrent.Executors
 
@@ -55,5 +56,13 @@ abstract class ChineseWordsDatabase : RoomDatabase() {
                     Log.d("ChineseWordsDatabase", "SQL Query: $sqlQuery SQL Args: $bindArgs")
                 }, Executors.newSingleThreadExecutor())
                 .build()
+
+        fun loadExternalDatabase(context: Context, dbFile: File) = Room.databaseBuilder(
+                context.applicationContext,
+                ChineseWordsDatabase::class.java,
+                dbFile.path
+            )
+            .createFromFile(dbFile) // instead of fromAsset
+            .build()
     }
 }

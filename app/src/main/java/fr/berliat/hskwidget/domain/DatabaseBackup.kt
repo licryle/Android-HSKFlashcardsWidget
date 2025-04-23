@@ -1,5 +1,6 @@
 package fr.berliat.hskwidget.domain
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -8,22 +9,25 @@ import androidx.activity.result.ActivityResultCaller
 import androidx.activity.result.contract.ActivityResultContracts
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
+import java.io.File
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-interface DatabaseBackupFolderUriCallbacks {
-    fun onUriPermissionGranted(uri: Uri)
-    fun onUriPermissionDenied()
+interface DatabaseBackupCallbacks {
+    fun onBackupFolderSet(uri: Uri)
+    fun onBackupFolderError()
+    fun onBackupFileSelected(uri: Uri)
+    fun onBackupFileSelectionCancelled()
 }
 
 class DatabaseBackup(comp: ActivityResultCaller,
                      private val context: Context,
-                     private val listener: DatabaseBackupFolderUriCallbacks) {
+                     private val listener: DatabaseBackupCallbacks) {
     private val prefStore = AppPreferencesStore(context)
 
     private val getFolderAct = comp.registerForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
         if (uri == null || ! DocumentsContract.isTreeUri(uri)) {
-            listener.onUriPermissionDenied()
+            listener.onBackupFolderError()
         } else {
             // Save the URI for future access
             prefStore.dbBackUpDirectory = uri
@@ -35,7 +39,17 @@ class DatabaseBackup(comp: ActivityResultCaller,
             )
 
             // Invoke the callback with the selected URI
-            listener.onUriPermissionGranted(uri)
+            listener.onBackupFolderSet(uri)
+        }
+    }
+
+    private val getBackUpFileAct = comp.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            result.data?.data?.let { uri ->
+                listener.onBackupFileSelected(uri)
+            }
+        } else {
+            listener.onBackupFileSelectionCancelled()
         }
     }
 
@@ -43,10 +57,19 @@ class DatabaseBackup(comp: ActivityResultCaller,
         getFolderAct.launch(null)
     }
 
+    fun selectBackupFile() {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "*/*"
+        }
+
+        getBackUpFileAct.launch(intent)
+    }
+
     fun getFolder() {
         val backUpFolderUri = prefStore.dbBackUpDirectory
         if (Utils.hasFolderWritePermission(context, backUpFolderUri))
-            listener.onUriPermissionGranted(backUpFolderUri)
+            listener.onBackupFolderSet(backUpFolderUri)
         else {
             selectFolder()
         }
@@ -60,5 +83,21 @@ class DatabaseBackup(comp: ActivityResultCaller,
         val fileName = "${current.format(formatter)}_${ChineseWordsDatabase.DATABASE_FILE}"
 
         return Utils.copyFileUsingSAF(context, sourcePath, destinationFolderUri, fileName)
+    }
+
+    suspend fun restoreDbFromFile(backupFile: File) {
+        val importedDb = ChineseWordsDatabase.loadExternalDatabase(context, backupFile)
+        val importedAnnotations = importedDb.chineseWordAnnotationDAO().getAll()
+        if (importedAnnotations.isEmpty()) {
+            throw IllegalStateException("Database is empty")
+        }
+
+        // Impoooort
+        val localDb = ChineseWordsDatabase.getInstance(context)
+        localDb.chineseWordAnnotationDAO().deleteAll()
+        localDb.chineseWordAnnotationDAO().insertAll(importedAnnotations)
+
+        localDb.chineseWordFrequencyDAO().deleteAll()
+        localDb.chineseWordFrequencyDAO().insertAll(importedDb.chineseWordFrequencyDAO().getAll())
     }
 }

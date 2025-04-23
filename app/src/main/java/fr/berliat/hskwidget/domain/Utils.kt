@@ -41,6 +41,7 @@ import java.io.FileOutputStream
 import java.io.InputStream
 import java.util.Locale
 import java.util.concurrent.TimeUnit
+import androidx.core.net.toUri
 
 
 class Utils {
@@ -74,7 +75,7 @@ class Utils {
         fun getOpenURLIntent(url: String): Intent {
             return Intent(
                 Intent.ACTION_VIEW,
-                Uri.parse(url)
+                url.toUri()
             ).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
 
@@ -91,15 +92,15 @@ class Utils {
             val workMgr = WorkManager.getInstance(context)
             workMgr.getWorkInfoByIdLiveData(speechRequest.id).observeForever(
                 object: Observer<WorkInfo> {
-                    override fun onChanged(workInfo: WorkInfo) {
-                        if (workInfo.state == WorkInfo.State.SUCCEEDED
-                            || workInfo.state == WorkInfo.State.FAILED
+                    override fun onChanged(value: WorkInfo) {
+                        if (value.state == WorkInfo.State.SUCCEEDED
+                            || value.state == WorkInfo.State.FAILED
                         ) {
 
-                            var errStringId = R.string.speech_failure_toast_unknown
-                            if (workInfo.state == WorkInfo.State.FAILED) {
+                            val errStringId: Int
+                            if (value.state == WorkInfo.State.FAILED) {
                                 var errId =
-                                    workInfo.outputData.getString(BackgroundSpeechService.FAILURE_REASON)
+                                    value.outputData.getString(BackgroundSpeechService.FAILURE_REASON)
                                 when (errId) {
                                     BackgroundSpeechService.FAILURE_MUTED
                                     -> errStringId = R.string.speech_failure_toast_muted
@@ -198,6 +199,18 @@ class Utils {
             }
         }
 
+        fun copyUriToCacheDir(context: Context, uri: Uri): File {
+            val inputStream = context.contentResolver.openInputStream(uri)
+                ?: throw IllegalArgumentException("Cannot open input stream from URI")
+
+            val outFile = File(context.cacheDir, "imported_backup.db")
+            outFile.outputStream().use { output ->
+                inputStream.copyTo(output)
+            }
+
+            return outFile
+        }
+
         fun hideKeyboard(context: Context, view: View) {
             val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             view.let {
@@ -219,7 +232,7 @@ class Utils {
             }
 
             with(binding.dictionaryItemChinese) {
-                hanziText = word.simplified.toString()
+                hanziText = word.simplified
                 pinyinText = pinyins
             }
             var hskViz = View.VISIBLE
@@ -251,7 +264,7 @@ class Utils {
                 }
 
                 setOnClickListener {
-                    val action = fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragmentDirections.annotateWord(word.simplified!!, false)
+                    val action = fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragmentDirections.annotateWord(word.simplified, false)
 
                     navController.navigate(action)
                 }
@@ -259,9 +272,9 @@ class Utils {
 
             val context = navController.context
             binding.dictionaryItemSpeak.setOnClickListener {
-                playWordInBackground(context, word.simplified!!)
+                playWordInBackground(context, word.simplified)
             }
-            binding.dictionaryItemCopy.setOnClickListener { copyToClipBoard(context, word.simplified!!) }
+            binding.dictionaryItemCopy.setOnClickListener { copyToClipBoard(context, word.simplified) }
         }
 
         private fun copyToClipBoard(context: Context, s: String) {

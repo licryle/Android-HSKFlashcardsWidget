@@ -19,7 +19,7 @@ import com.google.android.material.navigation.NavigationView
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.databinding.ActivityMainBinding
 import fr.berliat.hskwidget.domain.DatabaseBackup
-import fr.berliat.hskwidget.domain.DatabaseBackupFolderUriCallbacks
+import fr.berliat.hskwidget.domain.DatabaseBackupCallbacks
 import fr.berliat.hskwidget.domain.SharedViewModel
 import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.ui.OCR.CaptureImageFragmentDirections
@@ -30,7 +30,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class MainActivity : AppCompatActivity(), DatabaseBackupFolderUriCallbacks {
+class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
     companion object {
         const val INTENT_SEARCH_WORD: String = "search_word"
         private const val TAG = "MainActivity"
@@ -90,7 +90,7 @@ class MainActivity : AppCompatActivity(), DatabaseBackupFolderUriCallbacks {
         handleImageOCRIntent(intent)
     }
 
-    override fun onUriPermissionGranted(uri: Uri) {
+    override fun onBackupFolderSet(uri: Uri) {
         GlobalScope.launch {
             val success = databaseBackup.backUp(uri)
 
@@ -103,8 +103,16 @@ class MainActivity : AppCompatActivity(), DatabaseBackupFolderUriCallbacks {
         }
     }
 
-    override fun onUriPermissionDenied() {
+    override fun onBackupFolderError() {
         Toast.makeText(applicationContext, getString(R.string.dbbackup_failure_folderpermission), Toast.LENGTH_LONG).show()
+    }
+
+    override fun onBackupFileSelected(uri: Uri) {
+        throw Error("This should never be hit")
+    }
+
+    override fun onBackupFileSelectionCancelled() {
+        throw Error("This should never be hit")
     }
 
     private fun handleBackUp() {

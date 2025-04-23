@@ -12,6 +12,9 @@ interface ChineseWordFrequencyDAO {
         const val CHINESE_REGEX = "^[\\u4E00-\\u9FFF]+\$"
     }
 
+    @Query("SELECT * FROM chinesewordfrequency")
+    suspend fun getAll(): List<ChineseWordFrequency>
+
     @Query("SELECT * FROM chinesewordfrequency WHERE simplified = :simplifiedWord")
     suspend fun getFrequency(simplifiedWord: String?): ChineseWordFrequency?
 
@@ -23,9 +26,15 @@ interface ChineseWordFrequencyDAO {
         return current.associateBy { it.simplified }
     }
 
+    @Insert
+    suspend fun insertAll(annotations: List<ChineseWordFrequency>)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrUpdate(freq: ChineseWordFrequency)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrUpdate(freq: List<ChineseWordFrequency>)
+
+    @Query("DELETE FROM chinesewordfrequency")
+    suspend fun deleteAll(): Int
 }
