@@ -2,4 +2,12 @@
     <attr name="appWidgetRadius" />
     <attr name="appWidgetInnerRadius" />
     <attr name="appWidgetPadding" />
+
+    <declare-styleable name="FloatTextLayout">
+        <attr name="textToFloat" format="string" />
+        <attr name="android:textColor" />
+        <attr name="android:textSize" />
+        <attr name="floatPadding" format="dimension" />
+    </declare-styleable>
+
 </resources>

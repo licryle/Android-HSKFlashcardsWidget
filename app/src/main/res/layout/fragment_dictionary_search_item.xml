@@ -27,26 +27,45 @@
                 app:layout_constraintTop_toTopOf="parent"
                 android:padding="3dp" />
 
-            <!-- Chinese Character -->
-            <fr.berliat.hsktextviews.views.HSKWordView
-                android:id="@+id/dictionary_item_chinese"
-                android:layout_width="wrap_content"
+            <fr.berliat.hskwidget.ui.utils.FloatTextLayout
+                android:id="@+id/dictionary_item_definition"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
 
-                app:pinyin="@string/widget_default_pinyin"
-                app:pinyinSize="8sp"
-                app:pinyinColor="@android:color/darker_gray"
-
-                app:hanzi="@string/widget_default_chinese"
-                app:hanziSize="13sp"
-                app:hanziColor="@android:color/black"
-                app:hanziStyle="bold"
-
-                app:layout_constraintStart_toEndOf="@id/dictionary_item_speak"
                 app:layout_constraintTop_toTopOf="parent"
-                android:paddingStart="0dp"
-                android:paddingEnd="5dp"/>
+                app:layout_constraintStart_toEndOf="@id/dictionary_item_speak"
+                app:layout_constraintEnd_toStartOf="@id/dictionary_item_favorite"
+                android:layout_marginEnd="5dp"
 
+                app:floatPadding="5dp"
+                app:textToFloat="@string/widget_default_english"
+                android:textSize="18sp"
+                android:textColor="@android:color/black">
+
+                <!-- Chinese Character -->
+                <fr.berliat.hsktextviews.views.HSKWordView
+                    android:id="@+id/dictionary_item_chinese"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/holo_green_dark"
+
+                    app:pinyin="@string/widget_default_pinyin"
+                    app:pinyinSize="8sp"
+                    app:pinyinColor="@android:color/darker_gray"
+
+                    app:hanzi="@string/widget_default_chinese"
+                    app:hanziSize="13sp"
+                    app:hanziColor="@android:color/black"
+                    app:hanziStyle="bold"
+
+                    android:paddingStart="0dp"
+                    android:paddingEnd="5dp"
+
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"/>
+
+            </fr.berliat.hskwidget.ui.utils.FloatTextLayout>
 
             <ImageView
                 android:id="@+id/dictionary_item_speak"
@@ -64,26 +83,12 @@
             <ImageView
                 android:id="@+id/dictionary_item_copy"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintBottom_toBottomOf="@id/dictionary_item_chinese"
+                app:layout_constraintBottom_toBottomOf="parent"
                 style="@style/Widget.HSKFlashCardsWidget.Icons"
-                android:contentDescription="@string/widget_btn_speak"
+                android:contentDescription="@string/widget_btn_copy"
                 android:foreground="@drawable/round_foreground"
                 android:foregroundTint="?android:attr/colorBackground"
                 android:src="@drawable/content_copy_24px" />
-
-            <!-- English Definition -->
-            <TextView
-                android:id="@+id/dictionary_item_definition"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="@string/widget_default_english"
-                android:padding="5dp"
-                android:textSize="18sp"
-                android:textColor="@android:color/black"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toRightOf="@id/dictionary_item_chinese"
-                app:layout_constraintRight_toLeftOf="@id/dictionary_item_hsk_level" />
 
             <!-- HSK Level -->
             <TextView
@@ -96,20 +101,26 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 android:layout_marginEnd="5dp"/>
-        </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-            <TextView
-                android:id="@+id/dictionary_item_annotation"
-                android:layout_width="match_parent"
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:textSize="18sp"
-                android:layout_margin="5dp"
-                android:textAlignment="viewStart"
-                android:textColor="@android:color/holo_green_dark" />
-        </LinearLayout>
+
+                app:layout_constraintStart_toEndOf="@id/dictionary_item_copy"
+                app:layout_constraintTop_toBottomOf="@id/dictionary_item_definition"
+                app:layout_constraintEnd_toStartOf="@id/dictionary_item_hsk_level"
+                app:layout_constraintBottom_toBottomOf="parent"
+
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/dictionary_item_annotation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_margin="5dp"
+                    android:textAlignment="viewStart"
+                    android:textColor="@android:color/holo_green_dark" />
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

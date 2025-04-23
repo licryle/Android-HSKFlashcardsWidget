@@ -27,13 +27,12 @@
                 app:pinyinColor="@android:color/darker_gray"
 
                 app:hanzi="@string/widget_default_chinese"
-                app:hanziSize="13sp"
-                app:hanziColor="@android:color/black"
+                android:textSize="18sp"
+                android:textColor="@android:color/black"
                 app:hanziStyle="bold"
 
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintRight_toLeftOf="@id/dictionary_item_definition"
                 android:layout_gravity="center"/>
         </LinearLayout>
 
