@@ -1,4 +1,4 @@
-package fr.berliat.hskwidget.ui.utils
+package fr.berliat.floatlayouts.layouts
 
 import android.content.Context
 import android.text.StaticLayout
@@ -7,7 +7,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import fr.berliat.hskwidget.R
+import fr.berliat.floatlayouts.R
 import kotlin.math.max
 import androidx.core.content.withStyledAttributes
 
@@ -134,10 +134,6 @@ class FloatTextLayout @JvmOverloads constructor(
             MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
             MeasureSpec.UNSPECIFIED
         )
-
-        if (bottomText.startsWith(" never") || bottomText.startsWith("never")) {
-            println("bottomText: $bottomText")
-        }
 
         val totalHeight = max(floatH, textTop.measuredHeight) + if (bottomText == "") 0 else textBottom.measuredHeight
         setMeasuredDimension(width, totalHeight)

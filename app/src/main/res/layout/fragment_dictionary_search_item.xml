@@ -27,7 +27,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 android:padding="3dp" />
 
-            <fr.berliat.hskwidget.ui.utils.FloatTextLayout
+            <fr.berliat.floatlayouts.layouts.FloatTextLayout
                 android:id="@+id/dictionary_item_definition"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -65,7 +65,7 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toStartOf="parent"/>
 
-            </fr.berliat.hskwidget.ui.utils.FloatTextLayout>
+            </fr.berliat.floatlayouts.layouts.FloatTextLayout>
 
             <ImageView
                 android:id="@+id/dictionary_item_speak"
