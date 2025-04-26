@@ -4,7 +4,6 @@ import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import androidx.core.content.ContextCompat.startActivity
 import fr.berliat.hskwidget.MainActivity
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
@@ -100,7 +99,7 @@ class FlashcardManager private constructor(private val context: Context,
         confIntent.putExtra(MainActivity.INTENT_SEARCH_WORD, word)
         confIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
 
-        startActivity(context, confIntent, null)
+        context.startActivity(confIntent)
     }
 
     companion object {

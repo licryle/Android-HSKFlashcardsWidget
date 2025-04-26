@@ -34,6 +34,7 @@ import fr.berliat.hskwidget.databinding.FragmentOcrDisplayBinding
 import fr.berliat.hskwidget.domain.SharedViewModel
 import fr.berliat.hskwidget.domain.Utils
 import kotlinx.coroutines.launch
+import androidx.core.net.toUri
 
 class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.HSKTextSegmenterListener {
     private lateinit var viewBinding: FragmentOcrDisplayBinding
@@ -153,7 +154,7 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
             viewModel.scrollPosition = 0 // new text, new scroll position
 
             requireArguments().putString("imageUri", "") // consume condition
-            recognizeText(Uri.parse(imageUri))
+            recognizeText(imageUri.toUri())
         } else if (viewModel.text != null) {
             Log.d(TAG, "processFromArguments: text was provided")
 

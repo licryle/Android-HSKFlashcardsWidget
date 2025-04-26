@@ -9,7 +9,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.RemoteViews
-import androidx.core.content.ContextCompat.startActivity
 import androidx.work.WorkManager
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.domain.FlashcardManager
@@ -78,7 +77,7 @@ class FlashcardWidgetProvider : AppWidgetProvider() {
                 confIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, latestWidgetId)
                 confIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
 
-                startActivity(context, confIntent, null)
+                context.startActivity(confIntent)
             }
 
             ACTION_SPEAK -> {

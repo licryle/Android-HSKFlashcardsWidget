@@ -90,47 +90,52 @@ class Utils {
                 .build()
 
             val workMgr = WorkManager.getInstance(context)
-            workMgr.getWorkInfoByIdLiveData(speechRequest.id).observeForever(
-                object: Observer<WorkInfo> {
-                    override fun onChanged(value: WorkInfo) {
-                        if (value.state == WorkInfo.State.SUCCEEDED
-                            || value.state == WorkInfo.State.FAILED
-                        ) {
+            val observer = object : Observer<WorkInfo?> {
+                override fun onChanged(value: WorkInfo?) {
+                    if (value == null) {
+                        // Handle the case where workInfo is null
+                        return
+                    }
 
-                            val errStringId: Int
-                            if (value.state == WorkInfo.State.FAILED) {
-                                var errId =
-                                    value.outputData.getString(BackgroundSpeechService.FAILURE_REASON)
-                                when (errId) {
-                                    BackgroundSpeechService.FAILURE_MUTED
+                    if (value.state == WorkInfo.State.SUCCEEDED
+                        || value.state == WorkInfo.State.FAILED
+                    ) {
+
+                        val errStringId: Int
+                        if (value.state == WorkInfo.State.FAILED) {
+                            var errId =
+                                value.outputData.getString(BackgroundSpeechService.FAILURE_REASON)
+                            when (errId) {
+                                BackgroundSpeechService.FAILURE_MUTED
                                     -> errStringId = R.string.speech_failure_toast_muted
 
-                                    BackgroundSpeechService.FAILURE_INIT_FAILED
+                                BackgroundSpeechService.FAILURE_INIT_FAILED
                                     -> errStringId = R.string.speech_failure_toast_init
 
-                                    BackgroundSpeechService.FAILURE_LANG_UNSUPPORTED
+                                BackgroundSpeechService.FAILURE_LANG_UNSUPPORTED
                                     -> errStringId =
-                                        R.string.speech_failure_toast_chinese_unsupported
+                                    R.string.speech_failure_toast_chinese_unsupported
 
-                                    else -> {
-                                        errStringId = R.string.speech_failure_toast_unknown
-                                        errId = BackgroundSpeechService.FAILURE_UNKNOWN
-                                    }
+                                else -> {
+                                    errStringId = R.string.speech_failure_toast_unknown
+                                    errId = BackgroundSpeechService.FAILURE_UNKNOWN
                                 }
-
-                                logAnalyticsError(context, "SPEECH", errId, "")
-                                Toast.makeText(
-                                    context, context.getString(errStringId),
-                                    Toast.LENGTH_LONG
-                                ).show()
                             }
 
-                            workMgr.getWorkInfoByIdLiveData(speechRequest.id)
-                                .removeObserver(this)
+                            logAnalyticsError(context, "SPEECH", errId, "")
+                            Toast.makeText(
+                                context, context.getString(errStringId),
+                                Toast.LENGTH_LONG
+                            ).show()
                         }
+
+                        workMgr.getWorkInfoByIdLiveData(speechRequest.id)
+                            .removeObserver(this)
                     }
                 }
-            )
+            }
+
+            workMgr.getWorkInfoByIdLiveData(speechRequest.id).observeForever(observer)
 
             workMgr.enqueue(speechRequest)
 

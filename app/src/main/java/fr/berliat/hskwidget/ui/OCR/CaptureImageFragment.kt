@@ -214,7 +214,7 @@ class CaptureImageFragment : Fragment() {
         cropActivityResultLauncher.launch(uCrop.getIntent(requireContext()))
     }
 
-    fun handleCroppedImage(imageUri: Uri) {
+    private fun handleCroppedImage(imageUri: Uri) {
         Log.i(TAG, "Crop succeeded to image path $imageUri")
 
         try {

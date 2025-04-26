@@ -8,7 +8,6 @@ import android.media.AudioManager
 import android.os.SystemClock.sleep
 import android.speech.tts.TextToSpeech
 import android.util.Log
-import androidx.core.content.ContextCompat
 import androidx.work.Data
 import androidx.work.Worker
 import androidx.work.WorkerParameters
@@ -25,7 +24,7 @@ class BackgroundSpeechService(val context: Context, workerParams: WorkerParamete
         const val FAILURE_UNKNOWN = "FAILURE_UNKNOWN"
         const val FAILURE_REASON = "FAILURE_REASON"
         const val FAILURE_MUTED = "FAILURE_MUTED"
-        const val FAILURE_INIT_FAILED = "FAILURE_INITFAILED"
+        const val FAILURE_INIT_FAILED = "FAILURE_INIT_FAILED"
         const val FAILURE_LANG_UNSUPPORTED = "FAILURE_LANG_UNSUPPORTED"
     }
 
@@ -34,7 +33,7 @@ class BackgroundSpeechService(val context: Context, workerParams: WorkerParamete
         Log.i("BackgroundSpeechService", "Readying to play  ${word} out loud.")
         if (isMuted()) {
             Log.i("BackgroundSpeechService", "But volume is muted. Aborting.")
-            return Result.failure(Data(mapOf(FAILURE_REASON to FAILURE_MUTED)))
+            return buildErrorResult(FAILURE_MUTED)
         }
 
         while (initStatus == null) {
@@ -44,7 +43,7 @@ class BackgroundSpeechService(val context: Context, workerParams: WorkerParamete
 
         if (initStatus != TextToSpeech.SUCCESS) {
             Log.e("BackgroundSpeechService", "Initialization Failed!")
-            return Result.failure(Data(mapOf(FAILURE_REASON to FAILURE_INIT_FAILED)))
+            return buildErrorResult(FAILURE_INIT_FAILED)
         }
 
         Log.i("BackgroundSpeechService", "Setting language to play  ${word} out loud.")
@@ -55,9 +54,9 @@ class BackgroundSpeechService(val context: Context, workerParams: WorkerParamete
             val installIntent = Intent()
             installIntent.action = TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA
             installIntent.flags = FLAG_ACTIVITY_NEW_TASK
-            ContextCompat.startActivity(context, installIntent, null)
+            context.startActivity(installIntent)
 
-            return Result.failure(Data(mapOf(FAILURE_REASON to FAILURE_LANG_UNSUPPORTED)))
+            return buildErrorResult(FAILURE_LANG_UNSUPPORTED)
         }
 
         Log.i("BackgroundSpeechService", "Starting to play  ${word} out loud.")
@@ -75,5 +74,9 @@ class BackgroundSpeechService(val context: Context, workerParams: WorkerParamete
         val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         val musicVolume: Int = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
         return musicVolume == 0
+    }
+
+    private fun buildErrorResult(reason: String) : Result {
+        return Result.failure(Data.Builder().putString(FAILURE_REASON, reason).build())
     }
 }
