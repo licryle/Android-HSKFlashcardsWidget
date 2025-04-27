@@ -33,7 +33,7 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
     private var itemsPerPage = 20
     private val searchQuery: String
         get() {
-            return activity?.findViewById<SearchView>(R.id.appbar_search)?.query.toString()
+            return activity?.findViewById<SearchView>(R.id.appbar_search)?.query.toString().trim()
         }
 
     private var lastFullSearchStartTime = System.currentTimeMillis()
@@ -158,31 +158,32 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
     }
 
     private fun evaluateEmptyView() {
-        // Show/hide empty view based on data
-        if (searchAdapter.itemCount == 0) {
-            if (isLoading) {
-                binding.dictionarySearchLoading.visibility = View.VISIBLE
-                binding.dictionarySearchNoresults.visibility = View.GONE
-                binding.dictionarySearchResults.visibility = View.GONE
-            } else {
-                val text = binding.dictionaryNoresultText
-                text.text = getString(R.string.dictionary_noresult_text).format(searchQuery)
-
-                binding.dictionarySearchNoresults.setOnClickListener {
-                    val action =
-                        DictionarySearchFragmentDirections.annotateWord(searchQuery, true)
-
-                    findNavController().navigate(action)
-                }
-
-                binding.dictionarySearchLoading.visibility = View.GONE
-                binding.dictionarySearchNoresults.visibility = View.VISIBLE
-                binding.dictionarySearchResults.visibility = View.GONE
-            }
-        } else {
-            binding.dictionarySearchLoading.visibility = View.GONE
+        if (isLoading) {
+            binding.dictionarySearchLoading.visibility = View.VISIBLE
             binding.dictionarySearchNoresults.visibility = View.GONE
-            binding.dictionarySearchResults.visibility = View.VISIBLE
+            return
+        }
+
+        // Not loading
+        binding.dictionarySearchLoading.visibility = View.GONE
+
+        // Does the search have an exact match in dictionary?
+        if (searchQuery.isEmpty()
+            || ! searchAdapter.getData().none { it.simplified == searchQuery }
+            || ! Utils.containsChinese(searchQuery)) {
+            binding.dictionarySearchNoresults.visibility = View.GONE
+        } else {
+            val text = binding.dictionaryNoresultText
+            text.text = getString(R.string.dictionary_noresult_text).format(searchQuery)
+
+            binding.dictionarySearchNoresults.setOnClickListener {
+                val action =
+                    DictionarySearchFragmentDirections.annotateWord(searchQuery, true)
+
+                findNavController().navigate(action)
+            }
+
+            binding.dictionarySearchNoresults.visibility = View.VISIBLE
         }
     }
 

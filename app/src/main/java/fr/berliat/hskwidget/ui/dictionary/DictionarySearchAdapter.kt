@@ -38,6 +38,10 @@ class DictionarySearchAdapter(private val fragment: Fragment,
         notifySearchResultsChange()
     }
 
+    fun getData() : List<AnnotatedChineseWord> {
+        return results
+    }
+
     // Method to clear existing data
     fun clearData() {
         results.clear()

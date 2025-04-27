@@ -63,15 +63,6 @@ class Utils {
             )
         }
 
-        fun getOpenURLPendingIntent(context: Context, url: String): PendingIntent {
-            return PendingIntent.getActivity(
-                context,
-                0,
-                getOpenURLIntent(url),
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
-        }
-
         fun getOpenURLIntent(url: String): Intent {
             return Intent(
                 Intent.ACTION_VIEW,
@@ -382,6 +373,10 @@ class Utils {
             )
         }
 
+        fun containsChinese(text: String): Boolean {
+            val pattern = Regex("[\u4e00-\u9fff]")
+            return pattern.containsMatchIn(text)
+        }
     }
 
     enum class ANALYTICS_EVENTS {

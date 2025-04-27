@@ -34,23 +34,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    <!-- Scrollable Search Results -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/dictionary_search_results"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:padding="5dp"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        tools:listitem="@layout/fragment_dictionary_search_item" />
-
         <LinearLayout
             android:id="@+id/dictionary_search_noresults"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/dictionary_search_results"
             android:padding="16dp"
             android:visibility="visible"
             android:gravity="center">
@@ -71,6 +61,19 @@
                 android:layout_marginTop="10dp"
                 android:text="@string/dictionary_noresult_text" />  <!-- Initially hidden -->
         </LinearLayout>
+
+        <!-- Scrollable Search Results -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/dictionary_search_results"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:clipToPadding="false"
+            android:padding="5dp"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/dictionary_search_noresults"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:listitem="@layout/fragment_dictionary_search_item" />
 
         <LinearLayout
             android:id="@+id/dictionary_search_loading"
