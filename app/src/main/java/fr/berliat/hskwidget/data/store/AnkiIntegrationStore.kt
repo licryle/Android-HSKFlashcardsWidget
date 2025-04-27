@@ -212,7 +212,7 @@ class AnkiIntegrationStore(val context: Context):
                 note = api.getNote(word.annotation!!.ankiId)
             }
 
-            if (note != null && note.fields.size > 1 && note.fields[0] == word.simplified.trim()) {
+            if (note != null && note.fields.size > 1 && note.fields[0] == word.simplified.trim().replace("\r\n","\n")) {
                 api.updateNoteFields(note.id, fields)
                 api.updateNoteTags(note.id, tags)
                 return note.id
