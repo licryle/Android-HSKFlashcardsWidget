@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.DocumentsContract
+import android.util.Log
 import androidx.activity.result.ActivityResultCaller
 import androidx.activity.result.contract.ActivityResultContracts
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
@@ -76,6 +77,7 @@ class DatabaseBackup(comp: ActivityResultCaller,
     }
 
     suspend fun backUp(destinationFolderUri: Uri): Boolean {
+        Log.d(TAG, "Initiating Database Backup")
         val sourcePath = "${context.filesDir.path}/../databases/${ChineseWordsDatabase.DATABASE_FILE}"
 
         val current = LocalDateTime.now()
@@ -86,18 +88,27 @@ class DatabaseBackup(comp: ActivityResultCaller,
     }
 
     suspend fun restoreDbFromFile(backupFile: File) {
+        Log.d(TAG, "Initiating Database Restoration: reading file")
         val importedDb = ChineseWordsDatabase.loadExternalDatabase(context, backupFile)
         val importedAnnotations = importedDb.chineseWordAnnotationDAO().getAll()
         if (importedAnnotations.isEmpty()) {
+            Log.i(TAG, "Backup is empty or incompatible, aborting")
             throw IllegalStateException("Database is empty")
         }
 
         // Impoooort
+        Log.d(TAG, "Starting to import Annotations to local DB")
         val localDb = ChineseWordsDatabase.getInstance(context)
         localDb.chineseWordAnnotationDAO().deleteAll()
         localDb.chineseWordAnnotationDAO().insertAll(importedAnnotations)
 
+        Log.d(TAG, "Starting to import WordFrequency to local DB")
         localDb.chineseWordFrequencyDAO().deleteAll()
         localDb.chineseWordFrequencyDAO().insertAll(importedDb.chineseWordFrequencyDAO().getAll())
+        Log.i(TAG, "Database import done")
+    }
+
+    companion object {
+        const val TAG = "DatabaseBackup"
     }
 }

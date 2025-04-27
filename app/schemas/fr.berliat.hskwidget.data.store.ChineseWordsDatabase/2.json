@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "11832783e1cea31acff61d5a7a154c83",
+    "identityHash": "ffbcde896bfe1113489510603cfeceb4",
     "entities": [
       {
         "tableName": "ChineseWordAnnotation",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`a_simplified` TEXT NOT NULL, `a_pinyins` TEXT, `notes` TEXT, `class_type` TEXT, `class_level` TEXT, `themes` TEXT, `first_seen` INTEGER, `is_exam` INTEGER, `a_searchable_text` TEXT NOT NULL DEFAULT '', PRIMARY KEY(`a_simplified`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`a_simplified` TEXT NOT NULL, `a_pinyins` TEXT, `notes` TEXT, `class_type` TEXT, `class_level` TEXT, `themes` TEXT, `first_seen` INTEGER, `is_exam` INTEGER, `anki_id` INTEGER NOT NULL DEFAULT -1, `a_searchable_text` TEXT NOT NULL DEFAULT '', PRIMARY KEY(`a_simplified`))",
         "fields": [
           {
             "fieldPath": "simplified",
@@ -17,44 +17,44 @@
           {
             "fieldPath": "pinyins",
             "columnName": "a_pinyins",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "notes",
             "columnName": "notes",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "classType",
             "columnName": "class_type",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "level",
             "columnName": "class_level",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "themes",
             "columnName": "themes",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "firstSeen",
             "columnName": "first_seen",
-            "affinity": "INTEGER",
-            "notNull": false
+            "affinity": "INTEGER"
           },
           {
             "fieldPath": "isExam",
             "columnName": "is_exam",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "ankiId",
+            "columnName": "anki_id",
             "affinity": "INTEGER",
-            "notNull": false
+            "notNull": true,
+            "defaultValue": "-1"
           },
           {
             "fieldPath": "a_searchable_text",
@@ -80,8 +80,7 @@
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_ChineseWordAnnotation_a_searchable_text` ON `${TABLE_NAME}` (`a_searchable_text`)"
           }
-        ],
-        "foreignKeys": []
+        ]
       },
       {
         "tableName": "ChineseWord",
@@ -96,8 +95,7 @@
           {
             "fieldPath": "traditional",
             "columnName": "traditional",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "definition",
@@ -108,20 +106,17 @@
           {
             "fieldPath": "hskLevel",
             "columnName": "hsk_level",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "pinyins",
             "columnName": "pinyins",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "popularity",
             "columnName": "popularity",
-            "affinity": "INTEGER",
-            "notNull": false
+            "affinity": "INTEGER"
           },
           {
             "fieldPath": "searchable_text",
@@ -147,8 +142,7 @@
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_ChineseWord_searchable_text` ON `${TABLE_NAME}` (`searchable_text`)"
           }
-        ],
-        "foreignKeys": []
+        ]
       },
       {
         "tableName": "ChineseWordFrequency",
@@ -189,14 +183,12 @@
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_ChineseWordFrequency_simplified` ON `${TABLE_NAME}` (`simplified`)"
           }
-        ],
-        "foreignKeys": []
+        ]
       }
     ],
-    "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '11832783e1cea31acff61d5a7a154c83')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ffbcde896bfe1113489510603cfeceb4')"
     ]
   }
 }

@@ -50,6 +50,7 @@ class ChineseWordAnnotation:
         self.first_seen = datetime.strptime(first_seen, "%Y-%m-%d").timestamp() * 1000
         self.is_exam = is_exam
         self.searchable_text = unidecode(pinyins).replace(" ", "")  + ' ' + notes + ' ' + themes + ' ' + simplified
+        self.anki_id = -1
 
 
 def load_annotations(csv_file):
@@ -220,7 +221,7 @@ def build_dictionary(cedict_file: str, other_files: List[str], db_file: str):
 
     for word in cedict_words.values():
         cursor.execute('''
-        INSERT INTO ChineseWord (simplified, traditional,  hsk_level, pinyins, definition, popularity, searchable_text)
+        INSERT INTO ChineseWord (simplified, traditional,  hsk_level, pinyins, definition, popularity, searchable_text, anki_id)
         VALUES (?, ?, ?, ?, ?, ?, ?)
         ''', (word.simplified, word.traditional,  word.hsk_level, 
               word.pinyins, json.dumps(word.definition), word.popularity,
@@ -229,10 +230,10 @@ def build_dictionary(cedict_file: str, other_files: List[str], db_file: str):
     for word in annotations:
         cursor.execute('''
         INSERT INTO ChineseWordAnnotation (a_simplified, a_pinyins,  notes, class_level, class_type, themes, first_seen, is_exam, a_searchable_text)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (word.a_simplified, word.a_pinyins,  word.notes, 
               word.class_level, word.class_type, word.themes, word.first_seen,
-              0, word.searchable_text))
+              0, word.searchable_text, word.anki_id))
 
     # Commit and close
     conn.commit()

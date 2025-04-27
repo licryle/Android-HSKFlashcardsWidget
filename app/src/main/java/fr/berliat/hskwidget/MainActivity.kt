@@ -3,10 +3,12 @@ package fr.berliat.hskwidget
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.StrictMode
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.databinding.library.BuildConfig
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
@@ -46,6 +48,27 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setupSharedViewModel()
+
+        // Enable StrictMode in Debug mode
+        if (BuildConfig.DEBUG) {
+            val policy = StrictMode.ThreadPolicy.Builder()
+                .detectAll() // Detect disk writes, network operations, etc.
+                .penaltyLog() // Log violations in Logcat
+                .penaltyDeath() // Crash on violations (optional)
+                .build()
+
+            StrictMode.setThreadPolicy(policy)
+
+            val vmPolicy = StrictMode.VmPolicy.Builder()
+                .detectLeakedSqlLiteObjects() // Detect SQLite object leaks
+                .detectLeakedClosableObjects() // Detect closable object leaks
+                .penaltyLog()
+                .penaltyDeath()
+                .build()
+
+            StrictMode.setVmPolicy(vmPolicy)
+        }
+
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)

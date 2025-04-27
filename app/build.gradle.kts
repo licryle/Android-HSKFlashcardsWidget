@@ -17,7 +17,7 @@ android {
         //noinspection EditedTargetSdkVersion
         targetSdk = 35
         versionCode = 9
-        versionName = "2.0.0"
+        versionName = "2.2.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -134,4 +134,7 @@ dependencies {
     implementation("com.github.yalantis:ucrop:2.2.9-native")
 
     implementation("io.github.yrjyrj123:jieba-analysis:1.0.3")
+
+    // Anki
+    implementation("com.github.ankidroid:Anki-Android:api-v1.1.0")
 }

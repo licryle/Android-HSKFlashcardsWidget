@@ -120,4 +120,95 @@ We recommend to choose the level your at plus the one below, or above depending 
     <string name="dbrestore_failure_nofileselected">No file select: restoration cancelled</string>
     <string name="dbrestore_success">Database successfully restored</string>
     <string name="widget_btn_copy">Copy to clipboard</string>
+
+    <string name="anki_card_CNEN_front"><![CDATA[
+        <h1><tts class="mobile" service="android" voice="zh_CN">{{Hanzi}}</tts></h1>
+
+        <br />
+
+        {{tts zh:Hanzi}}
+        <div class="metadata">
+            <div>{{HSK}} - {{Level}}</div>
+        </div>
+    ]]></string>
+
+    <string name="anki_card_CNEN_back"><![CDATA[
+        <h1><tts class="mobile" service="android" voice="zh_CN">{{Hanzi}}</tts></h1>
+
+        {{Pinyin}}<br />
+
+        {{tts zh:Hanzi}}
+
+        <hr id="answer" />
+        {{Definition}}
+        {{tts en:Definition}}<br /><br />
+        {{Notes}}
+        <br /><br />
+
+        <hr id="example" />
+
+        <div class="metadata">
+            <div>{{HSK}} - {{Level}}</div>
+        </div>
+    ]]></string>
+
+    <string name="anki_card_css">H1 {
+font-size: 60px;
+}
+
+.card {
+font-family: arial;
+font-size: 20px;
+text-align: center;
+color: black;
+background-color: white;
+}
+
+.example {
+font-size: 20px;
+}
+
+HR {
+margin-top: 35px;
+margin-bottom: 35px;
+}
+
+.metadata > div {
+flex-grow: 1;
+}
+
+.metadata > div:nth-child(2) {
+font-size: 30px;
+}
+
+.metadata > div:nth-child(1) {
+text-align: center;
+font-size: 30px;
+}
+
+.metadata > div:nth-child(3) {
+text-align: right;
+}
+
+.metadata {
+position: fixed;
+display: flex;
+flex-direction: row;
+bottom: 0;
+width: 92%;
+align-items: flex-end;
+margin: 0;
+padding: 0;
+}
+
+.mobile .disabled {display: none;visibility: hidden;}</string>
+    <string name="config_anki_icon_alt">Anki integration</string>
+    <string name="config_anki_title">Anki integration</string>
+    <string name="config_anki_integration">Save notes in Anki automatically</string>
+    <string name="anki_not_installed"><![CDATA[AnkiDroid is not installed, or runs a very old version (<2.5)]]></string>
+    <string name="anki_failed_import">Anki cards import failed, try disabling/enabling again.</string>
+    <string name="anki_permission_denied">Permission to call AnkiDroid API denied.</string>
+    <string name="anki_import_completed">Successfully imported %d cards to Anki.</string>
+    <string name="anki_import_started">Starting the import into AnkiDroid</string>
+    <string name="anki_import_progress">Importing annotations to AnkiDroid: %d / %d</string>
 </resources>

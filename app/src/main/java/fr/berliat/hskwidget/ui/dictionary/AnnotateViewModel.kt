@@ -38,6 +38,16 @@ class AnnotateViewModel(context: Context) : ViewModel() {
         return null
     }
 
+    suspend fun updateAnnotationAnkiId(annotation: ChineseWordAnnotation, ankiId: Long): Exception? {
+        try {
+            annotationDAO.updateAnkiNoteId(annotation.simplified, ankiId)
+        } catch (e: Exception) {
+            return e
+        }
+
+        return null
+    }
+
     suspend fun deleteAnnotation(simplified: String): Exception? {
         val nbRowAffected: Int
         try {

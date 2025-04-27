@@ -1,6 +1,5 @@
 package fr.berliat.hskwidget.ui.dictionary
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment

@@ -18,6 +18,7 @@ import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWordAnnotation
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.databinding.FragmentAnnotationEditBinding
+import fr.berliat.hskwidget.domain.AnkiDroidHelper
 import fr.berliat.hskwidget.domain.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -171,6 +172,8 @@ class AnnotateFragment: Fragment() {
                 dialog.dismiss() // Dismiss the dialog
             }
 
+        //TODO("Add Anki Removal")
+
         val dialog = builder.create()
         dialog.show()
     }
@@ -181,14 +184,15 @@ class AnnotateFragment: Fragment() {
             firstSeen = Date()
 
         val updatedAnnotation = ChineseWordAnnotation(
-            simplified = simplifiedWord,
+            simplified = simplifiedWord.trim(),
             pinyins = null,  // Assume pinyins are handled elsewhere
             notes = binding.annotationEditNotes.text.toString(),
             classType = ChineseWordAnnotation.ClassType.entries[binding.annotationEditClassType.selectedItemPosition],
             level = ChineseWordAnnotation.ClassLevel.entries[binding.annotationEditClassLevel.selectedItemPosition],
             themes = binding.annotationEditThemes.text.toString(),
             firstSeen = firstSeen,  // Handle date logic
-            isExam = binding.annotationEditIsExam.isChecked
+            isExam = binding.annotationEditIsExam.isChecked,
+            ankiId = annotatedWord?.annotation?.ankiId ?: ChineseWordAnnotation.ANKI_ID_EMPTY
         )
 
         GlobalScope.launch {
@@ -199,11 +203,30 @@ class AnnotateFragment: Fragment() {
             }
         }
 
+        saveToAnki(AnnotatedChineseWord(annotatedWord?.word, updatedAnnotation))
+
         Utils.incrementConsultedWord(requireContext(), simplifiedWord)
 
         if (annotatedWord?.hasAnnotation() == false) {
             AppPreferencesStore(requireContext()).lastAnnotatedClassType = updatedAnnotation.classType!!
             AppPreferencesStore(requireContext()).lastAnnotatedClassLevel = updatedAnnotation.level!!
+        }
+    }
+
+    private fun saveToAnki(annotatedChineseWord: AnnotatedChineseWord) {
+        val appConfig = AppPreferencesStore(requireContext())
+
+        if (appConfig.ankiSaveNotes) {
+            val anki = AnkiDroidHelper(this)
+
+            val formerNoteId = annotatedChineseWord.annotation!!.ankiId
+            val ankiId = anki.store.importOrUpdateCard(annotatedChineseWord)
+
+            if (ankiId != null && formerNoteId != ankiId) {
+                GlobalScope.launch {
+                    viewModel.updateAnnotationAnkiId(annotatedChineseWord.annotation, ankiId)
+                }
+            }
         }
     }
 

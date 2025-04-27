@@ -32,6 +32,7 @@ data class AnnotatedChineseWord(
 private const val select_left_join =
     "SELECT a.a_simplified, COALESCE(w.simplified, a.a_simplified) simplified, a.a_searchable_text, " +
             " a.a_pinyins, a.notes, a.class_type, a.class_level, a.themes, a.first_seen, a.is_exam," +
+            " a.anki_id," +
             " w.traditional, w.definition, w.hsk_level, w.pinyins, w.popularity, " +
             " COALESCE(w.searchable_text, '') searchable_text, " +
             " (a.first_seen IS NULL) AS is_first_seen_null " +
@@ -43,6 +44,7 @@ private const val select_right_join =
     "SELECT COALESCE(a.a_simplified, w.simplified) a_simplified, w.simplified, " +
             " COALESCE(a.a_searchable_text, '') a_searchable_text, " +
             " a.a_pinyins, a.notes, a.class_type, a.class_level, a.themes, a.first_seen, a.is_exam," +
+            " a.anki_id," +
             " w.traditional, w.definition, w.hsk_level, w.pinyins, w.popularity, w.searchable_text, " +
             " (a.first_seen IS NULL) AS is_first_seen_null " +
             " FROM chineseword AS w LEFT JOIN chinesewordannotation AS a" +
@@ -59,6 +61,10 @@ interface AnnotatedChineseWordDAO {
             " ORDER BY is_first_seen_null, a.first_seen DESC, w.popularity DESC " +
             " LIMIT :pageSize OFFSET (:page * :pageSize)")
     suspend fun searchFromStrLike(str: String?, hasAnnotation: Boolean, page: Int = 0, pageSize: Int = 30): List<AnnotatedChineseWord>
+
+    suspend fun getAllAnnotated(): List<AnnotatedChineseWord> {
+        return searchFromStrLike("", true, 0, Int.MAX_VALUE)
+    }
 
     @Query("$select_left_join WHERE a_simplified = :simplifiedWord" +
             " UNION " +

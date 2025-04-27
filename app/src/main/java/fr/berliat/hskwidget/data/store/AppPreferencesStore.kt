@@ -4,16 +4,25 @@ import android.content.Context
 import android.net.Uri
 import fr.berliat.hskwidget.data.model.ChineseWordAnnotation.ClassLevel
 import fr.berliat.hskwidget.data.model.ChineseWordAnnotation.ClassType
+import androidx.core.net.toUri
 
 class AppPreferencesStore(context: Context):
     PrefixedPreferenceDataStoreBridge(context.dataStore, "app") {
+
+    var ankiSaveNotes: Boolean
+        get() {
+            return getBoolean("anki_save_notes", false)
+        }
+        set(enabled) {
+            putBoolean("anki_save_notes", enabled)
+        }
 
     var readerSeparateWords: Boolean
         get() {
             return getBoolean("reader_separate_word", false)
         }
-        set(wordSeparator) {
-            putBoolean("reader_separate_word", wordSeparator)
+        set(enabled) {
+            putBoolean("reader_separate_word", enabled)
         }
 
     var dbBackUpActive: Boolean
@@ -26,7 +35,7 @@ class AppPreferencesStore(context: Context):
 
     var dbBackUpDirectory: Uri
         get() {
-            return Uri.parse(getString("database_backup_directory", ""))
+            return getString("database_backup_directory", "")!!.toUri()
         }
         set(dir) {
             putString("database_backup_directory", dir.toString())
