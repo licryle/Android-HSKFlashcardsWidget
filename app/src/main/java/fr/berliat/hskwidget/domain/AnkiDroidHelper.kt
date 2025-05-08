@@ -1,13 +1,18 @@
 package fr.berliat.hskwidget.domain
 
+import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.ichi2.anki.api.AddContentApi
 import com.ichi2.anki.api.AddContentApi.READ_WRITE_PERMISSION
+import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.store.AnkiIntegrationStore
 
 
@@ -50,5 +55,35 @@ class AnkiDroidHelper(val fragment: Fragment) {
 
     fun requestPermission() {
         mPermissionCall.launch(arrayOf(READ_WRITE_PERMISSION))
+    }
+
+    fun isAnkiRunning() : Boolean {
+        return ankiStore.isStoreReady()
+    }
+
+    fun ensureAnkiDroidIsRunning() {
+        if (!isAnkiRunning()) {
+            startAnkiDroid()
+        }
+    }
+
+    fun startAnkiDroid() : Boolean {
+        //
+        val intent = Intent(Intent.ACTION_MAIN)
+        intent.setClassName("com.ichi2.anki", "com.ichi2.anki.IntentHandler")
+
+        try {
+            Toast.makeText(context, R.string.anki_must_start, Toast.LENGTH_LONG).show()
+            context.startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            Log.e(TAG, context.getString(R.string.anki_not_installed), e)
+            return false
+        }
+
+        return true
+    }
+
+    companion object {
+        const val TAG = "AnkiDroidHelper"
     }
 }

@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import fr.berliat.hskwidget.R
@@ -18,30 +17,27 @@ import fr.berliat.hskwidget.data.dao.ChineseWordAnnotationDAO
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.databinding.FragmentConfigBinding
-import fr.berliat.hskwidget.domain.AnkiDroidHelper
 import fr.berliat.hskwidget.domain.DatabaseBackup
 import fr.berliat.hskwidget.domain.DatabaseBackupCallbacks
 import fr.berliat.hskwidget.domain.Utils
+import fr.berliat.hskwidget.ui.utils.AnkiFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
-class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
+class ConfigFragment : AnkiFragment(), DatabaseBackupCallbacks,
         ActivityCompat.OnRequestPermissionsResultCallback{
     private lateinit var binding: FragmentConfigBinding
     private lateinit var appConfig: AppPreferencesStore
     private lateinit var databaseBackup : DatabaseBackup
-    private lateinit var ankiDroid : AnkiDroidHelper
     private lateinit var annotationDAO: ChineseWordAnnotationDAO
     private lateinit var appContext: Context
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         databaseBackup = DatabaseBackup(this, requireContext(), this)
-        ankiDroid = AnkiDroidHelper(this)
-        ankiDroid.initRequestPermission { isGranted -> onAnkiRequestPermissionsResult(isGranted) }
         annotationDAO = ChineseWordsDatabase.getInstance(requireContext()).chineseWordAnnotationDAO()
         appContext = requireContext().applicationContext
     }
@@ -79,25 +75,21 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
     }
 
     private fun onAnkiIntegrationChanged(enabled: Boolean) {
-        appConfig = AppPreferencesStore(requireContext())
-
+        appConfig.ankiSaveNotes = enabled
+        binding.configAnkiActivateBtn.isChecked = enabled
         if (enabled) {
-            if (ankiDroid.isApiAvailable()) {
-                if (ankiDroid.shouldRequestPermission()) {
-                    ankiDroid.requestPermission()
-                    return
-                }
-
-                onAnkiRequestPermissionsResult(true)
-            } else {
-                Toast.makeText(requireContext(), getString(R.string.anki_not_installed), Toast.LENGTH_LONG).show()
-                binding.configAnkiActivateBtn.isChecked = false
-                appConfig.ankiSaveNotes = false
-                return
-            }
-        } else {
-            appConfig.ankiSaveNotes = false
+            safelyModifyAnkiDbIfAllowed { importsAllNotesToAnkiDroid() }
         }
+    }
+
+    override fun onAnkiRequestPermissionDenied() {
+        appConfig.ankiSaveNotes = false
+        binding.configAnkiActivateBtn.isChecked = false
+    }
+
+    override fun onAnkiRequestPermissionGranted() {
+        appConfig.ankiSaveNotes = true
+        binding.configAnkiActivateBtn.isChecked = true
     }
 
     private fun importsAllNotesToAnkiDroid() {
@@ -191,18 +183,6 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
             getString(R.string.dbrestore_failure_nofileselected),
             Toast.LENGTH_LONG
         ).show()
-    }
-
-    private fun onAnkiRequestPermissionsResult(isGranted: Boolean) {
-        Log.i(TAG, "Requesting Anki permission to read/write")
-        AppPreferencesStore(requireContext()).ankiSaveNotes = isGranted
-        binding.configAnkiActivateBtn.isChecked = isGranted
-
-        if (isGranted) {
-            importsAllNotesToAnkiDroid()
-        } else {
-            Toast.makeText(requireContext(), R.string.anki_permission_denied, Toast.LENGTH_LONG).show()
-        }
     }
 
     companion object {

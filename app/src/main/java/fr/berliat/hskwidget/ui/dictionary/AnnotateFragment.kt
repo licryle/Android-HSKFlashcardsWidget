@@ -1,6 +1,7 @@
 package fr.berliat.hskwidget.ui.dictionary
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,28 +9,19 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.dao.AnnotatedChineseWord
-import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWordAnnotation
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.databinding.FragmentAnnotationEditBinding
-import fr.berliat.hskwidget.domain.AnkiDroidHelper
 import fr.berliat.hskwidget.domain.Utils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import fr.berliat.hskwidget.ui.utils.AnkiFragment
 import java.util.Date
 
 
-class AnnotateFragment: Fragment() {
-    private lateinit var simplifiedWord: String
-    private var annotatedWord: AnnotatedChineseWord? = null
+class AnnotateFragment: AnkiFragment() {
     private lateinit var binding: FragmentAnnotationEditBinding
     private lateinit var viewModel: AnnotateViewModel
 
@@ -51,27 +43,10 @@ class AnnotateFragment: Fragment() {
         val factory = AnnotateViewModelFactory(requireContext())
         viewModel = ViewModelProvider(this, factory)[AnnotateViewModel::class.java]
 
-        simplifiedWord = arguments?.getString("simplifiedWord") ?: ""
-        if (simplifiedWord == "") {
-            annotatedWord = AnnotatedChineseWord.getBlank(simplifiedWord)
-        } else {
-            viewLifecycleOwner.lifecycleScope.launch {
-                // Switch to the IO dispatcher to perform background work
-                annotatedWord = withContext(Dispatchers.IO) {
-                    viewModel.getAnnotatedChineseWord(simplifiedWord) // Checked just below
-                }
-                // Switch back to the main thread to update UI
-                withContext(Dispatchers.Main) {
-                    if (annotatedWord == null || annotatedWord?.hasAnnotation() == false) { // failure or new word
-                        annotatedWord = AnnotatedChineseWord(
-                            annotatedWord?.word ?: ChineseWord.getBlank(simplifiedWord),
-                            ChineseWordAnnotation.getBlank(simplifiedWord)
-                        )
-                    }
-                    updateUI()
-                }
-            }
+        viewModel.annotatedWord.observe(viewLifecycleOwner) { word ->
+            updateUI(word)
         }
+        viewModel.fetchAnnotatedWord(arguments)
 
         Utils.hideKeyboard(requireContext(), binding.root)
 
@@ -84,10 +59,7 @@ class AnnotateFragment: Fragment() {
         Utils.logAnalyticsScreenView(requireContext(), "Annotate")
     }
 
-    private fun updateUI() {
-        // Initialize ViewModel (you might want to use a ViewModelFactory)
-        viewModel = ViewModelProvider(this)[AnnotateViewModel::class.java]
-
+    private fun updateUI(annotatedWord: AnnotatedChineseWord) {
         // Populate the ClassType Spinner programmatically
         val classTypes = ChineseWordAnnotation.ClassType.entries.map { it.type }  // Convert enum to list of strings
         val classTypeAdapter = ArrayAdapter(
@@ -109,25 +81,25 @@ class AnnotateFragment: Fragment() {
         binding.annotationEditClassLevel.adapter = classLevelAdapter
 
         // Update UI with ChineseWord fields
-        binding.annotationEditChinese.hanziText = annotatedWord?.word?.simplified.toString()
-        binding.annotationEditChinese.pinyinText = annotatedWord?.word?.pinyins.toString()
+        binding.annotationEditChinese.hanziText = annotatedWord.word?.simplified.toString()
+        binding.annotationEditChinese.pinyinText = annotatedWord.word?.pinyins.toString()
 
         val prefStore = AppPreferencesStore(requireContext())
         // Populate fields from ChineseWordAnnotation
-        binding.annotationEditNotes.setText(annotatedWord?.annotation?.notes)
-        if (annotatedWord?.hasAnnotation() == true) {
-            binding.annotationEditClassType.setSelection(annotatedWord!!.annotation!!.classType!!.ordinal)
-            binding.annotationEditClassLevel.setSelection(annotatedWord!!.annotation!!.level!!.ordinal)
+        binding.annotationEditNotes.setText(annotatedWord.annotation?.notes)
+        if (annotatedWord.hasAnnotation()) {
+            binding.annotationEditClassType.setSelection(annotatedWord.annotation!!.classType!!.ordinal)
+            binding.annotationEditClassLevel.setSelection(annotatedWord.annotation.level!!.ordinal)
         } else {
             binding.annotationEditClassType.setSelection(prefStore.lastAnnotatedClassType.ordinal)
             binding.annotationEditClassLevel.setSelection(prefStore.lastAnnotatedClassLevel.ordinal)
         }
-        binding.annotationEditThemes.setText(annotatedWord?.annotation?.themes)
-        binding.annotationEditIsExam.isChecked = annotatedWord?.annotation?.isExam ?: false
+        binding.annotationEditThemes.setText(annotatedWord.annotation?.themes)
+        binding.annotationEditIsExam.isChecked = annotatedWord.annotation?.isExam ?: false
 
         binding.annotationEditSave.setOnClickListener { onSaveClick() }
 
-        if (annotatedWord?.hasAnnotation() == true) {
+        if (annotatedWord.hasAnnotation()) {
             binding.annotationEditDelete.setOnClickListener { showDeleteConfirmationDialog() }
         } else {
             binding.annotationEditDelete.visibility = View.GONE
@@ -144,10 +116,10 @@ class AnnotateFragment: Fragment() {
         }
 
         if (e == null) {
-            Toast.makeText(context, getString(msgRes, simplifiedWord), Toast.LENGTH_LONG).show()
+            Toast.makeText(context, getString(msgRes, viewModel.simplified), Toast.LENGTH_LONG).show()
             findNavController().popBackStack()
         } else {
-            Toast.makeText(context, getString(msgRes, simplifiedWord, e), Toast.LENGTH_LONG).show()
+            Toast.makeText(context, getString(msgRes, viewModel.simplified, e), Toast.LENGTH_LONG).show()
         }
     }
 
@@ -157,13 +129,7 @@ class AnnotateFragment: Fragment() {
             .setMessage(getString(R.string.annotation_edit_delete_confirm_message))
             .setPositiveButton(getString(R.string.annotation_edit_delete_confirm_yes)) { dialog, _ ->
                 // Handle positive action (e.g., save annotation)
-                GlobalScope.launch {
-                    val err = viewModel.deleteAnnotation(simplifiedWord)
-
-                    withContext(Dispatchers.Main) {
-                        handleIOResult(ACTION.DELETE, err)
-                    }
-                }
+                viewModel.deleteAnnotation { err -> handleIOResult(ACTION.DELETE, err) }
 
                 dialog.dismiss() // Dismiss the dialog
             }
@@ -172,19 +138,18 @@ class AnnotateFragment: Fragment() {
                 dialog.dismiss() // Dismiss the dialog
             }
 
-        //TODO("Add Anki Removal")
 
         val dialog = builder.create()
         dialog.show()
     }
 
     private fun onSaveClick() {            // Save the updated annotation fields
-        var firstSeen = annotatedWord?.annotation?.firstSeen
+        var firstSeen = viewModel.annotatedWord.value?.annotation?.firstSeen
         if (firstSeen == null)
             firstSeen = Date()
 
         val updatedAnnotation = ChineseWordAnnotation(
-            simplified = simplifiedWord.trim(),
+            simplified = viewModel.simplified.trim(),
             pinyins = null,  // Assume pinyins are handled elsewhere
             notes = binding.annotationEditNotes.text.toString(),
             classType = ChineseWordAnnotation.ClassType.entries[binding.annotationEditClassType.selectedItemPosition],
@@ -192,46 +157,36 @@ class AnnotateFragment: Fragment() {
             themes = binding.annotationEditThemes.text.toString(),
             firstSeen = firstSeen,  // Handle date logic
             isExam = binding.annotationEditIsExam.isChecked,
-            ankiId = annotatedWord?.annotation?.ankiId ?: ChineseWordAnnotation.ANKI_ID_EMPTY
+            ankiId = viewModel.annotatedWord.value?.annotation?.ankiId ?: ChineseWordAnnotation.ANKI_ID_EMPTY
         )
 
-        GlobalScope.launch {
-            val err = viewModel.updateAnnotation(updatedAnnotation)
+        val annotatedWord = AnnotatedChineseWord(viewModel.annotatedWord.value!!.word, updatedAnnotation)
+        viewModel.updateAnnotation(updatedAnnotation) { err -> handleIOResult(ACTION.UPDATE, err) }
 
-            withContext(Dispatchers.Main) {
-                handleIOResult(ACTION.UPDATE, err)
-            }
-        }
+        safelyModifyAnkiDbIfAllowed { saveWordToAnki(annotatedWord) }
 
-        saveToAnki(AnnotatedChineseWord(annotatedWord?.word, updatedAnnotation))
+        Utils.incrementConsultedWord(requireContext(), viewModel.simplified)
 
-        Utils.incrementConsultedWord(requireContext(), simplifiedWord)
-
-        if (annotatedWord?.hasAnnotation() == false) {
+        if (annotatedWord.hasAnnotation()) {
             AppPreferencesStore(requireContext()).lastAnnotatedClassType = updatedAnnotation.classType!!
             AppPreferencesStore(requireContext()).lastAnnotatedClassLevel = updatedAnnotation.level!!
         }
     }
 
-    private fun saveToAnki(annotatedChineseWord: AnnotatedChineseWord) {
-        val appConfig = AppPreferencesStore(requireContext())
+    fun saveWordToAnki(annotatedWord: AnnotatedChineseWord) {
+        Log.d(TAG, "saveWordToAnki: Start")
 
-        if (appConfig.ankiSaveNotes) {
-            val anki = AnkiDroidHelper(this)
+        val formerNoteId = annotatedWord.annotation!!.ankiId
+        Log.d(TAG, "saveWordToAnki: formerNoteId $formerNoteId")
+        val ankiId = ankiDroid.store.importOrUpdateCard(annotatedWord)
 
-            val formerNoteId = annotatedChineseWord.annotation!!.ankiId
-            val ankiId = anki.store.importOrUpdateCard(annotatedChineseWord)
-
-            if (ankiId != null && formerNoteId != ankiId) {
-                GlobalScope.launch {
-                    viewModel.updateAnnotationAnkiId(annotatedChineseWord.annotation, ankiId)
-                }
-            }
+        if (ankiId != null && formerNoteId != ankiId) {
+            viewModel.updateAnnotationAnkiId(ankiId, null)
         }
     }
 
     enum class ACTION {
-        DELETE,
-        UPDATE
+        UPDATE,
+        DELETE
     }
 }

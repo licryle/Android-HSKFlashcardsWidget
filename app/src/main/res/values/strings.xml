@@ -211,4 +211,5 @@ padding: 0;
     <string name="anki_import_completed">Successfully imported %d cards to Anki.</string>
     <string name="anki_import_started">Starting the import into AnkiDroid</string>
     <string name="anki_import_progress">Importing annotations to AnkiDroid: %d / %d</string>
+    <string name="anki_must_start">To save to Anki, Anki must be started. Starting Anki. Feel free to go back.</string>
 </resources>

@@ -8,12 +8,17 @@ import com.ichi2.anki.api.NoteInfo
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.dao.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWordAnnotation
+import fr.berliat.hskwidget.ui.utils.AnkiFragment
 import java.util.Locale
 import kotlin.reflect.KSuspendFunction2
 
 class AnkiIntegrationStore(val context: Context):
     PrefixedPreferenceDataStoreBridge(context.dataStore, "anki") {
     private val api: AddContentApi = AddContentApi(context)
+
+    fun isStoreReady() : Boolean {
+        return api.getDeckList() != null
+    }
 
     fun addModelId(modelName: String, modelId: Long) {
         putLong("model:${modelName}", modelId)
@@ -62,7 +67,13 @@ class AnkiIntegrationStore(val context: Context):
         } else {
             // Otherwise try to check if we have a reference to a deck that was renamed and return that
             did = getDeckId(deckName)
-            return if (did != -1L && api.getDeckName(did) != null) {
+
+            val deckNameCheck = try {
+                api.getDeckName(did)
+            } catch(e: NullPointerException) {
+                null
+            }
+            return if (did != -1L && deckNameCheck != null) {
                 did
             } else {
                 // If the deck really doesn't exist then return null
@@ -213,6 +224,7 @@ class AnkiIntegrationStore(val context: Context):
             }
 
             if (note != null && note.fields.size > 1 && note.fields[0] == word.simplified.trim().replace("\r\n","\n")) {
+                Log.d(AnkiFragment.TAG, "importOrUpdateCard: calling api.updates")
                 api.updateNoteFields(note.id, fields)
                 api.updateNoteTags(note.id, tags)
                 return note.id
