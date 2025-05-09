@@ -5,6 +5,10 @@ import com.ichi2.anki.FlashCardsContract.Note
 import com.ichi2.anki.api.AddContentApi
 import com.ichi2.anki.api.NoteInfo
 
+/**
+ * To check how to use the contentResolver, check out AnkiDroid's code at:
+ * https://github.com/ankidroid/Anki-Android/blob/main/api/src/main/java/com/ichi2/anki/api/AddContentApi.kt
+ */
 class AnkiNotesDAO(context: Context) {
     private val api = AddContentApi(context)
     private val resolver = context.contentResolver
