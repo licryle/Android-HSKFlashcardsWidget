@@ -1,6 +1,5 @@
 package fr.berliat.hskwidget.domain
 
-import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.content.ClipData
 import android.content.Context
@@ -273,7 +272,7 @@ class Utils {
             binding.dictionaryItemCopy.setOnClickListener { copyToClipBoard(context, word.simplified) }
         }
 
-        private fun copyToClipBoard(context: Context, s: String) {
+        fun copyToClipBoard(context: Context, s: String) {
             // https://stackoverflow.com/a/28780585/3059536
             val clipboard =
                 context.getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager

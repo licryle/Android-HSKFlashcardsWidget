@@ -13,10 +13,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.dao.AnnotatedChineseWord
+import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWordAnnotation
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.databinding.FragmentAnnotationEditBinding
 import fr.berliat.hskwidget.domain.Utils
+import fr.berliat.hskwidget.domain.Utils.Companion.copyToClipBoard
+import fr.berliat.hskwidget.domain.Utils.Companion.playWordInBackground
 import fr.berliat.hskwidget.ui.utils.AnkiFragment
 import java.util.Date
 
@@ -61,7 +64,8 @@ class AnnotateFragment: AnkiFragment() {
 
     private fun updateUI(annotatedWord: AnnotatedChineseWord) {
         // Populate the ClassType Spinner programmatically
-        val classTypes = ChineseWordAnnotation.ClassType.entries.map { it.type }  // Convert enum to list of strings
+        val classTypes =
+            ChineseWordAnnotation.ClassType.entries.map { it.type }  // Convert enum to list of strings
         val classTypeAdapter = ArrayAdapter(
             requireContext(),
             android.R.layout.simple_spinner_item,
@@ -84,6 +88,14 @@ class AnnotateFragment: AnkiFragment() {
         binding.annotationEditChinese.hanziText = annotatedWord.word?.simplified.toString()
         binding.annotationEditChinese.pinyinText = annotatedWord.word?.pinyins.toString()
 
+        binding.dictionaryItemHskLevel.text = annotatedWord.word?.hskLevel.toString()
+        binding.dictionaryItemHskLevel.visibility =
+            if (annotatedWord.word?.hskLevel == null || annotatedWord.word.hskLevel == ChineseWord.HSK_Level.NOT_HSK) {
+                    View.INVISIBLE
+            } else {
+                View.VISIBLE
+            }
+
         val prefStore = AppPreferencesStore(requireContext())
         // Populate fields from ChineseWordAnnotation
         binding.annotationEditNotes.setText(annotatedWord.annotation?.notes)
@@ -96,6 +108,11 @@ class AnnotateFragment: AnkiFragment() {
         }
         binding.annotationEditThemes.setText(annotatedWord.annotation?.themes)
         binding.annotationEditIsExam.isChecked = annotatedWord.annotation?.isExam ?: false
+
+        binding.dictionaryItemSpeak.setOnClickListener {
+            playWordInBackground(requireContext(), annotatedWord.simplified)
+        }
+        binding.dictionaryItemCopy.setOnClickListener { copyToClipBoard(requireContext(), annotatedWord.simplified) }
 
         binding.annotationEditSave.setOnClickListener { onSaveClick() }
 
