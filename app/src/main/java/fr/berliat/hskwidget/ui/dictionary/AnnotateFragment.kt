@@ -148,6 +148,8 @@ class AnnotateFragment: AnkiFragment() {
                 // Handle positive action (e.g., save annotation)
                 viewModel.deleteAnnotation { err -> handleIOResult(ACTION.DELETE, err) }
 
+                safelyModifyAnkiDbIfAllowed { deleteWordFromAnki() }
+
                 dialog.dismiss() // Dismiss the dialog
             }
             .setNegativeButton(getString(R.string.annotation_edit_delete_confirm_no)) { dialog, _ ->
@@ -158,6 +160,10 @@ class AnnotateFragment: AnkiFragment() {
 
         val dialog = builder.create()
         dialog.show()
+    }
+
+    private fun deleteWordFromAnki() {
+        ankiDroid.store.deleteCard(viewModel.annotatedWord.value!!)
     }
 
     private fun onSaveClick() {            // Save the updated annotation fields

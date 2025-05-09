@@ -104,7 +104,7 @@ class AnnotateViewModel(context: Context) : ViewModel() {
                 error = e
             }
 
-            if (error == null && nbRowAffected == 1) {
+            if (error == null && nbRowAffected == 0) {
                 error = Exception("No records deleted for $annotatedWord.value!!.simplified")
             }
 

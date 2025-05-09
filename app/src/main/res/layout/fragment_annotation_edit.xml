@@ -58,7 +58,7 @@
 
                 app:layout_constraintStart_toEndOf="@id/dictionary_item_copy"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/dictionary_item_hsk_level"
                 android:layout_gravity="center"/>
 
             <!-- HSK Level -->

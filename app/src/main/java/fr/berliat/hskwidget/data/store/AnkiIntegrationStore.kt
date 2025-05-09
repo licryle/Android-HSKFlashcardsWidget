@@ -3,9 +3,9 @@ package fr.berliat.hskwidget.data.store
 
 import android.content.Context
 import android.util.Log
-import com.ichi2.anki.api.AddContentApi
 import com.ichi2.anki.api.NoteInfo
 import fr.berliat.hskwidget.R
+import fr.berliat.hskwidget.data.dao.AnkiNotesDAO
 import fr.berliat.hskwidget.data.dao.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWordAnnotation
 import fr.berliat.hskwidget.ui.utils.AnkiFragment
@@ -14,7 +14,7 @@ import kotlin.reflect.KSuspendFunction2
 
 class AnkiIntegrationStore(val context: Context):
     PrefixedPreferenceDataStoreBridge(context.dataStore, "anki") {
-    private val api: AddContentApi = AddContentApi(context)
+    private val api: AnkiNotesDAO = AnkiNotesDAO(context)
 
     fun isStoreReady() : Boolean {
         return api.getDeckList() != null
@@ -41,8 +41,12 @@ class AnkiIntegrationStore(val context: Context):
         if (did == null) {
             did = api.addNewDeck(deckName)
 
-            Log.i(TAG, "findOrCreateDeckIdByName: Inserted new Deck into Anki")
+            if (did == null) {
+                Log.i(TAG, "findOrCreateModelIdByName: Couldn't add model to Anki")
+                return null
+            }
 
+            Log.i(TAG, "findOrCreateDeckIdByName: Inserted new Deck into Anki")
             addDeckId(deckName, did)
         }
 
@@ -88,7 +92,7 @@ class AnkiIntegrationStore(val context: Context):
      * @return the ID of the deck that has given name, or null if no deck was found or API error
      */
     private fun lookupDeckId(deckName: String): Long? {
-        val deckList: MutableMap<Long, String> = api.getDeckList() ?: return null
+        val deckList: Map<Long, String> = api.getDeckList() ?: return null
 
         for ((key, value) in deckList) {
             if (value.equals(deckName, ignoreCase = true)) {
@@ -113,8 +117,12 @@ class AnkiIntegrationStore(val context: Context):
                 null
             )
 
-            Log.i(TAG, "findOrCreateModelIdByName: Inserted new Model into Anki")
+            if (mid == null) {
+                Log.i(TAG, "findOrCreateModelIdByName: Couldn't add model to Anki")
+                return null
+            }
 
+            Log.i(TAG, "findOrCreateModelIdByName: Inserted new Model into Anki")
             addModelId(MODEL_NAME, mid)
         }
 
@@ -139,11 +147,12 @@ class AnkiIntegrationStore(val context: Context):
         if ((prefsModelId != -1L)
             && (api.getModelName(prefsModelId) != null)
             && (api.getFieldList(prefsModelId) != null)
-            && (api.getFieldList(prefsModelId).size >= numFields)
+            && (api.getFieldList(prefsModelId)!!.size >= numFields)
         ) { // could potentially have been renamed
             return prefsModelId
         }
-        val modelList: Map<Long?, String> = api.getModelList(numFields)
+        val modelList: Map<Long, String> = api.getModelList(numFields) ?: return null
+
         for ((key, value) in modelList) {
             if (value == modelName) {
                 return key // first model wins
@@ -232,6 +241,10 @@ class AnkiIntegrationStore(val context: Context):
                 return api.addNote(modelId, deckId, fields, tags)
             }
         }
+    }
+
+    fun deleteCard(word: AnnotatedChineseWord): Boolean {
+        return word.annotation?.ankiId?.let { api.deleteNote(it) } ?: false
     }
 
     companion object {
