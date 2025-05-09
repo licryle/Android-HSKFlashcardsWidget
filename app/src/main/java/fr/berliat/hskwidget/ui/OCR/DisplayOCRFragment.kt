@@ -26,7 +26,6 @@ import fr.berliat.hsktextviews.views.HSKWordView
 import fr.berliat.hskwidget.R
 
 import fr.berliat.hskwidget.data.dao.AnnotatedChineseWord
-import fr.berliat.hskwidget.data.dao.ChineseWordFrequencyDAO
 import fr.berliat.hskwidget.data.repo.ChineseWordFrequencyRepo
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
@@ -35,6 +34,7 @@ import fr.berliat.hskwidget.domain.SharedViewModel
 import fr.berliat.hskwidget.domain.Utils
 import kotlinx.coroutines.launch
 import androidx.core.net.toUri
+import fr.berliat.hskwidget.MainActivity
 
 class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.HSKTextSegmenterListener {
     private lateinit var viewBinding: FragmentOcrDisplayBinding
@@ -59,6 +59,10 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
             db.chineseWordFrequencyDAO(),
             db.annotatedChineseWordDAO()
         )
+
+        if (requireActivity().javaClass.simpleName == "MainActivity") {
+            (requireActivity() as MainActivity).setOCRReminderVisible()
+        }
     }
 
     override fun onCreateView(

@@ -5,11 +5,15 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.StrictMode
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.databinding.library.BuildConfig
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
@@ -43,6 +47,7 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
     private lateinit var navController: NavController
     private lateinit var appConfig: AppPreferencesStore
     private lateinit var databaseBackup: DatabaseBackup
+    private var showOCRReminder: Boolean = true
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -86,6 +91,19 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment
         navController = navHostFragment.navController
 
+        supportFragmentManager.registerFragmentLifecycleCallbacks(
+            object : FragmentManager.FragmentLifecycleCallbacks() {
+                override fun onFragmentResumed(fm: FragmentManager, f: Fragment) {
+                    showOCRReminderIfActive()
+                }
+
+                override fun onFragmentPaused(fm: FragmentManager, f: Fragment) {
+                    showOCRReminderIfActive()
+                }
+            },
+            true // recursive = true, to catch nested fragments too
+        )
+
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(
@@ -103,6 +121,44 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
         handleTextSearchIntent(intent)
         handleImageOCRIntent(intent)
         handleBackUp()
+    }
+
+    private fun showOCRReminderIfActive() {
+        if (!showOCRReminder) return
+
+        val nav = findNavController(R.id.nav_host_fragment_content_main)
+        val items = nav.currentBackStack.value
+
+        var lastOCRDisplay: NavBackStackEntry? = null
+        for (i in items.indices.reversed()) {
+            // Handle item from last to first
+            val item = items[i]
+
+            if (i == items.size - 1 && item.destination.id == R.id.nav_ocr_read) {
+                break // If we're in an OCR; we don't care about it
+            }
+
+            if (item.destination.id == R.id.nav_ocr_read) {
+                lastOCRDisplay = item
+                break
+            }
+        }
+
+        val isOcrActive = lastOCRDisplay != null
+        val ocrStatusBar = binding.appBarMain.navHostContentMain.navHostOcrIndicator
+        ocrStatusBar.visibility = if (isOcrActive && showOCRReminder) View.VISIBLE else View.GONE
+        binding.appBarMain.navHostContentMain.navHostOcrIndicatorClose.setOnClickListener {
+            showOCRReminder = false
+            ocrStatusBar.visibility = View.GONE
+        }
+
+        ocrStatusBar.setOnClickListener {
+            nav.popBackStack(R.id.nav_ocr_read, false)
+        }
+    }
+
+    fun setOCRReminderVisible() {
+        showOCRReminder = true
     }
 
     override fun onNewIntent(intent: Intent) {

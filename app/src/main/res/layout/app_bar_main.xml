@@ -37,6 +37,8 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <include layout="@layout/nav_host_content_main" />
+    <include
+        android:id="@+id/nav_host_content_main"
+        layout="@layout/nav_host_content_main" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
