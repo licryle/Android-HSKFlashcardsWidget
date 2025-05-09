@@ -35,6 +35,8 @@ import fr.berliat.hskwidget.domain.Utils
 import kotlinx.coroutines.launch
 import androidx.core.net.toUri
 import fr.berliat.hskwidget.MainActivity
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.HSKTextSegmenterListener {
     private lateinit var viewBinding: FragmentOcrDisplayBinding
@@ -184,7 +186,7 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
             viewModel.text = null // consume condition
 
             if (viewModel.selectedWord != null) {
-                fetchWordForDisplay(viewModel.selectedWord!!)
+                fetchWordForDisplay(viewModel.selectedWord!!, ::showSelectedWord)
             }
         } else {
             viewBinding.ocrDisplayText.text = ""
@@ -276,41 +278,48 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
         isProcessing = itIs
     }
 
-    private fun fetchWordForDisplay(hanzi: String) {
+    private fun fetchWordForDisplay(simplified: String, callback: (String, AnnotatedChineseWord?) -> Unit) {
         viewLifecycleOwner.lifecycleScope.launch {
             // Switch to the IO dispatcher to perform background work
-            val result = fetchWord(hanzi)
+            val result = fetchWord(simplified)
 
-            // Update the UI with the result
-            if (result == null)
-                Toast.makeText(context, "Couldn't find ${hanzi}", Toast.LENGTH_LONG).show()
-            else {
-                viewModel.clickedWords[hanzi] = result.word?.pinyins.toString()
-
-                Utils.populateDictionaryEntryView(viewBinding.ocrDisplayDefinition,result,
-                    findNavController())
-                viewBinding.ocrDisplayDefinition.root.visibility = View.VISIBLE
+            withContext(Dispatchers.Main) {
+                callback(simplified, result)
             }
         }
     }
 
-
-    companion object {
-        private const val TAG = "DisplayOCRFragment"
-    }
-
     override fun onWordClick(word: HSKWordView) {
         Log.d(TAG, "onWordClick ${word.hanziText}")
-        viewModel.selectedWord = word.hanziText
-        word.isClicked = true
-        viewModel.clickedWords[word.hanziText] = word.pinyinText
 
-        fetchWordForDisplay(word.hanziText)
+        fetchWordForDisplay(word.hanziText, ::showSelectedWord)
 
         lifecycle.coroutineScope.launch {
             Log.d(TAG, "Augmenting Consulted Count for ${word.hanziText} by 1, if word exists")
             frequencyWordsRepo.incrementConsulted(word.hanziText)
         }
+    }
+
+    private fun showSelectedWord(simplified: String, annotatedWord: AnnotatedChineseWord?) {
+        // Update the UI with the result
+        if (annotatedWord == null) {
+            viewModel.clickedWords[simplified] = ""
+            Utils.copyToClipBoard(requireContext(), simplified)
+
+            val message = requireContext().getString(R.string.ocr_display_word_not_found, simplified)
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+        } else {
+            viewModel.clickedWords[simplified] = annotatedWord.word?.pinyins.toString()
+
+            Utils.populateDictionaryEntryView(
+                viewBinding.ocrDisplayDefinition, annotatedWord,
+                findNavController()
+            )
+            viewBinding.ocrDisplayDefinition.root.visibility = View.VISIBLE
+            viewModel.selectedWord = simplified
+        }
+
+        viewBinding.ocrDisplayText.clickedWords = viewModel.clickedWords
     }
 
     override fun onTextAnalysisStart() {
@@ -337,5 +346,9 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
     override fun onIsSegmenterReady() {
         Log.d(TAG, "onIsSegmenterReady")
         processFromArguments()
+    }
+
+    companion object {
+        private const val TAG = "DisplayOCRFragment"
     }
 }
