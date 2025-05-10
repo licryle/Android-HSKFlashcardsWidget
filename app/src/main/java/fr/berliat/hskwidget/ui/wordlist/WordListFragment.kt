@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -80,7 +81,9 @@ class WordListFragment : Fragment() {
     }
 
     private fun consultList(list: WordListWithWords) {
-        // TODO: Navigate to list detail view
+        val query = "list:\"${list.wordList.name}\""
+        val searchView = requireActivity().findViewById<SearchView>(R.id.appbar_search)
+        searchView.setQuery(query, true)
     }
 }
 

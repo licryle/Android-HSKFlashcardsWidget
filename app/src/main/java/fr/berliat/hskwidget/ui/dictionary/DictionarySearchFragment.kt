@@ -18,6 +18,7 @@ import fr.berliat.hskwidget.data.dao.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.domain.Utils
+import fr.berliat.hskwidget.domain.SearchQueryProcessor
 import kotlinx.coroutines.launch
 
 import fr.berliat.hskwidget.databinding.FragmentDictionarySearchBinding
@@ -27,6 +28,7 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
     private lateinit var searchAdapter: DictionarySearchAdapter
     private lateinit var binding: FragmentDictionarySearchBinding
     private lateinit var appConfig: AppPreferencesStore
+    private val searchQueryProcessor = SearchQueryProcessor()
 
     private var isLoading = false
     private var currentPage = 0
@@ -143,7 +145,14 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
         val dao = db.annotatedChineseWordDAO()
         try {
             val annotatedOnly = binding.dictionarySearchFilterHasannotation.isChecked
-            val results = dao.searchFromStrLike(searchQuery, annotatedOnly, currentPage, itemsPerPage)
+            val (listName, otherFilters) = searchQueryProcessor.processSearchQuery(searchQuery)
+            
+            val results = if (listName != null) {
+                // Search within the specified word list
+                dao.searchFromWordList(listName, annotatedOnly, currentPage, itemsPerPage)
+            } else {
+                dao.searchFromStrLike(otherFilters ?: searchQuery, annotatedOnly, currentPage, itemsPerPage)
+            }
             Log.d("DictionarySearchFragment", "Search returned for $searchQuery")
 
             currentPage++
