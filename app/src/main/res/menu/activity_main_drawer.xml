@@ -9,6 +9,10 @@
             android:icon="@drawable/ic_dictionary_24dp"
             android:title="@string/menu_dictionary" />
         <item
+            android:id="@+id/nav_lists"
+            android:icon="@drawable/format_list_bulleted_24px"
+            android:title="@string/menu_lists" />
+        <item
             android:id="@+id/nav_widgets"
             android:icon="@drawable/baseline_widgets_24"
             android:title="@string/menu_widgets" />

@@ -99,8 +99,19 @@
                 android:textSize="16sp"
                 android:textColor="@android:color/holo_blue_dark"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/dictionary_item_lists"
+                app:layout_constraintTop_toBottomOf="@id/dictionary_item_favorite"
                 android:layout_marginEnd="5dp"/>
+
+            <ImageView
+                android:id="@+id/dictionary_item_lists"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                style="@style/Widget.HSKFlashCardsWidget.Icons"
+                android:contentDescription="@string/dictionary_item_lists"
+                android:foreground="@drawable/round_foreground"
+                android:foregroundTint="?android:attr/colorBackground"
+                android:src="@drawable/format_list_bulleted_add_24px" />
 
             <LinearLayout
                 android:layout_width="0dp"

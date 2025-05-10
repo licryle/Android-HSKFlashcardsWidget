@@ -86,7 +86,7 @@
         <View
             android:layout_width="wrap_content"
             android:layout_height="2dp"
-            android:background="@android:color/system_accent2_1000">
+            android:background="?attr/colorError">
         </View>
 
         <!-- Editable fields from ChineseWordAnnotation -->
@@ -109,7 +109,7 @@
         <View
             android:layout_width="wrap_content"
             android:layout_height="2dp"
-            android:background="@android:color/system_accent2_1000">
+            android:background="?attr/colorError">
         </View>
 
         <LinearLayout

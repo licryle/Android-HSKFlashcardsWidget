@@ -23,6 +23,12 @@
     </fragment>
 
     <fragment
+        android:id="@+id/nav_lists"
+        android:name="fr.berliat.hskwidget.ui.wordlist.WordListFragment"
+        android:label="@string/menu_lists"
+        tools:layout="@layout/fragment_wordlist" />
+
+    <fragment
         android:id="@+id/nav_annotate"
         android:name="fr.berliat.hskwidget.ui.dictionary.AnnotateFragment"
         android:label="@string/menu_dictionary"

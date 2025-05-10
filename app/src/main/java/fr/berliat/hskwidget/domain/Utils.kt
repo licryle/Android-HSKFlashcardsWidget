@@ -41,6 +41,8 @@ import java.io.InputStream
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 import androidx.core.net.toUri
+import androidx.fragment.app.FragmentActivity
+import fr.berliat.hskwidget.ui.wordlist.WordListSelectionDialog
 
 
 class Utils {
@@ -270,6 +272,11 @@ class Utils {
                 playWordInBackground(context, word.simplified)
             }
             binding.dictionaryItemCopy.setOnClickListener { copyToClipBoard(context, word.simplified) }
+            
+            binding.dictionaryItemLists.setOnClickListener {
+                val dialog = WordListSelectionDialog.newInstance(word.simplified)
+                dialog.show((context as FragmentActivity).supportFragmentManager, "WordListSelectionDialog")
+            }
         }
 
         fun copyToClipBoard(context: Context, s: String) {
