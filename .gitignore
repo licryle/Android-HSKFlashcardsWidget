@@ -16,3 +16,7 @@ local.properties
 /app/release
 /PlayStoreAssets
 .kotlin
+.idea/deploymentTargetSelector.xml
+.idea/gradle.xml
+app/src/main/assets/databases/chinese_words.db-shm
+app/src/main/assets/databases/chinese_words.db-wal
