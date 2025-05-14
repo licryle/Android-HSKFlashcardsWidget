@@ -6,8 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.ViewModelProvider
 import fr.berliat.hskwidget.R
+import fr.berliat.hskwidget.data.repo.WordListRepository
 import fr.berliat.hskwidget.databinding.FragmentWordlistDialogCreateListBinding
 
 class WordListReNameDialog : DialogFragment() {
@@ -46,8 +46,7 @@ class WordListReNameDialog : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val factory = WordListViewModelFactory(requireContext())
-        viewModel = ViewModelProvider(this, factory)[WordListViewModel::class.java]
+        viewModel = WordListViewModel(requireContext(), WordListRepository(requireContext()))
 
         val listId = arguments?.getLong(ARG_LIST_ID)
         val existingName = arguments?.getString(ARG_LIST_NAME)

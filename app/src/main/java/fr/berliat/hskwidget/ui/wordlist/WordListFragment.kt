@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -17,15 +16,23 @@ import androidx.recyclerview.widget.ListAdapter
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import fr.berliat.hskwidget.R
+import fr.berliat.hskwidget.data.model.WordList
 import fr.berliat.hskwidget.data.model.WordListWithWords
+import fr.berliat.hskwidget.ui.utils.AnkiIntegrationDelegate
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
 class WordListFragment : Fragment() {
-    private val viewModel: WordListViewModel by viewModels()
+    private lateinit var viewModel: WordListViewModel
     private lateinit var adapter: WordListAdapter
+    private lateinit var ankiDelegate: AnkiIntegrationDelegate
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        ankiDelegate = AnkiIntegrationDelegate(this)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -37,6 +44,8 @@ class WordListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        viewModel = WordListViewModel(requireContext(), ankiDelegate.wordListRepo)
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.wordListRecyclerView)
         adapter = WordListAdapter(
@@ -128,6 +137,12 @@ class WordListAdapter(
             infoCard.setOnClickListener { onConsultClick(list) }
             deleteButton.setOnClickListener { onDeleteClick(list) }
             renameButton.setOnClickListener { onRenameClick(list) }
+
+            val visibility = if (list.wordList.listType == WordList.ListType.SYSTEM)
+                View.INVISIBLE else View.VISIBLE
+
+            deleteButton.visibility = visibility
+            renameButton.visibility = visibility
         }
     }
 }

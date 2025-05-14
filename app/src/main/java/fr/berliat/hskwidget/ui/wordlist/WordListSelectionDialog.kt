@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -14,17 +13,21 @@ import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.model.WordListWithWords
 import fr.berliat.hskwidget.databinding.FragmentWordlistDialogSelectItemBinding
 import fr.berliat.hskwidget.databinding.FragmentWordlistDialogSelectListsBinding
+import fr.berliat.hskwidget.ui.utils.AnkiIntegrationDelegate
 import kotlinx.coroutines.launch
 
 class WordListSelectionDialog : DialogFragment() {
     private lateinit var binding: FragmentWordlistDialogSelectListsBinding
     private lateinit var viewModel: WordListViewModel
     private lateinit var adapter: WordListSelectionAdapter
+    private lateinit var ankiDelegate: AnkiIntegrationDelegate
     private var wordId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NORMAL, R.style.Theme_HSKFlashCardsWidget_Dialog)
+
+        ankiDelegate = AnkiIntegrationDelegate(this)
     }
 
     override fun onCreateView(
@@ -45,8 +48,7 @@ class WordListSelectionDialog : DialogFragment() {
             return
         }
 
-        val factory = WordListViewModelFactory(requireContext())
-        viewModel = ViewModelProvider(this, factory)[WordListViewModel::class.java]
+        viewModel = WordListViewModel(requireContext(), ankiDelegate.wordListRepo)
 
         setupRecyclerView()
         setupButtons()
@@ -78,7 +80,7 @@ class WordListSelectionDialog : DialogFragment() {
             // Load current word lists for this word
             viewModel.getWordListsForWord(wordId!!).collect { currentLists ->
                 // Load all word lists
-                viewModel.wordLists.collect { allLists ->
+                viewModel.userWordLists().collect { allLists ->
                     adapter.submitList(allLists)
                     adapter.setSelectedLists(currentLists.map { it.wordList.id })
                 }

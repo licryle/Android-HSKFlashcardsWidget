@@ -14,32 +14,44 @@ data class WordList(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val creationDate: Long = System.currentTimeMillis(),
-    val lastModified: Long = System.currentTimeMillis() // Add this field with current timestamp as default
-)
+    val lastModified: Long = System.currentTimeMillis(), // Add this field with current timestamp as default
+    val ankiDeckId: Long = 0,
+    val listType: ListType = ListType.USER
+) {
+
+    enum class ListType (val type: String) {
+        USER("USER"),
+        SYSTEM("SYSTEM");
+
+        companion object {
+            infix fun from(findValue: String): ListType = ListType.valueOf(findValue)
+        }
+    }
+
+    companion object {
+        const val ANKI_ID_EMPTY: Long = 0
+        const val SYSTEM_ANNOTATED_NAME = "Annotated Words"
+    }
+}
 
 @Entity(
     tableName = "word_list_entries",
-    primaryKeys = ["listId", "wordId"],
+    primaryKeys = ["listId", "simplified", "ankiNoteId"],
     foreignKeys = [
         ForeignKey(
             entity = WordList::class,
             parentColumns = ["id"],
             childColumns = ["listId"],
             onDelete = ForeignKey.CASCADE
-        ),
-        ForeignKey(
-            entity = ChineseWord::class,
-            parentColumns = ["simplified"],
-            childColumns = ["wordId"],
-            onDelete = ForeignKey.CASCADE
         )
     ],
-    indices = [Index("listId"), Index("wordId")]
+    indices = [Index("listId"), Index("simplified")]
 )
 
 data class WordListEntry(
     val listId: Long,
-    val wordId: String
+    val simplified: String,
+    val ankiNoteId: Long = 0
 )
 
 data class WordListWithWords(
@@ -50,8 +62,8 @@ data class WordListWithWords(
         associateBy = Junction(
             value = WordListEntry::class,
             parentColumn = "listId",
-            entityColumn = "wordId"
+            entityColumn = "simplified"
         )
     )
     val words: List<ChineseWord>
-) 
+)

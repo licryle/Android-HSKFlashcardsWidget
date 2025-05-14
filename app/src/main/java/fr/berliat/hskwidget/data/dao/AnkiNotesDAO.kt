@@ -1,6 +1,8 @@
 package fr.berliat.hskwidget.data.dao
 
+import android.content.ContentValues
 import android.content.Context
+import com.ichi2.anki.FlashCardsContract
 import com.ichi2.anki.FlashCardsContract.Note
 import com.ichi2.anki.api.AddContentApi
 import com.ichi2.anki.api.NoteInfo
@@ -8,6 +10,9 @@ import com.ichi2.anki.api.NoteInfo
 /**
  * To check how to use the contentResolver, check out AnkiDroid's code at:
  * https://github.com/ankidroid/Anki-Android/blob/main/api/src/main/java/com/ichi2/anki/api/AddContentApi.kt
+ * https://github.com/mmjang/ankihelper/blob/master/app/src/main/java/com/ichi2/anki/FlashCardsContract.java
+ * And in particular (for the API itself):
+ * https://github.com/ankidroid/Anki-Android/blob/main/AnkiDroid/src/main/java/com/ichi2/anki/provider/CardContentProvider.kt
  */
 class AnkiNotesDAO(context: Context) {
     private val api = AddContentApi(context)
@@ -17,7 +22,7 @@ class AnkiNotesDAO(context: Context) {
      * Deletes a note from AnkiDroid given a note ID.
      * Returns true if the note was deleted successfully.
      */
-    fun deleteNote(noteId: Long): Boolean {
+    suspend fun deleteNote(noteId: Long): Boolean {
         return try {
             val builder = Note.CONTENT_URI.buildUpon()
             val contentUri = builder.appendPath(noteId.toString()).build()
@@ -29,13 +34,46 @@ class AnkiNotesDAO(context: Context) {
         }
     }
 
-    fun getDeckList(): Map<Long, String>? = api.getDeckList()
-    fun addNewDeck(name: String): Long? = api.addNewDeck(name)
-    fun getDeckName(deckId: Long): String? = api.getDeckName(deckId)
+    suspend fun updateNoteDeck(noteId: Long, newDeckId: Long): Int {
+        val values = ContentValues().apply {
+            put(FlashCardsContract.Card.DECK_ID, newDeckId) // newDeckId is a Long
+        }
 
-    fun getModelList(minNumFields: Int): Map<Long, String>? = api.getModelList(minNumFields)
-    fun getModelName(mid: Long): String? = api.getModelName(mid)
-    fun addNewCustomModel(
+        var toUpdate = true
+        var i = 0
+        while (toUpdate) {
+            try {
+                val builder = Note.CONTENT_URI.buildUpon()
+                val contentUri = builder.appendPath(noteId.toString()).appendPath("cards").appendPath(i.toString()).build()
+                val rowsUpdated = resolver.update(contentUri, values, null, null)
+                toUpdate = rowsUpdated > 0
+                i += 1
+            } catch (e: Exception) {
+                toUpdate = false
+                e.printStackTrace()
+            }
+        }
+
+        return i
+    }
+
+    /*fun getNotesFromDeck(deckId: Long): List<Long> {
+        val notes = mutableListOf<Long>()
+
+        val builder = Note.CONTENT_URI_V2.buildUpon()
+        val contentUri = builder.appendPath(deckId.toString()).build()
+
+        val projection = arrayOf(Note._ID)
+        val query = "DID:\"$modelName\""
+        resolver.query(contentUri, projection, null, null, null)
+    }*/
+
+    suspend fun getDeckList(): Map<Long, String>? = api.getDeckList()
+    suspend fun addNewDeck(name: String): Long? = api.addNewDeck(name)
+    suspend fun getModelName(mid: Long): String? = api.getModelName(mid)
+    suspend fun isModelExist(mid: Long): Boolean = getModelName(mid) != null
+
+    suspend fun addNewCustomModel(
         name: String,
         fields: Array<String>,
         cards: Array<String>,
@@ -47,11 +85,10 @@ class AnkiNotesDAO(context: Context) {
         return api.addNewCustomModel(name, fields, cards, qfmt, afmt, css, did, sortf)
     }
 
-    fun getNote(noteId: Long): NoteInfo? = api.getNote(noteId)
-    fun addNote(modelId: Long, deckId: Long, fields: Array<String>, tags: Set<String>?): Long? {
+    suspend fun getNote(noteId: Long): NoteInfo? = api.getNote(noteId)
+    suspend fun addNote(modelId: Long, deckId: Long, fields: Array<String>, tags: Set<String>?): Long? {
         return api.addNote(modelId, deckId, fields, tags)
     }
-    fun updateNoteTags(noteId: Long, tags: Set<String>): Boolean = api.updateNoteTags(noteId, tags)
-    fun updateNoteFields(noteId: Long, fields: Array<String>): Boolean = api.updateNoteFields(noteId, fields)
-    fun getFieldList(modelId: Long): Array<String>? = api.getFieldList(modelId)
+    suspend fun updateNoteTags(noteId: Long, tags: Set<String>): Boolean = api.updateNoteTags(noteId, tags)
+    suspend fun updateNoteFields(noteId: Long, fields: Array<String>): Boolean = api.updateNoteFields(noteId, fields)
 }

@@ -32,7 +32,6 @@ data class AnnotatedChineseWord(
 private const val select_left_join =
     "SELECT a.a_simplified, COALESCE(w.simplified, a.a_simplified) simplified, a.a_searchable_text, " +
             " a.a_pinyins, a.notes, a.class_type, a.class_level, a.themes, a.first_seen, a.is_exam," +
-            " a.anki_id," +
             " w.traditional, w.definition, w.hsk_level, w.pinyins, w.popularity, " +
             " COALESCE(w.searchable_text, '') searchable_text, " +
             " (a.first_seen IS NULL) AS is_first_seen_null " +
@@ -44,7 +43,6 @@ private const val select_right_join =
     "SELECT COALESCE(a.a_simplified, w.simplified) a_simplified, w.simplified, " +
             " COALESCE(a.a_searchable_text, '') a_searchable_text, " +
             " a.a_pinyins, a.notes, a.class_type, a.class_level, a.themes, a.first_seen, a.is_exam," +
-            " a.anki_id," +
             " w.traditional, w.definition, w.hsk_level, w.pinyins, w.popularity, w.searchable_text, " +
             " (a.first_seen IS NULL) AS is_first_seen_null " +
             " FROM chineseword AS w LEFT JOIN chinesewordannotation AS a" +
@@ -64,11 +62,10 @@ interface AnnotatedChineseWordDAO {
 
     @Query("SELECT a.a_simplified, COALESCE(w.simplified, a.a_simplified) simplified, a.a_searchable_text, " +
             " a.a_pinyins, a.notes, a.class_type, a.class_level, a.themes, a.first_seen, a.is_exam," +
-            " a.anki_id," +
             " w.traditional, w.definition, w.hsk_level, w.pinyins, w.popularity, " +
             " COALESCE(w.searchable_text, '') searchable_text, " +
             " (a.first_seen IS NULL) AS is_first_seen_null " +
-            " FROM chinesewordannotation AS a INNER JOIN word_list_entries AS wle ON a.a_simplified = wle.wordid " +
+            " FROM chinesewordannotation AS a INNER JOIN word_list_entries AS wle ON a.a_simplified = wle.simplified " +
             " INNER JOIN word_lists AS wl ON wl.id = wle.listId " +
             " LEFT JOIN chineseword AS w ON a.a_simplified = w.simplified " +
             " WHERE wl.name = :listName " +
@@ -77,10 +74,9 @@ interface AnnotatedChineseWordDAO {
             " SELECT COALESCE(a.a_simplified, w.simplified) a_simplified, w.simplified, " +
             " COALESCE(a.a_searchable_text, '') a_searchable_text, " +
             " a.a_pinyins, a.notes, a.class_type, a.class_level, a.themes, a.first_seen, a.is_exam," +
-            " a.anki_id," +
             " w.traditional, w.definition, w.hsk_level, w.pinyins, w.popularity, w.searchable_text, " +
             " (a.first_seen IS NULL) AS is_first_seen_null " +
-            " FROM chineseword AS w  INNER JOIN word_list_entries AS wle ON w.simplified = wle.wordId " +
+            " FROM chineseword AS w  INNER JOIN word_list_entries AS wle ON w.simplified = wle.simplified " +
             " INNER JOIN word_lists AS wl ON wl.id = wle.listId " +
             " LEFT JOIN chinesewordannotation AS a ON a.a_simplified = w.simplified " +
             " WHERE wl.name = :listName " +

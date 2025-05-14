@@ -133,7 +133,7 @@ We recommend to choose the level your at plus the one below, or above depending 
     <string name="widget_btn_copy">Copy to clipboard</string>
 
     <string name="anki_card_CNEN_front"><![CDATA[
-        <h1><tts class="mobile" service="android" voice="zh_CN">{{Hanzi}}</tts></h1>
+        <h1 class="mobile">{{Hanzi}}</h1>
 
         <br />
 
@@ -144,7 +144,42 @@ We recommend to choose the level your at plus the one below, or above depending 
     ]]></string>
 
     <string name="anki_card_CNEN_back"><![CDATA[
-        <h1><tts class="mobile" service="android" voice="zh_CN">{{Hanzi}}</tts></h1>
+        <h1 class="mobile">{{Hanzi}}</h1>
+
+        {{Pinyin}}<br />
+
+        {{tts zh:Hanzi}}
+
+        <hr id="answer" />
+        {{Definition}}
+        {{tts en:Definition}}<br /><br />
+        {{Notes}}
+        <br /><br />
+
+        <hr id="example" />
+
+        <div class="metadata">
+            <div>{{HSK}} - {{Level}}</div>
+        </div>
+    ]]></string>
+
+    <string name="anki_card_ENCN_front"><![CDATA[
+        <h1 class="mobile">&nbsp;</h1>
+
+        <br />
+
+        <hr id="answer" />
+        {{Definition}}
+        {{tts en:Definition}}<br /><br />
+        {{Notes}}
+
+        <div class="metadata">
+            <div>{{HSK}} - {{Level}}</div>
+        </div>
+    ]]></string>
+
+    <string name="anki_card_ENCN_back"><![CDATA[
+        <h1 class="mobile">{{Hanzi}}</h1>
 
         {{Pinyin}}<br />
 
@@ -242,4 +277,8 @@ padding: 0;
     <string name="wordlist_rename_button">Rename list</string>
     <string name="wordlist_rename_list">Rename list</string>
     <string name="wordlist_list_name_dupe">This list name already exist, use another one.</string>
+    <string name="deck_name_global">All words</string>
+    <string name="anki_operation_success">Successfully applied changes to Anki</string>
+    <string name="anki_operation_failed">Failed to apply changes to Anki: %s</string>
+    <string name="anki_import_failed">Full import into Anki failed: %s</string>
 </resources>

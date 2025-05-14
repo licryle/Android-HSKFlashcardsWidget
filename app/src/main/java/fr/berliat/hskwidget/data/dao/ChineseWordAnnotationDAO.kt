@@ -35,9 +35,6 @@ interface ChineseWordAnnotationDAO {
         _insertOrUpdate(annotation)
     }
 
-    @Query("UPDATE chinesewordannotation SET anki_id=:ankiId WHERE a_simplified = :simplified")
-    suspend fun updateAnkiNoteId(simplified: String?, ankiId: Long)
-
     @Delete
     suspend fun delete(annotation: ChineseWordAnnotation)
 

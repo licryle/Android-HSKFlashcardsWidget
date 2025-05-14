@@ -32,7 +32,7 @@ private fun SupportSQLiteDatabase.hasAlreadyDoneMigration(migration: Migration):
 
 @Database(
     entities = [ChineseWordAnnotation::class, ChineseWord::class, ChineseWordFrequency::class, WordList::class, WordListEntry::class],
-    version = 5, exportSchema = true,
+    version = 7, exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 1, to = 2)
     ])
@@ -58,15 +58,15 @@ abstract class ChineseWordsDatabase : RoomDatabase() {
         const val DATABASE_FILE = "chinese_words.db"
 
         val MIGRATION_2_3 = object : Migration(2, 3) {
-            override fun migrate(database: SupportSQLiteDatabase) {
-                if (database.hasAlreadyDoneMigration(this)) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                if (db.hasAlreadyDoneMigration(this)) {
                     return
                 }
                 Log.d(TAG, "Migrating database from version 2 to version 3 (adding anki_id column")
                 try {
                     // Add a new column or any other complex changes for version 3
-                    database.execSQL("ALTER TABLE ChineseWordAnnotation ADD COLUMN anki_id INTEGER NOT NULL DEFAULT " + ChineseWordAnnotation.ANKI_ID_EMPTY)
-                    database.execSQL("ALTER TABLE AnnotatedChineseWord ADD COLUMN anki_id INTEGER NOT NULL DEFAULT " + ChineseWordAnnotation.ANKI_ID_EMPTY)
+                    db.execSQL("ALTER TABLE ChineseWordAnnotation ADD COLUMN anki_id INTEGER NOT NULL DEFAULT 0")
+                    db.execSQL("ALTER TABLE AnnotatedChineseWord ADD COLUMN anki_id INTEGER NOT NULL DEFAULT 0")
                 } catch (e: Exception) {
                     Log.d(TAG, "Room bullshit.")
                 }
@@ -74,14 +74,14 @@ abstract class ChineseWordsDatabase : RoomDatabase() {
         }
 
         private val MIGRATION_3_4 = object : Migration(3, 4) {
-            override fun migrate(database: SupportSQLiteDatabase) {
-                if (database.hasAlreadyDoneMigration(this)) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                if (db.hasAlreadyDoneMigration(this)) {
                     return
                 }
                 Log.d(TAG, "Migrating database from version 3 to version 4 (adding word lists)")
                 try {
                     // Create word_lists table
-                    database.execSQL("""
+                    db.execSQL("""
                         CREATE TABLE IF NOT EXISTS word_lists (
                             id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                             name TEXT NOT NULL,
@@ -90,7 +90,7 @@ abstract class ChineseWordsDatabase : RoomDatabase() {
                     """)
                     
                     // Create word_list_entries table with correct schema
-                    database.execSQL("""
+                    db.execSQL("""
                         CREATE TABLE IF NOT EXISTS word_list_entries (
                             listId INTEGER NOT NULL,
                             wordId TEXT NOT NULL,
@@ -101,8 +101,8 @@ abstract class ChineseWordsDatabase : RoomDatabase() {
                     """)
 
                     // Create indices
-                    database.execSQL("CREATE INDEX IF NOT EXISTS index_word_list_entries_listId ON word_list_entries(listId)")
-                    database.execSQL("CREATE INDEX IF NOT EXISTS index_word_list_entries_wordId ON word_list_entries(wordId)")
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_word_list_entries_listId ON word_list_entries(listId)")
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_word_list_entries_wordId ON word_list_entries(wordId)")
                 } catch (e: Exception) {
                     Log.d(TAG, "Error during migration: ${e.message}")
                 }
@@ -110,8 +110,134 @@ abstract class ChineseWordsDatabase : RoomDatabase() {
         }
 
         private val MIGRATION_4_5 = object : Migration(4, 5) {
-            override fun migrate(database: SupportSQLiteDatabase) {
-                database.execSQL("ALTER TABLE word_lists ADD COLUMN lastModified INTEGER NOT NULL DEFAULT ${System.currentTimeMillis()}")
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE word_lists ADD COLUMN lastModified INTEGER NOT NULL DEFAULT ${System.currentTimeMillis()}")
+            }
+        }
+
+        private val MIGRATION_5_6 = object : Migration(5, 6) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // WordList
+                db.execSQL("ALTER TABLE word_lists ADD COLUMN ankiDeckId INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE word_lists ADD COLUMN listType TEXT NOT NULL DEFAULT 'user'")
+                val stmt = db.compileStatement("""
+                    INSERT INTO word_lists 
+                        (name, listType, creationDate, lastModified, ankiDeckId) 
+                    VALUES (?, ?, ?, ?, ?)
+                """.trimIndent())
+
+                val currentTime = System.currentTimeMillis()
+                stmt.bindString(1, WordList.SYSTEM_ANNOTATED_NAME)
+                stmt.bindString(2, "SYSTEM")
+                stmt.bindLong(3, currentTime)
+                stmt.bindLong(4, currentTime)
+                stmt.bindLong(5, 0)
+
+                val insertedId = stmt.executeInsert()  // ✅ This gives you the generated ID
+
+                // Word List entries
+                db.execSQL("""
+                    CREATE TABLE word_list_entries_new (
+                        listId INTEGER NOT NULL,
+                        simplified TEXT NOT NULL,
+                        ankiNoteId INTEGER NOT NULL,
+                        PRIMARY KEY(listId, simplified, ankiNoteId),
+                        FOREIGN KEY(listId) REFERENCES word_lists(id) ON DELETE CASCADE,
+                        FOREIGN KEY(simplified) REFERENCES ChineseWord(simplified) ON DELETE CASCADE
+                    )
+                """.trimIndent())
+
+                // Step 3: Copy data
+                db.execSQL("""
+                    INSERT INTO word_list_entries_new (listId, simplified, ankiNoteId)
+                    SELECT listId, wordId, ${WordList.ANKI_ID_EMPTY} FROM word_list_entries
+                """)
+
+                // Step 4: Drop old table, rename new
+                db.execSQL("DROP TABLE word_list_entries")
+                db.execSQL("ALTER TABLE word_list_entries_new RENAME TO word_list_entries")
+
+                // Step 5: Recreate indices
+                db.execSQL("CREATE INDEX index_word_list_entries_listId ON word_list_entries(listId)")
+                db.execSQL("CREATE INDEX index_word_list_entries_simplified ON word_list_entries(simplified)")
+                db.execSQL("CREATE INDEX index_word_list_entries_ankiNoteId ON word_list_entries(ankiNoteId)")
+
+                db.execSQL("""INSERT INTO word_list_entries (listId, simplified, ankiNoteId)
+                                            SELECT $insertedId, a_simplified, anki_id FROM ChineseWordAnnotation""")
+
+                // Removing ankiId from Annotations
+                db.execSQL("""
+                    CREATE TABLE ChineseWordAnnotation_new (
+                        a_simplified TEXT NOT NULL,
+                        a_pinyins TEXT,
+                        notes TEXT,
+                        class_type TEXT,
+                        class_level TEXT,
+                        themes TEXT,
+                        first_seen INTEGER,
+                        a_searchable_text TEXT NOT NULL DEFAULT '',
+                        is_exam INTEGER,
+                        PRIMARY KEY(a_simplified)
+                    )
+                """.trimIndent())
+
+                db.execSQL("""
+                    INSERT INTO ChineseWordAnnotation_new (
+                        a_simplified,
+                        a_pinyins,
+                        notes,
+                        class_type,
+                        class_level,
+                        themes,
+                        first_seen,
+                        a_searchable_text,
+                        is_exam
+                    )
+                    SELECT
+                        a_simplified,
+                        a_pinyins,
+                        notes,
+                        class_type,
+                        class_level,
+                        themes,
+                        first_seen,
+                        a_searchable_text,
+                        is_exam
+                    FROM ChineseWordAnnotation
+                """.trimIndent())
+
+                db.execSQL("DROP TABLE ChineseWordAnnotation")
+                db.execSQL("ALTER TABLE ChineseWordAnnotation_new RENAME TO ChineseWordAnnotation")
+
+                db.execSQL("""
+                    CREATE INDEX index_ChineseWordAnnotation_a_searchable_text 
+                    ON ChineseWordAnnotation(a_searchable_text)
+                """.trimIndent())
+            }
+        }
+
+        private val MIGRATION_6_7 = object : Migration(6, 7) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("""
+                    CREATE TABLE word_list_entries_new (
+                        listId INTEGER NOT NULL,
+                        simplified TEXT NOT NULL,
+                        ankiNoteId INTEGER NOT NULL,
+                        PRIMARY KEY (listId, simplified, ankiNoteId),
+                        FOREIGN KEY (listId) REFERENCES word_lists(id) ON DELETE CASCADE
+                    )
+                """.trimIndent())
+
+                db.execSQL("""
+                    INSERT INTO word_list_entries_new (listId, simplified, ankiNoteId)
+                    SELECT listId, simplified, ankiNoteId FROM word_list_entries
+                """.trimIndent())
+
+                db.execSQL("DROP TABLE word_list_entries")
+                db.execSQL("ALTER TABLE word_list_entries_new RENAME TO word_list_entries")
+
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_word_list_entries_listId ON word_list_entries(listId)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_word_list_entries_simplified ON word_list_entries(simplified)")
             }
         }
 
@@ -127,7 +253,8 @@ abstract class ChineseWordsDatabase : RoomDatabase() {
                 .setQueryCallback({ sqlQuery, bindArgs ->
                     Log.d(TAG, "SQL Query: $sqlQuery SQL Args: $bindArgs")
                 }, Executors.newSingleThreadExecutor())
-                .addMigrations(MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
+                .addMigrations(MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6,
+                    MIGRATION_6_7)
                 .build()
 
         fun loadExternalDatabase(context: Context, dbFile: File) = Room.databaseBuilder(
@@ -135,7 +262,8 @@ abstract class ChineseWordsDatabase : RoomDatabase() {
                 ChineseWordsDatabase::class.java,
                 dbFile.path
             )
-            .addMigrations(MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5) // Add migration logic
+            .addMigrations(MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6,
+                MIGRATION_6_7)
             .createFromFile(dbFile) // instead of fromAsset
             .build()
     }

@@ -17,8 +17,7 @@ data class ChineseWordAnnotation (
     @ColumnInfo(name = "themes") val themes: String?,
 
     @ColumnInfo(name = "first_seen") val firstSeen: Date?,
-    @ColumnInfo(name = "is_exam") val isExam: Boolean?,
-    @ColumnInfo(name = "anki_id", defaultValue = ANKI_ID_EMPTY.toString()) val ankiId: Long,
+    @ColumnInfo(name = "is_exam") val isExam: Boolean?
 ) {
     @ColumnInfo(name = "a_searchable_text", defaultValue = "") var a_searchable_text: String = ""
 
@@ -59,9 +58,7 @@ data class ChineseWordAnnotation (
     companion object {
         fun getBlank(simplified: String = ""): ChineseWordAnnotation {
             return ChineseWordAnnotation(simplified, null, "", ClassType.NotFromClass,
-                ClassLevel.NotFromClass, "", null, false, ANKI_ID_EMPTY)
+                ClassLevel.NotFromClass, "", null, false)
         }
-
-        const val ANKI_ID_EMPTY: Long = -1
     }
 }
