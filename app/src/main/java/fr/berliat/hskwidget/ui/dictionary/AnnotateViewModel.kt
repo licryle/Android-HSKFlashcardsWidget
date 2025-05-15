@@ -78,6 +78,7 @@ class AnnotateViewModel(context: Context, val wordListRepo: WordListRepository) 
                 val nbRowAffected = annotationDAO.deleteBySimplified(annotatedWord.value!!.simplified)
                 if (nbRowAffected == 0) throw Exception("No records deleted")
 
+                wordListRepo.touchAnnotatedList()
                 wordListRepo.delegateToAnki(wordListRepo.removeWordFromAllLists(simplified))
             } catch (e: Exception) {
                 error = e

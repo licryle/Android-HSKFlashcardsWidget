@@ -308,6 +308,7 @@ class WordListRepository(private val context: Context) {
         if (entry == null) {
             entry = WordListEntry(wordList.id, word.simplified)
             wordListDAO.addWordToList(entry)
+            wordListDAO.touchList(wordList.id)
         }
 
         // Anki now
@@ -329,10 +330,18 @@ class WordListRepository(private val context: Context) {
         val wordList = getSystemLists()
 
         val annotList = wordList.find { it.name == WordList.SYSTEM_ANNOTATED_NAME }
-
         if (annotList == null) return null
 
         return addWordToList(annotList.wordList, word)
+    }
+
+    suspend fun touchAnnotatedList() : Boolean {
+        val wordList = getSystemLists()
+
+        val annotList = wordList.find { it.name == WordList.SYSTEM_ANNOTATED_NAME }
+        if (annotList == null) return false
+
+        return wordListDAO.touchList(annotList.id) > 0
     }
 
     suspend fun updateInAllLists(simplified: String): (suspend () -> Result<Unit>)? {
