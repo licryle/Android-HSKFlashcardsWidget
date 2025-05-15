@@ -25,4 +25,21 @@
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item> <!-- 50% makes it fully circular -->
     </style>
+
+    <style name="Word.SecondaryInfo.Body" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@android:color/holo_blue_dark</item>
+    </style>
+
+    <style name="Word.SecondaryInfo.Title" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/md_theme_light_secondary</item>
+        <item name="android:layout_marginTop">5sp</item>
+        <item name="android:background">@drawable/bottom_border</item>
+    </style>
+
+    <style name="Word.PrimaryInfo.Body" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:textSize">18sp</item>
+        <item name="android:layout_marginTop">5sp</item>
+    </style>
 </resources>

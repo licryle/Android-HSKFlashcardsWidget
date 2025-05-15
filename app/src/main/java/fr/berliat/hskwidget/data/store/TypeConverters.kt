@@ -9,80 +9,95 @@ import fr.berliat.hskwidget.data.model.ChineseWordAnnotation
 import java.util.Date
 import java.util.Locale
 
-class TypeConverters {
-    class DefinitionsConverter {
-        companion object {
-            @TypeConverter
-            @JvmStatic
-            fun fromStringMap(value: Map<Locale, String>?): String? {
-                return Gson().toJson(value)
-            }
 
-            @TypeConverter
-            @JvmStatic
-            fun fromString(s: String?): Map<Locale, String>? {
-                if (s == null)
-                    return mapOf<Locale, String>()
-
-                val mapType = object : TypeToken<Map<Locale, String>>() {}.type
-                return Gson().fromJson(s, mapType)
-            }
-        }
+object DefinitionsConverter {
+    @TypeConverter
+    @JvmStatic
+    fun fromStringMap(value: Map<Locale, String>?): String? {
+        return Gson().toJson(value)
     }
 
-    class AnnotatedChineseWordsConverter {
-        companion object {
-            @TypeConverter
-            @JvmStatic
-            fun fromMapToList(m: Map<ChineseWordAnnotation, List<ChineseWord>>): List<AnnotatedChineseWord> {
-                val words = mutableSetOf<AnnotatedChineseWord>()
+    @TypeConverter
+    @JvmStatic
+    fun fromString(s: String?): Map<Locale, String>? {
+        if (s == null)
+            return mapOf<Locale, String>()
 
-                m.forEach {
-                    words.add(AnnotatedChineseWord(it.value[0], it.key))
-                }
+        val mapType = object : TypeToken<Map<Locale, String>>() {}.type
+        return Gson().fromJson(s, mapType)
+    }
+}
 
-                return words.toList()
-            }
+object WordTypeConverter {
+    @TypeConverter
+    @JvmStatic
+    fun fromType(value: String?): ChineseWord.Type =
+        value?.let { ChineseWord.Type.from(it) } ?: ChineseWord.Type.UNKNOWN
 
-            @TypeConverter
-            @JvmStatic
-            fun fromMapToFirst(m: Map<ChineseWordAnnotation, List<ChineseWord>>): AnnotatedChineseWord? {
-                val words = fromMapToList(m)
+    @TypeConverter
+    @JvmStatic
+    fun toType(type: ChineseWord.Type): String = type.typ
+}
 
-                if (words.isEmpty())
-                    return null
+object ModalityConverter {
+    @TypeConverter
+    @JvmStatic
+    fun fromModality(value: String?): ChineseWord.Modality =
+        value?.let { ChineseWord.Modality.from(it) } ?: ChineseWord.Modality.UNKNOWN
 
-                return words.first()
-            }
+    @TypeConverter
+    @JvmStatic
+    fun toModality(modality: ChineseWord.Modality): String = modality.mod
+}
 
-            @TypeConverter
-            @JvmStatic
-            fun fromListToMap(l: List<Map<ChineseWordAnnotation, List<ChineseWord>>>): Map<String, AnnotatedChineseWord> {
-                val words = mutableMapOf<String, AnnotatedChineseWord>()
+object AnnotatedChineseWordsConverter {
+    @TypeConverter
+    @JvmStatic
+    fun fromMapToList(m: Map<ChineseWordAnnotation, List<ChineseWord>>): List<AnnotatedChineseWord> {
+        val words = mutableSetOf<AnnotatedChineseWord>()
 
-                l.forEach {
-                    words[it.keys.first().simplified] =
-                        AnnotatedChineseWord(it.values.first()[0], it.keys.first())
-                }
-
-                return words
-            }
+        m.forEach {
+            words.add(AnnotatedChineseWord(it.value[0], it.key))
         }
+
+        return words.toList()
     }
 
-    class DateConverter {
-        companion object {
-            @TypeConverter
-            @JvmStatic
-            fun toDate(dateLong: Long?): Date? {
-                return if (dateLong == null) null else Date(dateLong)
-            }
+    @TypeConverter
+    @JvmStatic
+    fun fromMapToFirst(m: Map<ChineseWordAnnotation, List<ChineseWord>>): AnnotatedChineseWord? {
+        val words = fromMapToList(m)
 
-            @TypeConverter
-            @JvmStatic
-            fun fromDate(date: Date?): Long? {
-                return if (date == null) null else date.getTime()
-            }
+        if (words.isEmpty())
+            return null
+
+        return words.first()
+    }
+
+    @TypeConverter
+    @JvmStatic
+    fun fromListToMap(l: List<Map<ChineseWordAnnotation, List<ChineseWord>>>): Map<String, AnnotatedChineseWord> {
+        val words = mutableMapOf<String, AnnotatedChineseWord>()
+
+        l.forEach {
+            words[it.keys.first().simplified] =
+                AnnotatedChineseWord(it.values.first()[0], it.keys.first())
         }
+
+        return words
+    }
+}
+
+object DateConverter {
+    @TypeConverter
+    @JvmStatic
+    fun toDate(dateLong: Long?): Date? {
+        return if (dateLong == null) null else Date(dateLong)
+    }
+
+    @TypeConverter
+    @JvmStatic
+    fun fromDate(date: Date?): Long? {
+        return if (date == null) null else date.getTime()
     }
 }

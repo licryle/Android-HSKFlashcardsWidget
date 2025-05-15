@@ -6,14 +6,13 @@
     android:layout_height="wrap_content"
     android:layout_margin="0dp"
     app:cardBackgroundColor="?attr/colorOnPrimary"
-    app:cardCornerRadius="14dp"
+    app:cardCornerRadius="8dp"
     app:cardElevation="2dp">
     <LinearLayout
+        android:id="@+id/dictionary_item_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_margin="1dp"
-        android:background="@drawable/search_item_border">
+        android:orientation="vertical">
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -41,6 +40,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toEndOf="@id/dictionary_item_speak"
                 app:layout_constraintEnd_toStartOf="@id/dictionary_item_favorite"
+                app:layout_constraintBottom_toTopOf="@id/dictionary_item_annotation"
                 android:layout_marginEnd="5dp"
 
                 app:floatPadding="5dp"
@@ -101,8 +101,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/dictionary_item_hsk"
-                android:textSize="16sp"
-                android:textColor="@android:color/holo_blue_dark"
+                style="@style/Word.SecondaryInfo.Body"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toTopOf="@id/dictionary_item_lists"
                 app:layout_constraintTop_toBottomOf="@id/dictionary_item_favorite"
@@ -119,25 +118,141 @@
                 android:contentDescription="@string/dictionary_item_lists"
                 android:src="@drawable/format_list_bulleted_add_24px" />
 
-            <LinearLayout
+            <TextView
+                android:id="@+id/dictionary_item_annotation"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-
+                android:textSize="18sp"
+                android:layout_margin="5dp"
+                android:textAlignment="viewStart"
+                android:textColor="@android:color/holo_green_dark"
                 app:layout_constraintStart_toEndOf="@id/dictionary_item_copy"
                 app:layout_constraintTop_toBottomOf="@id/dictionary_item_definition"
                 app:layout_constraintEnd_toStartOf="@id/dictionary_item_hsk_level"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/dictionary_item_toggle" />
 
+            <ImageView
+                android:id="@+id/dictionary_item_toggle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:src="@drawable/keyboard_arrow_down_24px"
+                android:contentDescription="@string/dictionary_item_toggle" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <LinearLayout
+            android:id="@+id/dictionary_item_more"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:padding="0dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/dictionary_item_modality"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    style="@style/Word.SecondaryInfo.Body"
+                    android:text="Oral And written" />
+                <TextView
+                    android:id="@+id/dictionary_item_type"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textAlignment="textEnd"
+                    style="@style/Word.SecondaryInfo.Body"
+                    android:text="Proposition" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <LinearLayout
+                    android:id="@+id/dictionary_item_synonyms_container"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/dictionary_item_synonyms_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/Word.SecondaryInfo.Title"
+                        android:text="@string/dictionary_item_synonyms" />
+                    <TextView
+                        android:id="@+id/dictionary_item_synonyms"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/Word.PrimaryInfo.Body"
+                        android:text="你吃饭了吗" />
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/dictionary_item_antonym_container"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/dictionary_item_antonyms_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        style="@style/Word.SecondaryInfo.Title"
+                        android:text="@string/dictionary_item_antonym" />
+                    <TextView
+                        android:id="@+id/dictionary_item_antonyms"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textAlignment="textEnd"
+                        style="@style/Word.PrimaryInfo.Body"
+                        android:text="再见" />
+                </LinearLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/dictionary_item_example_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="vertical">
                 <TextView
-                    android:id="@+id/dictionary_item_annotation"
-                    android:layout_width="match_parent"
+                    android:id="@+id/dictionary_item_example_label"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="18sp"
-                    android:layout_margin="5dp"
-                    android:textAlignment="viewStart"
-                    android:textColor="@android:color/holo_green_dark" />
+                    style="@style/Word.SecondaryInfo.Title"
+                    android:text="@string/dictionary_item_examples" />
+                <TextView
+                    android:id="@+id/dictionary_item_example"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/Word.PrimaryInfo.Body"
+                    android:text="你好，你好吗?" />
             </LinearLayout>
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            <LinearLayout
+                android:id="@+id/dictionary_item_altdefinition_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/dictionary_item_altdefinition_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/Word.SecondaryInfo.Title"
+                    android:text="@string/dictionary_item_altdefinition" />
+                <TextView
+                    android:id="@+id/dictionary_item_altdefinition"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/Word.PrimaryInfo.Body"
+                    android:text="blablabla" />
+            </LinearLayout>
+        </LinearLayout>
     </LinearLayout>
+
 </com.google.android.material.card.MaterialCardView>

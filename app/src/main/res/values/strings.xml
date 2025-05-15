@@ -281,4 +281,9 @@ padding: 0;
     <string name="anki_operation_success">Successfully applied changes to Anki</string>
     <string name="anki_operation_failed">Failed to apply changes to Anki: %s</string>
     <string name="anki_import_failed">Full import into Anki failed: %s</string>
+    <string name="dictionary_item_toggle">Expand/Fold more info</string>
+    <string name="dictionary_item_antonym">Antonym</string>
+    <string name="dictionary_item_synonyms">Synonym(s)</string>
+    <string name="dictionary_item_examples">Example(s)</string>
+    <string name="dictionary_item_altdefinition">Definition</string>
 </resources>

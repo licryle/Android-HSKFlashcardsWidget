@@ -11,12 +11,18 @@ import java.util.Locale
 
 @Entity(indices = [Index(value = ["searchable_text"])])
 data class ChineseWord(
+    // @Todo: lots of fields should be not-null. After hours of research, I can't get past compilation errors. So someday...
     @PrimaryKey val simplified: String,
     @ColumnInfo(name = "traditional") val traditional: String?,
     @ColumnInfo(name = "definition") val definition: Map<Locale, String>,
     @ColumnInfo(name = "hsk_level") val hskLevel: HSK_Level?,
     @ColumnInfo(name = "pinyins") val pinyins: Pinyins?,
     @ColumnInfo(name = "popularity") val popularity: Int?,
+    @ColumnInfo(name = "examples", defaultValue = "") val examples: String? = "",
+    @ColumnInfo(name = "modality", defaultValue = "N/A") val modality: Modality? = Modality.UNKNOWN,
+    @ColumnInfo(name = "type", defaultValue = "N/A") val type: Type? = Type.UNKNOWN,
+    @ColumnInfo(name = "synonyms", defaultValue = "") val synonyms: String? = "",
+    @ColumnInfo(name = "antonym", defaultValue = "") val antonym: String? = "",
     @ColumnInfo(name = "searchable_text", defaultValue = "") var searchable_text: String = ""
 ) {
 
@@ -88,6 +94,7 @@ data class ChineseWord(
             NEUTRAL(5)
         }
     }
+
     enum class HSK_Level (val level: Int) {
         HSK1(1),
         HSK2(2),
@@ -101,10 +108,49 @@ data class ChineseWord(
         NOT_HSK(10);
         companion object {
             fun from(findValue: Int): HSK_Level {
-                if (findValue == 10)
-                    return NOT_HSK
+                return if (findValue == 10)
+                    NOT_HSK
                 else
-                    return HSK_Level.valueOf("HSK$findValue")
+                    HSK_Level.valueOf("HSK$findValue")
+            }
+        }
+    }
+
+    enum class Modality(val mod: String) {
+        ORAL("ORAL"),
+        WRITTEN("WRITTEN"),
+        ORAL_WRITTEN("ORAL_WRITTEN"),
+        UNKNOWN("N/A");
+
+        companion object {
+            fun from(findValue: String): Modality {
+                return try {
+                    Modality.valueOf(findValue)
+                } catch (e: Exception) {
+                    UNKNOWN
+                }
+            }
+        }
+    }
+
+    enum class Type(val typ: String) {
+        NOUN("NOUN"),
+        VERB("VERB"),
+        ADJECTIVE("ADJECTIVE"),
+        ADVERB("ADVERB"),
+        CONJUNCTION("CONJUNCTION"),
+        PREPOSITION("PREPOSITION"),
+        INTERJECTION("INTERJECTION"),
+        IDIOM("IDIOM"),
+        UNKNOWN("N/A");
+
+        companion object {
+            fun from(findValue: String): Type {
+                return try {
+                    Type.valueOf(findValue)
+                } catch (e: Exception) {
+                    UNKNOWN
+                }
             }
         }
     }
@@ -112,7 +158,10 @@ data class ChineseWord(
     companion object {
         fun getBlank(simplified: String = ""): ChineseWord {
             return ChineseWord(simplified, "", mapOf<Locale, String>(), HSK_Level.NOT_HSK,
-                null, null)
+                null, null, "", Modality.UNKNOWN, Type.UNKNOWN,
+                "", "", "")
         }
+
+        val CN_HSK3 : Locale = Locale.Builder().setLanguage("zh").setRegion("CN").setVariant("HSK03").build()
     }
 }

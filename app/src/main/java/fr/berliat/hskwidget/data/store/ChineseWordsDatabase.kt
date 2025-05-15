@@ -33,14 +33,16 @@ private fun SupportSQLiteDatabase.hasAlreadyDoneMigration(migration: Migration):
 
 @Database(
     entities = [ChineseWordAnnotation::class, ChineseWord::class, ChineseWordFrequency::class, WordList::class, WordListEntry::class],
-    version = 7, exportSchema = true,
+    version = 8, exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 1, to = 2)
     ])
 @TypeConverters(ChineseWord.Pinyins::class,
-    fr.berliat.hskwidget.data.store.TypeConverters.DateConverter::class,
-    fr.berliat.hskwidget.data.store.TypeConverters.DefinitionsConverter::class,
-    fr.berliat.hskwidget.data.store.TypeConverters.AnnotatedChineseWordsConverter::class)
+    WordTypeConverter::class,
+    ModalityConverter::class,
+    DateConverter::class,
+    DefinitionsConverter::class,
+    AnnotatedChineseWordsConverter::class)
 
 abstract class ChineseWordsDatabase : RoomDatabase() {
     abstract fun annotatedChineseWordDAO(): AnnotatedChineseWordDAO
@@ -243,6 +245,16 @@ abstract class ChineseWordsDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_7_8 = object : Migration(7, 8) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE ChineseWord ADD COLUMN modality TEXT DEFAULT 'N/A' CHECK(modality IN ('ORAL', 'WRITTEN', 'ORAL_WRITTEN', 'N/A'))")
+                db.execSQL("ALTER TABLE ChineseWord ADD COLUMN examples TEXT DEFAULT ''")
+                db.execSQL("ALTER TABLE ChineseWord ADD COLUMN type TEXT DEFAULT 'N/A' CHECK(type IN ('NOUN', 'VERB', 'ADJECTIVE', 'ADVERB', 'CONJUNCTION', 'PREPOSITION', 'INTERJECTION', 'IDIOM', 'N/A'))")
+                db.execSQL("ALTER TABLE ChineseWord ADD COLUMN synonyms TEXT DEFAULT ''")
+                db.execSQL("ALTER TABLE ChineseWord ADD COLUMN antonym TEXT DEFAULT ''")
+            }
+        }
+
         fun getInstance(context: Context): ChineseWordsDatabase =
             INSTANCE ?: synchronized(this) {
                 INSTANCE ?: buildDatabase(context).also { INSTANCE = it }
@@ -256,7 +268,7 @@ abstract class ChineseWordsDatabase : RoomDatabase() {
                     Log.d(TAG, "SQL Query: $sqlQuery SQL Args: $bindArgs")
                 }, Executors.newSingleThreadExecutor())
                 .addMigrations(MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6,
-                    MIGRATION_6_7)
+                    MIGRATION_6_7, MIGRATION_7_8)
                 .build()
 
         fun loadExternalDatabase(context: Context, dbFile: File) = Room.databaseBuilder(
@@ -265,7 +277,7 @@ abstract class ChineseWordsDatabase : RoomDatabase() {
                 dbFile.path
             )
             .addMigrations(MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6,
-                MIGRATION_6_7)
+                MIGRATION_6_7, MIGRATION_7_8)
             .createFromFile(dbFile) // instead of fromAsset
             .build()
     }

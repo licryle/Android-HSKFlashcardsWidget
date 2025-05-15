@@ -43,6 +43,8 @@ import java.util.concurrent.TimeUnit
 import androidx.core.net.toUri
 import androidx.fragment.app.FragmentActivity
 import fr.berliat.hskwidget.ui.wordlist.WordListSelectionDialog
+import androidx.core.view.isVisible
+import fr.berliat.hskwidget.data.model.ChineseWord.Companion.CN_HSK3
 
 
 class Utils {
@@ -60,7 +62,12 @@ class Utils {
                 mapOf(Locale.ENGLISH to context.getString(R.string.widget_default_english)),
                 ChineseWord.HSK_Level.HSK1,
                 ChineseWord.Pinyins(context.getString(R.string.widget_default_pinyin)),
-                0
+                0,
+                "",
+                ChineseWord.Modality.ORAL,
+                ChineseWord.Type.NOUN,
+                "",
+                ""
             )
         }
 
@@ -215,8 +222,17 @@ class Utils {
             }
         }
 
+        fun hideViewIf(isTrue: Boolean): Int {
+            return if (isTrue) {
+                View.GONE
+            } else {
+                View.VISIBLE
+            }
+        }
+
         fun populateDictionaryEntryView(binding: FragmentDictionarySearchItemBinding,
                                         word: AnnotatedChineseWord, navController: NavController) {
+            // Populate the "top part"
             var pinyins = word.word?.pinyins.toString()
             if (pinyins == "")
                 pinyins = word.annotation?.pinyins?.toString() ?: ""
@@ -232,20 +248,15 @@ class Utils {
                 hanziText = word.simplified
                 pinyinText = pinyins
             }
-            var hskViz = View.VISIBLE
-            if (word.word?.hskLevel == null || word.word.hskLevel == ChineseWord.HSK_Level.NOT_HSK)
-                hskViz = View.INVISIBLE
 
-            binding.dictionaryItemHskLevel.visibility = hskViz
+            binding.dictionaryItemHskLevel.visibility = hideViewIf(
+                word.word?.hskLevel == null || word.word.hskLevel == ChineseWord.HSK_Level.NOT_HSK
+            )
             binding.dictionaryItemHskLevel.text = word.word?.hskLevel.toString()
 
             binding.dictionaryItemDefinition.text = definition
             binding.dictionaryItemAnnotation.text = annotation
-
-            if (annotation == "")
-                binding.dictionaryItemAnnotation.visibility = View.GONE
-            else
-                binding.dictionaryItemAnnotation.visibility = View.VISIBLE
+            binding.dictionaryItemAnnotation.visibility = hideViewIf(annotation.isEmpty())
 
             with(binding.dictionaryItemFavorite) {
                 if (word.hasAnnotation()) {
@@ -272,10 +283,57 @@ class Utils {
                 playWordInBackground(context, word.simplified)
             }
             binding.dictionaryItemCopy.setOnClickListener { copyToClipBoard(context, word.simplified) }
-            
+
             binding.dictionaryItemLists.setOnClickListener {
                 val dialog = WordListSelectionDialog.newInstance(word.simplified)
                 dialog.show((context as FragmentActivity).supportFragmentManager, "WordListSelectionDialog")
+            }
+            // Done with "top part"
+
+            // Populate the "more part"
+            val altDef = word.word?.definition?.get(CN_HSK3) ?: ""
+            binding.dictionaryItemAltdefinition.text = altDef
+            binding.dictionaryItemAltdefinitionContainer.visibility = hideViewIf(altDef.isEmpty())
+
+            val examples = word.word?.examples ?: ""
+            binding.dictionaryItemExample.text = examples
+            binding.dictionaryItemExampleContainer.visibility = hideViewIf(examples.isEmpty())
+
+            val antonym = word.word?.antonym ?: ""
+            binding.dictionaryItemAntonyms.text = word.word?.antonym.toString()
+            binding.dictionaryItemAntonymContainer.visibility = hideViewIf(antonym.isEmpty())
+
+            val synonyms = word.word?.synonyms ?: ""
+            binding.dictionaryItemSynonyms.text = synonyms
+            binding.dictionaryItemSynonymsContainer.visibility = hideViewIf(synonyms.isEmpty())
+
+            val modality = word.word?.modality ?: ChineseWord.Modality.UNKNOWN
+            binding.dictionaryItemModality.text = modality.toString().lowercase().capitalize()
+            binding.dictionaryItemModality.visibility = hideViewIf(modality == ChineseWord.Modality.UNKNOWN)
+
+            val type = word.word?.type ?: ChineseWord.Type.UNKNOWN
+            binding.dictionaryItemType.text = type.toString().lowercase().capitalize()
+            binding.dictionaryItemType.visibility = hideViewIf(type == ChineseWord.Type.UNKNOWN)
+
+            // Hide all if all empty
+            val nothingMore = (altDef + examples + antonym + synonyms).isEmpty()
+                    && (modality == ChineseWord.Modality.UNKNOWN)
+                    && (type == ChineseWord.Type.UNKNOWN)
+
+            binding.dictionaryItemToggle.visibility = hideViewIf(nothingMore)
+
+            if (! nothingMore) {
+                binding.dictionaryItemContainer.setOnClickListener {
+                    val isMoreShown = binding.dictionaryItemMore.isVisible
+
+                    if (isMoreShown) {
+                        binding.dictionaryItemMore.visibility = View.GONE
+                        binding.dictionaryItemToggle.setImageResource(R.drawable.keyboard_arrow_down_24px)
+                    } else {
+                        binding.dictionaryItemMore.visibility = View.VISIBLE
+                        binding.dictionaryItemToggle.setImageResource(R.drawable.keyboard_arrow_up_24px)
+                    }
+                }
             }
         }
 
