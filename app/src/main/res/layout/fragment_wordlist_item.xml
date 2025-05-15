@@ -45,7 +45,7 @@
                 android:id="@+id/wordlist_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="List name"
+                android:text="@string/wordlist_name"
                 android:textAppearance="?attr/textAppearanceHeadline6" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -57,7 +57,7 @@
                     android:id="@+id/wordlist_wordcount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="X words"
+                    android:text="@string/wordlist_word_count"
                     android:textAppearance="?attr/textAppearanceBody2"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -66,7 +66,7 @@
                     android:id="@+id/wordlist_creationdate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Creation date"
+                    android:text="@string/wordlist_createddate"
                     android:textAppearance="?attr/textAppearanceBody2"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -75,7 +75,7 @@
                     android:id="@+id/wordlist_modifdate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Last edit"
+                    android:text="@string/wordlist_editeddate"
                     android:textAppearance="?attr/textAppearanceBody2"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/wordlist_creationdate" />
