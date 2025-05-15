@@ -13,21 +13,21 @@ import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.model.WordListWithWords
 import fr.berliat.hskwidget.databinding.FragmentWordlistDialogSelectItemBinding
 import fr.berliat.hskwidget.databinding.FragmentWordlistDialogSelectListsBinding
-import fr.berliat.hskwidget.ui.utils.AnkiIntegrationDelegate
+import fr.berliat.hskwidget.ui.utils.AnkiDelegate
 import kotlinx.coroutines.launch
 
 class WordListSelectionDialog : DialogFragment() {
     private lateinit var binding: FragmentWordlistDialogSelectListsBinding
     private lateinit var viewModel: WordListViewModel
     private lateinit var adapter: WordListSelectionAdapter
-    private lateinit var ankiDelegate: AnkiIntegrationDelegate
+    private lateinit var ankiDelegate: AnkiDelegate
     private var wordId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NORMAL, R.style.Theme_HSKFlashCardsWidget_Dialog)
 
-        ankiDelegate = AnkiIntegrationDelegate(this)
+        ankiDelegate = AnkiDelegate(this)
     }
 
     override fun onCreateView(

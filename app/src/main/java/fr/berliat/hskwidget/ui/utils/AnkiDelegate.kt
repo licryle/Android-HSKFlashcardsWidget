@@ -18,13 +18,13 @@ import com.ichi2.anki.api.AddContentApi
 import com.ichi2.anki.api.AddContentApi.READ_WRITE_PERMISSION
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.repo.WordListRepository
+import fr.berliat.hskwidget.data.store.AnkiStore
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
-import fr.berliat.hskwidget.domain.AnkiDroidHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 /**
- * AnkiIntegrationDelegate is your easiest way to store things into Anki. This implementation is
+ * AnkiDelegate is your easiest way to store things into Anki. This implementation is
  * coupled to the WordListManager.
  *
  * Due to the fact that Anki API can only be called after having the right permissions, and app
@@ -35,14 +35,14 @@ import kotlinx.coroutines.launch
  *     override fun onCreate(savedInstanceState: Bundle?) {
  *         super.onCreate(savedInstanceState)
  *
- *         ankiDelegate = AnkiIntegrationDelegate(this)
+ *         ankiDelegate = AnkiDelegate(this)
  *         ankiDelegate.workListRepo.delegateToAnki(ankiDelegate.insertWordToList(list, word))
  *     }
  *
  *  The delegateToAnki wrapper checks all conditions needed for the call of Anki API before calling.
  *  Magic.
  */
-class AnkiIntegrationDelegate(
+class AnkiDelegate(
     private val fragment: Fragment
 ) {
     interface HandlerInterface {
@@ -56,7 +56,7 @@ class AnkiIntegrationDelegate(
     private val context = fragment.requireContext()
     private val callbackHandler = fragment as? HandlerInterface
     private val appConfig = AppPreferencesStore(context)
-    private val ankiDroid = AnkiDroidHelper(context)
+    private val ankiStore = AnkiStore(context)
     private val callQueue: ArrayDeque<suspend () -> Result<Unit>> = ArrayDeque()
     private lateinit var permissionLauncher: ActivityResultLauncher<Array<String>>
 
@@ -103,7 +103,7 @@ class AnkiIntegrationDelegate(
 
     /********* Checking Anki's Running & Installed **********/
     private suspend fun ensureAnkiDroidIsRunning() {
-        if (!ankiDroid.isAnkiRunning()) {
+        if (!ankiStore.isStoreReady()) {
             startAnkiDroid()
         }
     }
@@ -122,7 +122,7 @@ class AnkiIntegrationDelegate(
             true
         } catch (e: ActivityNotFoundException) {
             Toast.makeText(context, R.string.anki_not_installed, Toast.LENGTH_LONG).show()
-            Log.e(AnkiDroidHelper.TAG, context.getString(R.string.anki_not_installed), e)
+            Log.e(TAG, context.getString(R.string.anki_not_installed), e)
             false
         }
     }
@@ -234,6 +234,6 @@ class AnkiIntegrationDelegate(
     }
 
     companion object {
-        const val TAG = "AnkiIntegrationDelegate"
+        const val TAG = "AnkiDelegate"
     }
 }

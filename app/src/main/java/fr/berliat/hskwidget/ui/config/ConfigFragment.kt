@@ -20,18 +20,18 @@ import fr.berliat.hskwidget.databinding.FragmentConfigBinding
 import fr.berliat.hskwidget.domain.DatabaseBackup
 import fr.berliat.hskwidget.domain.DatabaseBackupCallbacks
 import fr.berliat.hskwidget.domain.Utils
-import fr.berliat.hskwidget.ui.utils.AnkiIntegrationDelegate
+import fr.berliat.hskwidget.ui.utils.AnkiDelegate
 import kotlinx.coroutines.launch
 
 
 class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
-        ActivityCompat.OnRequestPermissionsResultCallback, AnkiIntegrationDelegate.HandlerInterface {
+        ActivityCompat.OnRequestPermissionsResultCallback, AnkiDelegate.HandlerInterface {
     private lateinit var binding: FragmentConfigBinding
     private lateinit var appConfig: AppPreferencesStore
     private lateinit var databaseBackup : DatabaseBackup
     private lateinit var annotationDAO: ChineseWordAnnotationDAO
     private lateinit var appContext: Context
-    private lateinit var ankiDelegate: AnkiIntegrationDelegate
+    private lateinit var ankiDelegate: AnkiDelegate
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,7 +39,7 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
         annotationDAO = ChineseWordsDatabase.getInstance(requireContext()).chineseWordAnnotationDAO()
         appContext = requireContext().applicationContext
 
-        ankiDelegate = AnkiIntegrationDelegate(this)
+        ankiDelegate = AnkiDelegate(this)
     }
 
     override fun onResume() {

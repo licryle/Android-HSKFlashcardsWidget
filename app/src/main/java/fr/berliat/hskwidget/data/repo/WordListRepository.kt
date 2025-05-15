@@ -5,8 +5,9 @@ import android.util.Log
 import fr.berliat.hskwidget.data.dao.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.WordList
 import fr.berliat.hskwidget.data.model.WordListEntry
+import fr.berliat.hskwidget.data.store.AnkiStore
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
-import fr.berliat.hskwidget.domain.AnkiDroidHelper
+import fr.berliat.hskwidget.domain.AnkiDeck
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -20,7 +21,7 @@ import kotlinx.coroutines.flow.SharedFlow
  *
  * So what happens is that all suspend modifying functions here do the local DAO work and return a
  * suspend method with all Anki work to be executed in the Fragment thread. Use an
- * AnkiIntegrationDelegate for (very) easy use.
+ * AnkiDelegate for (very) easy use.
  *
  * To call any method touching Anki, those who return a suspend () -> Result<Unit>, use
  * delegateToAnki. Must be used in conjunction of a Fragment/Activity. This will automatically do
@@ -30,7 +31,7 @@ import kotlinx.coroutines.flow.SharedFlow
  *     override fun onCreate(savedInstanceState: Bundle?) {
  *         super.onCreate(savedInstanceState)
  *
- *         ankiDelegate = AnkiIntegrationDelegate(this)
+ *         ankiDelegate = AnkiDelegate(this)
  *         ankiDelegate.workListRepo.delegateToAnki(ankiDelegate.insertWordToList(list, word))
  *     }
  *
@@ -41,8 +42,8 @@ import kotlinx.coroutines.flow.SharedFlow
  * element you change/delete.
  */
 class WordListRepository(private val context: Context) {
-    private val ankiDroid = AnkiDroidHelper(context)
     private val database = ChineseWordsDatabase.getInstance(context)
+    private val ankiStore = AnkiStore(context)
     private val wordListDAO = database.wordListDAO()
     private var _cachedSystemLists: List<WordList>? = null
 
@@ -111,9 +112,9 @@ class WordListRepository(private val context: Context) {
 
             var nbDeckCreationErrors = 0
             Log.i(TAG, "syncListsToAnki.Anki: Creating decks if needed")
-            val decks = mutableMapOf<Long, AnkiDroidHelper.AnkiDeck>()
+            val decks = mutableMapOf<Long, AnkiDeck>()
             for (list in lists) {
-                decks[list.id] = AnkiDroidHelper.AnkiDeck.getOrCreate(context, ankiDroid.store, list)
+                decks[list.id] = AnkiDeck.getOrCreate(context, ankiStore, list)
 
                 if (decks[list.id]!!.ankiId == WordList.ANKI_ID_EMPTY) {
                     nbDeckCreationErrors += 1
@@ -142,7 +143,7 @@ class WordListRepository(private val context: Context) {
                     continue
                 }
 
-                val id = ankiDroid.importOrUpdateCard(deck, entry, words[entry.simplified]!!)
+                val id = ankiStore.importOrUpdateCard(deck, entry, words[entry.simplified]!!)
 
                 if (id == null) {
                     nbErrors += 1
@@ -183,16 +184,16 @@ class WordListRepository(private val context: Context) {
         return suspend { // Now do the Anki bidding by removing notes from entries
             var nbErrors = 0
             for (toDel in toDelete) {
-                if (!ankiDroid.store.deleteCard(toDel)) {
+                if (!ankiStore.deleteCard(toDel)) {
                     nbErrors += 1
                 }
             }
 
             val annotatedWord = database.annotatedChineseWordDAO().getFromSimplified(simplified)!!
             for (toA in toAdd) {
-                val deck = AnkiDroidHelper.AnkiDeck.getOrCreate(context, ankiDroid.store, wordListDAO.getListById(toA)!!)
+                val deck = AnkiDeck.getOrCreate(context, ankiStore, wordListDAO.getListById(toA)!!)
                 val entry = WordListEntry(toA, simplified)
-                if (ankiDroid.importOrUpdateCard(deck, entry, annotatedWord) == null) {
+                if (ankiStore.importOrUpdateCard(deck, entry, annotatedWord) == null) {
                     nbErrors += 1
                 }
             }
@@ -217,7 +218,7 @@ class WordListRepository(private val context: Context) {
         return suspend {
             var nbErrors = 0
             for (entry in entries) {
-                if (!ankiDroid.store.deleteCard(entry)) {
+                if (!ankiStore.deleteCard(entry)) {
                     nbErrors += 1
                 }
             }
@@ -245,9 +246,9 @@ class WordListRepository(private val context: Context) {
         }
 
         return suspend { // Will execute only if Anki integration is active, allowed and ready to fire
-            val deck = AnkiDroidHelper.AnkiDeck.getOrCreate(context, ankiDroid.store, wordList)
+            val deck = AnkiDeck.getOrCreate(context, ankiStore, wordList)
 
-            if (ankiDroid.importOrUpdateCard(deck, entry, word) != null) {
+            if (ankiStore.importOrUpdateCard(deck, entry, word) != null) {
                 Result.success(Unit)
             } else {
                 Result.failure(Exception("Coulnd't insert ${word.simplified} into Anki"))
@@ -265,7 +266,7 @@ class WordListRepository(private val context: Context) {
         wordListDAO.deleteWordFromList(entry!!.listId, entry.simplified)
 
         return suspend { // Will execute only if Anki integration is active, allowed and ready to fire
-            if (ankiDroid.store.deleteCard(entry)) {
+            if (ankiStore.deleteCard(entry)) {
                 Result.success(Unit)
             } else {
                 Result.failure(Exception("Couldn't delete entry $entry"))
@@ -285,7 +286,7 @@ class WordListRepository(private val context: Context) {
         return suspend { // Will execute only if Anki integration is active, allowed and ready to fire
             var nbErrors = 0
             for (entry in entries) {
-                if (!ankiDroid.store.deleteCard(entry)) {
+                if (!ankiStore.deleteCard(entry)) {
                     nbErrors += 1
                 }
             }
@@ -313,9 +314,9 @@ class WordListRepository(private val context: Context) {
 
         return suspend { // Will execute only if Anki integration is active, allowed and ready to fire
             // Create deck if needed (shouldn't)
-            val deck = AnkiDroidHelper.AnkiDeck.getOrCreate(context, ankiDroid.store, wordList)
+            val deck = AnkiDeck.getOrCreate(context, ankiStore, wordList)
 
-            if (ankiDroid.importOrUpdateCard(deck, entry, word) == null) {
+            if (ankiStore.importOrUpdateCard(deck, entry, word) == null) {
                 Result.failure(Exception("Couldn't add ${word.simplified} to anki"))
             } else {
                 Result.success(Unit)
@@ -341,8 +342,7 @@ class WordListRepository(private val context: Context) {
 
             var nbErrors = 0
             for (entry in entries) {
-                var wordList : WordList? = null
-                wordList = database.wordListDAO().getListById(entry.listId)
+                val wordList = database.wordListDAO().getListById(entry.listId)
                 val word = database.annotatedChineseWordDAO().getFromSimplified(simplified)
 
                 if (wordList == null || word == null) {
@@ -350,8 +350,8 @@ class WordListRepository(private val context: Context) {
                     continue
                 }
 
-                val deck = AnkiDroidHelper.AnkiDeck.getOrCreate(context, ankiDroid.store, wordList)
-                if (ankiDroid.importOrUpdateCard(deck, entry, word) == null) {
+                val deck = AnkiDeck.getOrCreate(context, ankiStore, wordList)
+                if (ankiStore.importOrUpdateCard(deck, entry, word) == null) {
                     nbErrors += 1
                 }
             }

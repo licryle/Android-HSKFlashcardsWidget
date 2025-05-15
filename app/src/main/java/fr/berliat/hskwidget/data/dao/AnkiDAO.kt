@@ -14,7 +14,7 @@ import com.ichi2.anki.api.NoteInfo
  * And in particular (for the API itself):
  * https://github.com/ankidroid/Anki-Android/blob/main/AnkiDroid/src/main/java/com/ichi2/anki/provider/CardContentProvider.kt
  */
-class AnkiNotesDAO(context: Context) {
+class AnkiDAO(context: Context) {
     private val api = AddContentApi(context)
     private val resolver = context.contentResolver
 

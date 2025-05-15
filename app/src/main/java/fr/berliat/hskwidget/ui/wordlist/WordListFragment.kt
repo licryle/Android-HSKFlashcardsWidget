@@ -18,7 +18,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.model.WordList
 import fr.berliat.hskwidget.data.model.WordListWithWords
-import fr.berliat.hskwidget.ui.utils.AnkiIntegrationDelegate
+import fr.berliat.hskwidget.ui.utils.AnkiDelegate
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -27,11 +27,11 @@ import java.util.*
 class WordListFragment : Fragment() {
     private lateinit var viewModel: WordListViewModel
     private lateinit var adapter: WordListAdapter
-    private lateinit var ankiDelegate: AnkiIntegrationDelegate
+    private lateinit var ankiDelegate: AnkiDelegate
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        ankiDelegate = AnkiIntegrationDelegate(this)
+        ankiDelegate = AnkiDelegate(this)
     }
 
     override fun onCreateView(
