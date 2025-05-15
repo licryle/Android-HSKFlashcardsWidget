@@ -20,4 +20,9 @@
         <item name="android:layout_width">30dp</item>
         <item name="android:padding">3dp</item>
     </style>
+
+    <style name="RoundImageView" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item> <!-- 50% makes it fully circular -->
+    </style>
 </resources>

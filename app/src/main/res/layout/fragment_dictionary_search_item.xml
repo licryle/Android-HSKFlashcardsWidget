@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
+<com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_margin="0dp"
+    app:cardBackgroundColor="?attr/colorPrimaryContainer"
+    app:cardCornerRadius="14dp"
+    app:cardElevation="2dp">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:layout_margin="1dp"
         android:background="@drawable/search_item_border">
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -67,27 +72,27 @@
 
             </fr.berliat.floatlayouts.layouts.FloatTextLayout>
 
-            <ImageView
+            <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/dictionary_item_speak"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
+                android:scaleType="centerInside"
+                android:padding="0dp"
                 style="@style/Widget.HSKFlashCardsWidget.Icons"
+                app:shapeAppearanceOverlay="@style/RoundImageView"
                 android:contentDescription="@string/widget_btn_speak"
-                android:foreground="@drawable/round_foreground"
-                android:foregroundTint="?android:attr/colorBackground"
                 android:src="@drawable/baseline_volume_up_24"
-                android:paddingBottom="5dp"
-                android:paddingEnd="5dp"/>
+                android:layout_marginEnd="5dp"/>
 
-
-            <ImageView
+            <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/dictionary_item_copy"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                style="@style/Widget.HSKFlashCardsWidget.Icons"
                 android:contentDescription="@string/widget_btn_copy"
-                android:foreground="@drawable/round_foreground"
-                android:foregroundTint="?android:attr/colorBackground"
+                android:scaleType="centerInside"
+                android:padding="0dp"
+                style="@style/Widget.HSKFlashCardsWidget.Icons"
+                app:shapeAppearanceOverlay="@style/RoundImageView"
                 android:src="@drawable/content_copy_24px" />
 
             <!-- HSK Level -->
@@ -103,14 +108,15 @@
                 app:layout_constraintTop_toBottomOf="@id/dictionary_item_favorite"
                 android:layout_marginEnd="5dp"/>
 
-            <ImageView
+            <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/dictionary_item_lists"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
+                android:scaleType="centerInside"
+                android:padding="0dp"
                 style="@style/Widget.HSKFlashCardsWidget.Icons"
+                app:shapeAppearanceOverlay="@style/RoundImageView"
                 android:contentDescription="@string/dictionary_item_lists"
-                android:foreground="@drawable/round_foreground"
-                android:foregroundTint="?android:attr/colorBackground"
                 android:src="@drawable/format_list_bulleted_add_24px" />
 
             <LinearLayout
@@ -134,4 +140,4 @@
             </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>

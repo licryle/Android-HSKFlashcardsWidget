@@ -4,37 +4,41 @@
     android:id="@+id/wordlist_infos_card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="4dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="2dp"
-    android:foregroundTint="?android:attr/colorBackground">
+    android:layout_marginBottom="6dp"
+    app:cardBackgroundColor="?attr/colorPrimaryContainer"
+    app:cardCornerRadius="14dp"
+    app:cardElevation="2dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_margin="1dp"
+        android:orientation="horizontal"
+        android:baselineAligned="false">
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <ImageView
+            <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/wordlist_rename_button"
+                android:scaleType="centerInside"
+                android:padding="0dp"
                 style="@style/Widget.HSKFlashCardsWidget.Icons"
+                app:shapeAppearanceOverlay="@style/RoundImageView"
                 android:contentDescription="@string/dictionary_item_lists"
-                android:foreground="@drawable/round_foreground"
                 android:src="@drawable/edit_24px" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
             android:layout_marginLeft="10dp"
+            android:layout_marginTop="2dp"
             android:layout_marginRight="10dp"
             android:layout_marginBottom="10dp"
+            android:layout_weight="1"
             android:orientation="vertical">
 
             <TextView
@@ -53,28 +57,28 @@
                     android:id="@+id/wordlist_wordcount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
                     android:text="X words"
-                    android:textAppearance="?attr/textAppearanceBody2" />
+                    android:textAppearance="?attr/textAppearanceBody2"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/wordlist_creationdate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
                     android:text="Creation date"
-                    android:textAppearance="?attr/textAppearanceBody2" />
+                    android:textAppearance="?attr/textAppearanceBody2"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/wordlist_modifdate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/wordlist_creationdate"
                     android:text="Last edit"
-                    android:textAppearance="?attr/textAppearanceBody2" />
+                    android:textAppearance="?attr/textAppearanceBody2"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/wordlist_creationdate" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </LinearLayout>
@@ -84,12 +88,12 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <ImageView
+            <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/wordlist_delete_button"
+                android:scaleType="centerInside"
                 style="@style/Widget.HSKFlashCardsWidget.Icons"
-                android:contentDescription="@string/wordlist_delete_button"
-                android:foreground="@drawable/round_foreground"
-                android:foregroundTint="?android:attr/colorBackground"
+                android:padding="0dp"
+                app:shapeAppearanceOverlay="@style/RoundImageView"
                 android:src="@drawable/delete_24px" />
         </LinearLayout>
 

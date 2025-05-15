@@ -70,7 +70,7 @@ class WordListFragment : Fragment() {
 
     private fun showRenameDialog(list: WordListWithCount) {
         WordListReNameDialog.newInstance(listId = list.id, listName = list.name)
-            .show(requireFragmentManager(), "RenameListDialog")
+            .show(parentFragmentManager, "RenameListDialog")
     }
 
     private fun showCreateListDialog() {
