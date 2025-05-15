@@ -28,6 +28,7 @@ import com.yalantis.ucrop.UCrop
 import fr.berliat.hskwidget.databinding.FragmentOcrCaptureBinding
 import fr.berliat.hskwidget.domain.Utils
 import java.io.File
+import java.time.Instant
 import java.util.Locale
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -163,7 +164,7 @@ class CaptureImageFragment : Fragment() {
 
         // Create time stamped name and MediaStore entry.
         val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
-            .format(System.currentTimeMillis())
+            .format(Instant.now().toEpochMilli())
         val contentValues = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, name)
             put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")

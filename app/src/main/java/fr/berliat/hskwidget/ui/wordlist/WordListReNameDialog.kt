@@ -59,7 +59,7 @@ class WordListReNameDialog : DialogFragment() {
         binding.cancelButton.setOnClickListener { dismiss() }
 
         binding.createButton.setOnClickListener {
-            val name = binding.listNameInput.text.toString()
+            val name = binding.listNameInput.text.toString().trim()
             if (name.isNotBlank()) {
                 if (listId != null) {
                     viewModel.renameList(listId, name) { err ->

@@ -22,6 +22,7 @@ import fr.berliat.hskwidget.data.model.ChineseWordFrequency
 import fr.berliat.hskwidget.data.model.WordList
 import fr.berliat.hskwidget.data.model.WordListEntry
 import java.io.File
+import java.time.Instant
 
 import java.util.concurrent.Executors
 
@@ -111,7 +112,8 @@ abstract class ChineseWordsDatabase : RoomDatabase() {
 
         private val MIGRATION_4_5 = object : Migration(4, 5) {
             override fun migrate(db: SupportSQLiteDatabase) {
-                db.execSQL("ALTER TABLE word_lists ADD COLUMN lastModified INTEGER NOT NULL DEFAULT ${System.currentTimeMillis()}")
+                val now = Instant.now().toEpochMilli()
+                db.execSQL("ALTER TABLE word_lists ADD COLUMN lastModified INTEGER NOT NULL DEFAULT $now")
             }
         }
 
@@ -126,7 +128,7 @@ abstract class ChineseWordsDatabase : RoomDatabase() {
                     VALUES (?, ?, ?, ?, ?)
                 """.trimIndent())
 
-                val currentTime = System.currentTimeMillis()
+                val currentTime = Instant.now().toEpochMilli()
                 stmt.bindString(1, WordList.SYSTEM_ANNOTATED_NAME)
                 stmt.bindString(2, "SYSTEM")
                 stmt.bindLong(3, currentTime)

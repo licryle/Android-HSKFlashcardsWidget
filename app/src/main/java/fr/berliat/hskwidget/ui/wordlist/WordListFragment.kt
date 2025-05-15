@@ -17,7 +17,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.model.WordList
-import fr.berliat.hskwidget.data.model.WordListWithWords
+import fr.berliat.hskwidget.data.model.WordListWithCount
 import fr.berliat.hskwidget.ui.utils.AnkiDelegate
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -68,8 +68,8 @@ class WordListFragment : Fragment() {
         }
     }
 
-    private fun showRenameDialog(list: WordListWithWords) {
-        WordListReNameDialog.newInstance(listId = list.wordList.id, listName = list.wordList.name)
+    private fun showRenameDialog(list: WordListWithCount) {
+        WordListReNameDialog.newInstance(listId = list.id, listName = list.name)
             .show(requireFragmentManager(), "RenameListDialog")
     }
 
@@ -78,10 +78,10 @@ class WordListFragment : Fragment() {
         dialog.show(childFragmentManager, "CreateListDialog")
     }
 
-    private fun showDeleteConfirmation(list: WordListWithWords) {
+    private fun showDeleteConfirmation(list: WordListWithCount) {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.wordlist_delete_button)
-            .setMessage(getString(R.string.wordlist_delete_confirmation, list.wordList.name))
+            .setMessage(getString(R.string.wordlist_delete_confirmation, list.name))
             .setPositiveButton(R.string.wordlist_delete_button) { _, _ ->
                 viewModel.deleteList(list.wordList)
             }
@@ -89,8 +89,8 @@ class WordListFragment : Fragment() {
             .show()
     }
 
-    private fun consultList(list: WordListWithWords) {
-        val query = "list:\"${list.wordList.name}\""
+    private fun consultList(list: WordListWithCount) {
+        val query = "list:\"${list.name}\""
         val searchView = requireActivity().findViewById<SearchView>(R.id.appbar_search)
         searchView.setQuery(query, true)
     }
@@ -98,10 +98,10 @@ class WordListFragment : Fragment() {
 
 class WordListAdapter(
     private val context: Context,
-    private val onConsultClick: (WordListWithWords) -> Unit,
-    private val onRenameClick: (WordListWithWords) -> Unit,
-    private val onDeleteClick: (WordListWithWords) -> Unit
-) : ListAdapter<WordListWithWords, WordListAdapter.ViewHolder>(WordListDiffCallback()) {
+    private val onConsultClick: (WordListWithCount) -> Unit,
+    private val onRenameClick: (WordListWithCount) -> Unit,
+    private val onDeleteClick: (WordListWithCount) -> Unit
+) : ListAdapter<WordListWithCount, WordListAdapter.ViewHolder>(WordListDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -122,11 +122,11 @@ class WordListAdapter(
         private val deleteButton: View = itemView.findViewById(R.id.wordlist_delete_button)
         private val renameButton: View = itemView.findViewById(R.id.wordlist_rename_button)
 
-        fun bind(list: WordListWithWords) {
+        fun bind(list: WordListWithCount) {
             nameTextView.text = list.wordList.name
             wordCountTextView.text = itemView.context.getString(
                 R.string.wordlist_word_count,
-                list.words.size
+                list.wordCount
             )
 
             val dateFormat = SimpleDateFormat(context.getString(R.string.date_format), Locale.getDefault())
@@ -147,12 +147,12 @@ class WordListAdapter(
     }
 }
 
-class WordListDiffCallback : DiffUtil.ItemCallback<WordListWithWords>() {
-    override fun areItemsTheSame(oldItem: WordListWithWords, newItem: WordListWithWords): Boolean {
+class WordListDiffCallback : DiffUtil.ItemCallback<WordListWithCount>() {
+    override fun areItemsTheSame(oldItem: WordListWithCount, newItem: WordListWithCount): Boolean {
         return oldItem.wordList.id == newItem.wordList.id
     }
 
-    override fun areContentsTheSame(oldItem: WordListWithWords, newItem: WordListWithWords): Boolean {
+    override fun areContentsTheSame(oldItem: WordListWithCount, newItem: WordListWithCount): Boolean {
         return oldItem == newItem
     }
 } 

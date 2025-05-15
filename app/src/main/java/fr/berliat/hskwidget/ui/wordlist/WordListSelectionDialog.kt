@@ -10,7 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import fr.berliat.hskwidget.R
-import fr.berliat.hskwidget.data.model.WordListWithWords
+import fr.berliat.hskwidget.data.model.WordListWithCount
 import fr.berliat.hskwidget.databinding.FragmentWordlistDialogSelectItemBinding
 import fr.berliat.hskwidget.databinding.FragmentWordlistDialogSelectListsBinding
 import fr.berliat.hskwidget.ui.utils.AnkiDelegate
@@ -124,10 +124,10 @@ class WordListSelectionDialog : DialogFragment() {
 }
 
 class WordListSelectionAdapter : RecyclerView.Adapter<WordListSelectionAdapter.ViewHolder>() {
-    private var items = listOf<WordListWithWords>()
+    private var items = listOf<WordListWithCount>()
     private var selectedListIds = setOf<Long>()
 
-    fun submitList(newItems: List<WordListWithWords>) {
+    fun submitList(newItems: List<WordListWithCount>) {
         items = newItems
         notifyDataSetChanged()
     }
@@ -156,11 +156,11 @@ class WordListSelectionAdapter : RecyclerView.Adapter<WordListSelectionAdapter.V
     inner class ViewHolder(private val binding: FragmentWordlistDialogSelectItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(wordList: WordListWithWords) {
-            binding.wordListCheckBox.isChecked = wordList.wordList.id in selectedListIds
-            binding.wordlistName.text = wordList.wordList.name
+        fun bind(wordList: WordListWithCount) {
+            binding.wordListCheckBox.isChecked = wordList.id in selectedListIds
+            binding.wordlistName.text = wordList.name
             binding.wordlistWordcount.text = itemView.context.getString(
-                R.string.wordlist_word_count, wordList.words.size)
+                R.string.wordlist_word_count, wordList.wordCount)
 
             binding.wordListRow.setOnClickListener {
                 binding.wordListCheckBox.performClick()
@@ -168,9 +168,9 @@ class WordListSelectionAdapter : RecyclerView.Adapter<WordListSelectionAdapter.V
 
             binding.wordListCheckBox.setOnCheckedChangeListener { _, isChecked ->
                 selectedListIds = if (isChecked) {
-                    selectedListIds + wordList.wordList.id
+                    selectedListIds + wordList.id
                 } else {
-                    selectedListIds - wordList.wordList.id
+                    selectedListIds - wordList.id
                 }
             }
         }

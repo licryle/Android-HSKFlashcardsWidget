@@ -5,6 +5,7 @@ import android.util.Log
 import fr.berliat.hskwidget.data.dao.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.WordList
 import fr.berliat.hskwidget.data.model.WordListEntry
+import fr.berliat.hskwidget.data.model.WordListWithCount
 import fr.berliat.hskwidget.data.store.AnkiStore
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.domain.AnkiDeck
@@ -45,7 +46,7 @@ class WordListRepository(private val context: Context) {
     private val database = ChineseWordsDatabase.getInstance(context)
     private val ankiStore = AnkiStore(context)
     private val wordListDAO = database.wordListDAO()
-    private var _cachedSystemLists: List<WordList>? = null
+    private var _cachedSystemLists: List<WordListWithCount>? = null
 
     protected val _uiEvents = MutableSharedFlow<UiEvent>(
         replay = 0,
@@ -59,7 +60,7 @@ class WordListRepository(private val context: Context) {
     }
 
     /****** NOT TOUCHING ANKI *******/
-    suspend fun getSystemLists(): List<WordList> {
+    suspend fun getSystemLists(): List<WordListWithCount> {
         if (_cachedSystemLists == null) {
             _cachedSystemLists = database.wordListDAO().getSystemLists()
         }
@@ -114,7 +115,7 @@ class WordListRepository(private val context: Context) {
             Log.i(TAG, "syncListsToAnki.Anki: Creating decks if needed")
             val decks = mutableMapOf<Long, AnkiDeck>()
             for (list in lists) {
-                decks[list.id] = AnkiDeck.getOrCreate(context, ankiStore, list)
+                decks[list.id] = AnkiDeck.getOrCreate(context, ankiStore, list.wordList)
 
                 if (decks[list.id]!!.ankiId == WordList.ANKI_ID_EMPTY) {
                     nbDeckCreationErrors += 1
@@ -191,7 +192,7 @@ class WordListRepository(private val context: Context) {
 
             val annotatedWord = database.annotatedChineseWordDAO().getFromSimplified(simplified)!!
             for (toA in toAdd) {
-                val deck = AnkiDeck.getOrCreate(context, ankiStore, wordListDAO.getListById(toA)!!)
+                val deck = AnkiDeck.getOrCreate(context, ankiStore, wordListDAO.getListById(toA)!!.wordList)
                 val entry = WordListEntry(toA, simplified)
                 if (ankiStore.importOrUpdateCard(deck, entry, annotatedWord) == null) {
                     nbErrors += 1
@@ -331,7 +332,7 @@ class WordListRepository(private val context: Context) {
 
         if (annotList == null) return null
 
-        return addWordToList(annotList, word)
+        return addWordToList(annotList.wordList, word)
     }
 
     suspend fun updateInAllLists(simplified: String): (suspend () -> Result<Unit>)? {
@@ -350,7 +351,7 @@ class WordListRepository(private val context: Context) {
                     continue
                 }
 
-                val deck = AnkiDeck.getOrCreate(context, ankiStore, wordList)
+                val deck = AnkiDeck.getOrCreate(context, ankiStore, wordList.wordList)
                 if (ankiStore.importOrUpdateCard(deck, entry, word) == null) {
                     nbErrors += 1
                 }

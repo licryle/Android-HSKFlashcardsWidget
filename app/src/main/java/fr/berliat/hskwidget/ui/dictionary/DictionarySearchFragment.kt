@@ -23,6 +23,7 @@ import kotlinx.coroutines.launch
 
 import fr.berliat.hskwidget.databinding.FragmentDictionarySearchBinding
 import fr.berliat.hskwidget.databinding.FragmentDictionarySearchItemBinding
+import java.time.Instant
 
 class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResultChangedListener {
     private lateinit var searchAdapter: DictionarySearchAdapter
@@ -38,7 +39,7 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
             return activity?.findViewById<SearchView>(R.id.appbar_search)?.query.toString().trim()
         }
 
-    private var lastFullSearchStartTime = System.currentTimeMillis()
+    private var lastFullSearchStartTime = Instant.now().toEpochMilli()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -109,7 +110,7 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
         viewLifecycleOwner.lifecycleScope.launch {
             // Here we executed in the coRoutine Scope
             val result: Pair<Long, List<AnnotatedChineseWord>> = Pair(
-                System.currentTimeMillis(),
+                Instant.now().toEpochMilli(),
                 fetchResultsForPage()
             )
 

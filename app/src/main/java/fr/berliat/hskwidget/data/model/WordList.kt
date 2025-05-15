@@ -1,20 +1,19 @@
 package fr.berliat.hskwidget.data.model
 
-import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
-import androidx.room.Junction
 import androidx.room.PrimaryKey
-import androidx.room.Relation
+import fr.berliat.hskwidget.data.model.WordList.ListType
+import java.time.Instant
 
 @Entity(tableName = "word_lists")
 data class WordList(
     val name: String,
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
-    val creationDate: Long = System.currentTimeMillis(),
-    val lastModified: Long = System.currentTimeMillis(), // Add this field with current timestamp as default
+    val creationDate: Long = Instant.now().toEpochMilli(),
+    val lastModified: Long = Instant.now().toEpochMilli(), // Add this field with current timestamp as default
     val ankiDeckId: Long = 0,
     val listType: ListType = ListType.USER
 ) {
@@ -54,16 +53,17 @@ data class WordListEntry(
     val ankiNoteId: Long = 0
 )
 
-data class WordListWithWords(
-    @Embedded val wordList: WordList,
-    @Relation(
-        parentColumn = "id",
-        entityColumn = "simplified",
-        associateBy = Junction(
-            value = WordListEntry::class,
-            parentColumn = "listId",
-            entityColumn = "simplified"
-        )
-    )
-    val words: List<ChineseWord>
-)
+data class WordListWithCount(
+    val name: String,
+    val id: Long,
+    val creationDate: Long,
+    val lastModified: Long,
+    val ankiDeckId: Long,
+    val listType: ListType,
+    val wordCount: Int
+) {
+    val wordList: WordList
+        get () {
+            return WordList(name, id, creationDate, lastModified, ankiDeckId, listType)
+        }
+}
