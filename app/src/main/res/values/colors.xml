@@ -3,7 +3,7 @@
     <color name="seed">#FF0000</color>
     <color name="md_theme_light_primary">#C00100</color>
     <color name="md_theme_light_onPrimary">#FFFFFF</color>
-    <color name="md_theme_light_primaryContainer">#FFFFFF</color>
+    <color name="md_theme_light_primaryContainer">#FFDAD4</color>
     <color name="md_theme_light_onPrimaryContainer">#410000</color>
     <color name="md_theme_light_secondary">#626200</color>
     <color name="md_theme_light_onSecondary">#FFFFFF</color>
