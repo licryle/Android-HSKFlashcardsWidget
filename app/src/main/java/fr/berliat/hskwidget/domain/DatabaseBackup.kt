@@ -102,6 +102,13 @@ class DatabaseBackup(comp: ActivityResultCaller,
         localDb.chineseWordAnnotationDAO().deleteAll()
         localDb.chineseWordAnnotationDAO().insertAll(importedAnnotations)
 
+        Log.d(TAG, "Starting to import Word_List_List to local DB")
+        localDb.wordListDAO().deleteAllEntries()
+        localDb.wordListDAO().deleteAllLists()
+        localDb.wordListDAO().insertAllLists(
+            importedDb.wordListDAO().getAllLists().map { it -> it.wordList })
+        localDb.wordListDAO().insertAllWords(importedDb.wordListDAO().getAllEntries())
+
         Log.d(TAG, "Starting to import WordFrequency to local DB")
         localDb.chineseWordFrequencyDAO().deleteAll()
         localDb.chineseWordFrequencyDAO().insertAll(importedDb.chineseWordFrequencyDAO().getAll())

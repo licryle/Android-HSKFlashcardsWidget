@@ -42,10 +42,13 @@ interface WordListDAO {
     suspend fun insertList(wordList: WordList): Long
 
     @Insert
+    suspend fun insertAllLists(lists: List<WordList>)
+
+    @Insert
     suspend fun insertWordToList(entry: WordListEntry)
 
     @Insert
-    suspend fun insertWordsToList(entries: List<WordListEntry>)
+    suspend fun insertAllWords(entries: List<WordListEntry>)
 
     @Delete
     suspend fun deleteList(wordList: WordList)
@@ -100,4 +103,13 @@ interface WordListDAO {
 
     @Query("DELETE FROM word_list_entries WHERE listId = :listId")
     suspend fun deleteAllFromList(listId: Long)
+
+    @Query("SELECT * FROM word_list_entries")
+    suspend fun getAllEntries(): List<WordListEntry>
+
+    @Query("DELETE FROM word_list_entries")
+    suspend fun deleteAllEntries()
+
+    @Query("DELETE FROM word_lists")
+    suspend fun deleteAllLists()
 }
