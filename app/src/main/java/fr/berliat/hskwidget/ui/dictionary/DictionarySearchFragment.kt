@@ -142,7 +142,7 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
     // Simulate fetching search results based on the query and current page
     private suspend fun fetchResultsForPage(): List<AnnotatedChineseWord> {
         Log.d("DictionarySearchFragment", "Searching for $searchQuery")
-        val db = ChineseWordsDatabase.getInstance(requireContext())
+        val db = ChineseWordsDatabase.getInstance()
         val dao = db.annotatedChineseWordDAO()
         try {
             val annotatedOnly = binding.dictionarySearchFilterHasannotation.isChecked

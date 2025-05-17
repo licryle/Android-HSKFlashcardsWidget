@@ -48,7 +48,7 @@ class WordListSelectionDialog : DialogFragment() {
             return
         }
 
-        viewModel = WordListViewModel(requireContext(), ankiDelegate.wordListRepo)
+        viewModel = WordListViewModel(ankiDelegate.wordListRepo)
 
         setupRecyclerView()
         setupButtons()

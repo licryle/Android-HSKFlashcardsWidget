@@ -43,7 +43,7 @@ import kotlinx.coroutines.flow.SharedFlow
  * element you change/delete.
  */
 class WordListRepository(private val context: Context) {
-    private val database = ChineseWordsDatabase.getInstance(context)
+    private val database = ChineseWordsDatabase.getInstance()
     private val ankiStore = AnkiStore(context)
     private val wordListDAO = database.wordListDAO()
     private var _cachedSystemLists: List<WordListWithCount>? = null

@@ -46,7 +46,7 @@ class WordListReNameDialog : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel = WordListViewModel(requireContext(), WordListRepository(requireContext()))
+        viewModel = WordListViewModel(WordListRepository(requireContext()))
 
         val listId = arguments?.getLong(ARG_LIST_ID)
         val existingName = arguments?.getString(ARG_LIST_NAME)

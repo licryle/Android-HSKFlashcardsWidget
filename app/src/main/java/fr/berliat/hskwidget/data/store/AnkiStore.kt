@@ -14,7 +14,7 @@ import java.util.Locale
 
 class AnkiStore(val context: Context):
     PrefixedPreferenceDataStoreBridge(context.dataStore, "anki") {
-    private val database = ChineseWordsDatabase.getInstance(context)
+    private val database = ChineseWordsDatabase.getInstance()
     val api: AnkiDAO = AnkiDAO(context)
 
     suspend fun isStoreReady() : Boolean {

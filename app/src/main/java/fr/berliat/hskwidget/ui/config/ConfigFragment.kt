@@ -36,7 +36,7 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         databaseBackup = DatabaseBackup(this, requireContext(), this)
-        annotationDAO = ChineseWordsDatabase.getInstance(requireContext()).chineseWordAnnotationDAO()
+        annotationDAO = ChineseWordsDatabase.getInstance().chineseWordAnnotationDAO()
         appContext = requireContext().applicationContext
 
         ankiDelegate = AnkiDelegate(this)

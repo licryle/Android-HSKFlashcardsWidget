@@ -18,7 +18,7 @@ import kotlinx.coroutines.withContext
 
 class FlashcardManager private constructor(private val context: Context,
                                            private val widgetId: Int) {
-    private val dict = ChineseWordsDatabase.getInstance(context).chineseWordDAO()
+    private val dict = ChineseWordsDatabase.getInstance().chineseWordDAO()
     private val fragments = mutableMapOf<Int, MutableSet<FlashcardFragment>>()
     private val flashCardPrefs = getPreferenceStore()
     private val appWidgetMgr = AppWidgetManager.getInstance(context)
