@@ -74,6 +74,7 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
         binding.dictionarySearchResults.adapter = searchAdapter
 
         binding.dictionarySearchFilterHasannotation.isChecked = appConfig.searchFilterHasAnnotation
+        binding.dictionaryShowHsk3definition.isChecked = appConfig.dictionaryShowHSK3Definition
 
         // Infinite scroll for pagination
         binding.dictionarySearchResults.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -97,6 +98,11 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
         binding.dictionarySearchFilterHasannotation.setOnClickListener {
             appConfig.searchFilterHasAnnotation = binding.dictionarySearchFilterHasannotation.isChecked
             performSearch()
+        }
+
+        binding.dictionaryShowHsk3definition.setOnClickListener {
+            appConfig.dictionaryShowHSK3Definition = binding.dictionaryShowHsk3definition.isChecked
+            searchAdapter.notifyDataSetChanged()
         }
     }
 

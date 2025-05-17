@@ -45,6 +45,7 @@ import androidx.fragment.app.FragmentActivity
 import fr.berliat.hskwidget.ui.wordlist.WordListSelectionDialog
 import androidx.core.view.isVisible
 import fr.berliat.hskwidget.data.model.ChineseWord.Companion.CN_HSK3
+import fr.berliat.hskwidget.data.store.AppPreferencesStore
 
 
 class Utils {
@@ -232,17 +233,27 @@ class Utils {
 
         fun populateDictionaryEntryView(binding: FragmentDictionarySearchItemBinding,
                                         word: AnnotatedChineseWord, navController: NavController) {
-            // Populate the "top part"
-            var pinyins = word.word?.pinyins.toString()
-            if (pinyins == "")
-                pinyins = word.annotation?.pinyins?.toString() ?: ""
-
+            // Definition vs. HSK definition -- which one to show?
+            // Collect then invert if needed
             var definition = word.word?.definition?.get(Locale.ENGLISH) ?: ""
             var annotation = word.annotation?.notes ?: ""
             if (definition == "") {
                 definition = word.annotation?.notes ?: ""
                 annotation = ""
             }
+            var altDef = word.word?.definition?.get(CN_HSK3) ?: ""
+
+            val appConfig = AppPreferencesStore(navController.context)
+            if (appConfig.dictionaryShowHSK3Definition && altDef.isNotEmpty()) {
+                val tmp = altDef
+                altDef = definition
+                definition = tmp
+            }
+
+            // Populate the "top part"
+            var pinyins = word.word?.pinyins.toString()
+            if (pinyins == "")
+                pinyins = word.annotation?.pinyins?.toString() ?: ""
 
             with(binding.dictionaryItemChinese) {
                 hanziText = word.simplified
@@ -291,7 +302,6 @@ class Utils {
             // Done with "top part"
 
             // Populate the "more part"
-            val altDef = word.word?.definition?.get(CN_HSK3) ?: ""
             binding.dictionaryItemAltdefinition.text = altDef
             binding.dictionaryItemAltdefinitionContainer.visibility = hideViewIf(altDef.isEmpty())
 

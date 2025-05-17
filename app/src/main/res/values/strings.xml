@@ -286,4 +286,5 @@ padding: 0;
     <string name="dictionary_item_synonyms">Synonym(s)</string>
     <string name="dictionary_item_examples">Example(s)</string>
     <string name="dictionary_item_altdefinition">Definition</string>
+    <string name="dictionary_search_filter_hsk3definition_hint">Definition in HSK3</string>
 </resources>
