@@ -1,6 +1,5 @@
 package fr.berliat.hskwidget.ui.wordlist
 
-import android.content.Context
 import fr.berliat.hskwidget.data.model.WordList
 import fr.berliat.hskwidget.data.model.WordListWithCount
 import fr.berliat.hskwidget.data.repo.WordListRepository
@@ -9,8 +8,8 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class WordListViewModel(context: Context, val wordListRepo: WordListRepository) {
-    private val wordListDao = ChineseWordsDatabase.getInstance(context).wordListDAO()
+class WordListViewModel(val wordListRepo: WordListRepository) {
+    private val wordListDao = ChineseWordsDatabase.getInstance().wordListDAO()
     private val viewModelScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     val wordLists = wordListDao.getAllListsFlow()

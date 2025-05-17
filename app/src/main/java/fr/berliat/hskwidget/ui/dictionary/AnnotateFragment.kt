@@ -45,7 +45,7 @@ class AnnotateFragment: Fragment() {
     ): View {
         binding = FragmentAnnotationEditBinding.inflate(inflater, container, false)
 
-        annotateViewModel = AnnotateViewModel(requireContext(), ankiDelegate.wordListRepo)
+        annotateViewModel = AnnotateViewModel(ankiDelegate.wordListRepo)
         annotateViewModel.annotatedWord.observe(viewLifecycleOwner) { word ->
             updateUI(word)
         }
@@ -179,7 +179,7 @@ class AnnotateFragment: Fragment() {
         val annotatedWord = AnnotatedChineseWord(annotateViewModel.annotatedWord.value!!.word, updatedAnnotation)
         annotateViewModel.updateAnnotation(annotatedWord) { err -> handleIOResult(ACTION.UPDATE, err) }
 
-        Utils.incrementConsultedWord(requireContext(), annotateViewModel.simplified)
+        Utils.incrementConsultedWord(annotateViewModel.simplified)
 
         if (annotatedWord.hasAnnotation()) {
             AppPreferencesStore(requireContext()).lastAnnotatedClassType = updatedAnnotation.classType!!

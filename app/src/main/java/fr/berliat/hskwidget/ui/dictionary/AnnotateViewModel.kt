@@ -1,6 +1,5 @@
 package fr.berliat.hskwidget.ui.dictionary
 
-import android.content.Context
 import android.os.Bundle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -16,13 +15,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class AnnotateViewModel(context: Context, val wordListRepo: WordListRepository) {
+class AnnotateViewModel(val wordListRepo: WordListRepository) {
     private val viewModelScope = CoroutineScope(Dispatchers.Main)
 
     private val annotatedWordsDAO: AnnotatedChineseWordDAO =
-        ChineseWordsDatabase.getInstance(context).annotatedChineseWordDAO()
+        ChineseWordsDatabase.getInstance().annotatedChineseWordDAO()
     private val annotationDAO: ChineseWordAnnotationDAO =
-        ChineseWordsDatabase.getInstance(context).chineseWordAnnotationDAO()
+        ChineseWordsDatabase.getInstance().chineseWordAnnotationDAO()
     private val _annotatedWord = MutableLiveData<AnnotatedChineseWord>()
     val annotatedWord: LiveData<AnnotatedChineseWord> get() = _annotatedWord
     val simplified: String get() = _annotatedWord.value?.simplified ?: ""

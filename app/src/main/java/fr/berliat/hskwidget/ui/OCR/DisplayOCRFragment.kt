@@ -56,7 +56,7 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
         segmenter = SharedViewModel.getInstance(this).segmenter
         viewModel = ViewModelProvider(this)[DisplayOCRViewModel::class.java]
 
-        val db = ChineseWordsDatabase.getInstance(requireContext())
+        val db = ChineseWordsDatabase.getInstance()
         frequencyWordsRepo = ChineseWordFrequencyRepo(
             db.chineseWordFrequencyDAO(),
             db.annotatedChineseWordDAO()
@@ -253,7 +253,7 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
 
     private suspend fun fetchWord(hanzi: String): AnnotatedChineseWord? {
         Log.d("DisplayOCRFragment", "Searching for $hanzi")
-        val db = ChineseWordsDatabase.getInstance(requireContext())
+        val db = ChineseWordsDatabase.getInstance()
         val dao = db.annotatedChineseWordDAO()
         try {
             val word = dao.getFromSimplified(hanzi)

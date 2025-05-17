@@ -138,11 +138,11 @@ class Utils {
 
             workMgr.enqueue(speechRequest)
 
-            incrementConsultedWord(context, word)
+            incrementConsultedWord(word)
         }
 
-        fun incrementConsultedWord(context: Context, word: String) {
-            val db = ChineseWordsDatabase.getInstance(context)
+        fun incrementConsultedWord(word: String) {
+            val db = ChineseWordsDatabase.getInstance()
             val frequencyWordsRepo = ChineseWordFrequencyRepo(
                 db.chineseWordFrequencyDAO(),
                 db.annotatedChineseWordDAO()
@@ -350,7 +350,7 @@ class Utils {
                 Toast.LENGTH_SHORT
             ).show()
 
-            incrementConsultedWord(context, s)
+            incrementConsultedWord(s)
         }
 
         /**

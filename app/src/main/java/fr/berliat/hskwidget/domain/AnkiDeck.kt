@@ -17,7 +17,7 @@ class AnkiDeck private constructor(private val context: Context,
     internal suspend fun setAnkiId(newAnkiId: Long) {
         _ankiId = newAnkiId
 
-        ChineseWordsDatabase.getInstance(context).wordListDAO()
+        ChineseWordsDatabase.getInstance().wordListDAO()
             .updateAnkiDeckId(wordList.id, newAnkiId)
     }
 
@@ -39,7 +39,7 @@ class AnkiDeck private constructor(private val context: Context,
             val decks = store.api.getDeckList()?: emptyMap()
 
             if (deck.ankiId == WordList.ANKI_ID_EMPTY || decks.none { it.key == deck.ankiId }) {
-                var ankiDeckId = 0L
+                var ankiDeckId : Long
                 // So deckId is non-existent or a goner. Let's piggy back by name given we have a prefix
                 val sameNameDeck = decks.filterValues { it == deck.getAnkiDeckName() }
                 if (sameNameDeck.isNotEmpty()) {

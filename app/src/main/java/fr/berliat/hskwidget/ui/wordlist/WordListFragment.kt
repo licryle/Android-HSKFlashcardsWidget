@@ -45,7 +45,7 @@ class WordListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel = WordListViewModel(requireContext(), ankiDelegate.wordListRepo)
+        viewModel = WordListViewModel(ankiDelegate.wordListRepo)
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.wordListRecyclerView)
         adapter = WordListAdapter(
