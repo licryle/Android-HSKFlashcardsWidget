@@ -23,6 +23,9 @@ interface WordListDAO {
     @Query("$wordlist_with_count WHERE listType = 'SYSTEM' $wordlist_with_count_groupby")
     suspend fun getSystemLists(): List<WordListWithCount>
 
+    @Query("$wordlist_with_count WHERE listType = 'USER' $wordlist_with_count_groupby")
+    suspend fun getUserLists(): List<WordListWithCount>
+
     @Query("$wordlist_with_count $wordlist_with_count_groupby ORDER BY lastModified DESC")
     suspend fun getAllLists(): List<WordListWithCount>
 

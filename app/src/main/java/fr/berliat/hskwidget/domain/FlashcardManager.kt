@@ -18,17 +18,19 @@ import kotlinx.coroutines.withContext
 
 class FlashcardManager private constructor(private val context: Context,
                                            private val widgetId: Int) {
-    private val dict = ChineseWordsDatabase.getInstance().chineseWordDAO()
     private val fragments = mutableMapOf<Int, MutableSet<FlashcardFragment>>()
     private val flashCardPrefs = getPreferenceStore()
     private val appWidgetMgr = AppWidgetManager.getInstance(context)
+
+
+    private suspend fun ChineseWordDAO() = ChineseWordsDatabase.getInstance(context).chineseWordDAO()
 
     fun getPreferenceStore(): FlashcardPreferencesStore {
         return FlashcardPreferencesStore(context, widgetId)
     }
 
     suspend fun getCurrentWord() : ChineseWord {
-        var currentWord = dict.findWordFromSimplified(flashCardPrefs.currentSimplified)
+        var currentWord = ChineseWordDAO().findWordFromSimplified(flashCardPrefs.currentSimplified)
 
         if (currentWord == null) currentWord = Utils.getDefaultWord(context)
 
@@ -36,9 +38,9 @@ class FlashcardManager private constructor(private val context: Context,
     }
 
     suspend fun getNewWord(): ChineseWord {
-        val currentWord = dict.findWordFromSimplified(flashCardPrefs.currentSimplified)
+        val currentWord = ChineseWordDAO().findWordFromSimplified(flashCardPrefs.currentSimplified)
 
-        var newWord = dict.getRandomHSKWord(flashCardPrefs.getAllowedHSK(), setOf(currentWord!!))
+        var newWord = ChineseWordDAO().getRandomHSKWord(flashCardPrefs.getAllowedHSK(), setOf(currentWord!!))
 
         if (newWord == null) newWord = Utils.getDefaultWord(context)
 

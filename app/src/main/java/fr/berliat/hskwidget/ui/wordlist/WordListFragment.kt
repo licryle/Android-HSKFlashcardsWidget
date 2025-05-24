@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.DiffUtil
@@ -19,8 +18,6 @@ import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.model.WordList
 import fr.berliat.hskwidget.data.model.WordListWithCount
 import fr.berliat.hskwidget.ui.utils.AnkiDelegate
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -61,20 +58,26 @@ class WordListFragment : Fragment() {
             showCreateListDialog()
         }
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.wordLists.collectLatest { lists ->
-                adapter.submitList(lists)
-            }
-        }
+        refreshLists()
+    }
+
+    private fun refreshLists() {
+        viewModel.getAllLists { wordLists, _ -> adapter.submitList(wordLists) }
     }
 
     private fun showRenameDialog(list: WordListWithCount) {
-        WordListReNameDialog.newInstance(listId = list.id, listName = list.name)
-            .show(parentFragmentManager, "RenameListDialog")
+        val dialog = WordListReNameDialog.newInstance(listId = list.id, listName = list.name) {
+            _, _ -> refreshLists()
+        }
+
+        dialog.show(parentFragmentManager, "RenameListDialog")
     }
 
     private fun showCreateListDialog() {
-        val dialog = WordListReNameDialog()
+        val dialog = WordListReNameDialog { _, _ ->
+            refreshLists()
+        }
+
         dialog.show(childFragmentManager, "CreateListDialog")
     }
 
@@ -83,7 +86,9 @@ class WordListFragment : Fragment() {
             .setTitle(R.string.wordlist_delete_button)
             .setMessage(getString(R.string.wordlist_delete_confirmation, list.name))
             .setPositiveButton(R.string.wordlist_delete_button) { _, _ ->
-                viewModel.deleteList(list.wordList)
+                viewModel.deleteList(list.wordList, callback = { _ ->
+                    refreshLists()
+                })
             }
             .setNegativeButton(R.string.cancel, null)
             .show()

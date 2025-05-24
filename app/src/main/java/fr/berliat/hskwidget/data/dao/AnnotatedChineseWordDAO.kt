@@ -6,7 +6,7 @@ import androidx.room.Query
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWordAnnotation
 
-data class AnnotatedChineseWord(
+data class AnnotatedChineseWord (
     @Embedded val word: ChineseWord?,
     @Embedded val annotation: ChineseWordAnnotation?) {
 

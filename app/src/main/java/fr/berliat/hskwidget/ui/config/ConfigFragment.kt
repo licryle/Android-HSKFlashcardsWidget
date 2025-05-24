@@ -1,6 +1,5 @@
 package fr.berliat.hskwidget.ui.config
 
-import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -13,9 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import fr.berliat.hskwidget.R
-import fr.berliat.hskwidget.data.dao.ChineseWordAnnotationDAO
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
-import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.databinding.FragmentConfigBinding
 import fr.berliat.hskwidget.domain.DatabaseBackup
 import fr.berliat.hskwidget.domain.DatabaseBackupCallbacks
@@ -29,15 +26,11 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
     private lateinit var binding: FragmentConfigBinding
     private lateinit var appConfig: AppPreferencesStore
     private lateinit var databaseBackup : DatabaseBackup
-    private lateinit var annotationDAO: ChineseWordAnnotationDAO
-    private lateinit var appContext: Context
     private lateinit var ankiDelegate: AnkiDelegate
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         databaseBackup = DatabaseBackup(this, requireContext(), this)
-        annotationDAO = ChineseWordsDatabase.getInstance().chineseWordAnnotationDAO()
-        appContext = requireContext().applicationContext
 
         ankiDelegate = AnkiDelegate(this)
     }

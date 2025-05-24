@@ -98,7 +98,7 @@ class DatabaseBackup(comp: ActivityResultCaller,
 
         // Impoooort
         Log.d(TAG, "Starting to import Annotations to local DB")
-        val localDb = ChineseWordsDatabase.getInstance()
+        val localDb = ChineseWordsDatabase.getInstance(context)
         localDb.chineseWordAnnotationDAO().deleteAll()
         localDb.chineseWordAnnotationDAO().insertAll(importedAnnotations)
 

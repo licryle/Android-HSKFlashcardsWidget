@@ -35,8 +35,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import androidx.lifecycle.lifecycleScope
-import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 
 class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
     companion object {
@@ -54,10 +52,6 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        lifecycleScope.launch {
-            ChineseWordsDatabase.init(applicationContext)
-        }
 
         setupSharedViewModel()
 

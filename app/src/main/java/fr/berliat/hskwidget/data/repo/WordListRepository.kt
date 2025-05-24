@@ -5,7 +5,6 @@ import android.util.Log
 import fr.berliat.hskwidget.data.dao.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.WordList
 import fr.berliat.hskwidget.data.model.WordListEntry
-import fr.berliat.hskwidget.data.model.WordListWithCount
 import fr.berliat.hskwidget.data.store.AnkiStore
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.domain.AnkiDeck
@@ -43,10 +42,10 @@ import kotlinx.coroutines.flow.SharedFlow
  * element you change/delete.
  */
 class WordListRepository(private val context: Context) {
-    private val database = ChineseWordsDatabase.getInstance()
     private val ankiStore = AnkiStore(context)
-    private val wordListDAO = database.wordListDAO()
-    private var _cachedSystemLists: List<WordListWithCount>? = null
+
+    private suspend fun wordListDAO() = ChineseWordsDatabase.getInstance(context).wordListDAO()
+    private suspend fun annotatedChineseWordDAO() = ChineseWordsDatabase.getInstance(context).annotatedChineseWordDAO()
 
     protected val _uiEvents = MutableSharedFlow<UiEvent>(
         replay = 0,
@@ -60,20 +59,18 @@ class WordListRepository(private val context: Context) {
     }
 
     /****** NOT TOUCHING ANKI *******/
-    suspend fun getSystemLists(): List<WordListWithCount> {
-        if (_cachedSystemLists == null) {
-            _cachedSystemLists = database.wordListDAO().getSystemLists()
-        }
-        return _cachedSystemLists!!
-    }
+    suspend fun getAllLists() = wordListDAO().getAllLists()
+    suspend fun getSystemLists() = wordListDAO().getSystemLists()
+    suspend fun getUserLists() = wordListDAO().getUserLists()
+    suspend fun getWordListsForWord(wordId: String) = wordListDAO().getWordListsForWord(wordId)
 
     suspend fun isWordInList(wordList: WordList, simplified: String) : Boolean {
-        val existingEntries = database.wordListDAO().getEntriesForWord(simplified)
+        val existingEntries = wordListDAO().getEntriesForWord(simplified)
         return (existingEntries.filter { it.listId == wordList.id }.isNotEmpty())
     }
 
     suspend fun isNameUnique(name: String, excludeId: Long = 0): Boolean {
-        return wordListDAO.countByName(name, excludeId) == 0
+        return wordListDAO().countByName(name, excludeId) == 0
     }
 
     suspend fun createList(name: String) {
@@ -83,7 +80,7 @@ class WordListRepository(private val context: Context) {
             throw Exception("A word list with this name already exists")
         }
 
-        wordListDAO.insertList(list)
+        wordListDAO().insertList(list)
     }
 
     suspend fun renameList(id: Long, newName: String) {
@@ -91,17 +88,17 @@ class WordListRepository(private val context: Context) {
             throw Exception("A word list with this name already exists")
         }
 
-        wordListDAO.renameList(id, newName)
-        wordListDAO.touchList(id)
+        wordListDAO().renameList(id, newName)
+        wordListDAO().touchList(id)
     }
 
     /****** ANKI ALTERING METHODS *******/
     suspend fun syncListsToAnki(): (suspend () -> Result<Unit>)? {
-        val lists = wordListDAO.getAllLists()
-        val entries = wordListDAO.getAllListEntries()
+        val lists = wordListDAO().getAllLists()
+        val entries = wordListDAO().getAllListEntries()
 
         val wordList = entries.map { it.simplified }
-        val annotatedChineseWords = database.annotatedChineseWordDAO().getFromSimplified(wordList)
+        val annotatedChineseWords = annotatedChineseWordDAO().getFromSimplified(wordList)
         val words = annotatedChineseWords.associateBy { it.simplified }
 
         if (lists.isEmpty() || entries.isEmpty() || words.isEmpty()) return null
@@ -167,19 +164,19 @@ class WordListRepository(private val context: Context) {
 
     suspend fun updateWordListAssociations(simplified: String, listIds: List<Long>): (suspend () -> Result<Unit>)? {
         // First remove all existing associations for this word
-        val entries = wordListDAO.getEntriesForWord(simplified)
+        val entries = wordListDAO().getEntriesForWord(simplified)
 
         val toDelete = entries.filter { ! listIds.contains(it.listId)  }
         val toAdd = listIds.filter { id -> entries.none { it.listId == id }  }
 
         // Then add new associations
         toAdd.forEach { listId ->
-            wordListDAO.addWordToList(WordListEntry(listId, simplified))
-            wordListDAO.touchList(listId)
+            wordListDAO().addWordToList(WordListEntry(listId, simplified))
+            wordListDAO().touchList(listId)
         }
 
         toDelete.forEach{ entry ->
-            wordListDAO.deleteWordFromList(entry.listId, simplified)
+            wordListDAO().deleteWordFromList(entry.listId, simplified)
         }
 
         return suspend { // Now do the Anki bidding by removing notes from entries
@@ -190,9 +187,9 @@ class WordListRepository(private val context: Context) {
                 }
             }
 
-            val annotatedWord = database.annotatedChineseWordDAO().getFromSimplified(simplified)!!
+            val annotatedWord = annotatedChineseWordDAO().getFromSimplified(simplified)!!
             for (toA in toAdd) {
-                val deck = AnkiDeck.getOrCreate(context, ankiStore, wordListDAO.getListById(toA)!!.wordList)
+                val deck = AnkiDeck.getOrCreate(context, ankiStore, wordListDAO().getListById(toA)!!.wordList)
                 val entry = WordListEntry(toA, simplified)
                 if (ankiStore.importOrUpdateCard(deck, entry, annotatedWord) == null) {
                     nbErrors += 1
@@ -209,12 +206,12 @@ class WordListRepository(private val context: Context) {
     }
 
     suspend fun deleteList(list: WordList): (suspend () -> Result<Unit>)? {
-        val entries = wordListDAO.getListEntries(list.id)
-        wordListDAO.deleteList(list)
+        val entries = wordListDAO().getListEntries(list.id)
+        wordListDAO().deleteList(list)
 
         if (entries.isEmpty()) return null
 
-        wordListDAO.deleteAllFromList(list.id)
+        wordListDAO().deleteAllFromList(list.id)
 
         return suspend {
             var nbErrors = 0
@@ -234,12 +231,12 @@ class WordListRepository(private val context: Context) {
     }
 
     suspend fun insertWordToList(wordList: WordList, word: AnnotatedChineseWord): (suspend () -> Result<Unit>)? {
-        val entries = wordListDAO.getEntriesForWord(word.simplified)
+        val entries = wordListDAO().getEntriesForWord(word.simplified)
         var entry = entries.find { it.listId == wordList.id }
 
         if (entry == null) {
             entry = WordListEntry(wordList.id, word.simplified)
-            wordListDAO.insertWordToList(entry)
+            wordListDAO().insertWordToList(entry)
         }
 
         if (entry.ankiNoteId != WordList.ANKI_ID_EMPTY) {
@@ -260,11 +257,11 @@ class WordListRepository(private val context: Context) {
     suspend fun removeWordFromList(wordList: WordList, simplified: String): (suspend () -> Result<Unit>)? {
         if (!isWordInList(wordList, simplified)) return null
 
-        val entries = wordListDAO.getEntriesForWord(simplified)
+        val entries = wordListDAO().getEntriesForWord(simplified)
         val entry = entries.find { it.listId == wordList.id }
 
         // Checked on first list of function
-        wordListDAO.deleteWordFromList(entry!!.listId, entry.simplified)
+        wordListDAO().deleteWordFromList(entry!!.listId, entry.simplified)
 
         return suspend { // Will execute only if Anki integration is active, allowed and ready to fire
             if (ankiStore.deleteCard(entry)) {
@@ -278,11 +275,11 @@ class WordListRepository(private val context: Context) {
     }
 
     suspend fun removeWordFromAllLists(simplified: String): (suspend () -> Result<Unit>)? {
-        if (wordListDAO.getEntriesForWord(simplified).isEmpty()) return null
+        if (wordListDAO().getEntriesForWord(simplified).isEmpty()) return null
 
         // saving entries for callback before deleting in DB
-        val entries = wordListDAO.getEntriesForWord(simplified)
-        wordListDAO.removeWordFromAllLists(simplified)
+        val entries = wordListDAO().getEntriesForWord(simplified)
+        wordListDAO().removeWordFromAllLists(simplified)
 
         return suspend { // Will execute only if Anki integration is active, allowed and ready to fire
             var nbErrors = 0
@@ -303,12 +300,12 @@ class WordListRepository(private val context: Context) {
     }
 
     suspend fun addWordToList(wordList: WordList, word: AnnotatedChineseWord): (suspend () -> Result<Unit>)? {
-        var entry = wordListDAO.getEntriesForWord(word.simplified).find { it.listId == wordList.id }
+        var entry = wordListDAO().getEntriesForWord(word.simplified).find { it.listId == wordList.id }
 
         if (entry == null) {
             entry = WordListEntry(wordList.id, word.simplified)
-            wordListDAO.addWordToList(entry)
-            wordListDAO.touchList(wordList.id)
+            wordListDAO().addWordToList(entry)
+            wordListDAO().touchList(wordList.id)
         }
 
         // Anki now
@@ -341,19 +338,19 @@ class WordListRepository(private val context: Context) {
         val annotList = wordList.find { it.name == WordList.SYSTEM_ANNOTATED_NAME }
         if (annotList == null) return false
 
-        return wordListDAO.touchList(annotList.id) > 0
+        return wordListDAO().touchList(annotList.id) > 0
     }
 
     suspend fun updateInAllLists(simplified: String): (suspend () -> Result<Unit>)? {
-        if (database.wordListDAO().getEntriesForWord(simplified).isEmpty()) return null
+        if (wordListDAO().getEntriesForWord(simplified).isEmpty()) return null
 
         return suspend { // Will execute only if Anki integration is active, allowed and ready to fire
-            val entries = database.wordListDAO().getEntriesForWord(simplified)
+            val entries = wordListDAO().getEntriesForWord(simplified)
 
             var nbErrors = 0
             for (entry in entries) {
-                val wordList = database.wordListDAO().getListById(entry.listId)
-                val word = database.annotatedChineseWordDAO().getFromSimplified(simplified)
+                val wordList = wordListDAO().getListById(entry.listId)
+                val word = annotatedChineseWordDAO().getFromSimplified(simplified)
 
                 if (wordList == null || word == null) {
                     nbErrors += 1

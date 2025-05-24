@@ -20,6 +20,7 @@ import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.domain.Utils.Companion.copyToClipBoard
 import fr.berliat.hskwidget.domain.Utils.Companion.playWordInBackground
 import fr.berliat.hskwidget.ui.utils.AnkiDelegate
+import java.time.Instant
 import java.util.Date
 
 
@@ -45,7 +46,7 @@ class AnnotateFragment: Fragment() {
     ): View {
         binding = FragmentAnnotationEditBinding.inflate(inflater, container, false)
 
-        annotateViewModel = AnnotateViewModel(ankiDelegate.wordListRepo)
+        annotateViewModel = AnnotateViewModel(requireContext(), ankiDelegate.wordListRepo)
         annotateViewModel.annotatedWord.observe(viewLifecycleOwner) { word ->
             updateUI(word)
         }
@@ -163,7 +164,7 @@ class AnnotateFragment: Fragment() {
     private fun onSaveClick() {            // Save the updated annotation fields
         var firstSeen = annotateViewModel.annotatedWord.value?.annotation?.firstSeen
         if (firstSeen == null)
-            firstSeen = Date()
+            firstSeen = Date(Instant.now().toEpochMilli())
 
         val updatedAnnotation = ChineseWordAnnotation(
             simplified = annotateViewModel.simplified.trim(),
@@ -179,7 +180,7 @@ class AnnotateFragment: Fragment() {
         val annotatedWord = AnnotatedChineseWord(annotateViewModel.annotatedWord.value!!.word, updatedAnnotation)
         annotateViewModel.updateAnnotation(annotatedWord) { err -> handleIOResult(ACTION.UPDATE, err) }
 
-        Utils.incrementConsultedWord(annotateViewModel.simplified)
+        Utils.incrementConsultedWord(requireContext(), annotateViewModel.simplified)
 
         if (annotatedWord.hasAnnotation()) {
             AppPreferencesStore(requireContext()).lastAnnotatedClassType = updatedAnnotation.classType!!

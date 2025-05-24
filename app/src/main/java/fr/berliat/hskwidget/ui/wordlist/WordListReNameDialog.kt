@@ -10,7 +10,8 @@ import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.repo.WordListRepository
 import fr.berliat.hskwidget.databinding.FragmentWordlistDialogCreateListBinding
 
-class WordListReNameDialog : DialogFragment() {
+class WordListReNameDialog(
+    private val onReNameResult: (success: Boolean, newName: String?) -> Unit) : DialogFragment() {
     private lateinit var binding: FragmentWordlistDialogCreateListBinding
     private lateinit var viewModel: WordListViewModel
 
@@ -18,12 +19,13 @@ class WordListReNameDialog : DialogFragment() {
         private const val ARG_LIST_ID = "list_id"
         private const val ARG_LIST_NAME = "list_name"
 
-        fun newInstance(listId: Long?, listName: String?): WordListReNameDialog {
+        fun newInstance(listId: Long?, listName: String?,
+                        onReNameResult: (success: Boolean, newName: String?) -> Unit): WordListReNameDialog {
             val args = Bundle().apply {
                 listId?.let { putLong(ARG_LIST_ID, it) }
                 listName?.let { putString(ARG_LIST_NAME, it) }
             }
-            return WordListReNameDialog().apply {
+            return WordListReNameDialog(onReNameResult).apply {
                 arguments = args
             }
         }
@@ -56,7 +58,10 @@ class WordListReNameDialog : DialogFragment() {
             binding.createButton.text = getString(R.string.wordlist_rename_button)
         }
 
-        binding.cancelButton.setOnClickListener { dismiss() }
+        binding.cancelButton.setOnClickListener {
+            dismiss()
+            onReNameResult(false, null)
+        }
 
         binding.createButton.setOnClickListener {
             val name = binding.listNameInput.text.toString().trim()
@@ -64,6 +69,7 @@ class WordListReNameDialog : DialogFragment() {
                 if (listId != null) {
                     viewModel.renameList(listId, name) { err ->
                         if (err == null) {
+                            onReNameResult(true, name)
                             dismiss()
                         } else {
                             Toast.makeText(context, getString(R.string.wordlist_list_name_dupe), Toast.LENGTH_LONG).show()
@@ -72,6 +78,7 @@ class WordListReNameDialog : DialogFragment() {
                 } else {
                     viewModel.createList(name) { err ->
                         if (err == null) {
+                            onReNameResult(true, name)
                             dismiss()
                         } else {
                             Toast.makeText(context, getString(R.string.wordlist_list_name_dupe), Toast.LENGTH_LONG).show()

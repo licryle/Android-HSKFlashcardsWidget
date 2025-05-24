@@ -1,11 +1,10 @@
 package fr.berliat.hskwidget.ui.dictionary
 
+import android.content.Context
 import android.os.Bundle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import fr.berliat.hskwidget.data.dao.AnnotatedChineseWord
-import fr.berliat.hskwidget.data.dao.AnnotatedChineseWordDAO
-import fr.berliat.hskwidget.data.dao.ChineseWordAnnotationDAO
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWordAnnotation
 import fr.berliat.hskwidget.data.repo.WordListRepository
@@ -15,16 +14,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class AnnotateViewModel(val wordListRepo: WordListRepository) {
+class AnnotateViewModel(val context: Context, val wordListRepo: WordListRepository) {
     private val viewModelScope = CoroutineScope(Dispatchers.Main)
 
-    private val annotatedWordsDAO: AnnotatedChineseWordDAO =
-        ChineseWordsDatabase.getInstance().annotatedChineseWordDAO()
-    private val annotationDAO: ChineseWordAnnotationDAO =
-        ChineseWordsDatabase.getInstance().chineseWordAnnotationDAO()
     private val _annotatedWord = MutableLiveData<AnnotatedChineseWord>()
     val annotatedWord: LiveData<AnnotatedChineseWord> get() = _annotatedWord
     val simplified: String get() = _annotatedWord.value?.simplified ?: ""
+
+    private suspend fun database() = ChineseWordsDatabase.getInstance(context)
 
     // Fetch annotated word for a given simplified word
     fun fetchAnnotatedWord(arguments: Bundle?) {
@@ -39,7 +36,7 @@ class AnnotateViewModel(val wordListRepo: WordListRepository) {
     }
 
     suspend fun getAnnotatedChineseWord(simplifiedWord: String): AnnotatedChineseWord {
-        val annot = annotatedWordsDAO.getFromSimplified(simplifiedWord)
+        val annot = database().annotatedChineseWordDAO().getFromSimplified(simplifiedWord)
         return if (annot == null || !annot.hasAnnotation()) {
             AnnotatedChineseWord(
                 annot?.word ?: ChineseWord.getBlank(simplifiedWord),
@@ -55,7 +52,7 @@ class AnnotateViewModel(val wordListRepo: WordListRepository) {
         viewModelScope.launch {
             var error: Exception? = null
             try {
-                annotationDAO.insertOrUpdate(annotatedWord.annotation!!)
+                database().chineseWordAnnotationDAO().insertOrUpdate(annotatedWord.annotation!!)
                 _annotatedWord.value = AnnotatedChineseWord(_annotatedWord.value!!.word, annotatedWord.annotation)
 
                 wordListRepo.delegateToAnki(wordListRepo.addWordToSysAnnotatedList(annotatedWord))
@@ -74,7 +71,7 @@ class AnnotateViewModel(val wordListRepo: WordListRepository) {
         viewModelScope.launch {
             var error: Exception? = null
             try {
-                val nbRowAffected = annotationDAO.deleteBySimplified(annotatedWord.value!!.simplified)
+                val nbRowAffected = database().chineseWordAnnotationDAO().deleteBySimplified(annotatedWord.value!!.simplified)
                 if (nbRowAffected == 0) throw Exception("No records deleted")
 
                 wordListRepo.touchAnnotatedList()

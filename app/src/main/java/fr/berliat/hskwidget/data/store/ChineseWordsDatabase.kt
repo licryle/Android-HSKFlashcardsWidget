@@ -3,17 +3,15 @@ package fr.berliat.hskwidget.data.store
 import android.content.Context
 import android.util.Log
 import androidx.room.AutoMigration
-
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-
 import fr.berliat.hskwidget.data.dao.AnnotatedChineseWordDAO
-import fr.berliat.hskwidget.data.dao.ChineseWordDAO
 import fr.berliat.hskwidget.data.dao.ChineseWordAnnotationDAO
+import fr.berliat.hskwidget.data.dao.ChineseWordDAO
 import fr.berliat.hskwidget.data.dao.ChineseWordFrequencyDAO
 import fr.berliat.hskwidget.data.dao.WordListDAO
 import fr.berliat.hskwidget.data.model.ChineseWord
@@ -23,10 +21,8 @@ import fr.berliat.hskwidget.data.model.WordList
 import fr.berliat.hskwidget.data.model.WordListEntry
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-
 import java.io.File
 import java.time.Instant
-
 import java.util.concurrent.Executors
 
 
@@ -55,6 +51,19 @@ abstract class ChineseWordsDatabase : RoomDatabase() {
     abstract fun wordListDAO(): WordListDAO
 
     companion object {
+        suspend fun getInstance(context: Context): ChineseWordsDatabase {
+            INSTANCE?.let { return it }
+
+            return mutex.withLock {
+                INSTANCE?.let { return it }
+
+                val instance = buildDatabase(context)
+
+                INSTANCE = instance
+                instance
+            }
+        }
+
         const val TAG = "ChineseWordsDatabase"
 
         @Volatile
@@ -277,20 +286,6 @@ abstract class ChineseWordsDatabase : RoomDatabase() {
                 db.execSQL("ALTER TABLE ChineseWord ADD COLUMN type TEXT DEFAULT 'N/A' CHECK(type IN ('NOUN', 'VERB', 'ADJECTIVE', 'ADVERB', 'CONJUNCTION', 'PREPOSITION', 'INTERJECTION', 'IDIOM', 'N/A'))")
                 db.execSQL("ALTER TABLE ChineseWord ADD COLUMN synonyms TEXT DEFAULT ''")
                 db.execSQL("ALTER TABLE ChineseWord ADD COLUMN antonym TEXT DEFAULT ''")
-            }
-        }
-
-        fun getInstance(): ChineseWordsDatabase {
-            return INSTANCE ?: throw IllegalStateException("Database not initialized yet")
-        }
-
-        suspend fun init(context: Context) {
-            if (INSTANCE == null) {
-                mutex.withLock {
-                    if (INSTANCE == null) {
-                        INSTANCE = buildDatabase(context.applicationContext)
-                    }
-                }
             }
         }
 

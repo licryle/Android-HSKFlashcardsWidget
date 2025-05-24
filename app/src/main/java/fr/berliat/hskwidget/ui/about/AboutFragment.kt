@@ -50,11 +50,11 @@ class AboutFragment : Fragment() {
     @SuppressLint("StringFormatMatches")
     private fun fetchAndDisplayStats() {
         Log.d("AboutFragment", "fetching stats")
-        val db = ChineseWordsDatabase.getInstance()
-        val words = db.chineseWordDAO()
-        val annotations = db.chineseWordAnnotationDAO()
 
         viewLifecycleOwner.lifecycleScope.launch {
+            val db = ChineseWordsDatabase.getInstance(requireContext())
+            val words = db.chineseWordDAO()
+            val annotations = db.chineseWordAnnotationDAO()
             // Here we executed in the coRoutine Scope
             val wordsCnt = words.getCount()
             val annotationsCnt = annotations.getCount()

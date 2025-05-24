@@ -3,26 +3,51 @@ package fr.berliat.hskwidget.ui.wordlist
 import fr.berliat.hskwidget.data.model.WordList
 import fr.berliat.hskwidget.data.model.WordListWithCount
 import fr.berliat.hskwidget.data.repo.WordListRepository
-import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 
 class WordListViewModel(val wordListRepo: WordListRepository) {
-    private val wordListDao = ChineseWordsDatabase.getInstance().wordListDAO()
     private val viewModelScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
-    val wordLists = wordListDao.getAllListsFlow()
 
-    fun userWordLists(): Flow<List<WordListWithCount>> {
-        return wordLists.map { list ->
-            list.filter { it.listType == WordList.ListType.USER }
+    fun getUserWordLists(callback: (List<WordListWithCount>, Exception?) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val result = withContext(Dispatchers.IO) {
+                    wordListRepo.getUserLists()
+                }
+                callback(result, null)
+            } catch (e: Exception) {
+                callback(emptyList(), e)
+            }
         }
     }
 
-    fun getWordListsForWord(wordId: String): Flow<List<WordListWithCount>> {
-        return wordListDao.getWordListsForWordFlow(wordId)
+    fun getAllLists(callback: (List<WordListWithCount>, Exception?) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val result = withContext(Dispatchers.IO) {
+                    wordListRepo.getAllLists()
+                }
+                callback(result, null)
+            } catch (e: Exception) {
+                callback(emptyList(), e)
+            }
+        }
     }
+
+    fun getWordListsForWord(wordId: String, callback: (List<WordListWithCount>, Exception?) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val result = withContext(Dispatchers.IO) {
+                    wordListRepo.getWordListsForWord(wordId)
+                }
+                callback(result, null) // already on Main
+            } catch (e: Exception) {
+                callback(emptyList(), e)
+            }
+        }
+    }
+
 
     fun createList(name: String, callback: (Exception?) -> Unit) {
         launchSafe(callback) {
@@ -30,8 +55,8 @@ class WordListViewModel(val wordListRepo: WordListRepository) {
         }
     }
 
-    fun deleteList(list: WordList) {
-        viewModelScope.launch {
+    fun deleteList(list: WordList, callback: (Exception?) -> Unit) {
+        launchSafe(callback) {
             wordListRepo.delegateToAnki(wordListRepo.deleteList(list))
         }
     }
@@ -54,7 +79,9 @@ class WordListViewModel(val wordListRepo: WordListRepository) {
         viewModelScope.launch {
             var error: Exception? = null
             try {
-                block()
+                val result = withContext(Dispatchers.IO) {
+                    block()
+                }
             } catch (e: Exception) {
                 error = e
             }

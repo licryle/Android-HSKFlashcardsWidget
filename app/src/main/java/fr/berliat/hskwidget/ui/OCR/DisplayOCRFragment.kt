@@ -43,7 +43,13 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
     private lateinit var segmenter: HSKTextView.HSKTextSegmenter
     private lateinit var viewModel: DisplayOCRViewModel
 
-    private lateinit var frequencyWordsRepo: ChineseWordFrequencyRepo
+    private suspend fun frequencyWordsRepo(): ChineseWordFrequencyRepo {
+        val db = ChineseWordsDatabase.getInstance(requireContext())
+        return ChineseWordFrequencyRepo(
+            db.chineseWordFrequencyDAO(),
+            db.annotatedChineseWordDAO()
+        )
+    }
 
     private var isProcessing = false
 
@@ -55,12 +61,6 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
         super.onCreate(savedInstanceState)
         segmenter = SharedViewModel.getInstance(this).segmenter
         viewModel = ViewModelProvider(this)[DisplayOCRViewModel::class.java]
-
-        val db = ChineseWordsDatabase.getInstance()
-        frequencyWordsRepo = ChineseWordFrequencyRepo(
-            db.chineseWordFrequencyDAO(),
-            db.annotatedChineseWordDAO()
-        )
 
         if (requireActivity().javaClass.simpleName == "MainActivity") {
             (requireActivity() as MainActivity).setOCRReminderVisible()
@@ -253,7 +253,7 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
 
     private suspend fun fetchWord(hanzi: String): AnnotatedChineseWord? {
         Log.d("DisplayOCRFragment", "Searching for $hanzi")
-        val db = ChineseWordsDatabase.getInstance()
+        val db = ChineseWordsDatabase.getInstance(requireContext())
         val dao = db.annotatedChineseWordDAO()
         try {
             val word = dao.getFromSimplified(hanzi)
@@ -296,7 +296,7 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
 
         lifecycle.coroutineScope.launch {
             Log.d(TAG, "Augmenting Consulted Count for ${word.hanziText} by 1, if word exists")
-            frequencyWordsRepo.incrementConsulted(word.hanziText)
+            frequencyWordsRepo().incrementConsulted(word.hanziText)
         }
     }
 
@@ -339,7 +339,7 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
         lifecycle.coroutineScope.launch {
             val wordFreq = viewBinding.ocrDisplayText.wordsFrequency
             Log.d(TAG, "Augmenting Appeared Count for ${wordFreq.size} words (if they exist): $wordFreq")
-            frequencyWordsRepo.incrementAppeared(wordFreq)
+            frequencyWordsRepo().incrementAppeared(wordFreq)
         }
     }
 

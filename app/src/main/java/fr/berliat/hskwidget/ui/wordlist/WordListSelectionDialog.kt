@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import fr.berliat.hskwidget.R
@@ -14,7 +13,6 @@ import fr.berliat.hskwidget.data.model.WordListWithCount
 import fr.berliat.hskwidget.databinding.FragmentWordlistDialogSelectItemBinding
 import fr.berliat.hskwidget.databinding.FragmentWordlistDialogSelectListsBinding
 import fr.berliat.hskwidget.ui.utils.AnkiDelegate
-import kotlinx.coroutines.launch
 
 class WordListSelectionDialog : DialogFragment() {
     private lateinit var binding: FragmentWordlistDialogSelectListsBinding
@@ -76,20 +74,17 @@ class WordListSelectionDialog : DialogFragment() {
     }
 
     private fun loadData() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            // Load current word lists for this word
-            viewModel.getWordListsForWord(wordId!!).collect { currentLists ->
+        viewModel.getWordListsForWord(wordId!!) { currentLists, _ ->
                 // Load all word lists
-                viewModel.userWordLists().collect { allLists ->
+                viewModel.getUserWordLists() { allLists, _ ->
                     adapter.submitList(allLists)
                     adapter.setSelectedLists(currentLists.map { it.wordList.id })
                 }
-            }
         }
     }
 
     private fun showCreateListDialog() {
-        val dialog = WordListReNameDialog()
+        val dialog = WordListReNameDialog() { _, _ -> }
         dialog.show(childFragmentManager, "CreateListDialog")
     }
 

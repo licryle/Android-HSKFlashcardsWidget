@@ -139,17 +139,17 @@ class Utils {
 
             workMgr.enqueue(speechRequest)
 
-            incrementConsultedWord(word)
+            incrementConsultedWord(context, word)
         }
 
-        fun incrementConsultedWord(word: String) {
-            val db = ChineseWordsDatabase.getInstance()
-            val frequencyWordsRepo = ChineseWordFrequencyRepo(
-                db.chineseWordFrequencyDAO(),
-                db.annotatedChineseWordDAO()
-            )
-
+        fun incrementConsultedWord(context: Context, word: String) {
             GlobalScope.launch {
+                val db = ChineseWordsDatabase.getInstance(context)
+                val frequencyWordsRepo = ChineseWordFrequencyRepo(
+                    db.chineseWordFrequencyDAO(),
+                    db.annotatedChineseWordDAO()
+                )
+
                 frequencyWordsRepo.incrementConsulted(word)
             }
         }
@@ -360,7 +360,7 @@ class Utils {
                 Toast.LENGTH_SHORT
             ).show()
 
-            incrementConsultedWord(s)
+            incrementConsultedWord(context, s)
         }
 
         /**
