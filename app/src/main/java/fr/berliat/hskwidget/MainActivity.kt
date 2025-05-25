@@ -108,7 +108,8 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.nav_dictionary, R.id.nav_widgets, R.id.nav_about
+                R.id.nav_dictionary, R.id.nav_widgets, R.id.nav_about, R.id.nav_lists,
+                R.id.nav_ocr_read, R.id.nav_config
             ), drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
