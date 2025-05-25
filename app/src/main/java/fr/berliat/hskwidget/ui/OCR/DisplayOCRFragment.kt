@@ -111,6 +111,31 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
     override fun onResume() {
         super.onResume()
 
+        toggleProcessing(true)
+        viewBinding.ocrDisplayText.text = viewModel.text ?: ""
+
+        if (viewModel.text != "") {
+            // Add Global Layout Listener
+            val globalLayoutListener = object : ViewTreeObserver.OnPreDrawListener {
+                override fun onPreDraw(): Boolean {
+                    // Restore scroll position
+                    if (viewBinding.ocrDisplayText.adapter?.itemCount!! > viewModel.scrollPosition) {
+                        viewBinding.ocrDisplayText.scrollToPosition(viewModel.scrollPosition)
+                        // Remove the listener to prevent multiple calls
+                        viewBinding.ocrDisplayText.viewTreeObserver.removeOnPreDrawListener(this)
+                    }
+
+                    return true // Allow the drawing to proceed
+                }
+            }
+            viewBinding.ocrDisplayText.viewTreeObserver.addOnPreDrawListener(globalLayoutListener)
+
+            viewBinding.ocrDisplayText.clickedWords = viewModel.clickedWords
+            if (viewModel.selectedWord != null) {
+                fetchWordForDisplay(viewModel.selectedWord!!, ::showSelectedWord)
+            }
+        }
+
         Utils.logAnalyticsScreenView(requireContext(), "DisplayOCR")
     }
 
@@ -151,45 +176,21 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
         if (arguments == null) return
 
         val imageUri = requireArguments().getString("imageUri") ?: ""
+        val text = requireArguments().getString("preText") ?: ""
         if (imageUri != "") {
             Log.d(TAG, "processFromArguments: image was provided")
-            viewModel.resetText()
-            viewBinding.ocrDisplayText.text = arguments?.getString("preText") ?: ""
 
-            toggleProcessing(true)
-            viewModel.scrollPosition = 0 // new text, new scroll position
+            viewModel.text = text
 
-            requireArguments().putString("imageUri", "") // consume condition
+            if (text == "")
+                viewModel.resetText()
+
             recognizeText(imageUri.toUri())
-        } else if (viewModel.text != null) {
+        } else if (text != "") {
             Log.d(TAG, "processFromArguments: text was provided")
 
-            toggleProcessing(true)
-
-            // Add Global Layout Listener
-            val globalLayoutListener = object : ViewTreeObserver.OnPreDrawListener {
-                override fun onPreDraw() : Boolean {
-                    // Restore scroll position
-                    if (viewBinding.ocrDisplayText.adapter?.itemCount!! > viewModel.scrollPosition) {
-                        viewBinding.ocrDisplayText.scrollToPosition(viewModel.scrollPosition)
-                        // Remove the listener to prevent multiple calls
-                        viewBinding.ocrDisplayText.viewTreeObserver.removeOnPreDrawListener(this)
-                    }
-
-                    return true // Allow the drawing to proceed
-                }
-            }
-            viewBinding.ocrDisplayText.viewTreeObserver.addOnPreDrawListener(globalLayoutListener)
-
-            viewBinding.ocrDisplayText.clickedWords = viewModel.clickedWords
-            viewBinding.ocrDisplayText.text = viewModel.text!!
-            viewModel.text = null // consume condition
-
-            if (viewModel.selectedWord != null) {
-                fetchWordForDisplay(viewModel.selectedWord!!, ::showSelectedWord)
-            }
-        } else {
-            viewBinding.ocrDisplayText.text = ""
+            viewModel.text = text
+        } else if (text == "" && viewModel.text == "") {
             Toast.makeText(requireContext(), "Oops - nothing to display", Toast.LENGTH_LONG).show()
         }
     }
@@ -244,11 +245,10 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
 
         Log.i(TAG, "Text recognition extracted, moving to display fragment: \n$concatText")
 
-        val incremental = (arguments?.getBoolean("incrementalOCR") ?: "") == true
-        if (incremental)
-            viewBinding.ocrDisplayText.text += concatText
-        else
-            viewBinding.ocrDisplayText.text = concatText
+        if (viewBinding.ocrDisplayText.text != "")
+            concatText = "\n\n" + concatText
+
+        viewBinding.ocrDisplayText.text += concatText
     }
 
     private suspend fun fetchWord(hanzi: String): AnnotatedChineseWord? {

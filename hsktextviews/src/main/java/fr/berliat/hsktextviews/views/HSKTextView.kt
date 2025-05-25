@@ -143,11 +143,12 @@ class HSKTextView @JvmOverloads constructor(
             cleanText = cleanText.replace("(\\n|\\n\\r)".toRegex(), "\n")
 
             originalText = cleanText
+            wordsAdapter.clearData()
 
             if (originalText != "") {
                 listener?.onTextAnalysisStart()
 
-                coroutineScope.launch {
+                coroutineScope.launch(Dispatchers.IO) {
                     Log.d(TAG, "Start parsing")
 
                     val words = mutableListOf<Pair<String, String>>()

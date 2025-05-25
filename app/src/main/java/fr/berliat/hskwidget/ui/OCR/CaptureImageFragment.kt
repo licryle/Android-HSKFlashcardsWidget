@@ -38,7 +38,6 @@ class CaptureImageFragment : Fragment() {
     private lateinit var viewBinding: FragmentOcrCaptureBinding
     private var imageCapture: ImageCapture? = null
     private lateinit var cameraExecutor: ExecutorService
-    private var incrementalOCR = false
 
     private val cropActivityResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -76,8 +75,6 @@ class CaptureImageFragment : Fragment() {
         viewBinding = FragmentOcrCaptureBinding.inflate(inflater, container, false) // Inflate here
 
         cameraExecutor = Executors.newSingleThreadExecutor()
-
-        incrementalOCR = arguments?.getBoolean("incrementalOCR", false) == true
 
         return viewBinding.root // Return the root view of the binding
     }
