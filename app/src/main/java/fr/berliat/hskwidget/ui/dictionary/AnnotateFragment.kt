@@ -145,13 +145,13 @@ class AnnotateFragment: Fragment() {
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle(getString(R.string.annotation_edit_delete_confirm_title))
             .setMessage(getString(R.string.annotation_edit_delete_confirm_message))
-            .setPositiveButton(getString(R.string.annotation_edit_delete_confirm_yes)) { dialog, _ ->
+            .setPositiveButton(getString(R.string.delete)) { dialog, _ ->
                 // Handle positive action (e.g., save annotation)
                 annotateViewModel.deleteAnnotation { err -> handleIOResult(ACTION.DELETE, err) }
 
                 dialog.dismiss() // Dismiss the dialog
             }
-            .setNegativeButton(getString(R.string.annotation_edit_delete_confirm_no)) { dialog, _ ->
+            .setNegativeButton(getString(R.string.cancel)) { dialog, _ ->
                 // Handle negative action (e.g., cancel)
                 dialog.dismiss() // Dismiss the dialog
             }

@@ -150,7 +150,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:src="@drawable/anki_icon"
-                android:contentDescription="@string/config_anki_icon_alt"/>
+                android:contentDescription="@string/config_anki_title"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"

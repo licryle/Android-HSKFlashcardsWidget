@@ -38,7 +38,7 @@
     <fragment
         android:id="@+id/nav_config"
         android:name="fr.berliat.hskwidget.ui.config.ConfigFragment"
-        android:label="@string/menu_config"
+        android:label="@string/settings"
         tools:layout="@layout/fragment_config">
     </fragment>
 
