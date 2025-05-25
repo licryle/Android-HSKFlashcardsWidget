@@ -18,7 +18,9 @@ import fr.berliat.hskwidget.domain.DatabaseBackup
 import fr.berliat.hskwidget.domain.DatabaseBackupCallbacks
 import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.ui.utils.AnkiDelegate
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
@@ -103,7 +105,7 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
         Log.i(TAG, "importsAllNotesToAnkiDroid: starting full import into Anki")
         Toast.makeText(requireContext(), R.string.anki_import_started, Toast.LENGTH_LONG).show()
 
-        viewLifecycleOwner.lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             ankiDelegate.wordListRepo.delegateToAnki(ankiDelegate.wordListRepo.syncListsToAnki())
         }
     }
@@ -132,32 +134,44 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
     }
 
     override fun onBackupFileSelected(uri: Uri) {
-        viewLifecycleOwner.lifecycleScope.launch {
+        Toast.makeText(
+            requireContext(),
+            getString(R.string.dbrestore_start),
+            Toast.LENGTH_LONG
+        ).show()
+
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             val file = Utils.copyUriToCacheDir(requireContext(), uri)
 
             try {
                 databaseBackup.restoreDbFromFile(file)
 
-                Toast.makeText(
-                    requireContext(),
-                    getString(R.string.dbrestore_success),
-                    Toast.LENGTH_LONG
-                ).show()
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.dbrestore_success),
+                        Toast.LENGTH_LONG
+                    ).show()
 
-                val action = ConfigFragmentDirections.search()
-                findNavController().navigate(action)
+                    val action = ConfigFragmentDirections.search()
+                    findNavController().navigate(action)
+                }
             } catch (e: IllegalStateException) {
-                Toast.makeText(
-                    requireContext(),
-                    getString(R.string.dbrestore_failure_fileformat),
-                    Toast.LENGTH_LONG
-                ).show()
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.dbrestore_failure_fileformat),
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
             } catch (e: Error) {
-                Toast.makeText(
-                    requireContext(),
-                    getString(R.string.dbrestore_failure_import),
-                    Toast.LENGTH_LONG
-                ).show()
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.dbrestore_failure_import),
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
             }
         }
     }

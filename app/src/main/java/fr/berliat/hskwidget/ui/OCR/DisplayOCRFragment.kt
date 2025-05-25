@@ -279,7 +279,7 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
     }
 
     private fun fetchWordForDisplay(simplified: String, callback: (String, AnnotatedChineseWord?) -> Unit) {
-        viewLifecycleOwner.lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             // Switch to the IO dispatcher to perform background work
             val result = fetchWord(simplified)
 
@@ -294,7 +294,7 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
 
         fetchWordForDisplay(word.hanziText, ::showSelectedWord)
 
-        lifecycle.coroutineScope.launch {
+        lifecycle.coroutineScope.launch(Dispatchers.IO) {
             Log.d(TAG, "Augmenting Consulted Count for ${word.hanziText} by 1, if word exists")
             frequencyWordsRepo().incrementConsulted(word.hanziText)
         }
@@ -336,7 +336,7 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
     override fun onTextAnalysisSuccess() {
         toggleProcessing(false)
 
-        lifecycle.coroutineScope.launch {
+        lifecycle.coroutineScope.launch(Dispatchers.IO) {
             val wordFreq = viewBinding.ocrDisplayText.wordsFrequency
             Log.d(TAG, "Augmenting Appeared Count for ${wordFreq.size} words (if they exist): $wordFreq")
             frequencyWordsRepo().incrementAppeared(wordFreq)

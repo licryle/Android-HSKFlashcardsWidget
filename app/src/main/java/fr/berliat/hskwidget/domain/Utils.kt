@@ -31,7 +31,6 @@ import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.databinding.FragmentDictionarySearchItemBinding
 import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -44,6 +43,7 @@ import androidx.core.net.toUri
 import androidx.fragment.app.FragmentActivity
 import fr.berliat.hskwidget.ui.wordlist.WordListSelectionDialog
 import androidx.core.view.isVisible
+import fr.berliat.hskwidget.HSKHelperApp
 import fr.berliat.hskwidget.data.model.ChineseWord.Companion.CN_HSK3
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 
@@ -142,8 +142,13 @@ class Utils {
             incrementConsultedWord(context, word)
         }
 
+        fun capitalizeStr(s: Any?) =
+            s?.toString()?.lowercase()?.replaceFirstChar { it.uppercaseChar() } ?: ""
+
+        fun getAppScope(context: Context) = (context.applicationContext as HSKHelperApp).applicationScope
+
         fun incrementConsultedWord(context: Context, word: String) {
-            GlobalScope.launch {
+           getAppScope(context).launch(Dispatchers.IO) {
                 val db = ChineseWordsDatabase.getInstance(context)
                 val frequencyWordsRepo = ChineseWordFrequencyRepo(
                     db.chineseWordFrequencyDAO(),
@@ -318,11 +323,11 @@ class Utils {
             binding.dictionaryItemSynonymsContainer.visibility = hideViewIf(synonyms.isEmpty())
 
             val modality = word.word?.modality ?: ChineseWord.Modality.UNKNOWN
-            binding.dictionaryItemModality.text = modality.toString().lowercase().capitalize()
+            binding.dictionaryItemModality.text = capitalizeStr(modality)
             binding.dictionaryItemModality.visibility = hideViewIf(modality == ChineseWord.Modality.UNKNOWN)
 
             val type = word.word?.type ?: ChineseWord.Type.UNKNOWN
-            binding.dictionaryItemType.text = type.toString().lowercase().capitalize()
+            binding.dictionaryItemType.text = capitalizeStr(type)
             binding.dictionaryItemType.visibility = hideViewIf(type == ChineseWord.Type.UNKNOWN)
 
             // Hide all if all empty

@@ -23,6 +23,8 @@ import kotlinx.coroutines.launch
 
 import fr.berliat.hskwidget.databinding.FragmentDictionarySearchBinding
 import fr.berliat.hskwidget.databinding.FragmentDictionarySearchItemBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.time.Instant
 
 class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResultChangedListener {
@@ -90,7 +92,7 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
 
                 // Load more if at the bottom and not already loading
                 if (!isLoading && totalItemCount <= (lastVisibleItem + 2)) {
-                    viewLifecycleOwner.lifecycleScope.launch { loadMoreResults() }
+                    viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) { loadMoreResults() }
                 }
             }
         })
@@ -113,25 +115,27 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
         searchAdapter.clearData()
         currentPage = 0
 
-        viewLifecycleOwner.lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             // Here we executed in the coRoutine Scope
             val result: Pair<Long, List<AnnotatedChineseWord>> = Pair(
                 Instant.now().toEpochMilli(),
                 fetchResultsForPage()
             )
 
-            // Switch back to the main thread to update UI
-            // Protecting against concurrent searches (typing fast etc)
-            if (result.first >= lastFullSearchStartTime) {
-                lastFullSearchStartTime = result.first
-                searchAdapter.clearData()
-                currentPage = 1
-            }
+            withContext(Dispatchers.Main) {
+                // Switch back to the main thread to update UI
+                // Protecting against concurrent searches (typing fast etc)
+                if (result.first >= lastFullSearchStartTime) {
+                    lastFullSearchStartTime = result.first
+                    searchAdapter.clearData()
+                    currentPage = 1
+                }
 
-            // Update the UI with the result
-            isLoading = false
-            searchAdapter.addData(result.second)
-            binding.dictionarySearchResults.scrollToPosition(0) // @TODO(Licryle): chase down the bug that keeps the screen blank, sometimes.
+                // Update the UI with the result
+                isLoading = false
+                searchAdapter.addData(result.second)
+                binding.dictionarySearchResults.scrollToPosition(0)
+            }
         }
     }
 
@@ -142,7 +146,10 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
         Log.d(TAG, "Load more results for currentSearch: $searchQuery")
         val newResults = fetchResultsForPage()
         isLoading = false
-        searchAdapter.addData(newResults)
+
+        withContext(Dispatchers.Main) {
+            searchAdapter.addData(newResults)
+        }
     }
 
     // Simulate fetching search results based on the query and current page

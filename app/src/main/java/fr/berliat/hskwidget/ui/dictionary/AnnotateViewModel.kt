@@ -30,7 +30,13 @@ class AnnotateViewModel(val context: Context, val wordListRepo: WordListReposito
             _annotatedWord.value = AnnotatedChineseWord.getBlank(simplifiedWord)
         } else {
             viewModelScope.launch {
-                _annotatedWord.value = getAnnotatedChineseWord(simplifiedWord)
+                val word = withContext(Dispatchers.IO) {
+                    getAnnotatedChineseWord(simplifiedWord)
+                }
+
+                withContext(Dispatchers.Main) {
+                    _annotatedWord.value = word
+                }
             }
         }
     }
@@ -49,11 +55,10 @@ class AnnotateViewModel(val context: Context, val wordListRepo: WordListReposito
 
     // Save or update annotation
     fun updateAnnotation(annotatedWord: AnnotatedChineseWord, callback: (Exception?) -> Unit) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             var error: Exception? = null
             try {
                 database().chineseWordAnnotationDAO().insertOrUpdate(annotatedWord.annotation!!)
-                _annotatedWord.value = AnnotatedChineseWord(_annotatedWord.value!!.word, annotatedWord.annotation)
 
                 wordListRepo.delegateToAnki(wordListRepo.addWordToSysAnnotatedList(annotatedWord))
                 wordListRepo.delegateToAnki(wordListRepo.updateInAllLists(simplified))
@@ -68,7 +73,7 @@ class AnnotateViewModel(val context: Context, val wordListRepo: WordListReposito
 
     // Delete annotation
     fun deleteAnnotation(callback: (Exception?) -> Unit) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             var error: Exception? = null
             try {
                 val nbRowAffected = database().chineseWordAnnotationDAO().deleteBySimplified(annotatedWord.value!!.simplified)

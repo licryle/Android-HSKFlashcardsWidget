@@ -13,8 +13,10 @@ import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
 import fr.berliat.hsktextviews.R
 import fr.berliat.hsktextviews.databinding.HskTextViewBinding
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.ceil
@@ -48,6 +50,8 @@ class HSKTextView @JvmOverloads constructor(
 
     private val wordsAdapter: HSKWordsAdapter
     private var originalText: String = ""
+
+    private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     private val DEFAULT_HANZI_SIZE = 20
     private val DEFAULT_WORD_SEPARATOR = ""
@@ -143,7 +147,7 @@ class HSKTextView @JvmOverloads constructor(
             if (originalText != "") {
                 listener?.onTextAnalysisStart()
 
-                GlobalScope.launch {
+                coroutineScope.launch {
                     Log.d(TAG, "Start parsing")
 
                     val words = mutableListOf<Pair<String, String>>()
@@ -184,6 +188,12 @@ class HSKTextView @JvmOverloads constructor(
 
     override fun onWordClick(wordView: HSKWordView) {
         listener?.onWordClick(wordView)
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        // Clean up any running coroutines to avoid memory leaks
+        coroutineScope.cancel()
     }
 
     class HSKWordsHolder(private val wordView: HSKWordView,

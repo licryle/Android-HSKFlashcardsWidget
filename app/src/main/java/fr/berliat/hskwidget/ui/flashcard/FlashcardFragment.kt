@@ -7,10 +7,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import fr.berliat.hskwidget.domain.FlashcardManager
 import fr.berliat.hskwidget.domain.Utils
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
@@ -64,7 +64,7 @@ class FlashcardFragment : Fragment() {
     }
 
     fun updateFlashcardView() {
-        GlobalScope.launch {
+        lifecycleScope.launch {
             // Switch to the IO dispatcher to perform background work
             val currentWord = withContext(Dispatchers.IO) {
                 flashcardsMfr.getCurrentWord()

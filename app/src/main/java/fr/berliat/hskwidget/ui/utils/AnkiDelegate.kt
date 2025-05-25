@@ -129,11 +129,11 @@ class AnkiDelegate(
 
     /********** Our main listening loop **********/
     private fun observeUiEvents() {
-        lifecycleOwner.lifecycleScope.launch {
+        lifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 wordListRepo.uiEvents.collect { event ->
-                    // Launching on the activity to enable to finish so matter the fragment in thre background.
-                    fragment.requireActivity().lifecycleScope.launch {
+                    // Launching on the activity to enable to finish so matter the fragment in the background.
+                    fragment.requireActivity().lifecycleScope.launch(Dispatchers.Main) {
                         val appContext = fragment.activity?.applicationContext
                         when (event) {
                             is WordListRepository.UiEvent.TriggerAnkiSync -> {

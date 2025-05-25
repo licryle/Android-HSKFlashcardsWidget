@@ -32,7 +32,6 @@ import fr.berliat.hskwidget.ui.OCR.CaptureImageFragmentDirections
 import fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragment
 import fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragmentDirections
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -171,7 +170,7 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
     }
 
     override fun onBackupFolderSet(uri: Uri) {
-        GlobalScope.launch {
+        Utils.getAppScope(applicationContext).launch(Dispatchers.IO) {
             val success = databaseBackup.backUp(uri)
 
             withContext(Dispatchers.Main) {

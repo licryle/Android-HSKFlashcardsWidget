@@ -6,8 +6,9 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.store.FlashcardPreferencesStore
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
+import fr.berliat.hskwidget.domain.Utils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class FlashcardConfigureFragment() : PreferenceFragmentCompat() {
     private var _widgetId: Int? = null
@@ -29,7 +30,7 @@ class FlashcardConfigureFragment() : PreferenceFragmentCompat() {
 
         setPreferencesFromResource(R.xml.flashcard_widget_configure, rootKey)
 
-        GlobalScope.async {
+        Utils.getAppScope(requireContext()).launch(Dispatchers.IO) {
             store.getAllKeys(true).forEach() {
                 val pref = preferenceManager.findPreference<Preference>(it)
 

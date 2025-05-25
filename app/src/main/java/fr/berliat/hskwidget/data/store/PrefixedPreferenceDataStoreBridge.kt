@@ -15,7 +15,6 @@ import androidx.datastore.preferences.core.stringSetPreferencesKey
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.first
@@ -23,7 +22,9 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 
 open class PrefixedPreferenceDataStoreBridge(private val dataStore: DataStore<Preferences>, private val prefix: String) :
-    PreferenceDataStore(), CoroutineScope by CoroutineScope(Dispatchers.IO + SupervisorJob()) {
+    PreferenceDataStore() {
+
+    private val coroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     private fun getPrefix(): String { return prefixKey("") }
 
@@ -83,7 +84,7 @@ open class PrefixedPreferenceDataStoreBridge(private val dataStore: DataStore<Pr
     }
 
     private fun <T> putPreference(key: Preferences.Key<T>, value: T?): Deferred<Preferences> {
-        return GlobalScope.async {
+        return coroutineScope.async {
             dataStore.edit {
                 if (value == null) {
                     it.remove(key)
@@ -95,7 +96,7 @@ open class PrefixedPreferenceDataStoreBridge(private val dataStore: DataStore<Pr
     }
 
     fun clear(): Deferred<Preferences> {
-        return GlobalScope.async {
+        return coroutineScope.async {
             dataStore.edit {
                 it.asMap().forEach {
                         entry ->

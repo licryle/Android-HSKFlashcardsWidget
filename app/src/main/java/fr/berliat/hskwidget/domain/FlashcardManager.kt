@@ -11,8 +11,6 @@ import fr.berliat.hskwidget.data.store.FlashcardPreferencesStore
 import fr.berliat.hskwidget.ui.flashcard.FlashcardFragment
 import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -21,6 +19,7 @@ class FlashcardManager private constructor(private val context: Context,
     private val fragments = mutableMapOf<Int, MutableSet<FlashcardFragment>>()
     private val flashCardPrefs = getPreferenceStore()
     private val appWidgetMgr = AppWidgetManager.getInstance(context)
+    private val coroutineScope = Utils.getAppScope(context)
 
 
     private suspend fun ChineseWordDAO() = ChineseWordsDatabase.getInstance(context).chineseWordDAO()
@@ -52,23 +51,18 @@ class FlashcardManager private constructor(private val context: Context,
 
     fun updateWord() {
         Log.i("FlashcardManager", "Word update requested")
-        GlobalScope.launch {
-            // Switch to the IO dispatcher to perform background work
-            withContext(Dispatchers.IO) {
-                getNewWord()
-            }
+        coroutineScope.launch(Dispatchers.IO) {
+            getNewWord()
 
             // Switch back to the main thread to update UI
             withContext(Dispatchers.Main) {
                 Log.i("FlashcardManager", "Now calling for fragments' update")
                 if (fragments[widgetId] != null)
-                    fragments[widgetId]!!.forEach{it.updateFlashcardView() }
-
-                Log.i("FlashcardManager", "Now calling for widgets' update")
-                GlobalScope.async {
-                    FlashcardWidgetProvider().updateFlashCardWidget(context, appWidgetMgr, widgetId)
-                }
+                    fragments[widgetId]!!.forEach { it.updateFlashcardView() }
             }
+
+            Log.i("FlashcardManager", "Now calling for widgets' update")
+            FlashcardWidgetProvider().updateFlashCardWidget(context, appWidgetMgr, widgetId)
         }
     }
 

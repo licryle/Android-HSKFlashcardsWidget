@@ -10,7 +10,7 @@ class WordListViewModel(val wordListRepo: WordListRepository) {
 
 
     fun getUserWordLists(callback: (List<WordListWithCount>, Exception?) -> Unit) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Main) {
             try {
                 val result = withContext(Dispatchers.IO) {
                     wordListRepo.getUserLists()
@@ -23,7 +23,7 @@ class WordListViewModel(val wordListRepo: WordListRepository) {
     }
 
     fun getAllLists(callback: (List<WordListWithCount>, Exception?) -> Unit) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Main) {
             try {
                 val result = withContext(Dispatchers.IO) {
                     wordListRepo.getAllLists()
@@ -36,7 +36,7 @@ class WordListViewModel(val wordListRepo: WordListRepository) {
     }
 
     fun getWordListsForWord(wordId: String, callback: (List<WordListWithCount>, Exception?) -> Unit) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Main) {
             try {
                 val result = withContext(Dispatchers.IO) {
                     wordListRepo.getWordListsForWord(wordId)
@@ -76,10 +76,10 @@ class WordListViewModel(val wordListRepo: WordListRepository) {
     }
 
     private fun launchSafe(callback: (Exception?) -> Unit, block: suspend () -> Unit) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Main) {
             var error: Exception? = null
             try {
-                val result = withContext(Dispatchers.IO) {
+                withContext(Dispatchers.IO) {
                     block()
                 }
             } catch (e: Exception) {

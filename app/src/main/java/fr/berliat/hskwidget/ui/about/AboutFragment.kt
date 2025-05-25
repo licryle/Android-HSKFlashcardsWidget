@@ -13,7 +13,9 @@ import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.databinding.FragmentAboutBinding
 import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.BuildConfig
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class AboutFragment : Fragment() {
     private lateinit var binding: FragmentAboutBinding
@@ -54,7 +56,7 @@ class AboutFragment : Fragment() {
     private fun fetchAndDisplayStats() {
         Log.d("AboutFragment", "fetching stats")
 
-        viewLifecycleOwner.lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             val db = ChineseWordsDatabase.getInstance(requireContext())
             val words = db.chineseWordDAO()
             val annotations = db.chineseWordAnnotationDAO()
@@ -65,7 +67,11 @@ class AboutFragment : Fragment() {
             // Switch back to the main thread to update UI
             // Update the UI with the result
             Log.d("AboutFragment", "stats fetched")
-            binding.textStats.text = getString(R.string.about_stats_text, wordsCnt, annotationsCnt)
+
+            withContext(Dispatchers.Main) {
+                binding.textStats.text =
+                    getString(R.string.about_stats_text, wordsCnt, annotationsCnt)
+            }
         }
     }
 }
