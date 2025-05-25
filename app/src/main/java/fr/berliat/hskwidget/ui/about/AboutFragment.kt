@@ -12,6 +12,7 @@ import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.databinding.FragmentAboutBinding
 import fr.berliat.hskwidget.domain.Utils
+import fr.berliat.hskwidget.BuildConfig
 import kotlinx.coroutines.launch
 
 class AboutFragment : Fragment() {
@@ -41,6 +42,8 @@ class AboutFragment : Fragment() {
             startActivity(Utils.getOpenURLIntent("https://github.com/licryle/Android-HSKFlashcardsWidget"))
             Utils.logAnalyticsScreenView(requireContext(), "Github")
         }
+
+        binding.aboutIntro1.text = getString(R.string.about_intro1).format(BuildConfig.APP_VERSION)
 
         fetchAndDisplayStats()
 

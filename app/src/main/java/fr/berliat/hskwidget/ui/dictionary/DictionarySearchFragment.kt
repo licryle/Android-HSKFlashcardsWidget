@@ -139,7 +139,7 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
     private suspend fun loadMoreResults() {
         isLoading = true
 
-        Log.d("DictionarySearchFragment", "Load more results for currentSearch: $searchQuery")
+        Log.d(TAG, "Load more results for currentSearch: $searchQuery")
         val newResults = fetchResultsForPage()
         isLoading = false
         searchAdapter.addData(newResults)
@@ -147,7 +147,7 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
 
     // Simulate fetching search results based on the query and current page
     private suspend fun fetchResultsForPage(): List<AnnotatedChineseWord> {
-        Log.d("DictionarySearchFragment", "Searching for $searchQuery")
+        Log.d(TAG, "Searching for $searchQuery")
         val dao = ChineseWordsDatabase.getInstance(requireContext()).annotatedChineseWordDAO()
         try {
             val annotatedOnly = binding.dictionarySearchFilterHasannotation.isChecked
@@ -159,14 +159,14 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
             } else {
                 dao.searchFromStrLike(otherFilters ?: searchQuery, annotatedOnly, currentPage, itemsPerPage)
             }
-            Log.d("DictionarySearchFragment", "Search returned for $searchQuery")
+            Log.d(TAG, "Search returned for $searchQuery")
 
             currentPage++
 
             return results
         } catch (e: Exception) {
             // Code for handling the exception
-            Log.e("DictionarySearchFragment", "$e")
+            Log.e(TAG, "$e")
         }
 
         return emptyList()
@@ -212,6 +212,10 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
         fun bind(result: AnnotatedChineseWord) {
             Utils.populateDictionaryEntryView(binding, result, navController)
         }
+    }
+
+    companion object {
+        const val TAG = "DictionarySearchFragment"
     }
 }
 
