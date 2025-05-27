@@ -6,7 +6,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 
-import fr.berliat.hskwidget.data.dao.AnnotatedChineseWord
+import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.databinding.FragmentDictionarySearchItemBinding
 
 

@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 import fr.berliat.hskwidget.R
-import fr.berliat.hskwidget.data.dao.AnnotatedChineseWord
+import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.domain.Utils

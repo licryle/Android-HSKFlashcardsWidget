@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
+import fr.berliat.hskwidget.data.dao.WidgetListsDAO
 import fr.berliat.hskwidget.data.model.WidgetListEntry
 import fr.berliat.hskwidget.data.model.WordListWithCount
 import fr.berliat.hskwidget.domain.Utils
@@ -12,7 +13,12 @@ internal val Context.dataStore: DataStore<Preferences> by preferencesDataStore("
 
 class FlashcardPreferencesStore(private val context: Context, private val widgetId: Int):
     PrefixedPreferenceDataStoreBridge(context.dataStore, widgetId.toString()) {
-    private suspend fun WidgetListsDAO() = ChineseWordsDatabase.getInstance(context).widgetListsDAO()
+    private suspend fun WidgetListsDAO(): WidgetListsDAO {
+        val inst = ChineseWordsDatabase.getInstance(context)
+        val dao = inst.widgetListsDAO()
+
+        return dao
+    }
     private suspend fun WordListDAO() = ChineseWordsDatabase.getInstance(context).wordListDAO()
 
     var currentSimplified : String

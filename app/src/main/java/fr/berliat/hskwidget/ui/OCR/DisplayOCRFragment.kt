@@ -25,7 +25,7 @@ import fr.berliat.hsktextviews.views.HSKTextView
 import fr.berliat.hsktextviews.views.HSKWordView
 import fr.berliat.hskwidget.R
 
-import fr.berliat.hskwidget.data.dao.AnnotatedChineseWord
+import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.repo.ChineseWordFrequencyRepo
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase

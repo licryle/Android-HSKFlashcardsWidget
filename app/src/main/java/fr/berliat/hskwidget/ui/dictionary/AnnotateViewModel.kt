@@ -4,7 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import fr.berliat.hskwidget.data.dao.AnnotatedChineseWord
+import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWordAnnotation
 import fr.berliat.hskwidget.data.repo.WordListRepository

@@ -2,7 +2,7 @@ package fr.berliat.hskwidget.data.repo
 
 import android.content.Context
 import android.util.Log
-import fr.berliat.hskwidget.data.dao.AnnotatedChineseWord
+import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.WordList
 import fr.berliat.hskwidget.data.model.WordListEntry
 import fr.berliat.hskwidget.data.store.AnkiStore

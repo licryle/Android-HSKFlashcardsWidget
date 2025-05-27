@@ -21,34 +21,35 @@ class FlashcardManager private constructor(private val context: Context,
     private val appWidgetMgr = AppWidgetManager.getInstance(context)
     private val coroutineScope = Utils.getAppScope(context)
 
-    private suspend fun ChineseWordDAO() = ChineseWordsDatabase.getInstance(context).chineseWordDAO()
-    private suspend fun WordListDAO() = ChineseWordsDatabase.getInstance(context).wordListDAO()
+    private suspend fun AnnotatedChineseWordDAO() = ChineseWordsDatabase.getInstance(context).annotatedChineseWordDAO()
 
     fun getPreferenceStore(): FlashcardPreferencesStore {
         return FlashcardPreferencesStore(context, widgetId)
     }
 
     suspend fun getCurrentWord() : ChineseWord {
-        var currentWord = ChineseWordDAO().findWordFromSimplified(flashCardPrefs.currentSimplified)
+        val currentWord = AnnotatedChineseWordDAO().getFromSimplified(flashCardPrefs.currentSimplified)
+            ?: return Utils.getDefaultWord(context)
 
-        if (currentWord == null) currentWord = Utils.getDefaultWord(context)
-
-        return currentWord
+        return currentWord.toChineseWord() ?: Utils.getDefaultWord(context)
     }
 
     suspend fun getNewWord(): ChineseWord {
-        val currentWord = ChineseWordDAO().findWordFromSimplified(flashCardPrefs.currentSimplified)
+        val currentWord = AnnotatedChineseWordDAO().getFromSimplified(flashCardPrefs.currentSimplified)
 
         val allowedListIds = flashCardPrefs.getAllowedLists().map { it.wordList.id }
-        var newWord = WordListDAO().getRandomWordFromLists(allowedListIds, arrayOf(currentWord!!.simplified))
+        val newWord = AnnotatedChineseWordDAO().getRandomWordFromLists(allowedListIds, arrayOf(currentWord?.simplified ?: ""))
+
+        var finalWord = Utils.getDefaultWord(context)
 
         Log.i(TAG, "Got a new word, maybe: %s".format(newWord))
-        if (newWord == null) newWord = Utils.getDefaultWord(context)
+        if (newWord != null)
+            finalWord = newWord.toChineseWord() ?: finalWord
 
         // Persist it in preferences for cross-App convenience
-        flashCardPrefs.currentSimplified = newWord.simplified
+        flashCardPrefs.currentSimplified = finalWord.simplified
 
-        return newWord
+        return finalWord
     }
 
     fun updateWord() {

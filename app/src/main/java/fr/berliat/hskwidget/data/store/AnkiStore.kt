@@ -6,7 +6,7 @@ import android.util.Log
 import com.ichi2.anki.api.NoteInfo
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.dao.AnkiDAO
-import fr.berliat.hskwidget.data.dao.AnnotatedChineseWord
+import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.WordList
 import fr.berliat.hskwidget.data.model.WordListEntry
 import fr.berliat.hskwidget.domain.AnkiDeck

@@ -1,33 +1,8 @@
 package fr.berliat.hskwidget.data.dao
 
 import androidx.room.Dao
-import androidx.room.Embedded
 import androidx.room.Query
-import fr.berliat.hskwidget.data.model.ChineseWord
-import fr.berliat.hskwidget.data.model.ChineseWordAnnotation
-
-data class AnnotatedChineseWord (
-    @Embedded val word: ChineseWord?,
-    @Embedded val annotation: ChineseWordAnnotation?) {
-
-    val simplified: String
-        get() {
-            return word?.simplified ?: annotation?.simplified!!
-        }
-
-    companion object {
-        fun getBlank(simplified: String = ""): AnnotatedChineseWord {
-            return AnnotatedChineseWord(
-                ChineseWord.getBlank(simplified),
-                ChineseWordAnnotation.getBlank(simplified)
-            )
-        }
-    }
-
-    fun hasAnnotation(): Boolean {
-        return annotation?.firstSeen != null
-    }
-}
+import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 
 private const val select_left_join =
     "SELECT a.a_simplified, COALESCE(w.simplified, a.a_simplified) simplified, a.a_searchable_text, " +
@@ -62,6 +37,13 @@ interface AnnotatedChineseWordDAO {
             " ORDER BY is_first_seen_null, a.first_seen DESC, w.popularity DESC " +
             " LIMIT :pageSize OFFSET (:page * :pageSize)")
     suspend fun searchFromStrLike(str: String?, hasAnnotation: Boolean, page: Int = 0, pageSize: Int = 30): List<AnnotatedChineseWord>
+
+    @Query("SELECT * FROM (" +
+           "       $select_left_join WHERE a.a_simplified IN (SELECT simplified FROM word_list_entries WHERE listId IN (:listIds) AND simplified NOT IN (:bannedWords))" +
+           " UNION " +
+           "$select_right_join WHERE w.simplified IN (SELECT simplified FROM word_list_entries WHERE listId IN (:listIds) AND simplified NOT IN (:bannedWords))" +
+           ") ORDER BY RANDOM() LIMIT 1")
+    suspend fun getRandomWordFromLists(listIds: List<Long>, bannedWords: Array<String>): AnnotatedChineseWord?
 
     @Query("SELECT a.a_simplified, COALESCE(w.simplified, a.a_simplified) simplified, a.a_searchable_text, " +
             " a.a_pinyins, a.notes, a.class_type, a.class_level, a.themes, a.first_seen, a.is_exam," +

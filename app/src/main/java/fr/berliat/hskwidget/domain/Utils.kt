@@ -24,7 +24,7 @@ import androidx.work.workDataOf
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.ktx.Firebase
 import fr.berliat.hskwidget.R
-import fr.berliat.hskwidget.data.dao.AnnotatedChineseWord
+import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.repo.ChineseWordFrequencyRepo
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
