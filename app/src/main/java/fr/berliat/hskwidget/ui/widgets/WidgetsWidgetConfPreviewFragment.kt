@@ -8,12 +8,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.preference.Preference
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.domain.FlashcardManager
 import fr.berliat.hskwidget.domain.Utils
-import fr.berliat.hskwidget.ui.flashcard.FlashcardConfigureFragment
-import fr.berliat.hskwidget.ui.flashcard.FlashcardFragment
+import fr.berliat.hskwidget.ui.widget.FlashcardWidgetConfigFragment
+import fr.berliat.hskwidget.ui.widget.FlashcardFragment
 
 
 private const val ARG_WIDGETID = "WIDGETID"
@@ -26,7 +25,7 @@ private const val ARG_WIDGETID = "WIDGETID"
 class WidgetsWidgetConfPreviewFragment : Fragment() {
     private var _widgetId: Int? = null
     private var _root: View ? = null
-    private var _confFragment: FlashcardConfigureFragment? = null
+    private var _confFragment: FlashcardWidgetConfigFragment? = null
     private var _previewFragment: FlashcardFragment? = null
     private var _prefChangeCallback: WidgetPrefListener? = null
 
@@ -44,7 +43,7 @@ class WidgetsWidgetConfPreviewFragment : Fragment() {
             _widgetId = it.getInt(ARG_WIDGETID)
         }
 
-        _confFragment = FlashcardConfigureFragment.newInstance(widgetId)
+        _confFragment = FlashcardWidgetConfigFragment.newInstance(widgetId)
         _prefChangeCallback = WidgetPrefListener(requireActivity(), requireContext())
         confFragment.addWidgetPreferenceListener(prefChangeCallback)
         _previewFragment = FlashcardFragment.newInstance(widgetId)
@@ -107,28 +106,28 @@ class WidgetsWidgetConfPreviewFragment : Fragment() {
             }
 
         private class WidgetPrefListener(val activity: Activity, val context: Context)
-            : FlashcardConfigureFragment.WidgetPreferenceListener {
+            : FlashcardWidgetConfigFragment.WidgetPreferenceListener {
 
             override fun onWidgetPreferenceChange(
                 widgetId: Int,
-                preference: Preference,
-                newValue: Any
+                listId: Long,
+                included: Boolean
             ) {
-                val resToastText =
-                    if (newValue as Boolean) R.string.flashcard_widget_configure_toggle_on else R.string.flashcard_widget_configure_toggle_off
 
-                Toast.makeText(
-                    activity,
-                    context.getString(resToastText, preference.key),
-                    Toast.LENGTH_LONG
-                ).show()
+            }
 
+            override fun onWidgetPreferenceSaved(widgetId: Int) {
                 FlashcardManager.getInstance(context, widgetId).updateWord()
-
                 Utils.logAnalyticsWidgetAction(
                     activity,
                     Utils.ANALYTICS_EVENTS.WIDGET_RECONFIGURE, widgetId
                 )
+
+                Toast.makeText(
+                    activity,
+                    "Widget configuration updated",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }

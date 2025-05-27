@@ -428,19 +428,11 @@ class Utils {
             val widgets = FlashcardWidgetProvider().getWidgetIds(context)
             val size = WidgetSizeProvider(context).getWidgetsSize(widgetId)
 
-            var hskLevels = ""
-            FlashcardManager.getInstance(context, widgetId).getPreferenceStore().getAllowedHSK()
-                .forEach() {
-                    hskLevels += it.level.toString() + ","
-                }
-            hskLevels = hskLevels.dropLast(1)
-
             logAnalyticsEvent(
                 context, event,
                 mapOf(
                     "WIDGET_NUMBER" to widgets.indexOf(widgetId).toString(),
-                    "WIDGET_SIZE" to "${size.first}x${size.second}",
-                    "WIDGET_HSK" to hskLevels
+                    "WIDGET_SIZE" to "${size.first}x${size.second}"
                 )
             )
         }

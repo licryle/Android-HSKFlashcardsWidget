@@ -8,7 +8,7 @@ import fr.berliat.hskwidget.MainActivity
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.data.store.FlashcardPreferencesStore
-import fr.berliat.hskwidget.ui.flashcard.FlashcardFragment
+import fr.berliat.hskwidget.ui.widget.FlashcardFragment
 import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -21,8 +21,8 @@ class FlashcardManager private constructor(private val context: Context,
     private val appWidgetMgr = AppWidgetManager.getInstance(context)
     private val coroutineScope = Utils.getAppScope(context)
 
-
     private suspend fun ChineseWordDAO() = ChineseWordsDatabase.getInstance(context).chineseWordDAO()
+    private suspend fun WordListDAO() = ChineseWordsDatabase.getInstance(context).wordListDAO()
 
     fun getPreferenceStore(): FlashcardPreferencesStore {
         return FlashcardPreferencesStore(context, widgetId)
@@ -39,8 +39,10 @@ class FlashcardManager private constructor(private val context: Context,
     suspend fun getNewWord(): ChineseWord {
         val currentWord = ChineseWordDAO().findWordFromSimplified(flashCardPrefs.currentSimplified)
 
-        var newWord = ChineseWordDAO().getRandomHSKWord(flashCardPrefs.getAllowedHSK(), setOf(currentWord!!))
+        val allowedListIds = flashCardPrefs.getAllowedLists().map { it.wordList.id }
+        var newWord = WordListDAO().getRandomWordFromLists(allowedListIds, arrayOf(currentWord!!.simplified))
 
+        Log.i(TAG, "Got a new word, maybe: %s".format(newWord))
         if (newWord == null) newWord = Utils.getDefaultWord(context)
 
         // Persist it in preferences for cross-App convenience
@@ -50,18 +52,18 @@ class FlashcardManager private constructor(private val context: Context,
     }
 
     fun updateWord() {
-        Log.i("FlashcardManager", "Word update requested")
+        Log.i(TAG, "Word update requested")
         coroutineScope.launch(Dispatchers.IO) {
             getNewWord()
 
             // Switch back to the main thread to update UI
             withContext(Dispatchers.Main) {
-                Log.i("FlashcardManager", "Now calling for fragments' update")
+                Log.i(TAG, "Now calling for fragments' update")
                 if (fragments[widgetId] != null)
                     fragments[widgetId]!!.forEach { it.updateFlashcardView() }
             }
 
-            Log.i("FlashcardManager", "Now calling for widgets' update")
+            Log.i(TAG, "Now calling for widgets' update")
             FlashcardWidgetProvider().updateFlashCardWidget(context, appWidgetMgr, widgetId)
         }
     }
@@ -99,6 +101,7 @@ class FlashcardManager private constructor(private val context: Context,
     }
 
     companion object {
+        const val TAG = "FlashcardManager"
         private var instances = mutableMapOf<Int, FlashcardManager>()
 
         fun getInstance(context: Context, widgetId: Int) =

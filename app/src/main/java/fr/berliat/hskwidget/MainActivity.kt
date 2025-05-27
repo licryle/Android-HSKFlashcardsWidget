@@ -1,5 +1,7 @@
 package fr.berliat.hskwidget
 
+import android.appwidget.AppWidgetManager
+import android.appwidget.AppWidgetManager.ACTION_APPWIDGET_CONFIGURE
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -31,6 +33,7 @@ import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.ui.OCR.CaptureImageFragmentDirections
 import fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragment
 import fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragmentDirections
+import fr.berliat.hskwidget.ui.widgets.WidgetsListFragmentDirections
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -118,9 +121,7 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
         setupSearchBtn()
         setupOCRBtn()
 
-        handleSearchIntent(intent)
-        handleTextSearchIntent(intent)
-        handleImageOCRIntent(intent)
+        handleIntents(intent)
         handleBackUp()
     }
 
@@ -165,6 +166,11 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
 
+        handleIntents(intent)
+    }
+
+    private fun handleIntents(intent: Intent) {
+        handleWidgetConfigIntent(intent)
         handleSearchIntent(intent)
         handleTextSearchIntent(intent)
         handleImageOCRIntent(intent)
@@ -198,6 +204,19 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
     private fun handleBackUp() {
         if (appConfig.dbBackUpActive)
             databaseBackup.getFolder()
+    }
+
+    private fun handleWidgetConfigIntent(intent: Intent?) {
+        intent?.let {
+            if (it.action == ACTION_APPWIDGET_CONFIGURE) {
+                val widgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
+
+                if (widgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
+                    val action = WidgetsListFragmentDirections.configureWidget(widgetId)
+                    navController.navigate(action)
+                }
+            }
+        }
     }
 
     private fun handleSearchIntent(intent: Intent?) {

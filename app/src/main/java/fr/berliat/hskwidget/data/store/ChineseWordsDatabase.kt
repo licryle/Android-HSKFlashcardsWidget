@@ -13,10 +13,12 @@ import fr.berliat.hskwidget.data.dao.AnnotatedChineseWordDAO
 import fr.berliat.hskwidget.data.dao.ChineseWordAnnotationDAO
 import fr.berliat.hskwidget.data.dao.ChineseWordDAO
 import fr.berliat.hskwidget.data.dao.ChineseWordFrequencyDAO
+import fr.berliat.hskwidget.data.dao.WidgetListsDAO
 import fr.berliat.hskwidget.data.dao.WordListDAO
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWordAnnotation
 import fr.berliat.hskwidget.data.model.ChineseWordFrequency
+import fr.berliat.hskwidget.data.model.WidgetListEntry
 import fr.berliat.hskwidget.data.model.WordList
 import fr.berliat.hskwidget.data.model.WordListEntry
 import kotlinx.coroutines.sync.Mutex
@@ -31,8 +33,9 @@ private fun SupportSQLiteDatabase.hasAlreadyDoneMigration(migration: Migration):
 }
 
 @Database(
-    entities = [ChineseWordAnnotation::class, ChineseWord::class, ChineseWordFrequency::class, WordList::class, WordListEntry::class],
-    version = 9, exportSchema = true,
+    entities = [ChineseWordAnnotation::class, ChineseWord::class, ChineseWordFrequency::class,
+                WordList::class, WordListEntry::class, WidgetListEntry::class],
+    version = 10, exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 1, to = 2)
     ])
@@ -49,6 +52,7 @@ abstract class ChineseWordsDatabase : RoomDatabase() {
     abstract fun chineseWordDAO(): ChineseWordDAO
     abstract fun chineseWordFrequencyDAO(): ChineseWordFrequencyDAO
     abstract fun wordListDAO(): WordListDAO
+    abstract fun widgetListsDAO(): WidgetListsDAO
 
     companion object {
         suspend fun getInstance(context: Context): ChineseWordsDatabase {
@@ -65,6 +69,7 @@ abstract class ChineseWordsDatabase : RoomDatabase() {
         }
 
         const val TAG = "ChineseWordsDatabase"
+        const val SQL_VAR_MAX = 900
 
         @Volatile
         private var INSTANCE: ChineseWordsDatabase? = null
@@ -289,6 +294,51 @@ abstract class ChineseWordsDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_9_10 = object : Migration(9, 10) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Create new table
+                db.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS widget_list_entries (
+                        widgetId INTEGER NOT NULL,
+                        listId INTEGER NOT NULL,
+                        PRIMARY KEY(widgetId, listId),
+                        FOREIGN KEY(listId) REFERENCES word_lists(id) ON DELETE CASCADE
+                    )
+                    """.trimIndent()
+                )
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_widget_list_entries_widgetId ON widget_list_entries(widgetId)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_widget_list_entries_listId ON widget_list_entries(listId)")
+
+                // Let's add the HSK lists, then populate them
+                val stmt = db.compileStatement(
+                    """
+                    INSERT INTO word_lists 
+                        (name, listType, creationDate, lastModified, ankiDeckId) 
+                    VALUES (?, ?, ?, ?, ?)
+                    """.trimIndent()
+                )
+
+                val currentTime = Instant.now().toEpochMilli()
+
+                for (i in 1 until 8) { // Currently capped at 8 inside the database!
+                    val hsk = ChineseWord.HSK_Level.from(i).toString()
+                    stmt.bindString(1, hsk)
+                    stmt.bindString(2, "SYSTEM")
+                    stmt.bindLong(3, currentTime - i) // For a nice sort
+                    stmt.bindLong(4, currentTime - i)
+                    stmt.bindLong(5, 0)
+
+                    val insertedId = stmt.executeInsert()
+
+                    db.execSQL(
+                        """INSERT INTO word_list_entries (listId, simplified, ankiNoteId)
+                                      SELECT $insertedId, simplified, 0 FROM ChineseWord WHERE hsk_level = '$hsk'"""
+                    )
+                }
+            }
+        }
+
         private fun replaceChineseWordMigration(
             fromVersion: Int,
             toVersion: Int,
@@ -312,7 +362,8 @@ abstract class ChineseWordsDatabase : RoomDatabase() {
                 .addMigrations(
                     MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6,
                     MIGRATION_6_7, MIGRATION_7_8,
-                    replaceChineseWordMigration(8, 9, context)
+                    replaceChineseWordMigration(8, 9, context),
+                    MIGRATION_9_10
                 )
                 .build()
 
@@ -325,7 +376,8 @@ abstract class ChineseWordsDatabase : RoomDatabase() {
                 .addMigrations(
                     MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6,
                     MIGRATION_6_7, MIGRATION_7_8,
-                    replaceChineseWordMigration(8, 9, context)
+                    replaceChineseWordMigration(8, 9, context),
+                    MIGRATION_9_10
                 )
                 .createFromFile(dbFile) // instead of fromAsset
                 .build()

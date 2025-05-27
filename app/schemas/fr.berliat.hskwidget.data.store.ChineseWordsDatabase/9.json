@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 9,
-    "identityHash": "1e6e6eb7ded70b01c3ef56c625dfeec3",
+    "identityHash": "23cebc4b3e4781934a155eb9bf16efd0",
     "entities": [
       {
         "tableName": "ChineseWordAnnotation",
@@ -320,11 +320,69 @@
             ]
           }
         ]
+      },
+      {
+        "tableName": "widget_list_entries",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`widgetId` INTEGER NOT NULL, `listId` INTEGER NOT NULL, PRIMARY KEY(`widgetId`, `listId`), FOREIGN KEY(`listId`) REFERENCES `word_lists`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "widgetId",
+            "columnName": "widgetId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "listId",
+            "columnName": "listId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "widgetId",
+            "listId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_widget_list_entries_widgetId",
+            "unique": false,
+            "columnNames": [
+              "widgetId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_widget_list_entries_widgetId` ON `${TABLE_NAME}` (`widgetId`)"
+          },
+          {
+            "name": "index_widget_list_entries_listId",
+            "unique": false,
+            "columnNames": [
+              "listId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_widget_list_entries_listId` ON `${TABLE_NAME}` (`listId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "word_lists",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "listId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1e6e6eb7ded70b01c3ef56c625dfeec3')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '23cebc4b3e4781934a155eb9bf16efd0')"
     ]
   }
 }

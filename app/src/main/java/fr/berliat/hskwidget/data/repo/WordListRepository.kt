@@ -97,8 +97,16 @@ class WordListRepository(private val context: Context) {
         val lists = wordListDAO().getAllLists()
         val entries = wordListDAO().getAllListEntries()
 
+        val annotatedChineseWords = mutableListOf<AnnotatedChineseWord>()
         val wordList = entries.map { it.simplified }
-        val annotatedChineseWords = annotatedChineseWordDAO().getFromSimplified(wordList)
+
+        // Safeguard against too many SQL vars error for a big migration
+        val chunks = wordList.chunked(ChineseWordsDatabase.SQL_VAR_MAX)
+        for (chunk in chunks) {
+            val partialResult = annotatedChineseWordDAO().getFromSimplified(chunk)
+            annotatedChineseWords.addAll(partialResult)
+        }
+
         val words = annotatedChineseWords.associateBy { it.simplified }
 
         if (lists.isEmpty() || entries.isEmpty() || words.isEmpty()) return null

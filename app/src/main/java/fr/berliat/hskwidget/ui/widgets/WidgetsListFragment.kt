@@ -18,7 +18,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.databinding.FragmentWidgetsBinding
 import fr.berliat.hskwidget.domain.Utils
-import fr.berliat.hskwidget.ui.flashcard.FlashcardFragment
+import fr.berliat.hskwidget.ui.widget.FlashcardFragment
 import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
 
 class WidgetsListFragment : Fragment() {
@@ -30,7 +30,17 @@ class WidgetsListFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
     private val viewModel get() = _viewModel!!
-    private val previewFragment get() = _previewFragment!!
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        with(childFragmentManager.beginTransaction()) {
+            add(
+                R.id.widgets_demoflashcard_fragment,
+                FlashcardFragment.newInstance(0))
+            commit()
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -46,56 +56,58 @@ class WidgetsListFragment : Fragment() {
         return binding.root
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        with(childFragmentManager.beginTransaction()) {
-            add(
-                R.id.widgets_demoflashcard_fragment,
-                FlashcardFragment.newInstance(0))
-            commit()
-        }
-    }
-
-    override fun onDestroy() {
-        if (_previewFragment != null)
-            childFragmentManager.beginTransaction().remove(previewFragment)
-                .commitAllowingStateLoss()
-
-        super.onDestroy()
-    }
-
     override fun onResume() {
         super.onResume()
 
+        val widgetsIntro = binding.widgetsIntro
         val tabsLayout = binding.widgetsTabs
         val widgetPager = binding.widgetsTabsConfigure
         val demoFlashcard = binding.widgetsDemoflashcardFragment
 
         val context = requireActivity().applicationContext
         val widgetIds = FlashcardWidgetProvider().getWidgetIds(context)
+
+
         if (widgetIds.isEmpty()) {
             tabsLayout.visibility = View.GONE
             widgetPager.visibility = View.GONE
             demoFlashcard.visibility = View.VISIBLE
+            widgetsIntro.visibility = View.VISIBLE
         } else {
             tabsLayout.visibility = View.VISIBLE
             widgetPager.visibility = View.VISIBLE
             demoFlashcard.visibility = View.GONE
+            widgetsIntro.visibility = View.GONE
 
-            val prevTabPos = viewModel.getLastTabPosition()
-
-            widgetPager.adapter = WidgetPagerAdapter(childFragmentManager, lifecycle, widgetIds)
+            widgetPager.adapter = WidgetPagerAdapter(childFragmentManager, viewLifecycleOwner.lifecycle, widgetIds)
             TabLayoutMediator(tabsLayout, widgetPager) { tab, position ->
                 tab.text = "Widget $position"
             }.attach()
 
+            // Handle intent asking to configure
+            handleIntent(arguments)
+
+            val prevTabPos = viewModel.getLastTabPosition()
             if (prevTabPos < widgetIds.size) {
                 tabsLayout.selectTab(binding.widgetsTabs.getTabAt(prevTabPos))
             }
         }
 
         Utils.logAnalyticsScreenView(requireContext(), "WidgetsList")
+    }
+
+    private fun handleIntent(arguments: Bundle?) {
+        if (arguments == null) return
+
+        val intentWidgetId = arguments.getInt("widgetId", AppWidgetManager.INVALID_APPWIDGET_ID)
+        if (intentWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
+            val context = requireActivity().applicationContext
+            val widgetIds = FlashcardWidgetProvider().getWidgetIds(context)
+            viewModel.onToggleTab(widgetIds.indexOf(intentWidgetId))
+            Utils.logAnalyticsWidgetAction(context, Utils.ANALYTICS_EVENTS.WIDGET_RECONFIGURE, intentWidgetId)
+            // Consume condition so we don't come back here until next intent
+            arguments.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
+        }
     }
 
     override fun onDestroyView() {

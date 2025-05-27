@@ -2,6 +2,7 @@ package fr.berliat.hskwidget.ui.widget
 
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
+import android.appwidget.AppWidgetManager.ACTION_APPWIDGET_CONFIGURE
 import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
@@ -10,10 +11,11 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.RemoteViews
 import androidx.work.WorkManager
+import fr.berliat.hskwidget.MainActivity
 import fr.berliat.hskwidget.R
+import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.domain.FlashcardManager
 import fr.berliat.hskwidget.domain.Utils
-import fr.berliat.hskwidget.ui.flashcard.FlashcardConfigureActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -24,7 +26,7 @@ internal const val ACTION_DICTIONARY = "fr.berliat.hskwidget.ACTION_DICTIONARY"
 
 /**
  * Implementation of App Widget functionality.
- * App Widget Configuration implemented in [FlashcardConfigureActivity]
+ * App Widget Configuration implemented in [FlashcardWidgetConfigFragment]
  */
 class FlashcardWidgetProvider : AppWidgetProvider() {
 
@@ -74,7 +76,8 @@ class FlashcardWidgetProvider : AppWidgetProvider() {
             ACTION_CONFIGURE_LATEST -> {
                 val latestWidgetId = getWidgetIds(context).last()
 
-                val confIntent = Intent(context, FlashcardConfigureActivity::class.java)
+                val confIntent = Intent(context, MainActivity::class.java)
+                confIntent.action = ACTION_APPWIDGET_CONFIGURE
                 confIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, latestWidgetId)
                 confIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
 
@@ -198,7 +201,10 @@ class FlashcardWidgetProvider : AppWidgetProvider() {
                     setTextViewText(R.id.flashcard_chinese, word.simplified)
                     setTextViewText(R.id.flashcard_definition, word.definition[Locale.ENGLISH])
                     setTextViewText(R.id.flashcard_pinyin, word.pinyins.toString())
+
                     setTextViewText(R.id.flashcard_hsklevel, word.hskLevel.toString())
+                    setViewVisibility(R.id.flashcard_hsklevel,
+                        Utils.hideViewIf(word.hskLevel == ChineseWord.HSK_Level.NOT_HSK))
                 }
 
                 // Tell the AppWidgetManager to perform an update on the current widget.

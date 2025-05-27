@@ -68,6 +68,9 @@ interface WordListDAO {
     @Query("SELECT * FROM chineseword WHERE simplified IN (SELECT simplified FROM word_list_entries WHERE listId = :listId)")
     suspend fun getWordsInList(listId: Long): List<ChineseWord>
 
+    @Query("SELECT * FROM chineseword WHERE simplified IN (SELECT simplified FROM word_list_entries WHERE listId IN (:listIds))")
+    suspend fun getWordsInLists(listIds: List<Long>): List<ChineseWord>
+
     @Transaction
     @Query("DELETE FROM word_list_entries WHERE simplified = :simplified")
     suspend fun removeWordFromAllLists(simplified: String): Int
@@ -115,4 +118,7 @@ interface WordListDAO {
 
     @Query("DELETE FROM word_lists")
     suspend fun deleteAllLists()
+
+    @Query("SELECT * FROM chineseword WHERE simplified IN (SELECT simplified FROM word_list_entries WHERE listId IN (:listIds) AND simplified NOT IN (:bannedWords) ORDER BY RANDOM() LIMIT 1)")
+    suspend fun getRandomWordFromLists(listIds: List<Long>, bannedWords: Array<String>): ChineseWord?
 }

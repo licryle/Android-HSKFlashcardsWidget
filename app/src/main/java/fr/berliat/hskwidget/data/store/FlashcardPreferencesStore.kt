@@ -4,13 +4,16 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
-import fr.berliat.hskwidget.data.model.ChineseWord
+import fr.berliat.hskwidget.data.model.WidgetListEntry
+import fr.berliat.hskwidget.data.model.WordListWithCount
 import fr.berliat.hskwidget.domain.Utils
 
 internal val Context.dataStore: DataStore<Preferences> by preferencesDataStore("WidgetPreferenceStore")
 
-class FlashcardPreferencesStore(private val context: Context, widgetId: Int):
+class FlashcardPreferencesStore(private val context: Context, private val widgetId: Int):
     PrefixedPreferenceDataStoreBridge(context.dataStore, widgetId.toString()) {
+    private suspend fun WidgetListsDAO() = ChineseWordsDatabase.getInstance(context).widgetListsDAO()
+    private suspend fun WordListDAO() = ChineseWordsDatabase.getInstance(context).wordListDAO()
 
     var currentSimplified : String
         get() {
@@ -23,19 +26,16 @@ class FlashcardPreferencesStore(private val context: Context, widgetId: Int):
             this.putStringBlocking(PREFERENCE_CURRENT_SIMPLIFIED, word)
         }
 
-    private fun showHSK(hskLevel: ChineseWord.HSK_Level) : Boolean {
-        return getBoolean("hsk" + hskLevel.level.toString(), false)
-    }
+    suspend fun getAllowedLists(): List<WordListWithCount> {
+        val widgetListIds = WidgetListsDAO().getListsForWidget(widgetId)
+        val lists = WordListDAO().getAllLists()
+        val listIds = lists.map { it.wordList.id }
 
-    fun getAllowedHSK(): Set<ChineseWord.HSK_Level> {
-        val hskLevels = mutableSetOf<ChineseWord.HSK_Level>()
-        ChineseWord.HSK_Level.values().forEach {
-            if (this.showHSK(it)) {
-                hskLevels.add(it)
-            }
-        }
+        // Lists to clean -- should be nothing but just in case
+        val toDelete = widgetListIds.filter { wl -> ! listIds.contains(wl) }
+        WidgetListsDAO().deleteWidgetLists(toDelete.map { it -> WidgetListEntry(widgetId, it) })
 
-        return hskLevels.toSet()
+        return lists.filter { widgetListIds.contains(it.wordList.id) }
     }
 
     companion object {
