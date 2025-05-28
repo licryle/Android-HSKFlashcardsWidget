@@ -84,7 +84,7 @@ class WordListSelectionDialog : DialogFragment() {
     }
 
     private fun showCreateListDialog() {
-        val dialog = WordListReNameDialog() { _, _ -> }
+        val dialog = WordListReNameDialog() { _, _ -> loadData() }
         dialog.show(childFragmentManager, "CreateListDialog")
     }
 

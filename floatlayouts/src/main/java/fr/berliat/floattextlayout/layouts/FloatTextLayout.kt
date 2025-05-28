@@ -109,7 +109,7 @@ class FloatTextLayout @JvmOverloads constructor(
             // Check if the accumulated height exceeds the floating block height
             if (accumulatedHeight > floatH) {
                 // The current line is where the cut should happen
-                cutIndex = staticLayout.getLineEnd(i - 2)  // Cut before this line
+                cutIndex = staticLayout.getLineEnd((i - 2).coerceAtLeast(0))  // Cut before this line
                 break
             }
         }
