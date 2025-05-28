@@ -186,6 +186,7 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
                 viewModel.resetText()
 
             recognizeText(imageUri.toUri())
+            requireArguments().putString("imageUri", "") // Consume condition
         } else if (text != "") {
             Log.d(TAG, "processFromArguments: text was provided")
 
