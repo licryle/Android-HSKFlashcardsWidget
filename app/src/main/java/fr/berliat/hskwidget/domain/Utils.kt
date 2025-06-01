@@ -410,7 +410,9 @@ class Utils {
                 bundle.putString("MAX_WIDGET_ID", widgets.last().toString())
             }
 
-            Firebase.analytics.logEvent(event.name, bundle)
+            getAppScope(context).launch(Dispatchers.IO) {
+                Firebase.analytics.logEvent(event.name, bundle)
+            }
         }
 
         fun logAnalyticsError(context: Context, module: String, error: String, details: String) {
