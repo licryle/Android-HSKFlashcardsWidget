@@ -7,7 +7,9 @@ import androidx.room.PrimaryKey
 import java.text.Normalizer
 import java.util.Date
 
-@Entity(indices = [Index(value = ["a_searchable_text"])])
+@Entity(
+    tableName = "chinese_word_annotation",
+    indices = [Index(value = ["a_searchable_text"])])
 data class ChineseWordAnnotation (
     @PrimaryKey @ColumnInfo(name = "a_simplified") val simplified: String = "",
     @ColumnInfo(name = "a_pinyins") val pinyins: ChineseWord.Pinyins?,

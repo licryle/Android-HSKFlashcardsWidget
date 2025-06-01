@@ -2,10 +2,10 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "11832783e1cea31acff61d5a7a154c83",
+    "identityHash": "8c11d8c0110e00f9938fbe598f89bced",
     "entities": [
       {
-        "tableName": "ChineseWordAnnotation",
+        "tableName": "chinese_word_annotation",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`a_simplified` TEXT NOT NULL, `a_pinyins` TEXT, `notes` TEXT, `class_type` TEXT, `class_level` TEXT, `themes` TEXT, `first_seen` INTEGER, `is_exam` INTEGER, `a_searchable_text` TEXT NOT NULL DEFAULT '', PRIMARY KEY(`a_simplified`))",
         "fields": [
           {
@@ -17,44 +17,37 @@
           {
             "fieldPath": "pinyins",
             "columnName": "a_pinyins",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "notes",
             "columnName": "notes",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "classType",
             "columnName": "class_type",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "level",
             "columnName": "class_level",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "themes",
             "columnName": "themes",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "firstSeen",
             "columnName": "first_seen",
-            "affinity": "INTEGER",
-            "notNull": false
+            "affinity": "INTEGER"
           },
           {
             "fieldPath": "isExam",
             "columnName": "is_exam",
-            "affinity": "INTEGER",
-            "notNull": false
+            "affinity": "INTEGER"
           },
           {
             "fieldPath": "a_searchable_text",
@@ -72,20 +65,19 @@
         },
         "indices": [
           {
-            "name": "index_ChineseWordAnnotation_a_searchable_text",
+            "name": "index_chinese_word_annotation_a_searchable_text",
             "unique": false,
             "columnNames": [
               "a_searchable_text"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_ChineseWordAnnotation_a_searchable_text` ON `${TABLE_NAME}` (`a_searchable_text`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_chinese_word_annotation_a_searchable_text` ON `${TABLE_NAME}` (`a_searchable_text`)"
           }
-        ],
-        "foreignKeys": []
+        ]
       },
       {
-        "tableName": "ChineseWord",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`simplified` TEXT NOT NULL, `traditional` TEXT, `definition` TEXT NOT NULL, `hsk_level` TEXT, `pinyins` TEXT, `popularity` INTEGER, `searchable_text` TEXT NOT NULL DEFAULT '', PRIMARY KEY(`simplified`))",
+        "tableName": "chinese_word",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`simplified` TEXT NOT NULL, `traditional` TEXT, `definition` TEXT NOT NULL, `hsk_level` TEXT, `pinyins` TEXT, `popularity` INTEGER, `examples` TEXT DEFAULT '', `modality` TEXT DEFAULT 'N/A', `type` TEXT DEFAULT 'N/A', `synonyms` TEXT DEFAULT '', `antonym` TEXT DEFAULT '', `searchable_text` TEXT NOT NULL DEFAULT '', PRIMARY KEY(`simplified`))",
         "fields": [
           {
             "fieldPath": "simplified",
@@ -96,8 +88,7 @@
           {
             "fieldPath": "traditional",
             "columnName": "traditional",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "definition",
@@ -108,20 +99,47 @@
           {
             "fieldPath": "hskLevel",
             "columnName": "hsk_level",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "pinyins",
             "columnName": "pinyins",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "popularity",
             "columnName": "popularity",
-            "affinity": "INTEGER",
-            "notNull": false
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "examples",
+            "columnName": "examples",
+            "affinity": "TEXT",
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "modality",
+            "columnName": "modality",
+            "affinity": "TEXT",
+            "defaultValue": "'N/A'"
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "defaultValue": "'N/A'"
+          },
+          {
+            "fieldPath": "synonyms",
+            "columnName": "synonyms",
+            "affinity": "TEXT",
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "antonym",
+            "columnName": "antonym",
+            "affinity": "TEXT",
+            "defaultValue": "''"
           },
           {
             "fieldPath": "searchable_text",
@@ -139,22 +157,232 @@
         },
         "indices": [
           {
-            "name": "index_ChineseWord_searchable_text",
+            "name": "index_chinese_word_searchable_text",
             "unique": false,
             "columnNames": [
               "searchable_text"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_ChineseWord_searchable_text` ON `${TABLE_NAME}` (`searchable_text`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_chinese_word_searchable_text` ON `${TABLE_NAME}` (`searchable_text`)"
+          }
+        ]
+      },
+      {
+        "tableName": "chinese_word_frequency",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`simplified` TEXT NOT NULL, `appearance_count` INTEGER NOT NULL, `consulted_count` INTEGER NOT NULL, PRIMARY KEY(`simplified`))",
+        "fields": [
+          {
+            "fieldPath": "simplified",
+            "columnName": "simplified",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "appearanceCnt",
+            "columnName": "appearance_count",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "consultedCnt",
+            "columnName": "consulted_count",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
-        "foreignKeys": []
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "simplified"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_chinese_word_frequency_simplified",
+            "unique": false,
+            "columnNames": [
+              "simplified"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_chinese_word_frequency_simplified` ON `${TABLE_NAME}` (`simplified`)"
+          }
+        ]
+      },
+      {
+        "tableName": "word_list",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `creation_date` INTEGER NOT NULL, `last_modified` INTEGER NOT NULL, `anki_deck_id` INTEGER NOT NULL, `list_type` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "creationDate",
+            "columnName": "creation_date",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastModified",
+            "columnName": "last_modified",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ankiDeckId",
+            "columnName": "anki_deck_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "listType",
+            "columnName": "list_type",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "word_list_entry",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`list_id` INTEGER NOT NULL, `simplified` TEXT NOT NULL, `anki_note_id` INTEGER NOT NULL, PRIMARY KEY(`list_id`, `simplified`, `anki_note_id`), FOREIGN KEY(`list_id`) REFERENCES `word_list`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "listId",
+            "columnName": "list_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "simplified",
+            "columnName": "simplified",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ankiNoteId",
+            "columnName": "anki_note_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "list_id",
+            "simplified",
+            "anki_note_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_word_list_entry_list_id",
+            "unique": false,
+            "columnNames": [
+              "list_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_word_list_entry_list_id` ON `${TABLE_NAME}` (`list_id`)"
+          },
+          {
+            "name": "index_word_list_entry_simplified",
+            "unique": false,
+            "columnNames": [
+              "simplified"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_word_list_entry_simplified` ON `${TABLE_NAME}` (`simplified`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "word_list",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "list_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "widget_list_entry",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`widget_id` INTEGER NOT NULL, `list_id` INTEGER NOT NULL, PRIMARY KEY(`widget_id`, `list_id`), FOREIGN KEY(`list_id`) REFERENCES `word_list`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "widgetId",
+            "columnName": "widget_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "listId",
+            "columnName": "list_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "widget_id",
+            "list_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_widget_list_entry_widget_id",
+            "unique": false,
+            "columnNames": [
+              "widget_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_widget_list_entry_widget_id` ON `${TABLE_NAME}` (`widget_id`)"
+          },
+          {
+            "name": "index_widget_list_entry_list_id",
+            "unique": false,
+            "columnNames": [
+              "list_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_widget_list_entry_list_id` ON `${TABLE_NAME}` (`list_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "word_list",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "list_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
       }
     ],
-    "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '11832783e1cea31acff61d5a7a154c83')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8c11d8c0110e00f9938fbe598f89bced')"
     ]
   }
 }

@@ -119,16 +119,16 @@ def setup_logging():
     return log_file
 
 def add_new_columns(cursor, conn):
-    """Add new columns to the ChineseWord table if they don't exist."""
+    """Add new columns to the chinese_word table if they don't exist."""
     # First, get existing columns
-    cursor.execute("PRAGMA table_info(ChineseWord)")
+    cursor.execute("PRAGMA table_info(chinese_word)")
     existing_columns = {row[1] for row in cursor.fetchall()}
     
     columns_added = False
     for column_name, column_type in AI_COLUMNS.items():
         if column_name not in existing_columns:
             try:
-                cursor.execute(f'ALTER TABLE ChineseWord ADD COLUMN {column_name} {column_type}')
+                cursor.execute(f'ALTER TABLE chinese_word ADD COLUMN {column_name} {column_type}')
                 logging.debug(f'Added column {column_name}')
                 columns_added = True
             except sqlite3.OperationalError as e:
@@ -145,7 +145,7 @@ def clear_ai_columns(cursor, conn):
     """Clear all AI-generated columns in the database."""
     try:
         for column in AI_COLUMNS.keys():
-            cursor.execute(f'UPDATE ChineseWord SET {column} = NULL')
+            cursor.execute(f'UPDATE chinese_word SET {column} = NULL')
         conn.commit()
         logging.info("Cleared all AI-generated columns")
     except sqlite3.OperationalError as e:
@@ -157,7 +157,7 @@ def get_words_without_definitions(cursor, limit: int) -> List[str]:
     # First, get HSK words without definitions
     cursor.execute('''
         SELECT simplified
-        FROM ChineseWord
+        FROM chinese_word
         WHERE examples IS NULL AND hsk_level != 'NOT_HSK'
         LIMIT ?
     ''', (limit,))
@@ -168,7 +168,7 @@ def get_words_without_definitions(cursor, limit: int) -> List[str]:
         remaining = limit - len(hsk_words)
         cursor.execute('''
             SELECT simplified
-            FROM ChineseWord
+            FROM chinese_word
             WHERE examples IS NULL AND hsk_level = 'NOT_HSK'
             LIMIT ?
         ''', (remaining,))
@@ -379,7 +379,7 @@ def update_word_definitions(cursor, definitions: List[Dict]):
     """Update the database with the new definitions."""
 
     # Create a dictionary mapping simplified words to definitions
-    cursor.execute('SELECT simplified, definition FROM ChineseWord')
+    cursor.execute('SELECT simplified, definition FROM chinese_word')
     rows = cursor.fetchall()
     local_defs = {simplified: definition for simplified, definition in rows}
 
@@ -426,7 +426,7 @@ def update_word_definitions(cursor, definitions: List[Dict]):
             placeholders.append(def_data['word'])  # Add the word for the WHERE clause
             
             cursor.execute(f'''
-                UPDATE ChineseWord 
+                UPDATE chinese_word 
                 SET {set_clause}
                 WHERE simplified = ?
             ''', placeholders)
@@ -459,11 +459,11 @@ def main():
         add_new_columns(cursor, conn)
         
         # Get total count of words
-        cursor.execute('SELECT COUNT(*) FROM ChineseWord')
+        cursor.execute('SELECT COUNT(*) FROM chinese_word')
         total_words = cursor.fetchone()[0]
         
         # Get count of words without definitions
-        cursor.execute('SELECT COUNT(*) FROM ChineseWord WHERE examples IS NULL')
+        cursor.execute('SELECT COUNT(*) FROM chinese_word WHERE examples IS NULL')
         remaining_words = cursor.fetchone()[0]
         
         logging.info("Total words: %d", total_words)
@@ -492,7 +492,7 @@ def main():
                 conn.commit()  # Commit after each successful batch
                 
                 # Update remaining count
-                cursor.execute('SELECT COUNT(*) FROM ChineseWord WHERE examples IS NULL')
+                cursor.execute('SELECT COUNT(*) FROM chinese_word WHERE examples IS NULL')
                 remaining_words = cursor.fetchone()[0]
                 logging.info("Remaining words: %d", remaining_words)
             else:

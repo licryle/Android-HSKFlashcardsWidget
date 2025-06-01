@@ -9,7 +9,9 @@ import java.text.Normalizer
 
 import java.util.Locale
 
-@Entity(indices = [Index(value = ["searchable_text"])])
+@Entity(
+    tableName = "chinese_word",
+    indices = [Index(value = ["searchable_text"])])
 data class ChineseWord(
     // @Todo: lots of fields should be not-null. After hours of research, I can't get past compilation errors. So someday...
     @PrimaryKey val simplified: String,

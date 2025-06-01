@@ -6,9 +6,9 @@ import fr.berliat.hskwidget.data.model.ChineseWord
 
 @Dao
 interface ChineseWordDAO {
-    @Query("SELECT * FROM chineseword WHERE simplified = :simplifiedWord")
+    @Query("SELECT * FROM chinese_word WHERE simplified = :simplifiedWord")
     suspend fun findWordFromSimplified(simplifiedWord: String?): ChineseWord?
 
-    @Query("SELECT COUNT(*) FROM ChineseWord")
+    @Query("SELECT COUNT(*) FROM chinese_word")
     suspend fun getCount(): Int
 }

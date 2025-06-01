@@ -20,7 +20,7 @@ class FlashcardWidgetConfigFragment() : Fragment() {
     private lateinit var viewBinding: FlashcardWidgetConfigureBinding
     private var _widgetId: Int? = null
     private val prefListeners = mutableListOf<WidgetPreferenceListener>()
-    private suspend fun WidgetListsDAO() = ChineseWordsDatabase.getInstance(requireContext()).widgetListsDAO()
+    private suspend fun WidgetListsDAO() = ChineseWordsDatabase.getInstance(requireContext()).widgetListDAO()
     private suspend fun WordListDAO() = ChineseWordsDatabase.getInstance(requireContext()).wordListDAO()
 
     private val switchList = mutableMapOf<Long, MaterialSwitch>()

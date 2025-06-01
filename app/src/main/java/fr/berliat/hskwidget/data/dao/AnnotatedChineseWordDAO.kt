@@ -11,7 +11,7 @@ private const val select_left_join =
             " w.modality, w.examples, w.type, w.synonyms, w.antonym, " +
             " COALESCE(w.searchable_text, '') searchable_text, " +
             " (a.first_seen IS NULL) AS is_first_seen_null " +
-            " FROM chinesewordannotation AS a LEFT JOIN chineseword AS w" +
+            " FROM chinese_word_annotation AS a LEFT JOIN chinese_word AS w" +
             " ON a.a_simplified = w.simplified" +
             " "
 
@@ -23,7 +23,7 @@ private const val select_right_join =
             " w.modality, w.examples, w.type, w.synonyms, w.antonym, " +
             " w.searchable_text, " +
             " (a.first_seen IS NULL) AS is_first_seen_null " +
-            " FROM chineseword AS w LEFT JOIN chinesewordannotation AS a" +
+            " FROM chinese_word AS w LEFT JOIN chinese_word_annotation AS a" +
             " ON a.a_simplified = w.simplified" +
             " "
 
@@ -39,9 +39,9 @@ interface AnnotatedChineseWordDAO {
     suspend fun searchFromStrLike(str: String?, hasAnnotation: Boolean, page: Int = 0, pageSize: Int = 30): List<AnnotatedChineseWord>
 
     @Query("SELECT * FROM (" +
-           "       $select_left_join WHERE a.a_simplified IN (SELECT simplified FROM word_list_entries WHERE listId IN (:listIds) AND simplified NOT IN (:bannedWords))" +
+           "       $select_left_join WHERE a.a_simplified IN (SELECT simplified FROM word_list_entry WHERE list_id IN (:listIds) AND simplified NOT IN (:bannedWords))" +
            " UNION " +
-           "$select_right_join WHERE w.simplified IN (SELECT simplified FROM word_list_entries WHERE listId IN (:listIds) AND simplified NOT IN (:bannedWords))" +
+           "$select_right_join WHERE w.simplified IN (SELECT simplified FROM word_list_entry WHERE list_id IN (:listIds) AND simplified NOT IN (:bannedWords))" +
            ") ORDER BY RANDOM() LIMIT 1")
     suspend fun getRandomWordFromLists(listIds: List<Long>, bannedWords: Array<String>): AnnotatedChineseWord?
 
@@ -51,9 +51,9 @@ interface AnnotatedChineseWordDAO {
             " w.modality, w.examples, w.type, w.synonyms, w.antonym, " +
             " COALESCE(w.searchable_text, '') searchable_text, " +
             " (a.first_seen IS NULL) AS is_first_seen_null " +
-            " FROM chinesewordannotation AS a INNER JOIN word_list_entries AS wle ON a.a_simplified = wle.simplified " +
-            " INNER JOIN word_lists AS wl ON wl.id = wle.listId " +
-            " LEFT JOIN chineseword AS w ON a.a_simplified = w.simplified " +
+            " FROM chinese_word_annotation AS a INNER JOIN word_list_entry AS wle ON a.a_simplified = wle.simplified " +
+            " INNER JOIN word_list AS wl ON wl.id = wle.list_id " +
+            " LEFT JOIN chinese_word AS w ON a.a_simplified = w.simplified " +
             " WHERE wl.name = :listName " +
             " AND (0=:hasAnnotation OR (1=:hasAnnotation AND a.first_seen IS NOT NULL)) " +
             " UNION " +
@@ -64,9 +64,9 @@ interface AnnotatedChineseWordDAO {
             " w.modality, w.examples, w.type, w.synonyms, w.antonym, " +
             " w.searchable_text, " +
             " (a.first_seen IS NULL) AS is_first_seen_null " +
-            " FROM chineseword AS w  INNER JOIN word_list_entries AS wle ON w.simplified = wle.simplified " +
-            " INNER JOIN word_lists AS wl ON wl.id = wle.listId " +
-            " LEFT JOIN chinesewordannotation AS a ON a.a_simplified = w.simplified " +
+            " FROM chinese_word AS w  INNER JOIN word_list_entry AS wle ON w.simplified = wle.simplified " +
+            " INNER JOIN word_list AS wl ON wl.id = wle.list_id " +
+            " LEFT JOIN chinese_word_annotation AS a ON a.a_simplified = w.simplified " +
             " WHERE wl.name = :listName " +
             " AND (0=:hasAnnotation OR (1=:hasAnnotation AND a.first_seen IS NOT NULL)) " +
             " ORDER BY is_first_seen_null, a.first_seen DESC, w.popularity DESC " +

@@ -7,11 +7,11 @@ import androidx.room.Query
 import fr.berliat.hskwidget.data.model.WidgetListEntry
 
 @Dao
-interface WidgetListsDAO {
-    @Query("SELECT listId FROM widget_list_entries WHERE widgetId = :widgetId")
+interface WidgetListDAO {
+    @Query("SELECT list_id FROM widget_list_entry WHERE widget_id = :widgetId")
     suspend fun getListsForWidget(widgetId: Int): List<Long>
 
-    @Query("SELECT * FROM widget_list_entries")
+    @Query("SELECT * FROM widget_list_entry")
     suspend fun getAllEntries(): List<WidgetListEntry>
 
     @Insert
@@ -23,9 +23,9 @@ interface WidgetListsDAO {
     @Delete
     suspend fun deleteWidgetLists(entries: List<WidgetListEntry>)
 
-    @Query("DELETE FROM widget_list_entries WHERE widgetId = :widgetId")
+    @Query("DELETE FROM widget_list_entry WHERE widget_id = :widgetId")
     suspend fun deleteWidget(widgetId: Int)
 
-    @Query("DELETE FROM widget_list_entries")
+    @Query("DELETE FROM widget_list_entry")
     suspend fun deleteAllWidgets()
 }
