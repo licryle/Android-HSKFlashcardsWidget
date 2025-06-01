@@ -32,12 +32,6 @@
 
     <!-- Widget Preferences -->
     <string name="flashcard_widget_configure_section_hsk">Vocabulary list to include</string>
-    <string name="flashcard_widget_configure_hsk1">HSK 1 words</string>
-    <string name="flashcard_widget_configure_hsk2">HSK 2 words</string>
-    <string name="flashcard_widget_configure_hsk3">HSK 3 words</string>
-    <string name="flashcard_widget_configure_hsk4">HSK 4 words</string>
-    <string name="flashcard_widget_configure_hsk5">HSK 5 words</string>
-    <string name="flashcard_widget_configure_hsk6">HSK 6 words</string>
     <string name="add_widget_title">Configure your HSK Flashcard Widget</string>
     <string name="flashcard_widget_configure_toggle_on">%1$s words will now show up on this widget</string>
     <string name="flashcard_widget_configure_toggle_off">%1$s words will no longer show up on this widget</string>
