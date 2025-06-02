@@ -22,6 +22,7 @@ import fr.berliat.hskwidget.data.store.AnkiStore
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * AnkiDelegate is your easiest way to store things into Anki. This implementation is
@@ -104,7 +105,9 @@ class AnkiDelegate(
     /********* Checking Anki's Running & Installed **********/
     private suspend fun ensureAnkiDroidIsRunning() {
         if (!ankiStore.isStoreReady()) {
-            startAnkiDroid()
+            withContext(Dispatchers.Main) {
+                startAnkiDroid()
+            }
         }
     }
 
@@ -149,8 +152,10 @@ class AnkiDelegate(
                                     }
                                 }
 
-                                result.onSuccess { onAnkiOperationSuccess(appContext) }
-                                    .onFailure { e -> onAnkiOperationFailed(appContext, e) }
+                                withContext(Dispatchers.Main) {
+                                    result.onSuccess { onAnkiOperationSuccess(appContext) }
+                                        .onFailure { e -> onAnkiOperationFailed(appContext, e) }
+                                }
                             }
                         }
                     }
