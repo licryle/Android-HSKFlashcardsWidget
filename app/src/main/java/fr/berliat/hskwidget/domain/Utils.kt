@@ -158,6 +158,11 @@ class Utils {
             return false
         }
 
+        suspend fun listFilesInSAFDirectory(context: Context, directoryUri: Uri): List<DocumentFile> {
+            val dir = DocumentFile.fromTreeUri(context, directoryUri)
+            return dir?.listFiles()?.toList() ?: emptyList()
+        }
+
         suspend fun copyFileUsingSAF(context: Context, sourcePath: String, destinationDir: Uri, fileName: String): Boolean {
             return withContext(Dispatchers.IO) {
                 try {

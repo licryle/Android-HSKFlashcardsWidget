@@ -41,6 +41,14 @@ class AppPreferencesStore(context: Context):
             putString("database_backup_directory", dir.toString())
         }
 
+    var dbBackUpMaxLocalFiles: Int
+        get() {
+            return getInt("database_backup_max_local_files", 2)
+        }
+        set(nb) {
+            putInt("database_backup_max_local_files", nb)
+        }
+
     var searchFilterHasAnnotation: Boolean
         get() {
             return getBoolean("search_filter_hasAnnotation", false)

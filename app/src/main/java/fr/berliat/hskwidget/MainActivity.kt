@@ -180,6 +180,10 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
         Utils.getAppScope(applicationContext).launch(Dispatchers.IO) {
             val success = databaseBackup.backUp(uri)
 
+            if (success) {
+                databaseBackup.cleanOldBackups(uri, appConfig.dbBackUpMaxLocalFiles)
+            }
+
             withContext(Dispatchers.Main) {
                 if (success)
                     Toast.makeText(applicationContext, getString(R.string.dbbackup_success), Toast.LENGTH_LONG).show()

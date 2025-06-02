@@ -113,6 +113,14 @@ We recommend to choose the level your at plus the one below, or above depending 
     <string name="config_backup_location">Backup directory</string>
     <string name="config_backup_directory_choose">Choose directory</string>
     <string name="config_backup_icon_alt">Database upload</string>
+    <string name="config_backup_max_number">Number of backups to keep</string>
+    <string name="config_backup_select_number">Select how many</string>
+    <string-array name="config_backup_max_locally">
+        <item>2 (~100MB)</item>
+        <item>5 (~250MB)</item>
+        <item>10 (~500MB)</item>
+    </string-array>
+
     <string name="about_stats_title">Statistics</string>
     <string name="about_terms_conditions_title"><![CDATA[Privacy Policy & Licences]]></string>
     <string name="about_stats">Loading…</string>

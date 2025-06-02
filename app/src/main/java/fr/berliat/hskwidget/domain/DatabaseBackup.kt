@@ -76,6 +76,24 @@ class DatabaseBackup(comp: ActivityResultCaller,
         }
     }
 
+    suspend fun cleanOldBackups(destinationFolderUri: Uri, maxBackups: Int) {
+        val documents = Utils.listFilesInSAFDirectory(context, destinationFolderUri)
+            .filter { it.name?.endsWith(ChineseWordsDatabase.DATABASE_FILE) == true }
+            .sortedByDescending { it.lastModified() }  // Most recent first
+
+        if (documents.size > maxBackups) {
+            val toDelete = documents.drop(maxBackups)
+            for (doc in toDelete) {
+                try {
+                    Log.d(TAG, "Deleting old backup: ${doc.name}")
+                    doc.delete()
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to delete backup ${doc.name}", e)
+                }
+            }
+        }
+    }
+
     suspend fun backUp(destinationFolderUri: Uri): Boolean {
         Log.d(TAG, "Initiating Database Backup")
         val sourcePath = "${context.filesDir.path}/../databases/${ChineseWordsDatabase.DATABASE_FILE}"

@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
@@ -52,6 +53,24 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
         appConfig = AppPreferencesStore(requireContext())
 
         binding.configBackupActivateBtn.isChecked = appConfig.dbBackUpActive
+
+        // Max number of local files
+        val values = listOf(2, 5, 10)
+        val labels = resources.getStringArray(R.array.config_backup_max_locally)
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, labels)
+
+        binding.configBackupMaxLocal.setAdapter(adapter)
+        binding.configBackupMaxLocal.setOnItemClickListener  {
+                _, _, position, _ ->
+            appConfig.dbBackUpMaxLocalFiles = values[position]
+        }
+
+        val index = values.indexOf(appConfig.dbBackUpMaxLocalFiles)
+        if (index != -1) {
+            binding.configBackupMaxLocal.setText(labels[index], false)
+        }
+        // End: Max number of local files
+
         binding.configBackupActivateBtn.setOnClickListener {
             appConfig.dbBackUpActive = binding.configBackupActivateBtn.isChecked
         }
