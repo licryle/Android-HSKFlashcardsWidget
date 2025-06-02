@@ -63,7 +63,7 @@ abstract class ChineseWordsDatabase : RoomDatabase() {
         private var INSTANCE: ChineseWordsDatabase? = null
         private val mutex = Mutex()
 
-        const val DATABASE_FILE = "chinese_words.db"
+        const val DATABASE_FILE = "Mandarin_Assistant.db"
 
         private fun buildDatabase(context: Context) =
             Room.databaseBuilder(

@@ -248,6 +248,6 @@ other_files = ['new_hsk/HSK List (Frequency)/HSK 7-9.txt', 'new_hsk/HSK List (Fr
                'new_hsk/HSK List (Frequency)/HSK 5.txt', 'new_hsk/HSK List (Frequency)/HSK 4.txt', 
                'new_hsk/HSK List (Frequency)/HSK 3.txt', 'new_hsk/HSK List (Frequency)/HSK 2.txt', 
                'new_hsk/HSK List (Frequency)/HSK 1.txt']  # List of other files containing Chinese words
-db_file = '../app/src/main/assets/databases/chinese_words.db'
+db_file = '../app/src/main/assets/databases/Mandarin_Assistant.db'
 
 build_dictionary(cedict_file, other_files, db_file)

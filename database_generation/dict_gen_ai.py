@@ -17,7 +17,7 @@ load_dotenv()
 BATCH_SIZE = 10  # Number of words to process in each batch
 API_ENDPOINT = os.getenv('LLM_API_ENDPOINT', 'http://localhost:1234/v1/chat/completions')  # LM Studio OpenAI-compatible endpoint
 MODEL_NAME = os.getenv('LLM_MODEL_NAME', 'Yi-1.5-6B-Chat-Q6_K')  # Default model name
-DB_FILE = '../app/src/main/assets/databases/chinese_words.db'
+DB_FILE = '../app/src/main/assets/databases/Mandarin_Assistant.db'
 MAX_CONSECUTIVE_FAILURES = 10  # Maximum number of consecutive API failures before exiting
 
 # Chinese to English mappings for modality and type
