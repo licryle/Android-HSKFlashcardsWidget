@@ -54,7 +54,7 @@ class AboutFragment : Fragment() {
 
     @SuppressLint("StringFormatMatches")
     private fun fetchAndDisplayStats() {
-        Log.d("AboutFragment", "fetching stats")
+        Log.d(TAG, "fetching stats")
 
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             val db = ChineseWordsDatabase.getInstance(requireContext())
@@ -66,12 +66,16 @@ class AboutFragment : Fragment() {
 
             // Switch back to the main thread to update UI
             // Update the UI with the result
-            Log.d("AboutFragment", "stats fetched")
+            Log.d(TAG, "stats fetched")
 
             withContext(Dispatchers.Main) {
                 binding.textStats.text =
                     getString(R.string.about_stats_text, wordsCnt, annotationsCnt)
             }
         }
+    }
+
+    companion object {
+        const val TAG = "AboutFragment"
     }
 }

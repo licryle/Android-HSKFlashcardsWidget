@@ -7,7 +7,6 @@ import androidx.datastore.preferences.preferencesDataStore
 import fr.berliat.hskwidget.data.dao.WidgetListDAO
 import fr.berliat.hskwidget.data.model.WidgetListEntry
 import fr.berliat.hskwidget.data.model.WordListWithCount
-import fr.berliat.hskwidget.domain.Utils
 
 internal val Context.dataStore: DataStore<Preferences> by preferencesDataStore("WidgetPreferenceStore")
 
@@ -21,16 +20,9 @@ class FlashcardPreferencesStore(private val context: Context, private val widget
     }
     private suspend fun WordListDAO() = ChineseWordsDatabase.getInstance(context).wordListDAO()
 
-    var currentSimplified : String
-        get() {
-            return this.getString(
-                PREFERENCE_CURRENT_SIMPLIFIED,
-                Utils.getDefaultWord(context).simplified) ?: return ""
-
-        }
-        set(word: String) {
-            this.putStringBlocking(PREFERENCE_CURRENT_SIMPLIFIED, word)
-        }
+    var currentSimplified : String?
+        get() = this.getString(PREFERENCE_CURRENT_SIMPLIFIED,null)
+        set(word: String?) { this.putStringBlocking(PREFERENCE_CURRENT_SIMPLIFIED, word) }
 
     suspend fun getAllowedLists(): List<WordListWithCount> {
         val widgetListIds = WidgetListsDAO().getListsForWidget(widgetId)

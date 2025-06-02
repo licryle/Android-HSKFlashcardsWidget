@@ -56,22 +56,6 @@ class Utils {
         }
     }
     companion object {
-        fun getDefaultWord(context: Context): ChineseWord {
-            return ChineseWord(
-                context.getString(R.string.widget_default_chinese),
-                "",
-                mapOf(Locale.ENGLISH to context.getString(R.string.widget_default_english)),
-                ChineseWord.HSK_Level.HSK1,
-                ChineseWord.Pinyins(context.getString(R.string.widget_default_pinyin)),
-                0,
-                "",
-                ChineseWord.Modality.ORAL,
-                ChineseWord.Type.NOUN,
-                "",
-                ""
-            )
-        }
-
         fun getOpenURLIntent(url: String): Intent {
             return Intent(
                 Intent.ACTION_VIEW,

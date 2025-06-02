@@ -27,29 +27,33 @@ class FlashcardManager private constructor(private val context: Context,
         return FlashcardPreferencesStore(context, widgetId)
     }
 
-    suspend fun getCurrentWord() : ChineseWord {
-        val currentWord = AnnotatedChineseWordDAO().getFromSimplified(flashCardPrefs.currentSimplified)
-            ?: return Utils.getDefaultWord(context)
+    suspend fun getCurrentWord() : ChineseWord? {
+        if (flashCardPrefs.currentSimplified == null) return null
 
-        return currentWord.toChineseWord() ?: Utils.getDefaultWord(context)
+        val currentWord = AnnotatedChineseWordDAO().getFromSimplified(flashCardPrefs.currentSimplified)
+            ?: return null
+
+        return currentWord.toChineseWord()
     }
 
-    suspend fun getNewWord(): ChineseWord {
+    suspend fun getNewWord(): ChineseWord? {
         val currentWord = AnnotatedChineseWordDAO().getFromSimplified(flashCardPrefs.currentSimplified)
 
         val allowedListIds = flashCardPrefs.getAllowedLists().map { it.wordList.id }
         val newWord = AnnotatedChineseWordDAO().getRandomWordFromLists(allowedListIds, arrayOf(currentWord?.simplified ?: ""))
 
-        var finalWord = Utils.getDefaultWord(context)
+        if (newWord == null) {
+            Log.i(TAG, "getNewWord: No new word gotten, null returned.")
+            flashCardPrefs.currentSimplified = null
+            return null
+        }
 
-        Log.i(TAG, "Got a new word, maybe: %s".format(newWord))
-        if (newWord != null)
-            finalWord = newWord.toChineseWord() ?: finalWord
+        Log.i(TAG, "getNewWord: Got a new word, maybe: %s".format(newWord))
 
         // Persist it in preferences for cross-App convenience
-        flashCardPrefs.currentSimplified = finalWord.simplified
+        flashCardPrefs.currentSimplified = newWord.simplified
 
-        return finalWord
+        return newWord.toChineseWord()
     }
 
     fun updateWord() {
@@ -82,9 +86,7 @@ class FlashcardManager private constructor(private val context: Context,
     }
 
     fun playWidgetWord() : Boolean {
-        val word = flashCardPrefs.currentSimplified
-
-        if (word == "") return false
+        val word = flashCardPrefs.currentSimplified ?: return false
 
         Utils.playWordInBackground(context, word)
 

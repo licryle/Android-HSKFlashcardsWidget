@@ -12,8 +12,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <ImageView
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/image_capture_button"
+        android:scaleType="centerInside"
+        android:padding="4dp"
         android:layout_width="110dp"
         android:layout_height="110dp"
         android:layout_marginBottom="50dp"
@@ -21,7 +23,11 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintEnd_toStartOf="@id/vertical_centerline"
-        android:src="@drawable/china_flag"/>
+        app:shapeAppearanceOverlay="@style/RoundImageView"
+        app:strokeColor="@android:color/white"
+        app:strokeWidth="3dp"
+        android:src="@mipmap/ic_launcher_round"
+        android:background="@mipmap/ic_launcher_background"/>
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/vertical_centerline"

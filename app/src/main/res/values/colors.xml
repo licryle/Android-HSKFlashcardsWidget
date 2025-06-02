@@ -1,6 +1,7 @@
 
 <resources>
     <color name="seed">#FF0000</color>
+    <color name="logo_background">#F44336</color>
     <color name="md_theme_light_primary">#C00100</color>
     <color name="md_theme_light_onPrimary">#FFFFFF</color>
     <color name="md_theme_light_primaryContainer">#FFDAD4</color>

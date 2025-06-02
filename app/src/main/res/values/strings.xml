@@ -1,5 +1,6 @@
 <resources>
-    <string name="app_name">HSK Helper</string>
+    <string name="app_name">HSK Mandarin Chinese Assistant</string>
+    <string name="app_slogan">Study at every phone unlock</string>
 
     <string name="date_format">yyyy-MM-dd</string>
 
@@ -11,8 +12,6 @@
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">HSK Widget</string>
-    <string name="nav_header_subtitle">Learn at every phone unlock</string>
     <string name="nav_header_desc">Navigation header</string>
 
     <string name="menu_widgets">Widgets</string>
@@ -32,11 +31,15 @@
 
     <!-- Widget Preferences -->
     <string name="flashcard_widget_configure_section_hsk">Vocabulary list to include</string>
+
     <string name="add_widget_title">Configure your HSK Flashcard Widget</string>
     <string name="flashcard_widget_configure_toggle_on">%1$s words will now show up on this widget</string>
     <string name="flashcard_widget_configure_toggle_off">%1$s words will no longer show up on this widget</string>
+    <string name="flashcard_widget_configure_saved">Widget configuration updated</string>
+    <string name="flashcard_widget_configure_empty">Widget NOT updated, select least 1 vocabulary list</string>
 
     <!-- Widget Default -->
+    <string name="widget_not_configured">No word.\nClick to configure list(s)</string>
     <string name="widget_default_chinese">你好</string>
     <string name="widget_default_english">Hello</string>
     <string name="widget_default_pinyin">nĭ hăo</string>

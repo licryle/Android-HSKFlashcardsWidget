@@ -21,10 +21,10 @@ import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.ui.widget.FlashcardFragment
 import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
 
+
 class WidgetsListFragment : Fragment() {
     private var _binding: FragmentWidgetsBinding? = null
     private var _viewModel: WidgetsListViewModel? = null
-    private val _previewFragment: FlashcardFragment? = null
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -34,12 +34,15 @@ class WidgetsListFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val previewWidget = FlashcardFragment.newInstance(0)
         with(childFragmentManager.beginTransaction()) {
             add(
                 R.id.widgets_demoflashcard_fragment,
-                FlashcardFragment.newInstance(0))
+                previewWidget)
             commit()
         }
+        childFragmentManager.executePendingTransactions()
+        previewWidget.updateWord()
     }
 
     override fun onCreateView(
@@ -103,10 +106,15 @@ class WidgetsListFragment : Fragment() {
         if (intentWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
             val context = requireActivity().applicationContext
             val widgetIds = FlashcardWidgetProvider().getWidgetIds(context)
-            viewModel.onToggleTab(widgetIds.indexOf(intentWidgetId))
+
+            val position = widgetIds.indexOf(intentWidgetId)
+            viewModel.onToggleTab(position)
             Utils.logAnalyticsWidgetAction(context, Utils.ANALYTICS_EVENTS.WIDGET_RECONFIGURE, intentWidgetId)
             // Consume condition so we don't come back here until next intent
             arguments.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
+
+            val adapter = binding.widgetsTabsConfigure.adapter as WidgetPagerAdapter
+            adapter.setFragmentToFireIntent(intentWidgetId)
         }
     }
 
@@ -136,15 +144,36 @@ class WidgetsListFragment : Fragment() {
 
     class WidgetPagerAdapter(fragMgr: FragmentManager, lifecycle: Lifecycle,
                              private val widgetIds : IntArray) :
-        FragmentStateAdapter(fragMgr, lifecycle) {
+                             FragmentStateAdapter(fragMgr, lifecycle) {
+        // TODO: Someday, is the API evolves, find a better way to access the fragment that cache
+        // it here. I don't know when items are removed.
+        private val fragMap = mutableMapOf<Int, WidgetsWidgetConfPreviewFragment>()
+        private val fragToFireIntent = mutableListOf<Int>()
+
         override fun getItemCount(): Int {
             return widgetIds.count()
         }
 
-        override fun createFragment(position: Int): Fragment {
-            return WidgetsWidgetConfPreviewFragment.newInstance(widgetIds[position])
+        override fun createFragment(position: Int): WidgetsWidgetConfPreviewFragment {
+            val widgetId = widgetIds[position]
+            val newFragment = WidgetsWidgetConfPreviewFragment.newInstance(widgetId)
+            fragMap[widgetId] = newFragment
+
+            if (fragToFireIntent.contains(widgetId)) {
+                newFragment.widgetExpectsIntent = true
+                fragToFireIntent.remove(widgetId)
+            }
+
+            return newFragment
         }
 
+        fun setFragmentToFireIntent(widgetId: Int) {
+            if (fragMap.contains(widgetId)) {
+                fragMap[widgetId]!!.widgetExpectsIntent = true
+            } else {
+                fragToFireIntent.add(widgetId)
+            }
+        }
     }
 
     class TabChangeListener(private val viewModel :WidgetsListViewModel)

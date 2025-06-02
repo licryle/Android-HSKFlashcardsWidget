@@ -21,6 +21,7 @@ class BackgroundSpeechService(val context: Context, workerParams: WorkerParamete
     private val word = inputData.getString("word")
 
     companion object {
+        const val TAG = "BackgroundSpeechService"
         const val FAILURE_UNKNOWN = "FAILURE_UNKNOWN"
         const val FAILURE_REASON = "FAILURE_REASON"
         const val FAILURE_MUTED = "FAILURE_MUTED"
@@ -30,26 +31,26 @@ class BackgroundSpeechService(val context: Context, workerParams: WorkerParamete
 
     @SuppressLint("RestrictedApi")
     override fun doWork(): Result {
-        Log.i("BackgroundSpeechService", "Readying to play  ${word} out loud.")
+        Log.i(TAG, "Readying to play  ${word} out loud.")
         if (isMuted()) {
-            Log.i("BackgroundSpeechService", "But volume is muted. Aborting.")
+            Log.i(TAG, "But volume is muted. Aborting.")
             return buildErrorResult(FAILURE_MUTED)
         }
 
         while (initStatus == null) {
-            Log.i("BackgroundSpeechService", "Not (yet) ready to play  ${word} out loud.")
+            Log.i(TAG, "Not (yet) ready to play  ${word} out loud.")
             sleep(10)
         }
 
         if (initStatus != TextToSpeech.SUCCESS) {
-            Log.e("BackgroundSpeechService", "Initialization Failed!")
+            Log.e(TAG, "Initialization Failed!")
             return buildErrorResult(FAILURE_INIT_FAILED)
         }
 
-        Log.i("BackgroundSpeechService", "Setting language to play  ${word} out loud.")
+        Log.i(TAG, "Setting language to play  ${word} out loud.")
         val result = textToSpeech.setLanguage(Locale.SIMPLIFIED_CHINESE)
         if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-            Log.e("BackgroundSpeechService", "Simplified_chinese not supported on this phone.")
+            Log.e(TAG, "Simplified_chinese not supported on this phone.")
 
             val installIntent = Intent()
             installIntent.action = TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA
@@ -59,9 +60,9 @@ class BackgroundSpeechService(val context: Context, workerParams: WorkerParamete
             return buildErrorResult(FAILURE_LANG_UNSUPPORTED)
         }
 
-        Log.i("BackgroundSpeechService", "Starting to play  ${word} out loud.")
+        Log.i(TAG, "Starting to play  ${word} out loud.")
         textToSpeech.speak(word, TextToSpeech.QUEUE_FLUSH, null, "")
-        Log.i("BackgroundSpeechService", "Finishing to play  ${word} out loud.")
+        Log.i(TAG, "Finishing to play  ${word} out loud.")
 
         return Result.success()
     }

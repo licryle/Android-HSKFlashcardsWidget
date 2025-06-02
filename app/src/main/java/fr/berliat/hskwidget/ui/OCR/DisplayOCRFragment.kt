@@ -253,17 +253,17 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
     }
 
     private suspend fun fetchWord(hanzi: String): AnnotatedChineseWord? {
-        Log.d("DisplayOCRFragment", "Searching for $hanzi")
+        Log.d(TAG, "Searching for $hanzi")
         val db = ChineseWordsDatabase.getInstance(requireContext())
         val dao = db.annotatedChineseWordDAO()
         try {
             val word = dao.getFromSimplified(hanzi)
-            Log.d("DictionarySearchFragment", "Search returned for $hanzi")
+            Log.d(TAG, "Search returned for $hanzi")
 
             return word
         } catch (e: Exception) {
             // Code for handling the exception
-            Log.e("DictionarySearchFragment", "$e")
+            Log.e(TAG, "$e")
         }
 
         return null

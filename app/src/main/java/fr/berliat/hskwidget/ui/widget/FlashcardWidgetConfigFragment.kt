@@ -68,20 +68,22 @@ class FlashcardWidgetConfigFragment() : Fragment() {
 
         viewBinding.flashcardWidgetConfigureAddwidget.setOnClickListener {
             val entriesToAdd = mutableListOf<WidgetListEntry>()
-            lifecycleScope.launch(Dispatchers.IO) {
-                for ((listId, switch) in switchList) {
-                    if (switch.isChecked) {
-                        entriesToAdd.add(WidgetListEntry(widgetId, listId))
-                    }
+            for ((listId, switch) in switchList) {
+                if (switch.isChecked) {
+                    entriesToAdd.add(WidgetListEntry(widgetId, listId))
                 }
             }
 
-            lifecycleScope.launch(Dispatchers.IO) {
-                WidgetListsDAO().deleteWidget(widgetId)
-                WidgetListsDAO().insertListsToWidget(entriesToAdd)
+            if (entriesToAdd.isEmpty()) {
+                fireWidgetPreferenceEmpty()
+            } else {
+                lifecycleScope.launch(Dispatchers.IO) {
+                    WidgetListsDAO().deleteWidget(widgetId)
+                    WidgetListsDAO().insertListsToWidget(entriesToAdd)
 
-                withContext(Dispatchers.Main) {
-                    fireWidgetPreferenceSaved()
+                    withContext(Dispatchers.Main) {
+                        fireWidgetPreferenceSaved()
+                    }
                 }
             }
         }
@@ -101,6 +103,12 @@ class FlashcardWidgetConfigFragment() : Fragment() {
     private fun fireWidgetPreferenceChange(listId: Long, included: Boolean) {
         prefListeners.forEach() {
             it.onWidgetPreferenceChange(widgetId, listId, included)
+        }
+    }
+
+    private fun fireWidgetPreferenceEmpty() {
+        prefListeners.forEach() {
+            it.onWidgetPreferenceEmpty(widgetId)
         }
     }
 
@@ -132,5 +140,6 @@ class FlashcardWidgetConfigFragment() : Fragment() {
     interface WidgetPreferenceListener {
         fun onWidgetPreferenceChange(widgetId: Int, listId: Long, included: Boolean)
         fun onWidgetPreferenceSaved(widgetId: Int)
+        fun onWidgetPreferenceEmpty(widgetId: Int)
     }
 }

@@ -1,7 +1,8 @@
 package fr.berliat.hskwidget.ui.widgets
 
 import android.app.Activity
-import android.content.Context
+import android.appwidget.AppWidgetManager
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -22,19 +23,18 @@ private const val ARG_WIDGETID = "WIDGETID"
  * Use the [WidgetsWidgetConfPreviewFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class WidgetsWidgetConfPreviewFragment : Fragment() {
+class WidgetsWidgetConfPreviewFragment : Fragment(), FlashcardWidgetConfigFragment.WidgetPreferenceListener  {
+    var widgetExpectsIntent: Boolean = false
     private var _widgetId: Int? = null
     private var _root: View ? = null
     private var _confFragment: FlashcardWidgetConfigFragment? = null
     private var _previewFragment: FlashcardFragment? = null
-    private var _prefChangeCallback: WidgetPrefListener? = null
 
     // Properties only valid between onCreateView and onDestroyView.
     private val widgetId get() = _widgetId!!
     private val root get() = _root!!
     private val confFragment get() = _confFragment!!
     private val previewFragment get() = _previewFragment!!
-    private val prefChangeCallback get() = _prefChangeCallback!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,8 +44,7 @@ class WidgetsWidgetConfPreviewFragment : Fragment() {
         }
 
         _confFragment = FlashcardWidgetConfigFragment.newInstance(widgetId)
-        _prefChangeCallback = WidgetPrefListener(requireActivity(), requireContext())
-        confFragment.addWidgetPreferenceListener(prefChangeCallback)
+        confFragment.addWidgetPreferenceListener(this)
         _previewFragment = FlashcardFragment.newInstance(widgetId)
 
         with(childFragmentManager.beginTransaction()) {
@@ -56,7 +55,7 @@ class WidgetsWidgetConfPreviewFragment : Fragment() {
     }
 
     override fun onDestroy() {
-        confFragment.removeWidgetPreferenceListener(prefChangeCallback)
+        confFragment.removeWidgetPreferenceListener(this)
 
         with(childFragmentManager.beginTransaction()) {
             if (_confFragment != null)
@@ -89,6 +88,39 @@ class WidgetsWidgetConfPreviewFragment : Fragment() {
         return root
     }
 
+    override fun onWidgetPreferenceChange(widgetId: Int, listId: Long, included: Boolean) {
+    }
+
+    override fun onWidgetPreferenceEmpty(widgetId: Int) {
+        Toast.makeText(
+            activity,
+            getString(R.string.flashcard_widget_configure_empty),
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+
+    override fun onWidgetPreferenceSaved(widgetId: Int) {
+        val activity = requireActivity()
+        FlashcardManager.getInstance(activity, widgetId).updateWord()
+        Utils.logAnalyticsWidgetAction(
+            activity,
+            Utils.ANALYTICS_EVENTS.WIDGET_RECONFIGURE, widgetId
+        )
+
+        Toast.makeText(
+            activity,
+            getString(R.string.flashcard_widget_configure_saved),
+            Toast.LENGTH_SHORT
+        ).show()
+
+        if (widgetExpectsIntent) {
+            val resultIntent = Intent()
+            resultIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
+            activity.setResult(Activity.RESULT_OK, activity.intent)
+            widgetExpectsIntent = false
+        }
+    }
+
     companion object {
         /**
          * Use this factory method to create a new instance of
@@ -104,31 +136,5 @@ class WidgetsWidgetConfPreviewFragment : Fragment() {
                     putInt(ARG_WIDGETID, widgetId)
                 }
             }
-
-        private class WidgetPrefListener(val activity: Activity, val context: Context)
-            : FlashcardWidgetConfigFragment.WidgetPreferenceListener {
-
-            override fun onWidgetPreferenceChange(
-                widgetId: Int,
-                listId: Long,
-                included: Boolean
-            ) {
-
-            }
-
-            override fun onWidgetPreferenceSaved(widgetId: Int) {
-                FlashcardManager.getInstance(context, widgetId).updateWord()
-                Utils.logAnalyticsWidgetAction(
-                    activity,
-                    Utils.ANALYTICS_EVENTS.WIDGET_RECONFIGURE, widgetId
-                )
-
-                Toast.makeText(
-                    activity,
-                    "Widget configuration updated",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
     }
 }
