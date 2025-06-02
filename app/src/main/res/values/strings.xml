@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">HSK Mandarin Chinese Assistant</string>
+    <string name="app_name">Mandarin Assistant</string>
     <string name="app_slogan">Study at every phone unlock</string>
 
     <string name="date_format">yyyy-MM-dd</string>
