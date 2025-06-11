@@ -60,7 +60,6 @@ We recommend to choose the level your at plus the one below, or above depending 
 \nLicense: GNU GPLv3. In a nutshell, you can do whatever you want with it, but must display credit for the work and use the same license downstream.
 \n
 \nThis project uses the awesome projects of:
-\n- HSK list from https://github.com/plaktos/hsk_csv
 \n- Full CN-EN from CC-CEDICT list from https://www.mdbg.net/chinese/
 \n- HSK list from https://github.com/krmanik/HSK-3.0
 \n- Dictionary metadata in Chinese (BETA!) was generated using Yi 1.5 6B - Q6_K LLM from 01.AI.</string>
