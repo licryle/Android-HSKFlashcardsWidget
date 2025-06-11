@@ -84,6 +84,10 @@ class FlashcardFragment : Fragment() {
 
             // Switch back to the main thread to update UI
             withContext(Dispatchers.Main) {
+                if (!::bindings.isInitialized) {
+                    return@withContext
+                }
+
                 if (currentWord == null) {
                     Log.i(TAG, "Updating Fragment view, but no word available")
 
