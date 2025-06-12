@@ -64,8 +64,15 @@ class Utils {
         }
 
         fun sendEmail(context: Context, address: String, subject: String = "", body: String = "") {
-            context.startActivity(getOpenURLIntent(
-                "mailto:$address?subject=" + Uri.encode(subject) + "&body=" + Uri.encode(body)))
+            val intent = getOpenURLIntent(
+                "mailto:$address?subject=" + Uri.encode(subject) + "&body=" + Uri.encode(body))
+
+            if (intent.resolveActivity(context.packageManager) != null) {
+                context.startActivity(intent)
+            } else {
+                Toast.makeText(context, context.getString(R.string.about_email_noapp), Toast.LENGTH_LONG).show()
+                copyToClipBoard(context, address)
+            }
         }
 
         fun playWordInBackground(context: Context, word: String) {

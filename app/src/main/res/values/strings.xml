@@ -288,4 +288,5 @@ padding: 0;
     <string name="dictionary_item_altdefinition">Definition</string>
     <string name="dictionary_search_filter_hsk3definition_hint">Definition in HSK3</string>
     <string name="dbrestore_start">Database restoration started</string>
+    <string name="about_email_noapp">No email client found. Address copied to clipboard.</string>
 </resources>
