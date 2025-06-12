@@ -46,6 +46,7 @@ android {
     buildFeatures {
         viewBinding = true
         buildConfig = true
+        dataBinding = true
     }
 }
 
@@ -64,7 +65,6 @@ dependencies {
     implementation("androidx.work:work-runtime-ktx:2.10.1")
     implementation("com.opencsv:opencsv:4.6")
     implementation("androidx.preference:preference-ktx:1.2.1")
-    implementation("androidx.databinding:adapters:3.2.0-alpha11")
     implementation("androidx.core:core-ktx:1.16.0")
     implementation("com.google.android.gms:play-services-mlkit-text-recognition:19.0.1")
     implementation("androidx.fragment:fragment-ktx:1.8.7")
@@ -142,6 +142,6 @@ dependencies {
 
 
     implementation("com.android.billingclient:billing:7.1.1")
-    implementation("com.android.billingclient:billing-ktx:6.1.0")
+    implementation("com.android.billingclient:billing-ktx:7.1.1")
 
 }

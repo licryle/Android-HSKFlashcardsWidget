@@ -24,5 +24,9 @@
             android:id="@+id/nav_about"
             android:icon="@drawable/baseline_info_24"
             android:title="@string/menu_about" />
+        <!--<item
+            android:id="@+id/nav_support"
+            android:icon="@drawable/bakery_dining_24px"
+            android:title="@string/support_app" />-->
     </group>
 </menu>

@@ -53,7 +53,7 @@ We recommend to choose the level your at plus the one below, or above depending 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="widgets_add_widget">Add a new widget</string>
     <string name="about_btn_view_source">View source code</string>
-    <string name="about_intro1">HSK Flashcard Widget (v%1$s) is an open source project by Cyrille Berliat that stems from a personal need to learn Mandarin. \n \nIf you purchased it via Google Play - Thank you! You\'ve contributed to Open Software and my countless hours of development.</string>
+    <string name="about_intro1">HSK Flashcard Widget (v%1$s) is an open source project by Cyrille Berliat that stems from a personal need to learn Mandarin. \n \nIf it\'s useful to you, please consider supporting me and my countless hours of development :)</string>
     <string name="about_intro2">If you have any suggestions, feedback or issues, feel free to email me.</string>
     <string name="about_intro3">Privacy policy: I use Google Analytics to track usage, such as which tab is visited the most on which device class (Tablet, Smartphone). \nNo Personal Identifiable Information (PII) data should be collected nor sent to me or Google Analytics.
 \n
@@ -289,4 +289,8 @@ padding: 0;
     <string name="dictionary_search_filter_hsk3definition_hint">Definition in HSK3</string>
     <string name="dbrestore_start">Database restoration started</string>
     <string name="about_email_noapp">No email client found. Address copied to clipboard.</string>
+    <string name="support_app">Support the creator!</string>
+    <string name="about_intro_title">About</string>
+    <string name="support_devintro_title">🥐 Support the creator 🥐</string>
+    <string name="support_devintro">Hello everyone, Cyrille here, I\'m an indie developer originally from France.\n\nAs I learn Chinese, I realized I needed such app and none of the existing ones filled my needs.\n\nSo here we are, I\'m happily sharing for free this creation with you.\n\nIf you also find it useful, please consider participating to my croissant fund!</string>
 </resources>
