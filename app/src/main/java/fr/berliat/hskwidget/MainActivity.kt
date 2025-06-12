@@ -5,7 +5,6 @@ import android.appwidget.AppWidgetManager.ACTION_APPWIDGET_CONFIGURE
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.os.StrictMode
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -32,6 +31,7 @@ import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.ui.OCR.CaptureImageFragmentDirections
 import fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragment
 import fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragmentDirections
+import fr.berliat.hskwidget.ui.utils.StrictModeManager
 import fr.berliat.hskwidget.ui.widgets.WidgetsListFragmentDirections
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -57,25 +57,7 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
         setupSharedViewModel()
 
         // Enable StrictMode in Debug mode
-        if (BuildConfig.DEBUG) {
-            val policy = StrictMode.ThreadPolicy.Builder()
-                .detectAll() // Detect disk writes, network operations, etc.
-                .penaltyLog() // Log violations in Logcat
-                .penaltyDeath() // Crash on violations (optional)
-                .build()
-
-            StrictMode.setThreadPolicy(policy)
-
-            val vmPolicy = StrictMode.VmPolicy.Builder()
-                .detectLeakedSqlLiteObjects() // Detect SQLite object leaks
-                .detectLeakedClosableObjects() // Detect closable object leaks
-                .penaltyLog()
-                .penaltyDeath()
-                .build()
-
-            StrictMode.setVmPolicy(vmPolicy)
-        }
-
+        StrictModeManager.init()
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)

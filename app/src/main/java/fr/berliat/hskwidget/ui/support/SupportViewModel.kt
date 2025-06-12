@@ -21,11 +21,12 @@ import org.json.JSONObject
 
 class SupportViewModel(application: Application) : AndroidViewModel(application),
     PurchasesUpdatedListener {
-    private val _totalSpentText = MutableLiveData("You’ve spent $0.00 so far.")
-    val totalSpentText: LiveData<String> = _totalSpentText
-
     private val _totalSpent = MutableLiveData(0.00)
     val totalSpent: LiveData<Double> = _totalSpent
+
+    private val _totalSpentText = MutableLiveData(
+        application.applicationContext.getString(R.string.support_total_support).format(totalSpent))
+    val totalSpentText: LiveData<String> = _totalSpentText
 
     private val _supportTier = MutableLiveData("No support yet 😢")
     val supportTier: LiveData<String> = _supportTier
@@ -53,12 +54,12 @@ class SupportViewModel(application: Application) : AndroidViewModel(application)
                 if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
                     queryPurchaseHistory()
                 } else {
-                    Log.e("Billing", "Setup failed: ${billingResult.debugMessage}")
+                    Log.e(TAG, "Billing Setup failed: ${billingResult.debugMessage}")
                 }
             }
 
             override fun onBillingServiceDisconnected() {
-                Log.w("Billing", "Service disconnected")
+                Log.w(TAG, "Billing Service disconnected")
             }
         })
     }
@@ -78,26 +79,18 @@ class SupportViewModel(application: Application) : AndroidViewModel(application)
                 _totalSpent.postValue(Math.round(totalDollars * 100).toDouble() / 100)
                 _totalSpentText.postValue("You’ve spent $${"%.2f".format(totalDollars)} so far.")
 
+                var statusStringId = 0
                 when {
-                    totalDollars >= 6 -> {
-                        _supportTier.postValue("Gold Supporter 🥇")
-                        _tierIcon.postValue(R.drawable.trophy_24px)
-                    }
-                    totalDollars >= 3 -> {
-                        _supportTier.postValue("Silver Supporter 🥈")
-                        _tierIcon.postValue(R.drawable.trophy_24px)
-                    }
-                    totalDollars >= 1 -> {
-                        _supportTier.postValue("Bronze Supporter 🥉")
-                        _tierIcon.postValue(R.drawable.trophy_24px)
-                    }
-                    else -> {
-                        _supportTier.postValue("No support yet 😢")
-                        _tierIcon.postValue(R.drawable.trophy_24px)
-                    }
+                    totalDollars >= 6 -> statusStringId = R.string.support_status_tier3
+                    totalDollars >= 3 -> statusStringId = R.string.support_status_tier2
+                    totalDollars >= 1 -> statusStringId = R.string.support_status_tier1
                 }
+
+                val statusTpl = application.applicationContext.getString(R.string.support_status)
+                val statusStr = application.applicationContext.getString(statusStringId)
+                _supportTier.postValue(statusTpl.format(statusStr))
             } else {
-                Log.e("Billing", "Failed to query purchase history: ${billingResult.debugMessage}")
+                Log.e(TAG, "Failed to query purchase history: ${billingResult.debugMessage}")
             }
         }
     }
@@ -174,7 +167,6 @@ class SupportViewModel(application: Application) : AndroidViewModel(application)
             }
         }
     }
-
 
     companion object {
         const val TAG = "SupportViewModel"

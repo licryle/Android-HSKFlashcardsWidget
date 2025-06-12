@@ -120,6 +120,7 @@ We recommend to choose the level your at plus the one below, or above depending 
         <item>10 (~500MB)</item>
     </string-array>
 
+    <string name="about_intro_title">About</string>
     <string name="about_stats_title">Statistics</string>
     <string name="about_terms_conditions_title"><![CDATA[Privacy Policy & Licences]]></string>
     <string name="about_stats">Loading…</string>
@@ -289,8 +290,16 @@ padding: 0;
     <string name="dictionary_search_filter_hsk3definition_hint">Definition in HSK3</string>
     <string name="dbrestore_start">Database restoration started</string>
     <string name="about_email_noapp">No email client found. Address copied to clipboard.</string>
-    <string name="support_app">Support the creator!</string>
-    <string name="about_intro_title">About</string>
+    <string name="menu_support">Support the creator!</string>
+
     <string name="support_devintro_title">🥐 Support the creator 🥐</string>
     <string name="support_devintro">Hello everyone, Cyrille here, I\'m an indie developer originally from France.\n\nAs I learn Chinese, I realized I needed such app and none of the existing ones filled my needs.\n\nSo here we are, I\'m happily sharing for free this creation with you.\n\nIf you also find it useful, please consider participating to my croissant fund!</string>
+    <string name="support_purchase_tier1">Become a Bronze Supporter for $1</string>
+    <string name="support_purchase_tier2">Become a Silver Supporter for $3</string>
+    <string name="support_purchase_tier3">Become a Golden Supporter for $6</string>
+    <string name="support_total_support">You’ve supported this app with $.2f (so far).</string>
+    <string name="support_status">Thank you for the 🥐 %s croissant 🥐 support!</string>
+    <string name="support_status_tier1">Bronze</string>
+    <string name="support_status_tier2">Silver</string>
+    <string name="support_status_tier3">Golden</string>
 </resources>

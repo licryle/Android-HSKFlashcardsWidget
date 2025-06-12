@@ -82,6 +82,12 @@
         tools:layout="@layout/fragment_about" />
 
     <fragment
+        android:id="@+id/nav_support"
+        android:name="fr.berliat.hskwidget.ui.support.SupportFragment"
+        android:label="@string/menu_support"
+        tools:layout="@layout/fragment_support" />
+
+    <fragment
         android:id="@+id/flashcardFragment"
         android:name="fr.berliat.hskwidget.ui.widget.FlashcardFragment"
         android:label="Flashcard Fragment" />
@@ -116,6 +122,11 @@
     <action
         android:id="@+id/see_about"
         app:destination="@id/nav_about">
+    </action>
+
+    <action
+        android:id="@+id/see_support"
+        app:destination="@id/nav_support">
     </action>
 
     <action

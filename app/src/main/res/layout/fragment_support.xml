@@ -64,7 +64,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/support_purchase_tier1"
-                android:text="Become a Bronze Supporter $1"
+                android:text="@string/support_purchase_tier1"
                 android:tag="support_tier1"
                 android:backgroundTint="@color/bronze"
                 app:icon="@drawable/bakery_dining_24px"
@@ -73,7 +73,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/support_purchase_tier2"
-                android:text="Contribute $3"
+                android:text="@string/support_purchase_tier2"
                 android:tag="support_tier2"
                 android:backgroundTint="@color/silver"
                 app:iconTint="@android:color/black"
@@ -85,7 +85,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/support_purchase_tier3"
-                android:text="Contribute $6"
+                android:text="@string/support_purchase_tier3"
                 android:tag="support_tier3"
                 android:backgroundTint="@color/gold"
                 app:icon="@drawable/bakery_dining_24px"
