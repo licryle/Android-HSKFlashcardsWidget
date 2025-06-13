@@ -77,4 +77,9 @@
         <item name="colorOnSurface">@color/md_theme_light_onSurface</item>
         <item name="android:windowBackground">@color/md_theme_light_background</item>
     </style>
+
+    <style name="Theme.CustomFullScreen" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
 </resources>

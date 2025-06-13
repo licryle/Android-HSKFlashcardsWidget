@@ -23,10 +23,14 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.yalantis.ucrop.UCrop
 import fr.berliat.hskwidget.databinding.FragmentOcrCaptureBinding
 import fr.berliat.hskwidget.domain.Utils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.time.Instant
 import java.util.Locale
@@ -104,8 +108,7 @@ class CaptureImageFragment : Fragment() {
 
     private val activityResultLauncher =
         registerForActivityResult(
-            ActivityResultContracts.RequestMultiplePermissions())
-        { permissions ->
+            ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             // Handle Permission granted/rejected
             var permissionGranted = true
             permissions.entries.forEach {
@@ -168,7 +171,7 @@ class CaptureImageFragment : Fragment() {
         val contentValues = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, name)
             put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
-            if(Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
                 put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/CameraX-Image")
             }
         }
@@ -200,19 +203,23 @@ class CaptureImageFragment : Fragment() {
     }
 
     private fun startCropActivity(sourceUri: Uri) {
-        val destinationUri = Uri.fromFile(File(requireContext().cacheDir, "cropped_image.jpg"))
-        val options = UCrop.Options().apply {
-            setCompressionQuality(100)
-            setCompressionFormat(Bitmap.CompressFormat.PNG)
-            setFreeStyleCropEnabled(true)
-            setShowCropFrame(true)
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+            val destinationUri = Uri.fromFile(File(requireContext().cacheDir, "cropped_image.jpg"))
+            val options = UCrop.Options().apply {
+                setCompressionQuality(100)
+                setCompressionFormat(Bitmap.CompressFormat.PNG)
+                setFreeStyleCropEnabled(true)
+                setShowCropFrame(true)
+            }
+
+            val uCrop = UCrop.of(sourceUri, destinationUri)
+                .withOptions(options)
+
+            withContext(Dispatchers.Main) {
+                Log.i(TAG, "Starting uCrop cropping activity")
+                cropActivityResultLauncher.launch(uCrop.getIntent(requireContext()))
+            }
         }
-
-        val uCrop = UCrop.of(sourceUri, destinationUri)
-            .withOptions(options)
-
-        Log.i(TAG, "Starting uCrop cropping activity")
-        cropActivityResultLauncher.launch(uCrop.getIntent(requireContext()))
     }
 
     private fun handleCroppedImage(imageUri: Uri) {
