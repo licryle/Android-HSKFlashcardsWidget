@@ -4,14 +4,15 @@ import android.os.Build
 import android.os.StrictMode
 import android.os.strictmode.Violation
 import android.util.Log
+import androidx.annotation.RequiresApi
 import fr.berliat.hskwidget.BuildConfig
-import java.lang.reflect.Field
-import java.lang.reflect.Modifier
+import java.util.concurrent.Executors
 
 /**
  * Helper for enabling strict mode, with a whitelist of a particular error.
  * Based on https://medium.com/@tokudu/how-to-whitelist-strictmode-violations-on-android-based-on-stacktrace-eb0018e909aa
  */
+@RequiresApi(Build.VERSION_CODES.P)
 class StrictModeManager {
     companion object {
         private const val TAG = "StrictModeManager"
@@ -22,7 +23,8 @@ class StrictModeManager {
          */
         private val STACKTRACE_WHITELIST = listOf(
             // This violation is related to Dex Loading optimization on Snapdragon devices.
-            "android.widget.OverScroller.<init>"
+            "android.widget.OverScroller.<init>",
+            "com.yalantis.ucrop.UCropActivity.cropAndSaveImage"
         )
 
         /**
@@ -36,19 +38,14 @@ class StrictModeManager {
         }
 
         private fun enableStrictMode() {
-            val builder = StrictMode.ThreadPolicy.Builder()
+            StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder()
                 .detectDiskReads()
                 .detectDiskWrites()
                 .detectNetwork()
                 .penaltyLog()
                 .penaltyDropBox()
-
-            // allow penaltyDeath on versions above N
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                builder.penaltyDeath()
-            }
-
-            StrictMode.setThreadPolicy(builder.build())
+                .penaltyListener(Executors.newSingleThreadExecutor()) { v -> onVmViolation(v) }
+                .build())
 
             StrictMode.setVmPolicy(StrictMode.VmPolicy.Builder()
                 .detectLeakedSqlLiteObjects()
@@ -56,66 +53,26 @@ class StrictModeManager {
                 .detectLeakedRegistrationObjects()
                 .penaltyLog()
                 .penaltyDropBox()
-                .penaltyDeath()
+                .penaltyListener(Executors.newSingleThreadExecutor()) { v -> onVmViolation(v) }
                 .build())
-
-            // Let the dirty hacks begin.
-            // Source: https://atscaleconference.com/videos/eliminating-long-tail-jank-with-strictmode/
-            // On API levels above N, we can use reflection to read the violationsBeingTimed field of strict
-            // to get notifications about reported violations
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                val field = StrictMode::class.java.getDeclaredField("violationsBeingTimed")
-                field.setAccessible(true) // Suppress Java language access checking
-                // Remove "final" modifier
-                val modifiersField = Field::class.java.getDeclaredField("accessFlags")
-                modifiersField.setAccessible(true)
-                modifiersField.setInt(field, field.modifiers and Modifier.FINAL.inv())
-                // Override the field with a custom ArrayList, which is able to skip whitelisted violations
-                field.set(null, object: ThreadLocal<ArrayList<out Object>>() {
-                    override fun get(): ArrayList<out Object> {
-                        return StrictModeHackArrayList()
-                    }
-                })
-            }
         }
-    }
 
-    /**
-     * Special array list that skip additions for matching ViolationInfo instances as per
-     * hack described in https://atscaleconference.com/videos/eliminating-long-tail-jank-with-strictmode/
-     */
-    class StrictModeHackArrayList: ArrayList<Object>() {
-        override fun add(element: Object): Boolean {
-            val crashInfoField = element.`class`.getDeclaredField("mViolation")
-            val fField = getViolationField(element)
+        private fun onVmViolation(v: Violation?) {
+            if (v == null) return
 
-            fField?.stackTrace?.forEach {
+            v.stackTrace.forEach {
                 for (whitelistedStacktraceCall in STACKTRACE_WHITELIST) {
                     if (it.toString().contains(whitelistedStacktraceCall)) {
                         Log.d(
                             TAG,
                             "Skipping whitelisted StrictMode violation: $whitelistedStacktraceCall"
                         )
-                        return false
+                        return
                     }
                 }
             }
-            // call super to continue with standard violation reporting
-            return super.add(element)
-        }
 
-        fun getViolationField(violationInfo: Object): Violation? {
-            return try {
-                val violationInfoClass = violationInfo.javaClass // or Class.forName("android.os.StrictMode$ViolationInfo")
-                val mViolationField = violationInfoClass.getDeclaredField("mViolation")
-                mViolationField.isAccessible = true  // bypass private access
-                val field = mViolationField.get(violationInfo)
-                field as Violation
-            } catch (e: Throwable) {
-                // Reflection failed — field missing or inaccessible
-                e.printStackTrace()
-                null
-            }
+            throw RuntimeException("StrictMode Violation: ${v.stackTrace}")
         }
     }
 }

@@ -200,24 +200,27 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
     private fun recognizeText(uri: Uri) {
         Log.d(TAG, "recognizeText starting")
         // Convert the Uri to InputImage for OCR
-        val image = InputImage.fromFilePath(requireContext(), uri)
+        lifecycleScope.launch(Dispatchers.IO) {
+            val image = InputImage.fromFilePath(requireContext(), uri)
 
-        val options = ChineseTextRecognizerOptions.Builder()
-            .build()
+            val options = ChineseTextRecognizerOptions.Builder()
+                .build()
 
-        val recognizer: TextRecognizer = TextRecognition.getClient(options)
+            val recognizer: TextRecognizer = TextRecognition.getClient(options)
 
-        recognizer.process(image)
-            .addOnSuccessListener { visionText ->
-                processTextRecognitionResult(visionText)
-                Log.d(TAG, "Recognized text: ${visionText.text}")
-            }
-            .addOnFailureListener { e ->
-                toggleProcessing(false)
-                Toast.makeText(requireContext(), "Text recognition failed", Toast.LENGTH_LONG).show()
-                Log.e(TAG, "Text recognition failed: ", e)
-                e.printStackTrace()
-            }
+            recognizer.process(image)
+                .addOnSuccessListener { visionText ->
+                    processTextRecognitionResult(visionText)
+                    Log.d(TAG, "Recognized text: ${visionText.text}")
+                }
+                .addOnFailureListener { e ->
+                    toggleProcessing(false)
+                    Toast.makeText(requireContext(), "Text recognition failed", Toast.LENGTH_LONG)
+                        .show()
+                    Log.e(TAG, "Text recognition failed: ", e)
+                    e.printStackTrace()
+                }
+        }
     }
 
     private fun processTextRecognitionResult(texts: Text) {
