@@ -22,7 +22,6 @@ class StrictModeManager {
          * are ignored.
          */
         private val STACKTRACE_WHITELIST = listOf(
-            // This violation is related to Dex Loading optimization on Snapdragon devices.
             "android.widget.OverScroller.<init>", // Triggered in NavDrawer code
             "com.yalantis.ucrop.UCropActivity.cropAndSaveImage", // From UCrop library
             "android.graphics.AwareBitmapCacher.-\$\$Nest\$mhandleCheckBgAndRelease", // Triggered at resume by OS?
