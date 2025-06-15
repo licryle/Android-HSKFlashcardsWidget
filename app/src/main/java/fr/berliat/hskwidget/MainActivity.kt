@@ -93,7 +93,7 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
         appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.nav_dictionary, R.id.nav_widgets, R.id.nav_about, R.id.nav_lists,
-                R.id.nav_ocr_read, R.id.nav_config
+                R.id.nav_ocr_read, R.id.nav_config, R.id.nav_support
             ), drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
