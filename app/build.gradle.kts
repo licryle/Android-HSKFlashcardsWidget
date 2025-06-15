@@ -16,8 +16,8 @@ android {
         minSdk = 26
         //noinspection EditedTargetSdkVersion
         targetSdk = 35
-        versionCode = 19
-        versionName = "3.0.8"
+        versionCode = 20
+        versionName = "3.1.0"
         buildConfigField("String", "APP_VERSION", "\"$versionName-$versionCode\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

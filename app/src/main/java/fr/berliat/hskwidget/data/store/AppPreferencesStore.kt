@@ -8,6 +8,13 @@ import androidx.core.net.toUri
 
 class AppPreferencesStore(context: Context):
     PrefixedPreferenceDataStoreBridge(context.dataStore, "app") {
+    var supportTotalSpent: Float
+        get() {
+            return getFloat("support_total_spent", -1f)
+        }
+        set(total) {
+            putFloat("support_total_spent", total)
+        }
 
     var ankiSaveNotes: Boolean
         get() {
@@ -15,14 +22,6 @@ class AppPreferencesStore(context: Context):
         }
         set(enabled) {
             putBoolean("anki_save_notes", enabled)
-        }
-
-    var readerSeparateWords: Boolean
-        get() {
-            return getBoolean("reader_separate_word", false)
-        }
-        set(enabled) {
-            putBoolean("reader_separate_word", enabled)
         }
 
     var dbBackUpActive: Boolean
@@ -91,5 +90,13 @@ class AppPreferencesStore(context: Context):
         }
         set(textSize) {
             putInt("reader_text_size", textSize)
+        }
+
+    var readerSeparateWords: Boolean
+        get() {
+            return getBoolean("reader_separate_word", false)
+        }
+        set(enabled) {
+            putBoolean("reader_separate_word", enabled)
         }
 }

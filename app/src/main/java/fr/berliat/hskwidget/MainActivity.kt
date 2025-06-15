@@ -21,8 +21,10 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.android.billingclient.api.Purchase
 import com.google.android.material.navigation.NavigationView
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
+import fr.berliat.hskwidget.data.store.SupportDevStore
 import fr.berliat.hskwidget.databinding.ActivityMainBinding
 import fr.berliat.hskwidget.domain.DatabaseBackup
 import fr.berliat.hskwidget.domain.DatabaseBackupCallbacks
@@ -48,6 +50,7 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
     private lateinit var navController: NavController
     private lateinit var appConfig: AppPreferencesStore
     private lateinit var databaseBackup: DatabaseBackup
+    private lateinit var supportDevStore: SupportDevStore
     private var showOCRReminder: Boolean = true
 
 
@@ -70,6 +73,8 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
 
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
+
+        setupSupporter(navView)
 
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment
@@ -236,6 +241,33 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
             }
         }
 
+    }
+
+    private fun setupSupporter(navView: NavigationView) {
+        supportDevStore = SupportDevStore.getInstance(applicationContext)
+
+        supportDevStore.addListener(object : SupportDevStore.SupportDevListener {
+            override fun onTotalSpentChange(totalSpent: Float) {
+                val tier = supportDevStore.getSupportTier(totalSpent)
+
+                var tpl = R.string.menu_support
+                if (totalSpent > 0) {
+                    tpl = R.string.support_status_tpl
+                }
+
+                val supStrId = supportDevStore.getSupportTierString(tier)
+                val supportMenu = navView.menu.findItem(R.id.nav_support)
+
+                supportMenu.title = getString(tpl).format(getString(supStrId))
+                navView.invalidate()
+            }
+
+            override fun onPurchaseSuccess(purchase: Purchase) { }
+
+            override fun onPurchaseAcknowledgedSuccess(purchase: Purchase) { }
+
+            override fun onPurchaseFailed(purchase: Purchase?, billingResponseCode: Int) { }
+        })
     }
 
     private fun setupSharedViewModel() {

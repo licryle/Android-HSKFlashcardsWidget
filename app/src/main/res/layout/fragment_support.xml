@@ -35,7 +35,7 @@
             <TextView
                 android:id="@+id/totalSpentLabel"
                 android:text='@{viewModel.totalSpentText}'
-                android:textSize="16sp"
+                android:textStyle="bold"
                 android:layout_marginBottom="16dp"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"/>

@@ -4,20 +4,22 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import fr.berliat.hskwidget.databinding.FragmentSupportBinding
 
 class SupportFragment : Fragment() {
     private var _binding: FragmentSupportBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: SupportViewModel by viewModels()
+    private lateinit var viewModel : SupportViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        viewModel = SupportViewModel(requireActivity().application, ::toast)
+
         _binding = FragmentSupportBinding.inflate(inflater, container, false)
         binding.viewModel = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
@@ -32,6 +34,12 @@ class SupportFragment : Fragment() {
         }
 
         return binding.root
+    }
+
+    private fun toast(resId: Int) {
+        if (context == null) return
+
+        Toast.makeText(requireContext(), requireContext().getString(resId), Toast.LENGTH_LONG).show()
     }
 
     override fun onDestroyView() {
