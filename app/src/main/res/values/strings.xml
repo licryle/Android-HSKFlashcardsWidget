@@ -305,7 +305,7 @@ padding: 0;
     <string name="support_status_tpl">%s 🥐 Supporter - Thank you!</string>
     <string name="support_payment_success">Thank you so much for your support, you\'re the boss!</string>
     <string name="support_payment_failed">Payment cancelled or failed</string>
-    <string name="support_status_nosupport">Not a supporter... yet!</string>
+    <string name="support_status_nosupport">Not a supporter… yet!</string>
     <string name="support_total_error">There was an error getting your purchase history.</string>
     <string name="support_status_error">Error</string>
 </resources>
