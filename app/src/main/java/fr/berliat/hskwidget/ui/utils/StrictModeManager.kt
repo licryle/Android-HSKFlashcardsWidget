@@ -23,8 +23,10 @@ class StrictModeManager {
          */
         private val STACKTRACE_WHITELIST = listOf(
             // This violation is related to Dex Loading optimization on Snapdragon devices.
-            "android.widget.OverScroller.<init>",
-            "com.yalantis.ucrop.UCropActivity.cropAndSaveImage"
+            "android.widget.OverScroller.<init>", // Triggered in NavDrawer code
+            "com.yalantis.ucrop.UCropActivity.cropAndSaveImage", // From UCrop library
+            "android.graphics.AwareBitmapCacher.-\$\$Nest\$mhandleCheckBgAndRelease", // Triggered at resume by OS?
+            "android.hwtheme.HwThemeManager.getDataSkinThemePackages" // Triggered when Billing activities are summoned
         )
 
         /**
@@ -55,24 +57,27 @@ class StrictModeManager {
                 .penaltyDropBox()
                 .penaltyListener(Executors.newSingleThreadExecutor()) { v -> onVmViolation(v) }
                 .build())
+
+            Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
+                if (throwable is Violation) onVmViolation(throwable)
+            }
         }
 
-        private fun onVmViolation(v: Violation?) {
-            if (v == null) return
+        private fun onVmViolation(violation: Violation?) {
+            if (violation == null) return
 
-            v.stackTrace.forEach {
-                for (whitelistedStacktraceCall in STACKTRACE_WHITELIST) {
-                    if (it.toString().contains(whitelistedStacktraceCall)) {
-                        Log.d(
-                            TAG,
-                            "Skipping whitelisted StrictMode violation: $whitelistedStacktraceCall"
-                        )
-                        return
-                    }
+            violation.stackTrace.forEach {
+                val method = "${it.className}.${it.methodName}"
+                if (STACKTRACE_WHITELIST.contains(method)) {
+                    Log.d(
+                        TAG,
+                        "Skipping whitelisted StrictMode violation: $method"
+                    )
+                    return
                 }
             }
 
-            throw RuntimeException("StrictMode Violation: ${v.stackTrace}")
+            throw violation
         }
     }
 }
