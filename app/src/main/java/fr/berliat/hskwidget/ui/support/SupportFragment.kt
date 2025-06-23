@@ -6,7 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import fr.berliat.hskwidget.data.store.SupportDevStore
 import fr.berliat.hskwidget.databinding.FragmentSupportBinding
+import fr.berliat.hskwidget.domain.Utils
 
 class SupportFragment : Fragment() {
     private var _binding: FragmentSupportBinding? = null
@@ -32,6 +34,17 @@ class SupportFragment : Fragment() {
         viewModel.tierIcon.observe(viewLifecycleOwner) { resId ->
             binding.tierIcon.setImageResource(resId)
         }
+
+        viewModel.purchaseList.observe(viewLifecycleOwner) { products ->
+            binding.supportPurchaseTier1.visibility =
+                Utils.hideViewIf(products.containsKey(SupportDevStore.SupportProduct.TIER1))
+            binding.supportPurchaseTier2.visibility =
+                Utils.hideViewIf(products.containsKey(SupportDevStore.SupportProduct.TIER2))
+            binding.supportPurchaseTier3.visibility =
+                Utils.hideViewIf(products.containsKey(SupportDevStore.SupportProduct.TIER3))
+        }
+
+        viewModel.fetchPurchases()
 
         return binding.root
     }

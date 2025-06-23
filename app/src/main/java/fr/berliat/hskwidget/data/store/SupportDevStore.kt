@@ -10,16 +10,18 @@ import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.Purchase
-import com.android.billingclient.api.PurchaseHistoryResponseListener
 import com.android.billingclient.api.PurchasesUpdatedListener
 import com.android.billingclient.api.QueryProductDetailsParams
-import com.android.billingclient.api.QueryPurchaseHistoryParams
+import com.android.billingclient.api.QueryPurchasesParams
 import fr.berliat.hskwidget.R
 
 class SupportDevStore private constructor(private val context: Context) : PurchasesUpdatedListener {
     private lateinit var billingClient: BillingClient
     private val appConfig = AppPreferencesStore(context)
     private val listeners = mutableListOf<SupportDevListener>()
+
+    var purchases: MutableMap<SupportProduct, Int> = mutableMapOf()
+        private set
 
     init {
         setupBillingClient()
@@ -30,11 +32,13 @@ class SupportDevStore private constructor(private val context: Context) : Purcha
             .setListener(this)  // Set the listener here
             .enablePendingPurchases()
             .build()
+    }
 
+    fun connect() {
         billingClient.startConnection(object : BillingClientStateListener {
             override fun onBillingSetupFinished(billingResult: BillingResult) {
                 if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                    syncTotalSpent { totalSpent -> triggerOnTotalSpentChange(totalSpent) }
+                    queryPurchaseHistory()
                 } else {
                     Log.e(TAG, "Billing Setup failed: ${billingResult.debugMessage}")
                 }
@@ -51,22 +55,40 @@ class SupportDevStore private constructor(private val context: Context) : Purcha
         NONE(0.0f),
         BRONZE(1.0f),
         SILVER(3.0f),
-        GOLDEN(6.0f);
+        GOLDEN(6.0f),
+        PLATINUM(10.0f);
     }
-
-    private val SupportProductPrices = mapOf<String, Double>(
-        "support_tier1" to 1.0,
-        "support_tier2" to 3.0,
-        "support_tier3" to 6.0
-    )
 
     private val SupportTierStrings = mapOf<SupportTier, Int>(
         SupportTier.ERROR to R.string.support_status_error,
         SupportTier.NONE to R.string.support_status_nosupport,
         SupportTier.BRONZE to R.string.support_status_tier1,
         SupportTier.SILVER to R.string.support_status_tier2,
-        SupportTier.GOLDEN to R.string.support_status_tier3
+        SupportTier.GOLDEN to R.string.support_status_tier3,
+        SupportTier.PLATINUM to R.string.support_status_tier4
     )
+
+    enum class SupportProduct(val productId: String) {
+        TIER1("support_tier1"),
+        TIER2("support_tier2"),
+        TIER3("support_tier3");
+
+        companion object {
+            fun fromProductId(id: String): SupportProduct? =
+                entries.find { it.productId == id }
+        }
+
+    }
+
+    private val SupportProductPrices = mapOf<SupportProduct, Double>(
+        SupportProduct.TIER1 to 1.0, // in USD
+        SupportProduct.TIER2 to 3.0,
+        SupportProduct.TIER3 to 6.0
+    )
+
+    fun isPurchased(product: SupportProduct) : Boolean {
+        return purchases.contains(product)
+    }
 
     fun getSupportTier(totalSpent: Float): SupportTier {
         val tiers = SupportTier.entries
@@ -81,41 +103,57 @@ class SupportDevStore private constructor(private val context: Context) : Purcha
         return SupportTierStrings[tier]!!
     }
 
-    private fun queryPurchaseHistory(callBack: PurchaseHistoryResponseListener) {
-        val params = QueryPurchaseHistoryParams.newBuilder()
+    fun queryPurchaseHistory() {
+        val params = QueryPurchasesParams.newBuilder()
             .setProductType(BillingClient.ProductType.INAPP)
             .build()
 
-        billingClient.queryPurchaseHistoryAsync(params, callBack)
-    }
-
-    fun queryTotalSpent(callback: (BillingResult, Float) -> Unit) {
-        queryPurchaseHistory { billingResult, historyList ->
+        billingClient.queryPurchasesAsync(params) { billingResult, historyList ->
             if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                val purchases = historyList?.mapNotNull { it.skus.firstOrNull() } ?: emptyList()
+                handlePurchaseHistory(historyList)
 
-                val counts = purchases.groupingBy { it }.eachCount()
-
-                val totalSpent = counts.entries.sumOf { (sku, quantity) ->
-                    val price = SupportProductPrices[sku] ?: 0.0
-                    quantity * price
+                val totSpent = getTotalSpent()
+                if (totSpent >= 0) {
+                    appConfig.supportTotalSpent = totSpent
                 }
 
-                callback(billingResult, totalSpent.toFloat())
+                triggerOnTotalSpentChange(totSpent)
             } else {
-                callback(billingResult, -1.0f)
+                triggerOnQueryFailure(billingResult)
             }
         }
     }
 
-    fun syncTotalSpent(callBack: (totalSpent: Float) -> Unit) {
-        queryTotalSpent { _, totSpent ->
-            if (totSpent >= 0) {
-                appConfig.supportTotalSpent = totSpent
-            }
+    private fun handlePurchaseHistory(historyList: MutableList<Purchase>?) {
+        val history = historyList?.mapNotNull {
+            runCatching {
+                if (it.purchaseState != Purchase.PurchaseState.PURCHASED) {
+                    null
+                } else {
+                    Pair<SupportProduct, Int>(
+                        SupportProduct.fromProductId(it.skus.first().toString())!!,
+                        it.quantity
+                    )
+                }
+            }.getOrNull()
+        } ?: emptyList()
 
-            callBack(totSpent)
+        val oldPurchases = purchases.toMap()
+        purchases.clear()
+        history.forEach {
+            purchases[it.first] = (purchases[it.first] ?: 0) + it.second
         }
+
+        if (oldPurchases != purchases) {
+            triggerOnPurchaseHistoryUpdate()
+        }
+    }
+
+    private fun getTotalSpent(): Float {
+        return purchases.entries.sumOf { (sku, quantity) ->
+            val price = SupportProductPrices[sku] ?: 0.0
+            quantity * price
+        }.toFloat()
     }
 
     // This method listens for purchase updates (success, failure, user cancel)
@@ -145,7 +183,7 @@ class SupportDevStore private constructor(private val context: Context) : Purcha
             .build()
 
         billingClient.queryProductDetailsAsync(queryParams) { billingResult, productDetailsList ->
-            if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && !productDetailsList.isNullOrEmpty()) {
+            if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && productDetailsList.isNotEmpty()) {
                 val productDetails = productDetailsList[0]
 
                 val billingParams = BillingFlowParams.newBuilder()
@@ -170,6 +208,13 @@ class SupportDevStore private constructor(private val context: Context) : Purcha
         if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
             // Grant entitlement to the user, e.g. unlock feature or update support tier
             triggerOnPurchaseSuccess(purchase)
+
+            runCatching {
+                val product = SupportProduct.fromProductId(purchase.skus.first())!!
+                purchases[product] = (purchases[product] ?:0) + purchase.quantity
+            }
+            triggerOnPurchaseHistoryUpdate()
+            triggerOnTotalSpentChange(getTotalSpent())
 
             // Acknowledge the purchase if not already acknowledged
             if (!purchase.isAcknowledged) {
@@ -221,15 +266,29 @@ class SupportDevStore private constructor(private val context: Context) : Purcha
 
     private fun triggerOnPurchaseFailed(purchase: Purchase?, billingResponseCode: Int) {
         listeners.forEach {
-            it.onPurchaseFailed(purchase, billingResponseCode)
+            it.onPurchaseFailure(purchase, billingResponseCode)
+        }
+    }
+
+    private fun triggerOnPurchaseHistoryUpdate() {
+        listeners.forEach {
+            it.onPurchaseHistoryUpdate(purchases)
+        }
+    }
+
+    private fun triggerOnQueryFailure(result: BillingResult) {
+        listeners.forEach {
+            it.onQueryFailure(result)
         }
     }
 
     interface SupportDevListener {
         fun onTotalSpentChange(totalSpent: Float)
+        fun onQueryFailure(result: BillingResult)
         fun onPurchaseSuccess(purchase: Purchase)
+        fun onPurchaseHistoryUpdate(purchases: Map<SupportProduct, Int>)
         fun onPurchaseAcknowledgedSuccess(purchase: Purchase)
-        fun onPurchaseFailed(purchase: Purchase?, billingResponseCode: Int)
+        fun onPurchaseFailure(purchase: Purchase?, billingResponseCode: Int)
     }
 
     companion object {

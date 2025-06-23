@@ -21,6 +21,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.Purchase
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.data.store.SupportDevStore
@@ -225,12 +226,20 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
                 updateSupportMenuTitle(totalSpent)
             }
 
+            override fun onQueryFailure(result: BillingResult) {
+                Toast.makeText(applicationContext, R.string.support_total_error, Toast.LENGTH_LONG).show()
+            }
+
             override fun onPurchaseSuccess(purchase: Purchase) { }
+
+            override fun onPurchaseHistoryUpdate(purchases: Map<SupportDevStore.SupportProduct, Int>) { }
 
             override fun onPurchaseAcknowledgedSuccess(purchase: Purchase) { }
 
-            override fun onPurchaseFailed(purchase: Purchase?, billingResponseCode: Int) { }
+            override fun onPurchaseFailure(purchase: Purchase?, billingResponseCode: Int) { }
         })
+
+        supportDevStore.connect()
     }
 
     private fun updateSupportMenuTitle(totalSpent: Float) {
