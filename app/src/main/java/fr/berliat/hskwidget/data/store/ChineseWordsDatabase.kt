@@ -85,4 +85,10 @@ abstract class ChineseWordsDatabase : RoomDatabase() {
                 .createFromFile(dbFile) // instead of fromAsset
                 .build()
     }
+
+    suspend fun flushToDisk() {
+        val cur = this.query("PRAGMA wal_checkpoint(FULL)", null)
+        cur.moveToFirst()
+        cur.close()
+    }
 }

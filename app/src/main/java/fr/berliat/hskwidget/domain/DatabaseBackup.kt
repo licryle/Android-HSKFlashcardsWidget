@@ -102,6 +102,8 @@ class DatabaseBackup(comp: ActivityResultCaller,
         val formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss")
         val fileName = "${current.format(formatter)}_${ChineseWordsDatabase.DATABASE_FILE}"
 
+        ChineseWordsDatabase.getInstance(context).flushToDisk()
+
         return Utils.copyFileUsingSAF(context, sourcePath, destinationFolderUri, fileName)
     }
 
