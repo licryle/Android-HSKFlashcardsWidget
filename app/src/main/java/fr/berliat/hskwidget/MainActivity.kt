@@ -22,7 +22,6 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.android.billingclient.api.Purchase
-import com.google.android.material.navigation.NavigationView
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.data.store.SupportDevStore
 import fr.berliat.hskwidget.databinding.ActivityMainBinding
@@ -56,7 +55,6 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setupSharedViewModel()
 
         // Enable StrictMode in Debug mode
@@ -69,43 +67,13 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
 
         appConfig = AppPreferencesStore(applicationContext)
 
-        setSupportActionBar(binding.appBarMain.toolbar)
-
-        val drawerLayout: DrawerLayout = binding.drawerLayout
-        val navView: NavigationView = binding.navView
-
-        setupSupporter(navView)
-
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment
-        navController = navHostFragment.navController
-
-        supportFragmentManager.registerFragmentLifecycleCallbacks(
-            object : FragmentManager.FragmentLifecycleCallbacks() {
-                override fun onFragmentResumed(fm: FragmentManager, f: Fragment) {
-                    showOCRReminderIfActive()
-                }
-
-                override fun onFragmentPaused(fm: FragmentManager, f: Fragment) {
-                    showOCRReminderIfActive()
-                }
-            },
-            true // recursive = true, to catch nested fragments too
-        )
-
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-        appBarConfiguration = AppBarConfiguration(
-            setOf(
-                R.id.nav_dictionary, R.id.nav_widgets, R.id.nav_about, R.id.nav_lists,
-                R.id.nav_ocr_read, R.id.nav_config, R.id.nav_support
-            ), drawerLayout
-        )
-        setupActionBarWithNavController(navController, appBarConfiguration)
-        navView.setupWithNavController(navController)
+        setupSupporter()
+        setupActionBar()
 
         setupSearchBtn()
         setupOCRBtn()
+
+        setupReminderView()
 
         handleIntents(intent)
         handleBackUp()
@@ -191,6 +159,10 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
         throw Error("This should never be hit")
     }
 
+    override fun onSupportNavigateUp(): Boolean {
+        return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
+    }
+
     private fun handleBackUp() {
         if (appConfig.dbBackUpActive)
             databaseBackup.getFolder()
@@ -243,23 +215,14 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
 
     }
 
-    private fun setupSupporter(navView: NavigationView) {
+    private fun setupSupporter() {
         supportDevStore = SupportDevStore.getInstance(applicationContext)
+
+        updateSupportMenuTitle(appConfig.supportTotalSpent)
 
         supportDevStore.addListener(object : SupportDevStore.SupportDevListener {
             override fun onTotalSpentChange(totalSpent: Float) {
-                val tier = supportDevStore.getSupportTier(totalSpent)
-
-                var tpl = R.string.menu_support
-                if (totalSpent > 0) {
-                    tpl = R.string.support_status_tpl
-                }
-
-                val supStrId = supportDevStore.getSupportTierString(tier)
-                val supportMenu = navView.menu.findItem(R.id.nav_support)
-
-                supportMenu.title = getString(tpl).format(getString(supStrId))
-                navView.invalidate()
+                updateSupportMenuTitle(totalSpent)
             }
 
             override fun onPurchaseSuccess(purchase: Purchase) { }
@@ -268,6 +231,19 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
 
             override fun onPurchaseFailed(purchase: Purchase?, billingResponseCode: Int) { }
         })
+    }
+
+    private fun updateSupportMenuTitle(totalSpent: Float) {
+        val tier = supportDevStore.getSupportTier(totalSpent)
+
+        var tpl = R.string.menu_support
+        if (totalSpent > 0) {
+            tpl = R.string.support_status_tpl
+        }
+
+        val supStrId = supportDevStore.getSupportTierString(tier)
+        val supportMenu = binding.navView.menu.findItem(R.id.nav_support)
+        supportMenu.title = getString(tpl).format(getString(supStrId))
     }
 
     private fun setupSharedViewModel() {
@@ -307,7 +283,37 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
         })
     }
 
-    override fun onSupportNavigateUp(): Boolean {
-        return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
+    private fun setupActionBar() {
+        val drawerLayout: DrawerLayout = binding.drawerLayout
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment
+        navController = navHostFragment.navController
+
+        setSupportActionBar(binding.appBarMain.toolbar)
+        // Passing each menu ID as a set of Ids because each
+        // menu should be considered as top level destinations.
+        appBarConfiguration = AppBarConfiguration(
+            setOf(
+                R.id.nav_dictionary, R.id.nav_widgets, R.id.nav_about, R.id.nav_lists,
+                R.id.nav_ocr_read, R.id.nav_config, R.id.nav_support
+            ), drawerLayout
+        )
+        setupActionBarWithNavController(navController, appBarConfiguration)
+        binding.navView.setupWithNavController(navController)
+    }
+
+    private fun setupReminderView() {
+        supportFragmentManager.registerFragmentLifecycleCallbacks(
+            object : FragmentManager.FragmentLifecycleCallbacks() {
+                override fun onFragmentResumed(fm: FragmentManager, f: Fragment) {
+                    showOCRReminderIfActive()
+                }
+
+                override fun onFragmentPaused(fm: FragmentManager, f: Fragment) {
+                    showOCRReminderIfActive()
+                }
+            },
+            true // recursive = true, to catch nested fragments too
+        )
     }
 }
