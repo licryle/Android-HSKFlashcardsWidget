@@ -22,6 +22,8 @@ import fr.berliat.hskwidget.ui.utils.AnkiDelegate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.net.URLDecoder
+import java.nio.charset.StandardCharsets
 
 
 class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
@@ -77,7 +79,7 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
 
         val bkDir = appConfig.dbBackUpDirectory.toString().substringAfterLast("%3A")
         if (bkDir != "")
-            binding.configBtnBackupChangedir.text = bkDir
+            binding.configBtnBackupChangedir.text = URLDecoder.decode(bkDir, StandardCharsets.UTF_8.name())
 
         binding.configBtnBackupChangedir.setOnClickListener { databaseBackup.selectFolder() }
         binding.configBtnRestoreChoosefile.setOnClickListener { databaseBackup.selectBackupFile() }
