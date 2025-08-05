@@ -101,7 +101,7 @@ class WordListRepository(private val context: Context) {
         val wordList = entries.map { it.simplified }
 
         // Safeguard against too many SQL vars error for a big migration
-        val chunks = wordList.chunked(ChineseWordsDatabase.SQL_VAR_MAX)
+        val chunks = wordList.chunked(ChineseWordsDatabase.SQL_MAX_CHUNK)
         for (chunk in chunks) {
             val partialResult = annotatedChineseWordDAO().getFromSimplified(chunk)
             annotatedChineseWords.addAll(partialResult)
