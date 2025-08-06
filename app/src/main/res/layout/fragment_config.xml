@@ -218,6 +218,56 @@
                 app:layout_constraintTop_toTopOf="parent"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <!-- Progress Section -->
+        <LinearLayout
+            android:id="@+id/anki_sync_progress_section"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:padding="16dp"
+            android:background="@drawable/rounded_background">
+
+            <TextView
+                android:id="@+id/anki_sync_progress_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/config_anki_sync_title"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"/>
+
+            <TextView
+                android:id="@+id/anki_sync_progress_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/config_anki_sync_progress"
+                android:textSize="14sp"
+                android:layout_marginBottom="8dp"/>
+
+            <ProgressBar
+                android:id="@+id/anki_sync_progress_bar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="end">
+
+                <Button
+                    android:id="@+id/anki_sync_cancel_btn"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Cancel"
+                    android:textColor="@android:color/holo_red_dark"/>
+            </LinearLayout>
+        </LinearLayout>
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

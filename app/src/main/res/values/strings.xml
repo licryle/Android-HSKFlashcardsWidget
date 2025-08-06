@@ -252,13 +252,23 @@ padding: 0;
 .mobile .disabled {display: none;visibility: hidden;}</string>
     <string name="config_anki_title">Anki integration</string>
     <string name="config_anki_integration">Save notes in Anki automatically</string>
+    <string name="config_anki_sync_title">Anki sync in progress</string>
+    <string name="config_anki_sync_progress" formatted="false">Progress %d / %d</string>
+    <string name="config_anki_sync_cancelled">Import cancelled</string>
+    <string name="config_anki_sync_completed">Import complete</string>
+    <string name="anki_sync_notification_name">Anki Sync Progress</string>
+    <string name="anki_sync_notification_description">Provides you with a progress notification for the Anki Sync.</string>
     <string name="anki_not_installed"><![CDATA[AnkiDroid is not installed, or runs a very old version (<2.5)]]></string>
     <string name="anki_failed_import">Anki cards import failed, try disabling/enabling again.</string>
     <string name="anki_permission_denied">Permission to call AnkiDroid API denied.</string>
     <string name="anki_import_completed">Successfully imported %d cards to Anki.</string>
     <string name="anki_import_started">Starting the import into AnkiDroid</string>
-    <string name="anki_import_progress">Importing annotations to AnkiDroid: %d / %d</string>
+    <string name="anki_import_progress" formatted="false">Syncing word %s to AnkiDroid: %d / %d</string>
     <string name="anki_must_start">To save to Anki, Anki must be started. Starting Anki. Feel free to go back.</string>
+    <string name="anki_operation_success">Successfully applied changes to Anki</string>
+    <string name="anki_operation_failed">Failed to apply changes to Anki: %s</string>
+    <string name="anki_operation_cancelled">You cancelled the sync to Anki</string>
+    <string name="anki_import_failed">Full import into Anki failed: %s</string>
     <string name="nav_host_ocr_reminder_close">Close OCR Reminder</string>
     <string name="nav_host_ocr_reminder_text">Your scanned text is still accessible by clicking here.</string>
     <string name="menu_ocr_display">OCR: Scanned Text</string>
@@ -278,9 +288,6 @@ padding: 0;
     <string name="wordlist_rename_button">Rename list</string>
     <string name="wordlist_list_name_dupe">This list name already exist, use another one.</string>
     <string name="deck_name_global">All words</string>
-    <string name="anki_operation_success">Successfully applied changes to Anki</string>
-    <string name="anki_operation_failed">Failed to apply changes to Anki: %s</string>
-    <string name="anki_import_failed">Full import into Anki failed: %s</string>
     <string name="dictionary_item_toggle">Expand/Fold more info</string>
     <string name="dictionary_item_antonym">Antonym</string>
     <string name="dictionary_item_synonyms">Synonym(s)</string>

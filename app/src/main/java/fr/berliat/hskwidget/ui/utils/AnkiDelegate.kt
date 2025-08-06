@@ -18,8 +18,10 @@ import com.ichi2.anki.api.AddContentApi
 import com.ichi2.anki.api.AddContentApi.READ_WRITE_PERMISSION
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.repo.WordListRepository
+import fr.berliat.hskwidget.data.repo.WordListRepository.SharedEventBus as AnkiEventBus
 import fr.berliat.hskwidget.data.store.AnkiStore
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -40,17 +42,23 @@ import kotlinx.coroutines.withContext
  *         ankiDelegate.workListRepo.delegateToAnki(ankiDelegate.insertWordToList(list, word))
  *     }
  *
- *  The delegateToAnki wrapper checks all conditions needed for the call of Anki API before calling.
- *  Magic.
+ * If you use a viewModel, make sure to use the same workListRepo from your AnkiDelegateHelper.
+ * In other words, don't instantiate WordListRepository yourself. Take it from the Helper, always.
+ *
+ * Beware of execution patterns, as the callbacks can mean Anki calls executing after whatever
+ * element you change/delete.
  */
 class AnkiDelegate(
     private val fragment: Fragment
 ) {
     interface HandlerInterface {
         fun onAnkiOperationSuccess()
+        fun onAnkiOperationCancelled()
         fun onAnkiOperationFailed(e: Throwable)
-        fun onAnkiRequestPermissionGranted() { }
-        fun onAnkiRequestPermissionDenied() { }
+        fun onAnkiSyncProgress(current: Int, total: Int, message: String)
+        fun onAnkiRequestPermissionGranted()
+        fun onAnkiRequestPermissionDenied()
+        fun onAnkiServiceStarting(serviceDelegate: AnkiSyncServiceDelegate)
     }
 
     private val lifecycleOwner : LifecycleOwner = fragment
@@ -134,15 +142,15 @@ class AnkiDelegate(
     private fun observeUiEvents() {
         lifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                wordListRepo.uiEvents.collect { event ->
+                AnkiEventBus.uiEvents.collect { event ->
                     // Launching on the activity to enable to finish so matter the fragment in the background.
                     fragment.requireActivity().lifecycleScope.launch(Dispatchers.Main) {
                         val appContext = fragment.activity?.applicationContext
                         when (event) {
-                            is WordListRepository.UiEvent.TriggerAnkiSync -> {
+                            is AnkiEventBus.UiEvent.TriggerAnkiSync -> {
                                 val result = safelyModifyAnkiDbIfAllowed {
                                     try {
-                                        event.action()
+                                        event.action() // action sync must happen on IO thread.
                                     } catch (e: Exception) {
                                         Log.e(
                                             TAG,
@@ -152,10 +160,23 @@ class AnkiDelegate(
                                     }
                                 }
 
-                                withContext(Dispatchers.Main) {
-                                    result.onSuccess { onAnkiOperationSuccess(appContext) }
-                                        .onFailure { e -> onAnkiOperationFailed(appContext, e) }
-                                }
+                                result.onSuccess { onAnkiOperationSuccess(appContext) }
+                                    .onFailure { e ->
+                                        if (e is CancellationException)
+                                            onAnkiOperationCancelled(appContext)
+                                        else
+                                            onAnkiOperationFailed(appContext, e)
+                                    }
+                            }
+                            is AnkiEventBus.UiEvent.ProgressUpdate -> {
+                                // Handle progress updates for long operations
+                                Log.d(TAG, "Progress update: ${event.state.progress}/${event.state.total} - ${event.state.message}")
+                                
+                                // Forward progress to registered callback
+                                onAnkiSyncProgress(appContext, event)
+                            }
+                            is AnkiEventBus.UiEvent.ServiceStarting -> {
+                                onAnkiServiceStarting(appContext, event.serviceDelegate)
                             }
                         }
                     }
@@ -166,7 +187,9 @@ class AnkiDelegate(
 
     private suspend fun safelyModifyAnkiDb(ankiDbAction: suspend () -> Result<Unit>): Result<Unit> {
         ensureAnkiDroidIsRunning()
-        return ankiDbAction()
+        return withContext(Dispatchers.IO) {
+            ankiDbAction()
+        }
     }
 
     private suspend fun safelyModifyAnkiDbIfAllowed(ankiDbAction: suspend () -> Result<Unit>): Result<Unit> {
@@ -213,12 +236,34 @@ class AnkiDelegate(
         callbackHandler?.onAnkiOperationFailed(e)
     }
 
+    private fun onAnkiServiceStarting(appContext: Context?, serviceDelegate: AnkiSyncServiceDelegate) {
+        if (context == null) return
+
+        callbackHandler?.onAnkiServiceStarting(serviceDelegate)
+    }
+
+    private fun onAnkiSyncProgress(context: Context?, event: AnkiEventBus.UiEvent.ProgressUpdate) {
+        if (context == null) return
+
+        // The service does the notification update
+
+        callbackHandler?.onAnkiSyncProgress(event.state.progress, event.state.total, event.state.message)
+    }
+
     private fun onAnkiOperationSuccess(context: Context?) {
         if (context == null) return
 
         appContextToast(context, context.getString(R.string.anki_operation_success))
 
         callbackHandler?.onAnkiOperationSuccess()
+    }
+
+    private fun onAnkiOperationCancelled(context: Context?) {
+        if (context == null) return
+
+        appContextToast(context, context.getString(R.string.anki_operation_cancelled))
+
+        callbackHandler?.onAnkiOperationCancelled()
     }
 
     private fun onAnkiNotInstalled() {

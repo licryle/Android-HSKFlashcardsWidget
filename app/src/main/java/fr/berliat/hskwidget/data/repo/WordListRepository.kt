@@ -1,13 +1,14 @@
 package fr.berliat.hskwidget.data.repo
 
 import android.content.Context
-import android.util.Log
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.WordList
 import fr.berliat.hskwidget.data.model.WordListEntry
 import fr.berliat.hskwidget.data.store.AnkiStore
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.domain.AnkiDeck
+import fr.berliat.hskwidget.domain.AnkiSyncService
+import fr.berliat.hskwidget.ui.utils.AnkiSyncServiceDelegate
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -47,15 +48,27 @@ class WordListRepository(private val context: Context) {
     private suspend fun wordListDAO() = ChineseWordsDatabase.getInstance(context).wordListDAO()
     private suspend fun annotatedChineseWordDAO() = ChineseWordsDatabase.getInstance(context).annotatedChineseWordDAO()
 
-    protected val _uiEvents = MutableSharedFlow<UiEvent>(
-        replay = 0,
-        extraBufferCapacity = 10,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST
-    )
-    val uiEvents: SharedFlow<UiEvent> = _uiEvents
+    object SharedEventBus {
+        private val _uiEvents = MutableSharedFlow<UiEvent>(
+            replay = 0,
+            extraBufferCapacity = 10,
+            onBufferOverflow = BufferOverflow.DROP_OLDEST
+        )
+        val uiEvents: SharedFlow<UiEvent> = _uiEvents
+
+        sealed class UiEvent {
+            data class TriggerAnkiSync(val action: suspend () -> Result<Unit>) : UiEvent()
+            data class ServiceStarting(val serviceDelegate: AnkiSyncServiceDelegate) : UiEvent()
+            data class ProgressUpdate(val state: AnkiSyncService.OperationState.Running) : UiEvent()
+        }
+
+        suspend fun emit(event: UiEvent) {
+            _uiEvents.emit(event)
+        }
+    }
 
     suspend fun delegateToAnki(callback: (suspend () -> Result<Unit>)?) {
-        callback?.let { _uiEvents.emit(UiEvent.TriggerAnkiSync(it)) }
+        callback?.let { SharedEventBus.emit(SharedEventBus.UiEvent.TriggerAnkiSync(it)) }
     }
 
     /****** NOT TOUCHING ANKI *******/
@@ -93,81 +106,15 @@ class WordListRepository(private val context: Context) {
     }
 
     /****** ANKI ALTERING METHODS *******/
-    suspend fun syncListsToAnki(): (suspend () -> Result<Unit>)? {
-        val lists = wordListDAO().getAllLists()
-        val entries = wordListDAO().getAllListEntries()
+    suspend fun syncListsToAnki(): (suspend () -> Result<Unit>) {
+        val serviceDelegate = AnkiSyncServiceDelegate(context)
 
-        val annotatedChineseWords = mutableListOf<AnnotatedChineseWord>()
-        val wordList = entries.map { it.simplified }
-
-        // Safeguard against too many SQL vars error for a big migration
-        val chunks = wordList.chunked(ChineseWordsDatabase.SQL_MAX_CHUNK)
-        for (chunk in chunks) {
-            val partialResult = annotatedChineseWordDAO().getFromSimplified(chunk)
-            annotatedChineseWords.addAll(partialResult)
-        }
-
-        val words = annotatedChineseWords.associateBy { it.simplified }
-
-        if (lists.isEmpty() || entries.isEmpty() || words.isEmpty()) return null
+        serviceDelegate.startSyncToAnkiOperation()
 
         return suspend {
-            val nbToImport = entries.size
-            var nbImported = 0
-            var nbErrors = 0
-
-            var nbDeckCreationErrors = 0
-            Log.i(TAG, "syncListsToAnki.Anki: Creating decks if needed")
-            val decks = mutableMapOf<Long, AnkiDeck>()
-            for (list in lists) {
-                decks[list.id] = AnkiDeck.getOrCreate(context, ankiStore, list.wordList)
-
-                if (decks[list.id]!!.ankiId == WordList.ANKI_ID_EMPTY) {
-                    nbDeckCreationErrors += 1
-                }
-            }
-            Log.i(TAG, "syncListsToAnki.Anki: Created decks if possible: $nbDeckCreationErrors errors")
-
-            Log.i(TAG, "syncListsToAnki.Anki: Starting iterating through lists")
-            for (entry in entries) {
-                val deck = decks[entry.listId]
-                if (deck == null) {
-                    Log.e(TAG, "syncListsToAnki.Anki: found a WordListEntry not linked to any list. Skipping entry")
-                    nbErrors += 1
-                    continue
-                }
-
-                if (words[entry.simplified] == null) {
-                    Log.e(TAG, "syncListsToAnki.Anki: found a WordListEntry not linked to an actual word. Skipping entry")
-                    nbErrors += 1
-                    continue
-                }
-
-                if (deck.ankiId == WordList.ANKI_ID_EMPTY) {
-                    Log.e(TAG, "syncListsToAnki.Anki: deck with no ID in Anki. Skipping entry")
-                    nbErrors += 1
-                    continue
-                }
-
-                val id = ankiStore.importOrUpdateCard(deck, entry, words[entry.simplified]!!)
-
-                if (id == null) {
-                    nbErrors += 1
-                } else {
-                    nbImported += 1
-                    /* @TODO Implement call back for progress*/
-                }
-
-            }
-
-            Log.i(TAG, "importOrUpdateAllCards: import done for $nbImported ouf of $nbToImport")
-
-            if (nbErrors > 0) {
-                Result.failure(Exception("Only $nbImported ouf of $nbToImport imported to Anki."))
-            } else {
-                Result.success(Unit)
-            }
-        }
+            SharedEventBus.emit(SharedEventBus.UiEvent.ServiceStarting(serviceDelegate))
+            serviceDelegate.awaitOperationCompletion()
+        } // Returns result when done
     }
 
     suspend fun updateWordListAssociations(simplified: String, listIds: List<Long>): (suspend () -> Result<Unit>)? {
@@ -379,10 +326,6 @@ class WordListRepository(private val context: Context) {
                 Result.failure(Exception("$nbErrors errors during update of ${entries.size} entries"))
             }
         }
-    }
-
-    sealed class UiEvent {
-        data class TriggerAnkiSync(val action: suspend () -> Result<Unit>) : UiEvent()
     }
 
     companion object {

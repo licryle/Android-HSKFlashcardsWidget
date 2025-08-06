@@ -2,6 +2,7 @@ package fr.berliat.hskwidget.data.dao
 
 import android.content.ContentValues
 import android.content.Context
+import android.util.Log
 import com.ichi2.anki.FlashCardsContract
 import com.ichi2.anki.FlashCardsContract.Note
 import com.ichi2.anki.api.AddContentApi
@@ -17,6 +18,10 @@ import com.ichi2.anki.api.NoteInfo
 class AnkiDAO(context: Context) {
     private val api = AddContentApi(context)
     private val resolver = context.contentResolver
+
+    companion object {
+        private const val TAG = "AnkiDAO"
+    }
 
     /**
      * Deletes a note from AnkiDroid given a note ID.
@@ -50,7 +55,7 @@ class AnkiDAO(context: Context) {
                 i += 1
             } catch (e: Exception) {
                 toUpdate = false
-                e.printStackTrace()
+                Log.d(TAG, "Updated $i cards for note $noteId")
             }
         }
 
