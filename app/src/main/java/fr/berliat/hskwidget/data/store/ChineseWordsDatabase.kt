@@ -57,7 +57,6 @@ abstract class ChineseWordsDatabase : RoomDatabase() {
         }
 
         const val TAG = "ChineseWordsDatabase"
-        const val SQL_MAX_CHUNK = 500 // This avoids hitting "too many variables" error by breaking up queries
 
         @Volatile
         private var INSTANCE: ChineseWordsDatabase? = null

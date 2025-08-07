@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.database.sqlite.SQLiteException
 import android.graphics.BitmapFactory
 import android.os.Binder
 import android.os.IBinder
@@ -140,11 +141,33 @@ class AnkiSyncService : LifecycleService() {
         val annotatedChineseWords = mutableListOf<AnnotatedChineseWord>()
         val wordList = entries.map { it.simplified }
 
-        // Safeguard against too many SQL vars error for a big migration
-        val chunks = wordList.chunked(ChineseWordsDatabase.SQL_MAX_CHUNK)
-        for (chunk in chunks) {
-            val partialResult = annotatedChineseWordDAO.getFromSimplified(chunk)
-            annotatedChineseWords.addAll(partialResult)
+        /**
+         * Some devices like Huawei P20 or Samsung Galaxy A11 have a low limit on variables per
+         * SQLite queries. Most devices don't, so to be safe, we will iterate at max 12 times with
+         * lowering the number of words per query, hence lowering the number of variables each time.
+         */
+        var chunkSize = 2048
+        var formerException : SQLiteException? = SQLiteException()
+        while (formerException != null && chunkSize >= 1) {
+            annotatedChineseWords.clear()
+
+            try {
+                // Safeguard against too many SQL vars error for a big migration
+                val chunks = wordList.chunked(chunkSize)
+                for (chunk in chunks) {
+                    val partialResult = annotatedChineseWordDAO.getFromSimplified(chunk)
+                    annotatedChineseWords.addAll(partialResult)
+                }
+                formerException = null
+
+            } catch (e: SQLiteException) {
+                formerException = e
+                chunkSize /= 2
+            }
+        }
+
+        if (formerException != null) {
+            throw formerException
         }
 
         val words = annotatedChineseWords.associateBy { it.simplified }

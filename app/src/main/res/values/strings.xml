@@ -259,7 +259,7 @@ padding: 0;
     <string name="anki_sync_notification_name">Anki Sync Progress</string>
     <string name="anki_sync_notification_description">Provides you with a progress notification for the Anki Sync.</string>
     <string name="anki_not_installed"><![CDATA[AnkiDroid is not installed, or runs a very old version (<2.5)]]></string>
-    <string name="anki_failed_import">Anki cards import failed, try disabling/enabling again.</string>
+    <string name="anki_failed_import">Anki cards import failed, try disabling/enabling again: %s</string>
     <string name="anki_permission_denied">Permission to call AnkiDroid API denied.</string>
     <string name="anki_import_completed">Successfully imported %d cards to Anki.</string>
     <string name="anki_import_started">Starting the import into AnkiDroid</string>
