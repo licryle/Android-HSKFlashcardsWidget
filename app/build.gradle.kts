@@ -80,12 +80,12 @@ dependencies {
     implementation("androidx.activity:activity-ktx:1.10.1")
     implementation("androidx.fragment:fragment-ktx:1.8.8")
 
-    implementation("androidx.datastore:datastore:1.1.1")
-    implementation("androidx.datastore:datastore-core:1.1.1")
-    implementation("androidx.datastore:datastore-rxjava2:1.1.1")
-    implementation("androidx.datastore:datastore-rxjava3:1.1.1")
-    implementation("androidx.datastore:datastore-preferences:1.1.1")
-    implementation("androidx.datastore:datastore-preferences-core:1.1.1")
+    implementation("androidx.datastore:datastore:1.1.7")
+    implementation("androidx.datastore:datastore-core:1.1.7")
+    implementation("androidx.datastore:datastore-rxjava2:1.1.7")
+    implementation("androidx.datastore:datastore-rxjava3:1.1.7")
+    implementation("androidx.datastore:datastore-preferences:1.1.7")
+    implementation("androidx.datastore:datastore-preferences-core:1.1.7")
 
     implementation("androidx.lifecycle:lifecycle-service:2.9.2")
 
@@ -98,7 +98,7 @@ dependencies {
 
     implementation("com.google.code.gson:gson:2.13.1")
 
-    val roomVersion = "2.7.1"
+    val roomVersion = "2.7.2"
 
     implementation("androidx.room:room-runtime:$roomVersion")
 
