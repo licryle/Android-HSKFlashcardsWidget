@@ -236,7 +236,7 @@ class AnkiDelegate(
         callbackHandler?.onAnkiOperationFailed(e)
     }
 
-    private fun onAnkiServiceStarting(appContext: Context?, serviceDelegate: AnkiSyncServiceDelegate) {
+    private fun onAnkiServiceStarting(context: Context?, serviceDelegate: AnkiSyncServiceDelegate) {
         if (context == null) return
 
         callbackHandler?.onAnkiServiceStarting(serviceDelegate)
