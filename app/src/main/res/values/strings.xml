@@ -67,7 +67,7 @@ We recommend to choose the level your at plus the one below, or above depending 
     <string name="speech_failure_toast_unknown">Unknown speech error</string>
     <string name="speech_failure_toast_muted">Unmute to hear the word</string>
     <string name="speech_failure_toast_chinese_unsupported">Please install the "Chinese (China)" voice</string>
-    <string name="speech_failure_toast_init">www</string>
+    <string name="speech_failure_toast_init">Failed to initialized Text-To-Speech</string>
     <string name="menu_dictionary">Dictionary</string>
     <string name="menu_lists">Lists</string>
     <string name="menu_annotate">Annotate a word</string>
