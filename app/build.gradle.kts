@@ -9,22 +9,23 @@ plugins {
 
 android {
     namespace = "fr.berliat.hskwidget"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "fr.berliat.hskwidget"
         minSdk = 26
         //noinspection EditedTargetSdkVersion
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 23
         versionName = "3.2.1"
         buildConfigField("String", "APP_VERSION", "\"$versionName-$versionCode\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        ksp {
-            arg("room.schemaLocation", "$projectDir/schemas")
-        }
+    }
+
+    ksp {
+        arg("room.schemaLocation", "$projectDir/schemas")
     }
 
     buildTypes {
@@ -40,13 +41,16 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
     buildFeatures {
         viewBinding = true
         buildConfig = true
         dataBinding = true
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
     }
 }
 
