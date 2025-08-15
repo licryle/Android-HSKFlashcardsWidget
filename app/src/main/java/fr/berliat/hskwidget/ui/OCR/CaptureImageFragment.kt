@@ -156,6 +156,13 @@ class CaptureImageFragment : Fragment() {
                 Log.d(TAG, "Camera started")
             } catch(exc: Exception) {
                 Log.e(TAG, "Couldn't start camera: binding failed", exc)
+
+                Utils.logAnalyticsError(
+                    requireContext(),
+                    "OCR_CAPTURE",
+                    "CameraBindingFailed",
+                    exc.message ?: ""
+                )
             }
 
         }, ContextCompat.getMainExecutor(requireContext()))
@@ -191,6 +198,13 @@ class CaptureImageFragment : Fragment() {
             object : ImageCapture.OnImageSavedCallback {
                 override fun onError(exc: ImageCaptureException) {
                     Log.e(TAG, "Photo capture failed: ${exc.message}", exc)
+
+                    Utils.logAnalyticsError(
+                        requireContext(),
+                        "OCR_CAPTURE",
+                        "PhotoCaptureFailed",
+                        exc.message ?: ""
+                    )
                 }
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
@@ -231,6 +245,13 @@ class CaptureImageFragment : Fragment() {
         } catch (e: Exception) {
             e.printStackTrace()
             Toast.makeText(requireContext(), "Error processing cropped image", Toast.LENGTH_SHORT).show()
+
+            Utils.logAnalyticsError(
+                requireContext(),
+                "OCR_CAPTURE",
+                "ProcessingPictureFailed",
+                e.message ?: ""
+            )
         }
     }
 

@@ -11,6 +11,7 @@ import com.android.billingclient.api.Purchase
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.data.store.SupportDevStore
+import fr.berliat.hskwidget.domain.Utils
 
 class SupportViewModel(application: Application, private val toastMe: (Int) -> Unit)
     : AndroidViewModel(application),
@@ -45,6 +46,11 @@ class SupportViewModel(application: Application, private val toastMe: (Int) -> U
 
     fun makePurchase(activity: Activity, productId: String) {
         supportDevStore.makePurchase(activity, productId)
+        Utils.logAnalyticsEvent(
+            application.applicationContext,
+            Utils.ANALYTICS_EVENTS.PURCHASE_CLICK,
+            mapOf("product_id" to productId)
+        )
     }
 
     override fun onTotalSpentChange(totalSpent: Float) {
@@ -79,6 +85,11 @@ class SupportViewModel(application: Application, private val toastMe: (Int) -> U
 
     override fun onPurchaseSuccess(purchase: Purchase) {
         toastMe(R.string.support_payment_success)
+        Utils.logAnalyticsEvent(
+            application.applicationContext,
+            Utils.ANALYTICS_EVENTS.PURCHASE_SUCCESS,
+            mapOf("product_id" to getFirstProductId(purchase))
+        )
     }
 
     override fun onPurchaseHistoryUpdate(purchases: Map<SupportDevStore.SupportProduct, Int>) {
@@ -89,6 +100,15 @@ class SupportViewModel(application: Application, private val toastMe: (Int) -> U
 
     override fun onPurchaseFailure(purchase: Purchase?, billingResponseCode: Int) {
         toastMe(R.string.support_payment_failed)
+        Utils.logAnalyticsEvent(
+            application.applicationContext,
+            Utils.ANALYTICS_EVENTS.PURCHASE_FAILED,
+            mapOf("product_id" to getFirstProductId(purchase))
+        )
+    }
+
+    fun getFirstProductId(purchase: Purchase?): String {
+        return purchase?.products?.first() ?: ""
     }
 
     companion object {

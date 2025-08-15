@@ -137,6 +137,11 @@ class Utils {
             workMgr.enqueue(speechRequest)
 
             incrementConsultedWord(context, word)
+
+            logAnalyticsEvent(
+                context,
+                ANALYTICS_EVENTS.WIDGET_PLAY_WORD
+            )
         }
 
         fun capitalizeStr(s: Any?) =
@@ -384,6 +389,8 @@ class Utils {
                 Toast.LENGTH_SHORT
             ).show()
 
+            logAnalyticsEvent(context, ANALYTICS_EVENTS.WIDGET_COPY_WORD)
+
             incrementConsultedWord(context, s)
         }
 
@@ -474,7 +481,7 @@ class Utils {
     enum class ANALYTICS_EVENTS {
         SCREEN_VIEW,
         AUTO_WORD_CHANGE,
-        ERROR,
+        ERROR, // Use logAnalyticsError for details
         WIDGET_PLAY_WORD,
         WIDGET_MANUAL_WORD_CHANGE,
         WIDGET_RECONFIGURE,
@@ -482,7 +489,29 @@ class Utils {
         WIGDET_RESIZE,
         WIGDET_ADD,
         WIGDET_REMOVE,
-        WIDGET_OPEN_DICTIONARY
+        WIDGET_OPEN_DICTIONARY,
+        WIDGET_COPY_WORD,
+        CONFIG_BACKUP_ON,
+        CONFIG_BACKUP_OFF,
+        CONFIG_BACKUP_RESTORE,
+        CONFIG_ANKI_SYNC_ON,
+        CONFIG_ANKI_SYNC_OFF,
+        ANNOTATION_SAVE,
+        ANNOTATION_DELETE,
+        LIST_CREATE,
+        LIST_DELETE,
+        LIST_MODIFY_WORD,
+        LIST_RENAME,
+        DICT_HSK3_ON,
+        DICT_HSK3_OFF,
+        DICT_ANNOTATION_ON,
+        DICT_ANNOTATION_OFF,
+        DICT_SEARCH,
+        OCR_WORD_NOTFOUND,
+        OCR_WORD_FOUND,
+        PURCHASE_CLICK,
+        PURCHASE_FAILED,
+        PURCHASE_SUCCESS
     }
 
     /* Thank to https://stackoverflow.com/questions/25153604/get-the-size-of-my-homescreen-widget */

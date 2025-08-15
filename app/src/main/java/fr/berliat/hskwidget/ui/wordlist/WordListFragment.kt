@@ -17,6 +17,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.model.WordList
 import fr.berliat.hskwidget.data.model.WordListWithCount
+import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.ui.utils.AnkiDelegate
 import java.text.SimpleDateFormat
 import java.util.*
@@ -29,6 +30,12 @@ class WordListFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ankiDelegate = AnkiDelegate(this)
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        Utils.logAnalyticsScreenView(requireContext(), "WordListFragment")
     }
 
     override fun onCreateView(
@@ -89,6 +96,8 @@ class WordListFragment : Fragment() {
                 viewModel.deleteList(list.wordList, callback = { _ ->
                     refreshLists()
                 })
+
+                Utils.logAnalyticsEvent(requireContext(), Utils.ANALYTICS_EVENTS.LIST_DELETE)
             }
             .setNegativeButton(R.string.cancel, null)
             .show()

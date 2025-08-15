@@ -9,6 +9,7 @@ import androidx.fragment.app.DialogFragment
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.repo.WordListRepository
 import fr.berliat.hskwidget.databinding.FragmentWordlistDialogCreateListBinding
+import fr.berliat.hskwidget.domain.Utils
 
 class WordListReNameDialog(
     private val onReNameResult: (success: Boolean, newName: String?) -> Unit) : DialogFragment() {
@@ -70,6 +71,8 @@ class WordListReNameDialog(
                     viewModel.renameList(listId, name) { err ->
                         if (err == null) {
                             onReNameResult(true, name)
+                            Utils.logAnalyticsEvent(requireContext(), Utils.ANALYTICS_EVENTS.LIST_RENAME)
+
                             dismiss()
                         } else {
                             Toast.makeText(context, getString(R.string.wordlist_list_name_dupe), Toast.LENGTH_LONG).show()
@@ -79,6 +82,9 @@ class WordListReNameDialog(
                     viewModel.createList(name) { err ->
                         if (err == null) {
                             onReNameResult(true, name)
+
+                            Utils.logAnalyticsEvent(requireContext(), Utils.ANALYTICS_EVENTS.LIST_CREATE)
+
                             dismiss()
                         } else {
                             Toast.makeText(context, getString(R.string.wordlist_list_name_dupe), Toast.LENGTH_LONG).show()

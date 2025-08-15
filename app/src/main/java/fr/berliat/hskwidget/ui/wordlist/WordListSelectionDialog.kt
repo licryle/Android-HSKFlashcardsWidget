@@ -12,6 +12,7 @@ import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.model.WordListWithCount
 import fr.berliat.hskwidget.databinding.FragmentWordlistDialogSelectItemBinding
 import fr.berliat.hskwidget.databinding.FragmentWordlistDialogSelectListsBinding
+import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.ui.utils.AnkiDelegate
 
 class WordListSelectionDialog : DialogFragment() {
@@ -94,6 +95,9 @@ class WordListSelectionDialog : DialogFragment() {
             if (error == null) {
                 Toast.makeText(context, R.string.wordlist_lists_updated_toast, Toast.LENGTH_SHORT)
                     .show()
+
+                Utils.logAnalyticsEvent(requireContext(), Utils.ANALYTICS_EVENTS.LIST_MODIFY_WORD)
+
                 dismiss()
             } else {
                 Toast.makeText(

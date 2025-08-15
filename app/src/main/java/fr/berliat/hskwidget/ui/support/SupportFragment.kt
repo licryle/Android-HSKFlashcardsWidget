@@ -16,6 +16,12 @@ class SupportFragment : Fragment() {
 
     private lateinit var viewModel : SupportViewModel
 
+    override fun onResume() {
+        super.onResume()
+
+        Utils.logAnalyticsScreenView(requireContext(), "SupportDev")
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?

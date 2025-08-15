@@ -219,6 +219,13 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
                         .show()
                     Log.e(TAG, "Text recognition failed: ", e)
                     e.printStackTrace()
+
+                    Utils.logAnalyticsError(
+                        requireContext(),
+                        "OCR_DISPLAY",
+                        "TextRecognitionFailed",
+                        e.message ?: ""
+                    )
                 }
         }
     }
@@ -312,6 +319,11 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
 
             val message = requireContext().getString(R.string.ocr_display_word_not_found, simplified)
             Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+
+            Utils.logAnalyticsEvent(
+                requireContext(),
+                Utils.ANALYTICS_EVENTS.OCR_WORD_NOTFOUND
+            )
         } else {
             viewModel.clickedWords[simplified] = annotatedWord.word?.pinyins.toString()
 
@@ -321,6 +333,11 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
             )
             viewBinding.ocrDisplayDefinition.root.visibility = View.VISIBLE
             viewModel.selectedWord = simplified
+
+            Utils.logAnalyticsEvent(
+                requireContext(),
+                Utils.ANALYTICS_EVENTS.OCR_WORD_FOUND
+            )
         }
 
         viewBinding.ocrDisplayText.clickedWords = viewModel.clickedWords
@@ -335,6 +352,13 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
 
         toggleProcessing(false)
         Toast.makeText(context, getString(R.string.ocr_display_analysis_failure), Toast.LENGTH_LONG).show()
+
+        Utils.logAnalyticsError(
+            requireContext(),
+            "OCR_DISPLAY",
+            "TextAnalysisFailed",
+            e.message ?: ""
+        )
     }
 
     override fun onTextAnalysisSuccess() {

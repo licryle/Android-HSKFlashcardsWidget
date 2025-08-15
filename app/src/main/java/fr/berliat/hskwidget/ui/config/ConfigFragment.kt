@@ -77,6 +77,11 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
 
         binding.configBackupActivateBtn.setOnClickListener {
             appConfig.dbBackUpActive = binding.configBackupActivateBtn.isChecked
+
+            var evt = Utils.ANALYTICS_EVENTS.CONFIG_BACKUP_OFF
+            if (appConfig.dbBackUpActive)
+                evt = Utils.ANALYTICS_EVENTS.CONFIG_BACKUP_ON
+            Utils.logAnalyticsEvent(requireContext(), evt)
         }
 
         val bkDir = appConfig.dbBackUpDirectory.toString().substringAfterLast("%3A")
@@ -104,8 +109,10 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
         if (enabled) {
             Utils.requestPermissionNotification(requireActivity())
             importsAllNotesToAnkiDroid()
+            Utils.logAnalyticsEvent(requireContext(), Utils.ANALYTICS_EVENTS.CONFIG_ANKI_SYNC_ON)
         } else {
             cancelServiceSync()
+            Utils.logAnalyticsEvent(requireContext(), Utils.ANALYTICS_EVENTS.CONFIG_ANKI_SYNC_OFF)
         }
     }
 
@@ -140,6 +147,13 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
         message = message.format(e.message)
 
         Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+
+        Utils.logAnalyticsError(
+            requireContext(),
+            "ANKI_SYNC",
+            "FullAnkiImportFailed",
+            e.message ?: ""
+        )
     }
 
     override fun onAnkiSyncProgress(current: Int, total: Int, message: String) {
@@ -191,6 +205,7 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
             getString(R.string.dbrestore_start),
             Toast.LENGTH_LONG
         ).show()
+        Utils.logAnalyticsEvent(requireContext(), Utils.ANALYTICS_EVENTS.CONFIG_BACKUP_RESTORE)
 
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             val file = Utils.copyUriToCacheDir(requireContext(), uri)
@@ -215,6 +230,13 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
                         getString(R.string.dbrestore_failure_fileformat),
                         Toast.LENGTH_LONG
                     ).show()
+
+                    Utils.logAnalyticsError(
+                        requireContext(),
+                        "BACKUP_RESTORE",
+                        getString(R.string.dbrestore_failure_fileformat),
+                        e.message ?: ""
+                    )
                 }
             } catch (e: Error) {
                 withContext(Dispatchers.Main) {
@@ -223,6 +245,13 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
                         getString(R.string.dbrestore_failure_import),
                         Toast.LENGTH_LONG
                     ).show()
+
+                    Utils.logAnalyticsError(
+                        requireContext(),
+                        "BACKUP_RESTORE",
+                        getString(R.string.dbrestore_failure_import),
+                        e.message ?: ""
+                    )
                 }
             }
         }

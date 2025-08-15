@@ -95,11 +95,6 @@ class FlashcardWidgetProvider : AppWidgetProvider() {
 
             ACTION_SPEAK -> {
                 FlashcardManager.getInstance(context, widgetId).playWidgetWord()
-
-                Utils.logAnalyticsWidgetAction(
-                    context,
-                    Utils.ANALYTICS_EVENTS.WIDGET_PLAY_WORD, widgetId
-                )
             }
 
             ACTION_DICTIONARY -> {

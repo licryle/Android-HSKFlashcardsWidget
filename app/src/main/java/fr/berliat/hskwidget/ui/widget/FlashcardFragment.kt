@@ -132,10 +132,6 @@ class FlashcardFragment : Fragment() {
 
                     configuredBindings.flashcardSpeak.setOnClickListener {
                         flashcardsMfr.playWidgetWord()
-                        Utils.logAnalyticsWidgetAction(
-                            context,
-                            Utils.ANALYTICS_EVENTS.WIDGET_PLAY_WORD, widgetId
-                        )
                     }
 
                     configuredBindings.flashcardReload.setOnClickListener {
