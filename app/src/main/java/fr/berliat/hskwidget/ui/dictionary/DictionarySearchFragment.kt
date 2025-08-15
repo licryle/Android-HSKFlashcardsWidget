@@ -18,11 +18,11 @@ import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.domain.Utils
-import fr.berliat.hskwidget.domain.SearchQueryProcessor
 import kotlinx.coroutines.launch
 
 import fr.berliat.hskwidget.databinding.FragmentDictionarySearchBinding
 import fr.berliat.hskwidget.databinding.FragmentDictionarySearchItemBinding
+import fr.berliat.hskwidget.domain.SearchQuery
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.time.Instant
@@ -31,14 +31,13 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
     private lateinit var searchAdapter: DictionarySearchAdapter
     private lateinit var binding: FragmentDictionarySearchBinding
     private lateinit var appConfig: AppPreferencesStore
-    private val searchQueryProcessor = SearchQueryProcessor()
 
     private var isLoading = false
     private var currentPage = 0
     private var itemsPerPage = 20
-    private val searchQuery: String
+    private val searchQuery: SearchQuery
         get() {
-            return activity?.findViewById<SearchView>(R.id.appbar_search)?.query.toString().trim()
+            return SearchQuery.fromString(activity?.findViewById<SearchView>(R.id.appbar_search)?.query.toString())
         }
 
     private var lastFullSearchStartTime = Instant.now().toEpochMilli()
@@ -177,13 +176,14 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
         val dao = ChineseWordsDatabase.getInstance(requireContext()).annotatedChineseWordDAO()
         try {
             val annotatedOnly = binding.dictionarySearchFilterHasannotation.isChecked
-            val (listName, otherFilters) = searchQueryProcessor.processSearchQuery(searchQuery)
-            
+
+            val listName = searchQuery.inListName
             val results = if (listName != null) {
                 // Search within the specified word list
-                dao.searchFromWordList(listName, annotatedOnly, currentPage, itemsPerPage)
+                dao.searchFromWordList(listName, annotatedOnly && !searchQuery.ignoreAnnotation, currentPage, itemsPerPage)
+                    .filter { it.toString().contains(searchQuery.query) }
             } else {
-                dao.searchFromStrLike(otherFilters ?: searchQuery, annotatedOnly, currentPage, itemsPerPage)
+                dao.searchFromStrLike(searchQuery.query, annotatedOnly && !searchQuery.ignoreAnnotation, currentPage, itemsPerPage)
             }
             Log.d(TAG, "Search returned for $searchQuery")
 
@@ -209,17 +209,17 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
         binding.dictionarySearchLoading.visibility = View.GONE
 
         // Does the search have an exact match in dictionary?
-        if (searchQuery.isEmpty()
-            || ! searchAdapter.getData().none { it.simplified == searchQuery }
-            || ! Utils.containsChinese(searchQuery)) {
+        if (searchQuery.query.isEmpty()
+            || ! searchAdapter.getData().none { it.simplified == searchQuery.query }
+            || ! Utils.containsChinese(searchQuery.query)) {
             binding.dictionarySearchNoresults.visibility = View.GONE
         } else {
             val text = binding.dictionaryNoresultText
-            text.text = getString(R.string.dictionary_noresult_text).format(searchQuery)
+            text.text = getString(R.string.dictionary_noresult_text).format(searchQuery.query)
 
             binding.dictionarySearchNoresults.setOnClickListener {
                 val action =
-                    DictionarySearchFragmentDirections.annotateWord(searchQuery, true)
+                    DictionarySearchFragmentDirections.annotateWord(searchQuery.query, true)
 
                 findNavController().navigate(action)
             }
