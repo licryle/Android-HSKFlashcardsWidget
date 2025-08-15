@@ -329,7 +329,8 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
 
             Utils.populateDictionaryEntryView(
                 viewBinding.ocrDisplayDefinition, annotatedWord,
-                findNavController()
+                findNavController(),
+                { }
             )
             viewBinding.ocrDisplayDefinition.root.visibility = View.VISIBLE
             viewModel.selectedWord = simplified

@@ -13,6 +13,7 @@ import fr.berliat.hskwidget.data.model.WordListWithCount
 import fr.berliat.hskwidget.databinding.FragmentWordlistDialogSelectItemBinding
 import fr.berliat.hskwidget.databinding.FragmentWordlistDialogSelectListsBinding
 import fr.berliat.hskwidget.domain.Utils
+import fr.berliat.hskwidget.domain.CallbackNoParam
 import fr.berliat.hskwidget.ui.utils.AnkiDelegate
 
 class WordListSelectionDialog : DialogFragment() {
@@ -21,6 +22,8 @@ class WordListSelectionDialog : DialogFragment() {
     private lateinit var adapter: WordListSelectionAdapter
     private lateinit var ankiDelegate: AnkiDelegate
     private var wordId: String? = null
+
+    var onSave: CallbackNoParam? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -98,6 +101,7 @@ class WordListSelectionDialog : DialogFragment() {
 
                 Utils.logAnalyticsEvent(requireContext(), Utils.ANALYTICS_EVENTS.LIST_MODIFY_WORD)
 
+                onSave?.invoke()
                 dismiss()
             } else {
                 Toast.makeText(

@@ -8,10 +8,12 @@ import androidx.recyclerview.widget.RecyclerView
 
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.databinding.FragmentDictionarySearchItemBinding
+import fr.berliat.hskwidget.domain.CallbackNoParam
 
 
 class DictionarySearchAdapter(private val fragment: Fragment,
-                              private val dataChangedListener: SearchResultChangedListener
+                              private val dataChangedListener: SearchResultChangedListener,
+                              private val wordListChangedCallback: CallbackNoParam
 )  :
     RecyclerView.Adapter<DictionarySearchFragment.SearchResultItem>() {
 
@@ -21,7 +23,7 @@ class DictionarySearchAdapter(private val fragment: Fragment,
         val binding = FragmentDictionarySearchItemBinding.inflate(
             LayoutInflater.from(parent.context), parent, false)
 
-        return DictionarySearchFragment.SearchResultItem(binding, fragment.findNavController())
+        return DictionarySearchFragment.SearchResultItem(binding, fragment.findNavController(), wordListChangedCallback)
     }
 
     override fun onBindViewHolder(holder: DictionarySearchFragment.SearchResultItem, position: Int) {

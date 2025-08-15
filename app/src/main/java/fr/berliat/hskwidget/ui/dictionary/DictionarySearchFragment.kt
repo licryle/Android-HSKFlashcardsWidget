@@ -22,6 +22,7 @@ import kotlinx.coroutines.launch
 
 import fr.berliat.hskwidget.databinding.FragmentDictionarySearchBinding
 import fr.berliat.hskwidget.databinding.FragmentDictionarySearchItemBinding
+import fr.berliat.hskwidget.domain.CallbackNoParam
 import fr.berliat.hskwidget.domain.SearchQuery
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -44,7 +45,9 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        searchAdapter = DictionarySearchAdapter(requireParentFragment(), this)
+        searchAdapter = DictionarySearchAdapter(requireParentFragment(),
+            this,
+            { performSearch() })
     }
 
     override fun onCreateView(
@@ -233,10 +236,12 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
     }
 
     class SearchResultItem(private val binding: FragmentDictionarySearchItemBinding,
-                           private val navController: NavController) : RecyclerView.ViewHolder(binding.root) {
+                           private val navController: NavController,
+                           private val wordListChangedCallback: CallbackNoParam
+    ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(result: AnnotatedChineseWord) {
-            Utils.populateDictionaryEntryView(binding, result, navController)
+            Utils.populateDictionaryEntryView(binding, result, navController, wordListChangedCallback)
         }
     }
 

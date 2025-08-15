@@ -53,6 +53,7 @@ import fr.berliat.hskwidget.HSKHelperApp
 import fr.berliat.hskwidget.data.model.ChineseWord.Companion.CN_HSK3
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 
+typealias CallbackNoParam = () -> Unit
 
 class Utils {
     class DummyWorker(context: Context, workerParams: WorkerParameters)
@@ -244,7 +245,9 @@ class Utils {
         }
 
         fun populateDictionaryEntryView(binding: FragmentDictionarySearchItemBinding,
-                                        word: AnnotatedChineseWord, navController: NavController) {
+                                        word: AnnotatedChineseWord, navController: NavController,
+                                        wordListChangedCallback: CallbackNoParam
+        ) {
             // Definition vs. HSK definition -- which one to show?
             // Collect then invert if needed
             var definition = word.word?.definition?.get(Locale.ENGLISH) ?: ""
@@ -309,6 +312,7 @@ class Utils {
 
             binding.dictionaryItemLists.setOnClickListener {
                 val dialog = WordListSelectionDialog.newInstance(word.simplified)
+                dialog.onSave = wordListChangedCallback
                 dialog.show((context as FragmentActivity).supportFragmentManager, "WordListSelectionDialog")
             }
             // Done with "top part"
@@ -550,5 +554,4 @@ class Utils {
         private fun Context.dip(value: Int): Int =
             (value * resources.displayMetrics.density).toInt()
     }
-
 }
