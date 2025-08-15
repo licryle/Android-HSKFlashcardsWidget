@@ -51,7 +51,7 @@ class FlashcardManager private constructor(private val context: Context,
         Log.i(TAG, "getNewWord: Got a new word, maybe: %s".format(newWord))
 
         // Persist it in preferences for cross-App convenience
-        flashCardPrefs.currentSimplified = newWord.simplified
+        flashCardPrefs.setCurrentSimplified(newWord.simplified, null).await()
 
         return newWord.toChineseWord()
     }

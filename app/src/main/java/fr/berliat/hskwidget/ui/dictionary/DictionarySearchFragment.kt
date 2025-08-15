@@ -100,27 +100,29 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
         })
 
         binding.dictionarySearchFilterHasannotation.setOnClickListener {
-            appConfig.searchFilterHasAnnotation = binding.dictionarySearchFilterHasannotation.isChecked
-            performSearch()
+            appConfig.setSearchFilterHasAnnotation(binding.dictionarySearchFilterHasannotation.isChecked) {
+                performSearch()
 
-            var evt = Utils.ANALYTICS_EVENTS.DICT_ANNOTATION_OFF
-            if (appConfig.searchFilterHasAnnotation) {
-                evt = Utils.ANALYTICS_EVENTS.DICT_ANNOTATION_ON
+                var evt = Utils.ANALYTICS_EVENTS.DICT_ANNOTATION_OFF
+                if (appConfig.searchFilterHasAnnotation) {
+                    evt = Utils.ANALYTICS_EVENTS.DICT_ANNOTATION_ON
+                }
+
+                Utils.logAnalyticsEvent(requireContext(), evt)
             }
-
-            Utils.logAnalyticsEvent(requireContext(), evt)
         }
 
         binding.dictionaryShowHsk3definition.setOnClickListener {
-            appConfig.dictionaryShowHSK3Definition = binding.dictionaryShowHsk3definition.isChecked
-            searchAdapter.notifyDataSetChanged()
+            appConfig.setDictionaryShowHSK3Definition(binding.dictionaryShowHsk3definition.isChecked) {
+                searchAdapter.notifyDataSetChanged()
 
-            var evt = Utils.ANALYTICS_EVENTS.DICT_HSK3_OFF
-            if (appConfig.searchFilterHasAnnotation) {
-                evt = Utils.ANALYTICS_EVENTS.DICT_HSK3_ON
+                var evt = Utils.ANALYTICS_EVENTS.DICT_HSK3_OFF
+                if (appConfig.searchFilterHasAnnotation) {
+                    evt = Utils.ANALYTICS_EVENTS.DICT_HSK3_ON
+                }
+
+                Utils.logAnalyticsEvent(requireContext(), evt)
             }
-
-            Utils.logAnalyticsEvent(requireContext(), evt)
         }
     }
 

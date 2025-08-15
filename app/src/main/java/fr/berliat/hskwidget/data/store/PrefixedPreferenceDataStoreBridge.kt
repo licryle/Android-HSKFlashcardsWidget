@@ -20,6 +20,9 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+
+typealias Callback = () -> Unit
 
 open class PrefixedPreferenceDataStoreBridge(private val dataStore: DataStore<Preferences>, private val prefix: String) :
     PreferenceDataStore() {
@@ -30,33 +33,34 @@ open class PrefixedPreferenceDataStoreBridge(private val dataStore: DataStore<Pr
 
     private fun prefixKey(key: String): String { return prefix + '_' + key }
 
-    override fun putString(key: String, value: String?) {
-        putPreference(stringPreferencesKey(prefixKey(key)), value)
+    override fun putString(key: String, value: String?) { putString(key, value, null) }
+    fun putString(key: String, value: String?, callback: Callback?) : Deferred<Preferences> {
+        return putPreference(stringPreferencesKey(prefixKey(key)), value, callback)
     }
 
-    fun putStringBlocking(key: String, value: String?) = runBlocking {
-        val j = putPreference(stringPreferencesKey(prefixKey(key)), value)
-        j.await()
+    override fun putStringSet(key: String, values: MutableSet<String>?) { putStringSet(key, values, null) }
+    fun putStringSet(key: String, values: MutableSet<String>?, callback: Callback?) : Deferred<Preferences> {
+        return putPreference(stringSetPreferencesKey(prefixKey(key)), values, callback)
     }
 
-    override fun putStringSet(key: String, values: MutableSet<String>?) {
-        putPreference(stringSetPreferencesKey(prefixKey(key)), values)
+    override fun putInt(key: String, value: Int) { putInt(key, value, null) }
+    fun putInt(key: String, value: Int, callback: Callback? = null) : Deferred<Preferences> {
+        return putPreference(intPreferencesKey(prefixKey(key)), value, callback)
     }
 
-    override fun putInt(key: String, value: Int) {
-        putPreference(intPreferencesKey(prefixKey(key)), value)
+    override fun putLong(key: String, value: Long) { putLong(key, value, null) }
+    fun putLong(key: String, value: Long, callback: Callback?) : Deferred<Preferences> {
+        return putPreference(longPreferencesKey(prefixKey(key)), value, callback)
     }
 
-    override fun putLong(key: String, value: Long) {
-        putPreference(longPreferencesKey(prefixKey(key)), value)
+    override fun putFloat(key: String, value: Float) { putFloat(key, value, null) }
+    fun putFloat(key: String, value: Float, callback: Callback?) : Deferred<Preferences> {
+        return putPreference(floatPreferencesKey(prefixKey(key)), value, callback)
     }
 
-    override fun putFloat(key: String, value: Float) {
-        putPreference(floatPreferencesKey(prefixKey(key)), value)
-    }
-
-    override fun putBoolean(key: String, value: Boolean) {
-        putPreference(booleanPreferencesKey(prefixKey(key)), value)
+    override fun putBoolean(key: String, value: Boolean) { putBoolean(key, value, null)}
+    fun putBoolean(key: String, value: Boolean, callback: Callback?) : Deferred<Preferences> {
+        return putPreference(booleanPreferencesKey(prefixKey(key)), value, callback)
     }
 
     override fun getString(key: String, defValue: String?) = runBlocking {
@@ -83,37 +87,49 @@ open class PrefixedPreferenceDataStoreBridge(private val dataStore: DataStore<Pr
         dataStore.data.map { it[booleanPreferencesKey(prefixKey(key))] ?: defValue }.first()
     }
 
-    private fun <T> putPreference(key: Preferences.Key<T>, value: T?): Deferred<Preferences> {
-        return coroutineScope.async {
-            dataStore.edit {
+    private fun <T> putPreference(key: Preferences.Key<T>, value: T?, callback: Callback? = null) : Deferred<Preferences> {
+       return coroutineScope.async {
+            val pref = dataStore.edit {
                 if (value == null) {
                     it.remove(key)
                 } else {
                     it[key] = value
                 }
             }
+
+            withContext(Dispatchers.Main) {
+                callback?.invoke()
+            }
+
+            pref
         }
     }
 
-    fun clear(): Deferred<Preferences> {
+    fun clear(callback: Callback? = null): Deferred<Preferences> {
         return coroutineScope.async {
-            dataStore.edit {
+            val pref = dataStore.edit {
                 it.asMap().forEach {
                         entry ->
                     if (entry.key.name.startsWith(getPrefix()))
                         it.remove(entry.key)
                 }
             }
+
+            withContext(Dispatchers.Main) {
+                callback?.invoke()
+            }
+
+            pref
         }
     }
 
-    suspend fun getAllKeys(strip_prefix: Boolean) : Array<String> {
+    suspend fun getAllKeys(stripPrefix: Boolean) : Array<String> {
         val prefs = dataStore.data.map {
                 preferences ->
             preferences.asMap().filter {
                 it.key.name.startsWith(getPrefix())
             }.map {
-                if (strip_prefix) {
+                if (stripPrefix) {
                     it.key.name.substring(getPrefix().length)
                 } else {
                     it.key.name

@@ -5,6 +5,8 @@ import android.net.Uri
 import fr.berliat.hskwidget.data.model.ChineseWordAnnotation.ClassLevel
 import fr.berliat.hskwidget.data.model.ChineseWordAnnotation.ClassType
 import androidx.core.net.toUri
+import androidx.datastore.preferences.core.Preferences
+import kotlinx.coroutines.Deferred
 
 class AppPreferencesStore(context: Context):
     PrefixedPreferenceDataStoreBridge(context.dataStore, "app") {
@@ -53,16 +55,22 @@ class AppPreferencesStore(context: Context):
             return getBoolean("search_filter_hasAnnotation", false)
         }
         set(hasAnnotation) {
-            putBoolean("search_filter_hasAnnotation", hasAnnotation)
+            setSearchFilterHasAnnotation(hasAnnotation, null)
         }
+    fun setSearchFilterHasAnnotation(hasAnnotation: Boolean, callback: Callback?) : Deferred<Preferences> {
+        return putBoolean("search_filter_hasAnnotation", hasAnnotation, callback)
+    }
 
     var dictionaryShowHSK3Definition: Boolean
         get() {
             return getBoolean("dictionary_show_hsk3_definition", false)
         }
         set(showHSK3) {
-            putBoolean("dictionary_show_hsk3_definition", showHSK3)
+            setDictionaryShowHSK3Definition(showHSK3, null)
         }
+    fun setDictionaryShowHSK3Definition(showHSK3: Boolean, callback: Callback?) : Deferred<Preferences> {
+        return putBoolean("dictionary_show_hsk3_definition", showHSK3, callback)
+    }
 
     var lastAnnotatedClassLevel : ClassLevel
         get() {
