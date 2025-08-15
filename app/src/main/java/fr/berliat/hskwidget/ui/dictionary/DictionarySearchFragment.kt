@@ -70,7 +70,7 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
     override fun onResume() {
         super.onResume()
 
-        Utils.logAnalyticsScreenView(requireContext(), "DictionarySearch")
+        Utils.logAnalyticsScreenView("DictionarySearch")
     }
 
     private fun setupRecyclerView() {
@@ -108,7 +108,7 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
                     evt = Utils.ANALYTICS_EVENTS.DICT_ANNOTATION_ON
                 }
 
-                Utils.logAnalyticsEvent(requireContext(), evt)
+                Utils.logAnalyticsEvent(evt)
             }
         }
 
@@ -121,7 +121,7 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
                     evt = Utils.ANALYTICS_EVENTS.DICT_HSK3_ON
                 }
 
-                Utils.logAnalyticsEvent(requireContext(), evt)
+                Utils.logAnalyticsEvent(evt)
             }
         }
     }
@@ -156,10 +156,7 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
             }
         }
 
-        Utils.logAnalyticsEvent(
-            requireContext(),
-            Utils.ANALYTICS_EVENTS.DICT_SEARCH
-        )
+        Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.DICT_SEARCH)
     }
 
     // Method to load more results with pagination

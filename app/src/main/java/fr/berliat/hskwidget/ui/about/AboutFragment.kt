@@ -23,7 +23,7 @@ class AboutFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        Utils.logAnalyticsScreenView(requireContext(), "About")
+        Utils.logAnalyticsScreenView("About")
     }
 
     override fun onCreateView(
@@ -35,14 +35,14 @@ class AboutFragment : Fragment() {
 
         val emailMeIntent: () -> Unit = {
             Utils.sendEmail(requireContext(), "cyrille.berliat+hsk@gmail.com")
-            Utils.logAnalyticsScreenView(requireContext(), "Email")
+            Utils.logAnalyticsScreenView("Email")
         }
         binding.aboutBtnEmail.setOnClickListener { emailMeIntent() }
         binding.aboutBtnEmail2.setOnClickListener { emailMeIntent() }
 
         binding.aboutBtnViewSource.setOnClickListener {
             startActivity(Utils.getOpenURLIntent("https://github.com/licryle/Android-HSKFlashcardsWidget"))
-            Utils.logAnalyticsScreenView(requireContext(), "Github")
+            Utils.logAnalyticsScreenView("Github")
         }
 
         binding.aboutIntro1.text = getString(R.string.about_intro1).format(BuildConfig.APP_VERSION)

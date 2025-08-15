@@ -137,7 +137,6 @@ class FlashcardFragment : Fragment() {
                     configuredBindings.flashcardReload.setOnClickListener {
                         flashcardsMfr.updateWord()
                         Utils.logAnalyticsWidgetAction(
-                            context,
                             Utils.ANALYTICS_EVENTS.WIDGET_MANUAL_WORD_CHANGE, widgetId
                         )
                     }

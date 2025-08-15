@@ -72,10 +72,7 @@ class WidgetsWidgetConfPreviewFragment : Fragment(), FlashcardWidgetConfigFragme
     override fun onResume() {
         super.onResume()
 
-        Utils.logAnalyticsWidgetAction(
-            requireContext(),
-            Utils.ANALYTICS_EVENTS.WIDGET_CONFIG_VIEW, widgetId
-        )
+        Utils.logAnalyticsWidgetAction(Utils.ANALYTICS_EVENTS.WIDGET_CONFIG_VIEW, widgetId)
     }
 
     override fun onCreateView(
@@ -102,10 +99,7 @@ class WidgetsWidgetConfPreviewFragment : Fragment(), FlashcardWidgetConfigFragme
     override fun onWidgetPreferenceSaved(widgetId: Int) {
         val activity = requireActivity()
         FlashcardManager.getInstance(activity, widgetId).updateWord()
-        Utils.logAnalyticsWidgetAction(
-            activity,
-            Utils.ANALYTICS_EVENTS.WIDGET_RECONFIGURE, widgetId
-        )
+        Utils.logAnalyticsWidgetAction(Utils.ANALYTICS_EVENTS.WIDGET_RECONFIGURE, widgetId)
 
         Toast.makeText(
             activity,

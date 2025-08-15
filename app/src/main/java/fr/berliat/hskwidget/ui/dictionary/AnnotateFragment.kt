@@ -60,7 +60,7 @@ class AnnotateFragment: Fragment() {
     override fun onResume() {
         super.onResume()
 
-        Utils.logAnalyticsScreenView(requireContext(), "Annotate")
+        Utils.logAnalyticsScreenView("Annotate")
     }
 
     private fun updateUI(annotatedWord: AnnotatedChineseWord) {

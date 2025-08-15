@@ -96,7 +96,7 @@ class WidgetsListFragment : Fragment() {
             }
         }
 
-        Utils.logAnalyticsScreenView(requireContext(), "WidgetsList")
+        Utils.logAnalyticsScreenView("WidgetsList")
     }
 
     private fun handleIntent(arguments: Bundle?) {
@@ -109,7 +109,7 @@ class WidgetsListFragment : Fragment() {
 
             val position = widgetIds.indexOf(intentWidgetId)
             viewModel.onToggleTab(position)
-            Utils.logAnalyticsWidgetAction(context, Utils.ANALYTICS_EVENTS.WIDGET_RECONFIGURE, intentWidgetId)
+            Utils.logAnalyticsWidgetAction(Utils.ANALYTICS_EVENTS.WIDGET_RECONFIGURE, intentWidgetId)
             // Consume condition so we don't come back here until next intent
             arguments.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
 

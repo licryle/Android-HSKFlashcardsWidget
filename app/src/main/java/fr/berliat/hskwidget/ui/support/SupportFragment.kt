@@ -19,7 +19,7 @@ class SupportFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        Utils.logAnalyticsScreenView(requireContext(), "SupportDev")
+        Utils.logAnalyticsScreenView("SupportDev")
     }
 
     override fun onCreateView(

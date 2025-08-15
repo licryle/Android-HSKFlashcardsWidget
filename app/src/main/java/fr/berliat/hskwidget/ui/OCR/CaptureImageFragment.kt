@@ -86,7 +86,7 @@ class CaptureImageFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         Utils.hideKeyboard(requireContext(), viewBinding.root)
-        Utils.logAnalyticsScreenView(requireContext(), "CaptureImage")
+        Utils.logAnalyticsScreenView("CaptureImage")
     }
 
     override fun onDestroy() {
@@ -158,7 +158,6 @@ class CaptureImageFragment : Fragment() {
                 Log.e(TAG, "Couldn't start camera: binding failed", exc)
 
                 Utils.logAnalyticsError(
-                    requireContext(),
                     "OCR_CAPTURE",
                     "CameraBindingFailed",
                     exc.message ?: ""
@@ -200,7 +199,6 @@ class CaptureImageFragment : Fragment() {
                     Log.e(TAG, "Photo capture failed: ${exc.message}", exc)
 
                     Utils.logAnalyticsError(
-                        requireContext(),
                         "OCR_CAPTURE",
                         "PhotoCaptureFailed",
                         exc.message ?: ""
@@ -247,7 +245,6 @@ class CaptureImageFragment : Fragment() {
             Toast.makeText(requireContext(), "Error processing cropped image", Toast.LENGTH_SHORT).show()
 
             Utils.logAnalyticsError(
-                requireContext(),
                 "OCR_CAPTURE",
                 "ProcessingPictureFailed",
                 e.message ?: ""

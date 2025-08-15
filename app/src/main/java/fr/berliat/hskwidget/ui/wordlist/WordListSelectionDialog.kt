@@ -99,7 +99,7 @@ class WordListSelectionDialog : DialogFragment() {
                 Toast.makeText(context, R.string.wordlist_lists_updated_toast, Toast.LENGTH_SHORT)
                     .show()
 
-                Utils.logAnalyticsEvent(requireContext(), Utils.ANALYTICS_EVENTS.LIST_MODIFY_WORD)
+                Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.LIST_MODIFY_WORD)
 
                 onSave?.invoke()
                 dismiss()

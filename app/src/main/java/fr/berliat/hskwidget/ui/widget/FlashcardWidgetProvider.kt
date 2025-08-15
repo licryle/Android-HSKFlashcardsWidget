@@ -59,7 +59,7 @@ class FlashcardWidgetProvider : AppWidgetProvider() {
 
         // When the user deletes the widget, delete the preference associated with it.
         for (widgetId in appWidgetIds) {
-            Utils.logAnalyticsWidgetAction(context, Utils.ANALYTICS_EVENTS.WIGDET_REMOVE, widgetId)
+            Utils.logAnalyticsWidgetAction(Utils.ANALYTICS_EVENTS.WIGDET_REMOVE, widgetId)
 
             FlashcardManager.getInstance(context, widgetId).getPreferenceStore().clear()
         }
@@ -108,15 +108,11 @@ class FlashcardWidgetProvider : AppWidgetProvider() {
                 if (widgetId == -1) {
                     widgetIds = getWidgetIds(context)
 
-                    Utils.logAnalyticsEvent(
-                        context,
-                        Utils.ANALYTICS_EVENTS.AUTO_WORD_CHANGE
-                    )
+                    Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.AUTO_WORD_CHANGE)
                 } else {
                     widgetIds[0] = widgetId
 
                     Utils.logAnalyticsWidgetAction(
-                        context,
                         Utils.ANALYTICS_EVENTS.WIDGET_MANUAL_WORD_CHANGE, widgetId
                     )
                 }
@@ -138,7 +134,7 @@ class FlashcardWidgetProvider : AppWidgetProvider() {
     ) {
         Log.i(TAG, "onAppWidgetOptionsChanged")
         super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions)
-        Utils.logAnalyticsWidgetAction(context!!, Utils.ANALYTICS_EVENTS.WIGDET_RESIZE, appWidgetId)
+        Utils.logAnalyticsWidgetAction(Utils.ANALYTICS_EVENTS.WIGDET_RESIZE, appWidgetId)
     }
 
     override fun onEnabled(context: Context) {

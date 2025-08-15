@@ -35,7 +35,7 @@ class WordListFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        Utils.logAnalyticsScreenView(requireContext(), "WordListFragment")
+        Utils.logAnalyticsScreenView("WordListFragment")
     }
 
     override fun onCreateView(
@@ -97,7 +97,7 @@ class WordListFragment : Fragment() {
                     refreshLists()
                 })
 
-                Utils.logAnalyticsEvent(requireContext(), Utils.ANALYTICS_EVENTS.LIST_DELETE)
+                Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.LIST_DELETE)
             }
             .setNegativeButton(R.string.cancel, null)
             .show()

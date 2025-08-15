@@ -47,7 +47,6 @@ class SupportViewModel(application: Application, private val toastMe: (Int) -> U
     fun makePurchase(activity: Activity, productId: String) {
         supportDevStore.makePurchase(activity, productId)
         Utils.logAnalyticsEvent(
-            application.applicationContext,
             Utils.ANALYTICS_EVENTS.PURCHASE_CLICK,
             mapOf("product_id" to productId)
         )
@@ -86,7 +85,6 @@ class SupportViewModel(application: Application, private val toastMe: (Int) -> U
     override fun onPurchaseSuccess(purchase: Purchase) {
         toastMe(R.string.support_payment_success)
         Utils.logAnalyticsEvent(
-            application.applicationContext,
             Utils.ANALYTICS_EVENTS.PURCHASE_SUCCESS,
             mapOf("product_id" to getFirstProductId(purchase))
         )
@@ -101,7 +99,6 @@ class SupportViewModel(application: Application, private val toastMe: (Int) -> U
     override fun onPurchaseFailure(purchase: Purchase?, billingResponseCode: Int) {
         toastMe(R.string.support_payment_failed)
         Utils.logAnalyticsEvent(
-            application.applicationContext,
             Utils.ANALYTICS_EVENTS.PURCHASE_FAILED,
             mapOf("product_id" to getFirstProductId(purchase))
         )

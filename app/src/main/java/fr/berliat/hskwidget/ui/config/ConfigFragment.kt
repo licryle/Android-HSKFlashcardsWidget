@@ -45,7 +45,7 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
     override fun onResume() {
         super.onResume()
 
-        Utils.logAnalyticsScreenView(requireContext(), "Config")
+        Utils.logAnalyticsScreenView("Config")
     }
 
     override fun onCreateView(
@@ -81,7 +81,7 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
             var evt = Utils.ANALYTICS_EVENTS.CONFIG_BACKUP_OFF
             if (appConfig.dbBackUpActive)
                 evt = Utils.ANALYTICS_EVENTS.CONFIG_BACKUP_ON
-            Utils.logAnalyticsEvent(requireContext(), evt)
+            Utils.logAnalyticsEvent(evt)
         }
 
         val bkDir = appConfig.dbBackUpDirectory.toString().substringAfterLast("%3A")
@@ -109,10 +109,10 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
         if (enabled) {
             Utils.requestPermissionNotification(requireActivity())
             importsAllNotesToAnkiDroid()
-            Utils.logAnalyticsEvent(requireContext(), Utils.ANALYTICS_EVENTS.CONFIG_ANKI_SYNC_ON)
+            Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.CONFIG_ANKI_SYNC_ON)
         } else {
             cancelServiceSync()
-            Utils.logAnalyticsEvent(requireContext(), Utils.ANALYTICS_EVENTS.CONFIG_ANKI_SYNC_OFF)
+            Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.CONFIG_ANKI_SYNC_OFF)
         }
     }
 
@@ -149,7 +149,6 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
         Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
 
         Utils.logAnalyticsError(
-            requireContext(),
             "ANKI_SYNC",
             "FullAnkiImportFailed",
             e.message ?: ""
@@ -205,7 +204,7 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
             getString(R.string.dbrestore_start),
             Toast.LENGTH_LONG
         ).show()
-        Utils.logAnalyticsEvent(requireContext(), Utils.ANALYTICS_EVENTS.CONFIG_BACKUP_RESTORE)
+        Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.CONFIG_BACKUP_RESTORE)
 
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             val file = Utils.copyUriToCacheDir(requireContext(), uri)
@@ -232,7 +231,6 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
                     ).show()
 
                     Utils.logAnalyticsError(
-                        requireContext(),
                         "BACKUP_RESTORE",
                         getString(R.string.dbrestore_failure_fileformat),
                         e.message ?: ""
@@ -247,7 +245,6 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
                     ).show()
 
                     Utils.logAnalyticsError(
-                        requireContext(),
                         "BACKUP_RESTORE",
                         getString(R.string.dbrestore_failure_import),
                         e.message ?: ""

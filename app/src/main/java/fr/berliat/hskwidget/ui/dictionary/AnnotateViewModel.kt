@@ -61,7 +61,7 @@ class AnnotateViewModel(val context: Context, val wordListRepo: WordListReposito
             try {
                 database().chineseWordAnnotationDAO().insertOrUpdate(annotatedWord.annotation!!)
 
-                Utils.logAnalyticsEvent(context, Utils.ANALYTICS_EVENTS.ANNOTATION_SAVE)
+                Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.ANNOTATION_SAVE)
 
                 wordListRepo.delegateToAnki(wordListRepo.addWordToSysAnnotatedList(annotatedWord))
                 wordListRepo.delegateToAnki(wordListRepo.updateInAllLists(simplified))
@@ -82,7 +82,7 @@ class AnnotateViewModel(val context: Context, val wordListRepo: WordListReposito
                 val nbRowAffected = database().chineseWordAnnotationDAO().deleteBySimplified(annotatedWord.value!!.simplified)
                 if (nbRowAffected == 0) throw Exception("No records deleted")
 
-                Utils.logAnalyticsEvent(context, Utils.ANALYTICS_EVENTS.ANNOTATION_DELETE)
+                Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.ANNOTATION_DELETE)
 
                 wordListRepo.touchAnnotatedList()
                 wordListRepo.delegateToAnki(wordListRepo.removeWordFromAllLists(simplified))

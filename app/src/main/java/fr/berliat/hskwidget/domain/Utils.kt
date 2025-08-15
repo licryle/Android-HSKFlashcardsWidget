@@ -62,7 +62,12 @@ class Utils {
             return Result.success()
         }
     }
+
     companion object {
+        fun getAppContext() : HSKHelperApp {
+            return HSKHelperApp.instance
+        }
+
         fun getOpenURLIntent(url: String): Intent {
             return Intent(
                 Intent.ACTION_VIEW,
@@ -120,7 +125,7 @@ class Utils {
                                 }
                             }
 
-                            logAnalyticsError(context, "SPEECH", errId, "")
+                            logAnalyticsError("SPEECH", errId, "")
                             Toast.makeText(
                                 context, context.getString(errStringId),
                                 Toast.LENGTH_LONG
@@ -139,10 +144,7 @@ class Utils {
 
             incrementConsultedWord(context, word)
 
-            logAnalyticsEvent(
-                context,
-                ANALYTICS_EVENTS.WIDGET_PLAY_WORD
-            )
+            logAnalyticsEvent(ANALYTICS_EVENTS.WIDGET_PLAY_WORD)
         }
 
         fun capitalizeStr(s: Any?) =
@@ -352,13 +354,18 @@ class Utils {
                 binding.dictionaryItemContainer.setOnClickListener {
                     val isMoreShown = binding.dictionaryItemMore.isVisible
 
+                    var evt : ANALYTICS_EVENTS
                     if (isMoreShown) {
                         binding.dictionaryItemMore.visibility = View.GONE
                         binding.dictionaryItemToggle.setImageResource(R.drawable.keyboard_arrow_down_24px)
+                        evt = ANALYTICS_EVENTS.WIDGET_COLLAPSE
                     } else {
                         binding.dictionaryItemMore.visibility = View.VISIBLE
                         binding.dictionaryItemToggle.setImageResource(R.drawable.keyboard_arrow_up_24px)
+                        evt = ANALYTICS_EVENTS.WIDGET_EXPAND
                     }
+
+                    logAnalyticsEvent(evt)
                 }
             }
         }
@@ -393,7 +400,7 @@ class Utils {
                 Toast.LENGTH_SHORT
             ).show()
 
-            logAnalyticsEvent(context, ANALYTICS_EVENTS.WIDGET_COPY_WORD)
+            logAnalyticsEvent(ANALYTICS_EVENTS.WIDGET_COPY_WORD)
 
             incrementConsultedWord(context, s)
         }
@@ -422,16 +429,17 @@ class Utils {
         }
 
         fun logAnalyticsEvent(
-            context: Context, event: ANALYTICS_EVENTS,
+            event: ANALYTICS_EVENTS,
             params: Map<String, String> = mapOf()
         ) {
+            val appContext = getAppContext()
             val bundle = Bundle()
             params.forEach {
                 bundle.putString(it.key, it.value)
             }
 
             val appMgr = FlashcardWidgetProvider()
-            val widgets = appMgr.getWidgetIds(context)
+            val widgets = appMgr.getWidgetIds(appContext)
             bundle.putString("WIDGET_TOTAL_NUMBER", widgets.size.toString())
 
             if (widgets.isEmpty()) {
@@ -440,14 +448,14 @@ class Utils {
                 bundle.putString("MAX_WIDGET_ID", widgets.last().toString())
             }
 
-            getAppScope(context).launch(Dispatchers.IO) {
+            appContext.applicationScope.launch(Dispatchers.IO) {
                 Firebase.analytics.logEvent(event.name, bundle)
             }
         }
 
-        fun logAnalyticsError(context: Context, module: String, error: String, details: String) {
+        fun logAnalyticsError(module: String, error: String, details: String) {
             logAnalyticsEvent(
-                context, ANALYTICS_EVENTS.ERROR,
+                ANALYTICS_EVENTS.ERROR,
                 mapOf(
                     "MODULE" to module,
                     "ERROR_ID" to error,
@@ -456,12 +464,13 @@ class Utils {
             )
         }
 
-        fun logAnalyticsWidgetAction(context: Context, event: ANALYTICS_EVENTS, widgetId: Int) {
-            val widgets = FlashcardWidgetProvider().getWidgetIds(context)
-            val size = WidgetSizeProvider(context).getWidgetsSize(widgetId)
+        fun logAnalyticsWidgetAction(event: ANALYTICS_EVENTS, widgetId: Int) {
+            val appContext = getAppContext()
+            val widgets = FlashcardWidgetProvider().getWidgetIds(appContext)
+            val size = WidgetSizeProvider(appContext).getWidgetsSize(widgetId)
 
             logAnalyticsEvent(
-                context, event,
+                event,
                 mapOf(
                     "WIDGET_NUMBER" to widgets.indexOf(widgetId).toString(),
                     "WIDGET_SIZE" to "${size.first}x${size.second}"
@@ -469,9 +478,9 @@ class Utils {
             )
         }
 
-        fun logAnalyticsScreenView(context: Context, screenName: String) {
+        fun logAnalyticsScreenView(screenName: String) {
             logAnalyticsEvent(
-                context, ANALYTICS_EVENTS.SCREEN_VIEW,
+                ANALYTICS_EVENTS.SCREEN_VIEW,
                 mapOf("SCREEN_NAME" to screenName)
             )
         }
@@ -492,6 +501,8 @@ class Utils {
         WIDGET_CONFIG_VIEW,
         WIGDET_RESIZE,
         WIGDET_ADD,
+        WIDGET_EXPAND,
+        WIDGET_COLLAPSE,
         WIGDET_REMOVE,
         WIDGET_OPEN_DICTIONARY,
         WIDGET_COPY_WORD,
