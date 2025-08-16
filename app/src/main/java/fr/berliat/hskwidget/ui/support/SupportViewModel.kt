@@ -8,6 +8,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.application
 import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.Purchase
+import com.google.android.play.core.review.ReviewException
+import com.google.android.play.core.review.ReviewManager
+import com.google.android.play.core.review.model.ReviewErrorCode
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.data.store.SupportDevStore
@@ -102,6 +105,25 @@ class SupportViewModel(application: Application, private val toastMe: (Int) -> U
             Utils.ANALYTICS_EVENTS.PURCHASE_FAILED,
             mapOf("product_id" to getFirstProductId(purchase))
         )
+    }
+
+    fun triggerReview(activity : Activity, reviewManager : ReviewManager) {
+        val request = reviewManager.requestReviewFlow()
+        request.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                // We got the ReviewInfo object
+                val reviewInfo = task.result
+                val flow = reviewManager.launchReviewFlow(activity, reviewInfo)
+                flow.addOnCompleteListener { _ ->
+                    toastMe(R.string.support_reviewed)
+                }
+            } else {
+                toastMe(R.string.support_review_failed)
+                // There was some problem, log or handle the error code.
+                @ReviewErrorCode val reviewErrorCode = (task.exception as ReviewException).errorCode
+                Utils.logAnalyticsError(TAG, "RequestReviewFlow_SetupFailed", reviewErrorCode.toString())
+            }
+        }
     }
 
     fun getFirstProductId(purchase: Purchase?): String {

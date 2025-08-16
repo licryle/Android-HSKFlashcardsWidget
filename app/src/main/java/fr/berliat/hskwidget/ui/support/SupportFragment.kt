@@ -6,6 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.google.android.play.core.review.ReviewManager
+import com.google.android.play.core.review.ReviewManagerFactory
 import fr.berliat.hskwidget.data.store.SupportDevStore
 import fr.berliat.hskwidget.databinding.FragmentSupportBinding
 import fr.berliat.hskwidget.domain.Utils
@@ -15,11 +17,18 @@ class SupportFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var viewModel : SupportViewModel
+    private lateinit var reviewManager : ReviewManager
 
     override fun onResume() {
         super.onResume()
 
         Utils.logAnalyticsScreenView("SupportDev")
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        reviewManager = ReviewManagerFactory.create(requireContext())
     }
 
     override fun onCreateView(
@@ -36,6 +45,8 @@ class SupportFragment : Fragment() {
         binding.supportPurchaseTier1.setOnClickListener { viewModel.makePurchase(activity, it.tag.toString()) }
         binding.supportPurchaseTier2.setOnClickListener { viewModel.makePurchase(activity, it.tag.toString()) }
         binding.supportPurchaseTier3.setOnClickListener { viewModel.makePurchase(activity, it.tag.toString()) }
+
+        binding.supportReviewBtn.setOnClickListener { viewModel.triggerReview(activity, reviewManager) }
 
         viewModel.tierIcon.observe(viewLifecycleOwner) { resId ->
             binding.tierIcon.setImageResource(resId)

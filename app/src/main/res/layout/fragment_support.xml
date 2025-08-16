@@ -28,9 +28,18 @@
             <TextView
                 android:text="@string/support_devintro"
                 android:layout_marginTop="8dp"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="8dp"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/support_review_btn"
+                android:text="@string/support_review_btn"
+                android:tag="support_tier1"
+                app:icon="@drawable/star_shine_24px"
+                android:layout_marginBottom="26dp"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent" />
 
             <TextView
                 android:id="@+id/totalSpentLabel"

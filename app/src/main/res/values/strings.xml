@@ -299,7 +299,7 @@ padding: 0;
     <string name="menu_support">Support the creator!</string>
 
     <string name="support_devintro_title">🥐 Support the creator 🥐</string>
-    <string name="support_devintro">Hello everyone, Cyrille here, I\'m an indie developer originally from France.\n\nAs I learn Chinese, I realized I needed such app and none of the existing ones filled my needs.\n\nSo here we are, I\'m happily sharing for free this creation with you.\n\nIf you also find it useful, please consider participating to my croissant fund!</string>
+    <string name="support_devintro">Hello everyone, Cyrille here, I\'m an indie developer originally from France.\n\nAs I learn Chinese, I realized I needed such app and none of the existing ones filled my needs.\n\nSo here we are, I\'m happily sharing for free this creation with you.\n\nIf you also find it useful, please consider participating to my croissant fund, or review it for free!\n\nReviews, feedback, encouragement help tremendously!</string>
     <string name="support_purchase_tier1">Buy the Bronze 🥐 Support tier for US\$1</string>
     <string name="support_purchase_tier2">Buy the Silver 🥐 Support tier for US\$3</string>
     <string name="support_purchase_tier3">Buy the Golden 🥐 Support tier for US\$6</string>
@@ -315,4 +315,7 @@ padding: 0;
     <string name="support_status_nosupport">Not a supporter… yet!</string>
     <string name="support_total_error">There was an error getting your purchase history.</string>
     <string name="support_status_error">Error</string>
+    <string name="support_review_btn">Review the app on Google Play for free</string>
+    <string name="support_review_failed">Couldn\'t connect to Google Reviews server.</string>
+    <string name="support_reviewed"><![CDATA[Thank you! If you click more than once, the dialog won\'t appear.]]></string>
 </resources>

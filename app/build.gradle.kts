@@ -16,8 +16,8 @@ android {
         minSdk = 26
         //noinspection EditedTargetSdkVersion
         targetSdk = 36
-        versionCode = 26
-        versionName = "3.2.4"
+        versionCode = 28
+        versionName = "3.3.0"
         buildConfigField("String", "APP_VERSION", "\"$versionName-$versionCode\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -144,8 +144,9 @@ dependencies {
     // Anki
     implementation("com.github.ankidroid:Anki-Android:api-v1.1.0")
 
-
     implementation("com.android.billingclient:billing:8.0.0")
     implementation("com.android.billingclient:billing-ktx:8.0.0")
 
+    implementation("com.google.android.play:review:2.0.2")
+    implementation("com.google.android.play:review-ktx:2.0.2")
 }
