@@ -34,6 +34,7 @@ import fr.berliat.hskwidget.ui.OCR.CaptureImageFragmentDirections
 import fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragment
 import fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragmentDirections
 import fr.berliat.hskwidget.ui.utils.StrictModeManager
+import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
 import fr.berliat.hskwidget.ui.widgets.WidgetsListFragmentDirections
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -68,6 +69,8 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
 
         appConfig = AppPreferencesStore(applicationContext)
 
+        handleAppUpdate()
+
         setupSupporter()
         setupActionBar()
 
@@ -78,6 +81,16 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
 
         handleIntents(intent)
         handleBackUp()
+    }
+
+    private fun handleAppUpdate() {
+        if (appConfig.appVersionCode != BuildConfig.VERSION_CODE) {
+            appConfig.appVersionCode = BuildConfig.VERSION_CODE
+
+            // Now we can upgrade stuff
+            val widgetIds = FlashcardWidgetProvider().getWidgetIds(applicationContext)
+            FlashcardWidgetProvider().onUpdate(applicationContext, AppWidgetManager.getInstance(applicationContext), widgetIds)
+        }
     }
 
     private fun showOCRReminderIfActive() {

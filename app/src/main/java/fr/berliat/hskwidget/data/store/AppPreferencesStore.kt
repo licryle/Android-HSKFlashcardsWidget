@@ -18,6 +18,14 @@ class AppPreferencesStore(context: Context):
             putFloat("support_total_spent", total)
         }
 
+    var appVersionCode: Int
+        get() {
+            return getInt("appVersionCode", 0)
+        }
+        set(version) {
+            putInt("appVersionCode", version)
+        }
+
     var ankiSaveNotes: Boolean
         get() {
             return getBoolean("anki_save_notes", false)

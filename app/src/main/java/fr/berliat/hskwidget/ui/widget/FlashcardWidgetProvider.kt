@@ -101,7 +101,7 @@ class FlashcardWidgetProvider : AppWidgetProvider() {
                 FlashcardManager.getInstance(context, widgetId).openDictionary()
             }
 
-            AppWidgetManager.ACTION_APPWIDGET_UPDATE -> {
+            Intent.ACTION_BOOT_COMPLETED, AppWidgetManager.ACTION_APPWIDGET_UPDATE -> {
                 if (Utils.preventUnnecessaryAppWidgetUpdates(context)) return
 
                 var widgetIds = IntArray(1)
