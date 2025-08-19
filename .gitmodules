@@ -4,3 +4,6 @@
 [submodule "database_generation/new_hsk"]
 	path = database_generation/new_hsk
 	url = https://github.com/krmanik/HSK-3.0/
+[submodule "googledrivebackup"]
+	path = googledrivebackup
+	url = https://github.com/licryle/GoogleDriveBackUp.git
