@@ -7,6 +7,7 @@ import fr.berliat.hskwidget.data.model.ChineseWordAnnotation.ClassType
 import androidx.core.net.toUri
 import androidx.datastore.preferences.core.Preferences
 import kotlinx.coroutines.Deferred
+import java.time.Instant
 
 class AppPreferencesStore(context: Context):
     PrefixedPreferenceDataStoreBridge(context.dataStore, "app") {
@@ -32,6 +33,14 @@ class AppPreferencesStore(context: Context):
         }
         set(enabled) {
             putBoolean("anki_save_notes", enabled)
+        }
+
+    var dbBackupCloudLastSuccess: Instant
+        get() {
+            return Instant.ofEpochMilli(getLong("database_backupcloud_lastsuccess", 0))
+        }
+        set(time) {
+            putLong("database_backupcloud_lastsuccess", time.toEpochMilli())
         }
 
     var dbBackUpActive: Boolean

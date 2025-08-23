@@ -7,6 +7,7 @@
     <string name="cancel">Cancel</string>
     <string name="delete">Delete</string>
     <string name="save">Save</string>
+    <string name="proceed">Proceed</string>
     <string name="configure">Configure</string>
     <string name="settings">Settings</string>
     <string name="about">About</string>
@@ -105,7 +106,7 @@ We recommend to choose the level your at plus the one below, or above depending 
     <string name="ocr_display_analysis_failure">Text Analysis failed - try again</string>
     <string name="ocr_display_separator">Separate words</string>
     <string name="copied_to_clipboard">Copied %s to clipboard</string>
-    <string name="config_backup_title">Backup</string>
+    <string name="config_backup_title">Backup/Restore from local file</string>
     <string name="config_backup_activate">Activate backup</string>
     <string name="config_backup_frequency">Backup frequency</string>
     <string name="config_backup_frequency_options">When app starts</string>
@@ -126,8 +127,16 @@ We recommend to choose the level your at plus the one below, or above depending 
     <string name="about_stats_text">%1$s words in dictionary.\n%2$s annotations.</string>
     <string name="config_restore_file">Restore from file</string>
     <string name="config_restore_file_choose">Choose file</string>
-    <string name="config_restore_title">Restore</string>
-    <string name="config_restore_icon_alt">Restore database</string>
+    <string name="config_backup_cloud_icon_alt">Backup/Restore from Google</string>
+    <string name="config_backup_cloud_title">Backup/Restore from Google</string>
+    <string name="config_backup_cloud_account">Google Account</string>
+    <string name="config_backup_cloud_account_notconfigured">Logged out</string>
+    <string name="config_backup_cloud_activate">Activate backup</string>
+    <string name="config_backup_cloud_lastone">Last successful backup</string>
+    <string name="config_backup_cloud_lastone_never">Never</string>
+    <string name="config_backup_cloud_backupnow">Backup now</string>
+    <string name="config_backup_cloud_restorenow">Restore now</string>
+
     <string name="dbrestore_failure_fileformat">File doesn\'t seem to be a backup for this app</string>
     <string name="dbrestore_failure_import">Import failed</string>
     <string name="dbrestore_failure_nofileselected">No file select: restoration cancelled</string>
@@ -254,8 +263,8 @@ padding: 0;
     <string name="config_anki_integration">Save notes in Anki automatically</string>
     <string name="config_anki_sync_title">Anki sync in progress</string>
     <string name="config_anki_sync_progress" formatted="false">Progress %d / %d</string>
-    <string name="config_anki_sync_cancelled">Import cancelled</string>
-    <string name="config_anki_sync_completed">Import complete</string>
+    <string name="config_anki_sync_cancelled">Anki Import cancelled</string>
+    <string name="config_anki_sync_completed">Anki Import complete</string>
     <string name="anki_sync_notification_name">Anki Sync Progress</string>
     <string name="anki_sync_notification_description">Provides you with a progress notification for the Anki Sync.</string>
     <string name="anki_not_installed"><![CDATA[AnkiDroid is not installed, or runs a very old version (<2.5)]]></string>
@@ -318,4 +327,23 @@ padding: 0;
     <string name="support_review_btn">Review the app on Google Play for free</string>
     <string name="support_review_failed">Couldn\'t connect to Google Reviews server.</string>
     <string name="support_reviewed"><![CDATA[Thank you! If you click more than once, the dialog won\'t appear.]]></string>
+
+    <string name="googledrive_backup_start_title">Backup in progress</string>
+    <string name="googledrive_backup_start_message">Preparing for backup</string>
+    <string name="googledrive_backup_success_title">Backup complete</string>
+    <string name="googledrive_backup_success_message">Backup succeeded at %s.</string>
+    <string name="googledrive_backup_cancel_title">Backup cancelled</string>
+    <string name="googledrive_backup_cancel_message">Backup cancelled.</string>
+    <string name="googledrive_backup_progress_message">Backup in progress: %1$s MB / %2$s MB</string>
+    <string name="googledrive_backup_denied_scope">Google authorization not secured</string>
+    <string name="googledrive_backup_failed_title">Backup failed</string>
+    <string name="googledrive_backup_failed_message">Backup failed with error message: %s</string>
+    <string name="googledrive_backup_noaccountselected">No Google account was selected, cancelling.</string>
+    <string name="googledrive_restore_emptyserver">No backup available on Google Drive</string>
+    <string name="googledrive_restore_started">Restoration from Google Drive started</string>
+    <string name="googledrive_restore_download_complete">Files from Google Drive downloaded</string>
+    <string name="googledrive_restore_confirm_overwrite">"You're about to delete your local data and replace it with a backup from %s.\n\nThis is irrevocable. Proceed?"</string>
+    <string name="googledrive_restore_failed">Restoration from Google Drive failed with error %s.</string>
+    <string name="googledrive_logout_confirm">Would you like to logout of your Google Drive account?\nNo data will be deleted from Google Drive.</string>
+
 </resources>

@@ -52,6 +52,9 @@ import androidx.core.view.isVisible
 import fr.berliat.hskwidget.HSKHelperApp
 import fr.berliat.hskwidget.data.model.ChineseWord.Companion.CN_HSK3
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 typealias CallbackNoParam = () -> Unit
 
@@ -85,6 +88,13 @@ class Utils {
                 Toast.makeText(context, context.getString(R.string.about_email_noapp), Toast.LENGTH_LONG).show()
                 copyToClipBoard(context, address)
             }
+        }
+
+        fun formatDate(time: Instant) : String {
+            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                .withZone(ZoneId.systemDefault())
+
+            return formatter.format(time)
         }
 
         fun playWordInBackground(context: Context, word: String) {
@@ -290,12 +300,12 @@ class Utils {
                 if (word.hasAnnotation()) {
                     setImageResource(R.drawable.bookmark_heart_24px)
                     imageTintList = android.content.res.ColorStateList.valueOf(
-                        androidx.core.content.ContextCompat.getColor(context, R.color.md_theme_dark_inversePrimary)
+                        ContextCompat.getColor(context, R.color.md_theme_dark_inversePrimary)
                     )
                 } else {
                     setImageResource(R.drawable.bookmark_24px)
                     imageTintList = android.content.res.ColorStateList.valueOf(
-                        androidx.core.content.ContextCompat.getColor(context, R.color.md_theme_dark_surface)
+                        ContextCompat.getColor(context, R.color.md_theme_dark_surface)
                     )
                 }
 
@@ -509,6 +519,10 @@ class Utils {
         CONFIG_BACKUP_ON,
         CONFIG_BACKUP_OFF,
         CONFIG_BACKUP_RESTORE,
+        CONFIG_BACKUPCLOUD_ON,
+        CONFIG_BACKUPCLOUD_OFF,
+        CONFIG_BACKUPCLOUD_RESTORE,
+        CONFIG_BACKUPCLOUD_BACKUP,
         CONFIG_ANKI_SYNC_ON,
         CONFIG_ANKI_SYNC_OFF,
         ANNOTATION_SAVE,

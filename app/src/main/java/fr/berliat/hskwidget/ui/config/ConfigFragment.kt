@@ -8,7 +8,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -17,23 +19,33 @@ import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.databinding.FragmentConfigBinding
 import fr.berliat.hskwidget.domain.DatabaseBackup
 import fr.berliat.hskwidget.domain.DatabaseBackupCallbacks
+import fr.berliat.googledrivebackup.GoogleDriveBackup
+import fr.berliat.googledrivebackup.GoogleDriveBackupFile
+import fr.berliat.googledrivebackup.GoogleDriveBackupInterface
+import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.ui.utils.AnkiDelegate
 import fr.berliat.hskwidget.ui.utils.AnkiSyncServiceDelegate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
+import java.time.Instant
 
 
 class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
-        ActivityCompat.OnRequestPermissionsResultCallback, AnkiDelegate.HandlerInterface {
+        ActivityCompat.OnRequestPermissionsResultCallback, AnkiDelegate.HandlerInterface,
+        GoogleDriveBackupInterface {
     private lateinit var binding: FragmentConfigBinding
     private lateinit var appConfig: AppPreferencesStore
     private lateinit var databaseBackup : DatabaseBackup
     private lateinit var ankiDelegate: AnkiDelegate
     private var ankiSyncServiceDelegate: AnkiSyncServiceDelegate? = null
+    private lateinit var gDriveBackUp : GoogleDriveBackup
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -95,11 +107,68 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
         binding.configAnkiActivateBtn.setOnClickListener { onAnkiIntegrationChanged(binding.configAnkiActivateBtn.isChecked) }
 
         // Setup progress UI
-        binding.ankiSyncCancelBtn.setOnClickListener {
-            cancelServiceSync()
+        binding.ankiSyncCancelBtn.setOnClickListener { cancelServiceSync() }
+
+        gDriveBackUp = GoogleDriveBackup(this, requireActivity(), getString(R.string.app_name))
+        gDriveBackUp.addListener(this)
+
+        val lastBackupCloud = appConfig.dbBackupCloudLastSuccess
+        if (lastBackupCloud.toEpochMilli() != 0L)
+            binding.configBackupCloudLastone.text = Utils.formatDate(appConfig.dbBackupCloudLastSuccess)
+
+        binding.configBtnBackupCloudBackupnow.setOnClickListener { gDriveBackUp.login { backupToCloud() } }
+        binding.configBtnBackupCloudRestorenow.setOnClickListener { gDriveBackUp.login { restoreFromCloud() } }
+        updateLoggedInAccount()
+        binding.googledriveSyncCancelBtn.setOnClickListener { gDriveBackUp.cancelBackup() }
+
+        binding.configBackupCloudAccount.setOnClickListener {
+            AlertDialog.Builder(requireContext())
+                .setMessage(getString(R.string.googledrive_logout_confirm))
+                .setPositiveButton(R.string.proceed) { _, _ -> gDriveBackUp.deviceAccounts.forEach { gDriveBackUp.logout(it) } }   // user confirms
+                .setNegativeButton(R.string.cancel) { _, _ -> {} }
+                .setCancelable(true)                                 // allow dismiss by tapping outside
+                .show()
         }
 
         return binding.root
+    }
+
+    private fun updateLoggedInAccount() {
+        if (gDriveBackUp.deviceAccounts.isNotEmpty())
+            binding.configBackupCloudAccount.text = gDriveBackUp.deviceAccounts[0].name
+        else
+            binding.configBackupCloudAccount.text = getString(R.string.config_backup_cloud_account_notconfigured)
+    }
+
+    private fun backupToCloud() {
+        val sourcePath =
+            "${requireContext().filesDir.path}/../databases/${ChineseWordsDatabase.DATABASE_FILE}"
+
+        gDriveBackUp.backup(
+            listOf(GoogleDriveBackupFile.UploadFile(
+                "database.sqlite",
+                FileInputStream(sourcePath),
+                "application/octet-stream",
+                File(sourcePath).length()
+            ))
+        )
+
+        Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.CONFIG_BACKUPCLOUD_BACKUP)
+    }
+
+    private fun restoreFromCloud() {
+        val sourcePath =
+            "${requireContext().cacheDir}/restore/${ChineseWordsDatabase.DATABASE_FILE}"
+        File(sourcePath).parentFile?.mkdirs()
+
+        gDriveBackUp.restore(
+            listOf(GoogleDriveBackupFile.DownloadFile(
+                "database.sqlite",
+                FileOutputStream(sourcePath)
+            ))
+        )
+
+        Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.CONFIG_BACKUPCLOUD_RESTORE)
     }
 
     private fun onAnkiIntegrationChanged(enabled: Boolean) {
@@ -261,6 +330,156 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
             getString(R.string.dbrestore_failure_nofileselected),
             Toast.LENGTH_LONG
         ).show()
+    }
+
+    override fun onLogout() {
+        Log.i(TAG, "GoogleDriveBackup.onLogout")
+
+        updateLoggedInAccount()
+    }
+
+    override fun onReady() {
+        Log.i(TAG, "GoogleDriveBackup.onReady")
+
+        updateLoggedInAccount()
+    }
+
+    override fun onNoAccountSelected() {
+        Log.i(TAG, "GoogleDriveBackup.onNoAccountSelected")
+        Toast.makeText(
+            requireContext(),
+            R.string.googledrive_backup_noaccountselected,
+            Toast.LENGTH_LONG).show()
+    }
+
+    override fun onScopeDenied(e: Exception) {
+        Log.i(TAG, "GoogleDriveBackup.onScopeDenied")
+        Toast.makeText(
+            requireContext(),
+            R.string.googledrive_backup_denied_scope,
+            Toast.LENGTH_LONG).show()
+    }
+
+    override fun onBackupStarted() {
+        Log.i(TAG, "GoogleDriveBackup.onBackupStarted")
+        toggleGoogleDriveBackupInProgress(true)
+
+        binding.googledriveSyncProgressSection.visibility = View.VISIBLE
+        binding.googledriveSyncProgressTitle.text =
+            getString(R.string.googledrive_backup_start_title)
+        binding.googledriveSyncProgressBar.isIndeterminate = true
+        binding.googledriveSyncProgressMessage.text =
+            getString(R.string.googledrive_backup_start_message)
+    }
+
+    override fun onBackupProgress(fileName: String, fileIndex: Int, fileCount: Int, bytesSent: Long, bytesTotal: Long) {
+        val sentMB = String.format("%.2f", bytesSent.toDouble() / 1024 / 1024)
+        val totalMB = String.format("%.2f", bytesTotal.toDouble() / 1024 / 1024)
+        Log.i(TAG, "GoogleDriveBackup.onBackupProgress: ${sentMB} / ${totalMB}")
+
+        toggleGoogleDriveBackupInProgress(bytesTotal != bytesSent)
+        binding.googledriveSyncProgressMessage.text =
+            getString(R.string.googledrive_backup_progress_message, sentMB, totalMB)
+
+        binding.googledriveSyncProgressBar.isIndeterminate = false
+        binding.googledriveSyncProgressBar.max = bytesTotal.toInt()
+        binding.googledriveSyncProgressBar.progress = bytesSent.toInt()
+    }
+
+    override fun onBackupSuccess() {
+        Log.i(TAG, "GoogleDriveBackup.onBackupSuccess")
+        val now = Instant.now()
+        val nowString = Utils.formatDate(now)
+
+        toggleGoogleDriveBackupInProgress(false)
+        appConfig.dbBackupCloudLastSuccess = now
+        binding.configBackupCloudLastone.text = nowString
+        binding.googledriveSyncProgressMessage.text =
+            getString(R.string.googledrive_backup_success_message, nowString)
+        binding.googledriveSyncProgressTitle.text =
+            getString(R.string.googledrive_backup_success_title)
+    }
+
+    override fun onBackupCancelled() {
+        Log.i(TAG, "GoogleDriveBackup.onBackupCancelled")
+        toggleGoogleDriveBackupInProgress(false)
+        binding.googledriveSyncProgressTitle.text =
+            getString(R.string.googledrive_backup_cancel_title)
+        binding.googledriveSyncProgressMessage.text =
+            getString(R.string.googledrive_backup_cancel_message)
+    }
+
+    override fun onBackupFailed(e: Exception) {
+        Log.i(TAG, "GoogleDriveBackup.onBackupFailed")
+        toggleGoogleDriveBackupInProgress(false)
+        binding.googledriveSyncProgressTitle.text =
+            getString(R.string.googledrive_backup_failed_title)
+        binding.googledriveSyncProgressMessage.text =
+            getString(R.string.googledrive_backup_failed_message, e.message)
+        Utils.logAnalyticsError(TAG,"CloudBackUpFailed", e.message?: "")
+    }
+
+    override fun onRestoreEmpty() {
+        Toast.makeText(requireContext(),
+            getString(R.string.googledrive_restore_emptyserver),Toast.LENGTH_LONG).show()
+    }
+
+    override fun onRestoreStarted() {
+        Toast.makeText(requireContext(),
+            getString(R.string.googledrive_restore_started),Toast.LENGTH_LONG).show()
+    }
+
+    override fun onRestoreProgress(
+        fileName: String,
+        fileIndex: Int,
+        fileCount: Int,
+        bytesSent: Long,
+        bytesTotal: Long
+    ) {
+        //TODO("Not yet implemented")
+    }
+
+    override fun onRestoreSuccess(files: List<GoogleDriveBackupFile.DownloadFile>) {
+        if (files.isEmpty() || files[0].name != "database.sqlite") {
+            throw Exception("ConfigFragement.onRestoreSuccess: Something went really wrong, wrong backup file")
+        }
+
+        Toast.makeText(requireContext(),
+            getString(R.string.googledrive_restore_download_complete),Toast.LENGTH_LONG).show()
+
+        val sourcePath =
+            "${requireContext().filesDir.path}/../databases/${ChineseWordsDatabase.DATABASE_FILE}"
+
+        AlertDialog.Builder(requireContext())
+            .setMessage(getString(R.string.googledrive_restore_confirm_overwrite, Utils.formatDate(files[0].modifiedTime ?: Instant.ofEpochMilli(0))))
+            .setPositiveButton(R.string.proceed) { _, _ -> onBackupFileSelected(File(sourcePath).toUri()) }   // user confirms
+            .setNegativeButton(R.string.cancel) { _, _ -> {} }
+            .setCancelable(true)                                 // allow dismiss by tapping outside
+            .show()
+    }
+
+    override fun onRestoreCancelled() {
+        TODO("Not yet implemented")
+    }
+
+    override fun onRestoreFailed(e: Exception) {
+        Toast.makeText(requireContext(),
+            getString(R.string.googledrive_restore_failed),Toast.LENGTH_LONG).show()
+        Utils.logAnalyticsError(TAG, "CloudRestoreFailed", e.message ?: e.toString())
+    }
+
+    override fun onDeletePreviousBackupFailed(e: Exception) {
+        Log.i(TAG, "Failed to delete previous Google Drive backups")
+        Utils.logAnalyticsError(TAG, "GoogleDriveFailureDeletePreviousBackup", e.message ?: e.toString())
+    }
+
+    override fun onDeletePreviousBackupSuccess() {
+        Log.i(TAG, "Successfully deleted previous Google Drive backups")
+    }
+
+    private fun toggleGoogleDriveBackupInProgress(inProgress : Boolean) {
+        binding.googledriveSyncProgressBar.visibility = Utils.hideViewIf(!inProgress)
+        binding.googledriveSyncCancelBtn.visibility = Utils.hideViewIf(!inProgress)
     }
 
     companion object {

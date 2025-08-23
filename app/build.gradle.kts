@@ -16,8 +16,8 @@ android {
         minSdk = 26
         //noinspection EditedTargetSdkVersion
         targetSdk = 36
-        versionCode = 29
-        versionName = "3.4.0"
+        versionCode = 30
+        versionName = "3.5.0"
         buildConfigField("String", "APP_VERSION", "\"$versionName-$versionCode\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -45,6 +45,14 @@ android {
         viewBinding = true
         buildConfig = true
         dataBinding = true
+    }
+    packaging {
+        resources {
+            excludes += listOf(
+                "META-INF/INDEX.LIST",
+                "META-INF/DEPENDENCIES"
+            )
+        }
     }
 }
 
@@ -124,6 +132,7 @@ dependencies {
 
     implementation(project(":hsktextviews"))
     implementation(project(":floatlayouts"))
+    implementation(project(":googledrivebackup"))
 
     val cameraxVersion = "1.4.2"
     implementation("androidx.camera:camera-core:${cameraxVersion}")
@@ -144,9 +153,11 @@ dependencies {
     // Anki
     implementation("com.github.ankidroid:Anki-Android:api-v1.1.0")
 
+    // Let's allow users to support the dev with money
     implementation("com.android.billingclient:billing:8.0.0")
     implementation("com.android.billingclient:billing-ktx:8.0.0")
 
+    // Let's adk the user for reviews
     implementation("com.google.android.play:review:2.0.2")
     implementation("com.google.android.play:review-ktx:2.0.2")
 }
