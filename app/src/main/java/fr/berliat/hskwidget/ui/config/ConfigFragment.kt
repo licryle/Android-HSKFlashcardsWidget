@@ -35,6 +35,7 @@ import java.io.FileOutputStream
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
 import java.time.Instant
+import java.util.Locale
 
 
 class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
@@ -110,6 +111,7 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
         binding.ankiSyncCancelBtn.setOnClickListener { cancelServiceSync() }
 
         gDriveBackUp = GoogleDriveBackup(this, requireActivity(), getString(R.string.app_name))
+        gDriveBackUp.transferChunkSize = 1024 * 1024 // 1 MB
         gDriveBackUp.addListener(this)
 
         val lastBackupCloud = appConfig.dbBackupCloudLastSuccess
@@ -118,9 +120,9 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
 
         binding.configBtnBackupCloudBackupnow.setOnClickListener { gDriveBackUp.login { backupToCloud() } }
         binding.configBtnBackupCloudRestorenow.setOnClickListener { gDriveBackUp.login { restoreFromCloud() } }
-        updateLoggedInAccount()
         binding.googledriveSyncCancelBtn.setOnClickListener { gDriveBackUp.cancelBackup() }
 
+        /*updateLoggedInAccount()
         binding.configBackupCloudAccount.setOnClickListener {
             AlertDialog.Builder(requireContext())
                 .setMessage(getString(R.string.googledrive_logout_confirm))
@@ -128,17 +130,17 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
                 .setNegativeButton(R.string.cancel) { _, _ -> {} }
                 .setCancelable(true)                                 // allow dismiss by tapping outside
                 .show()
-        }
+        }*/
 
         return binding.root
     }
 
-    private fun updateLoggedInAccount() {
+    /*private fun updateLoggedInAccount() {
         if (gDriveBackUp.deviceAccounts.isNotEmpty())
             binding.configBackupCloudAccount.text = gDriveBackUp.deviceAccounts[0].name
         else
             binding.configBackupCloudAccount.text = getString(R.string.config_backup_cloud_account_notconfigured)
-    }
+    }*/
 
     private fun backupToCloud() {
         val sourcePath =
@@ -335,13 +337,13 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
     override fun onLogout() {
         Log.i(TAG, "GoogleDriveBackup.onLogout")
 
-        updateLoggedInAccount()
+        //updateLoggedInAccount()
     }
 
     override fun onReady() {
         Log.i(TAG, "GoogleDriveBackup.onReady")
 
-        updateLoggedInAccount()
+        //updateLoggedInAccount()
     }
 
     override fun onNoAccountSelected() {
@@ -373,8 +375,8 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
     }
 
     override fun onBackupProgress(fileName: String, fileIndex: Int, fileCount: Int, bytesSent: Long, bytesTotal: Long) {
-        val sentMB = String.format("%.2f", bytesSent.toDouble() / 1024 / 1024)
-        val totalMB = String.format("%.2f", bytesTotal.toDouble() / 1024 / 1024)
+        val sentMB = String.format(Locale.getDefault(), "%.2f", bytesSent.toDouble() / 1024 / 1024)
+        val totalMB = String.format(Locale.getDefault(), "%.2f", bytesTotal.toDouble() / 1024 / 1024)
         Log.i(TAG, "GoogleDriveBackup.onBackupProgress: ${sentMB} / ${totalMB}")
 
         toggleGoogleDriveBackupInProgress(bytesTotal != bytesSent)
