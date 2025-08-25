@@ -6,7 +6,7 @@
 import json
 import re
 import sqlite3
-import csv 
+import csv
 from datetime import datetime
 from typing import List, Optional
 from unidecode import unidecode
@@ -50,7 +50,6 @@ class ChineseWordAnnotation:
         self.first_seen = datetime.strptime(first_seen, "%Y-%m-%d").timestamp() * 1000
         self.is_exam = is_exam
         self.searchable_text = unidecode(pinyins).replace(" ", "")  + ' ' + notes + ' ' + themes + ' ' + simplified
-        self.anki_id = -1
 
 
 def load_annotations(csv_file):
@@ -120,24 +119,30 @@ tone_marks = {
 }
 
 def convert_pinyin_with_tones(pinyin_string):
-    # Regex to match syllables with tones
+    pinyin_string =  pinyin_string.replace("u:", "ü").replace("U:", "Ü")
     pinyin_pattern = re.compile(r"([a-züÜ]+)([1-5]?)", re.IGNORECASE)
-    
+
     def replace_tone(match):
         syllable, tone = match.groups()
-        if not tone or tone == '5':  # No tone number or neutral tone, pass through
-            return syllable
-        
+        if not tone or tone == '5':
+            return syllable  # neutral tone = no diacritic
+
         tone_num = int(tone) - 1
-        # Replace the correct vowel with the corresponding tone mark
-        for vowel in 'aAeEiIoOuUüÜ':
+
+        # 1) handle iu / ui special case
+        if "iu" in syllable:
+            return syllable.replace("u", tone_marks["u"][tone_num])
+        if "ui" in syllable:
+            return syllable.replace("i", tone_marks["i"][tone_num])
+
+        # 2) apply vowel priority a > o > e > (i, u, ü)
+        for vowel in ["a","A","o","O","e","E","i","I","u","U","ü","Ü"]:
             if vowel in syllable:
                 return syllable.replace(vowel, tone_marks[vowel][tone_num])
-        return syllable  # If no valid vowel found, return unchanged
-    
-    # Replace all syllables with tones
-    return ' '.join(replace_tone(match) for match in pinyin_pattern.finditer(pinyin_string))
 
+        return syllable
+
+    return ' '.join(replace_tone(m) for m in pinyin_pattern.finditer(pinyin_string))
 
 # Function to load Chinese words from cedict
 def load_words_dict(files: List[str]) -> List[ChineseWord]:
@@ -221,7 +226,7 @@ def build_dictionary(cedict_file: str, other_files: List[str], db_file: str):
 
     for word in cedict_words.values():
         cursor.execute('''
-        INSERT INTO chinese_word (simplified, traditional,  hsk_level, pinyins, definition, popularity, searchable_text, anki_id)
+        INSERT INTO chinese_word (simplified, traditional,  hsk_level, pinyins, definition, popularity, searchable_text)
         VALUES (?, ?, ?, ?, ?, ?, ?)
         ''', (word.simplified, word.traditional,  word.hsk_level, 
               word.pinyins, json.dumps(word.definition), word.popularity,
@@ -233,7 +238,7 @@ def build_dictionary(cedict_file: str, other_files: List[str], db_file: str):
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (word.a_simplified, word.a_pinyins,  word.notes, 
               word.class_level, word.class_type, word.themes, word.first_seen,
-              0, word.searchable_text, word.anki_id))
+              0, word.searchable_text))
 
     # Commit and close
     conn.commit()
@@ -242,12 +247,12 @@ def build_dictionary(cedict_file: str, other_files: List[str], db_file: str):
     print(f'Wrote {len(cedict_words)} rows into Truncated ChineseWord')
     print(f'Wrote {len(annotations)} rows into Truncated ChineseWordAnnotations')
 
-# Example usage
-cedict_file = 'cedict_ts.u8'
-other_files = ['new_hsk/HSK List (Frequency)/HSK 7-9.txt', 'new_hsk/HSK List (Frequency)/HSK 6.txt', 
-               'new_hsk/HSK List (Frequency)/HSK 5.txt', 'new_hsk/HSK List (Frequency)/HSK 4.txt', 
-               'new_hsk/HSK List (Frequency)/HSK 3.txt', 'new_hsk/HSK List (Frequency)/HSK 2.txt', 
-               'new_hsk/HSK List (Frequency)/HSK 1.txt']  # List of other files containing Chinese words
-db_file = '../app/src/main/assets/databases/Mandarin_Assistant.db'
+if __name__ == "__main__":
+    cedict_file = 'cedict_ts.u8'
+    other_files = ['new_hsk/HSK List (Frequency)/HSK 7-9.txt', 'new_hsk/HSK List (Frequency)/HSK 6.txt', 
+                'new_hsk/HSK List (Frequency)/HSK 5.txt', 'new_hsk/HSK List (Frequency)/HSK 4.txt', 
+                'new_hsk/HSK List (Frequency)/HSK 3.txt', 'new_hsk/HSK List (Frequency)/HSK 2.txt', 
+                'new_hsk/HSK List (Frequency)/HSK 1.txt']  # List of other files containing Chinese words
+    db_file = '../app/src/main/assets/databases/Mandarin_Assistant.db'
 
-build_dictionary(cedict_file, other_files, db_file)
+    build_dictionary(cedict_file, other_files, db_file)
