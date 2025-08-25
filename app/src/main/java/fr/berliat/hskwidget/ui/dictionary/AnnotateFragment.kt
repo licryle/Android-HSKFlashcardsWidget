@@ -87,7 +87,12 @@ class AnnotateFragment: Fragment() {
 
         // Update UI with ChineseWord fields
         binding.annotationEditChinese.hanziText = annotatedWord.word?.simplified.toString()
-        binding.annotationEditChinese.pinyinText = annotatedWord.word?.pinyins.toString()
+        if (! annotatedWord.hasWord()) {
+            binding.annotationEditChinese.pinyinEditable = true
+            binding.annotationEditChinese.pinyinText = annotatedWord.annotation?.pinyins.toString()
+        } else {
+            binding.annotationEditChinese.pinyinText = annotatedWord.word?.pinyins.toString()
+        }
 
         binding.dictionaryItemHskLevel.text = annotatedWord.word?.hskLevel.toString()
         binding.dictionaryItemHskLevel.visibility =
@@ -168,7 +173,7 @@ class AnnotateFragment: Fragment() {
 
         val updatedAnnotation = ChineseWordAnnotation(
             simplified = annotateViewModel.simplified.trim(),
-            pinyins = null,  // Assume pinyins are handled elsewhere
+            pinyins = ChineseWord.Pinyins.fromString(binding.annotationEditChinese.pinyinText),
             notes = binding.annotationEditNotes.text.toString(),
             classType = ChineseWordAnnotation.ClassType.entries[binding.annotationEditClassType.selectedItemPosition],
             level = ChineseWordAnnotation.ClassLevel.entries[binding.annotationEditClassLevel.selectedItemPosition],
