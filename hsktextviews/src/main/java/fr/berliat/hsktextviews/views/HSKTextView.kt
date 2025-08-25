@@ -20,6 +20,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.ceil
+import androidx.core.content.withStyledAttributes
 
 
 class HSKTextView @JvmOverloads constructor(
@@ -76,17 +77,23 @@ class HSKTextView @JvmOverloads constructor(
         )
 
         attrs?.let {
-            val typedArray = context.obtainStyledAttributes(it, R.styleable.HSKTextView, 0, 0)
+            context.withStyledAttributes(it, R.styleable.HSKTextView, 0, 0) {
 
-            text = typedArray.getString(R.styleable.HSKTextView_text) ?: ""
-            wordSeparator = typedArray.getString(R.styleable.HSKTextView_wordSeparator) ?: ""
-            hanziTextSize = typedArray.getDimensionPixelSize(R.styleable.HSKTextView_hanziTextSize, wordsAdapter.hanziSize)
+                text = getString(R.styleable.HSKTextView_text) ?: ""
+                wordSeparator = getString(R.styleable.HSKTextView_wordSeparator) ?: ""
+                hanziTextSize = getDimensionPixelSize(
+                    R.styleable.HSKTextView_hanziTextSize,
+                    wordsAdapter.hanziSize
+                )
 
-            clickedBackgroundColor = typedArray.getColor(R.styleable.HSKTextView_clickedWordBackgroundColor, Color.BLACK)
-            clickedHanziColor = typedArray.getColor(R.styleable.HSKTextView_clickedWordHanziColor, Color.WHITE)
-            clickedPinyinColor = typedArray.getColor(R.styleable.HSKTextView_clickedWordPinyinColor, Color.WHITE)
+                clickedBackgroundColor =
+                    getColor(R.styleable.HSKTextView_clickedWordBackgroundColor, Color.BLACK)
+                clickedHanziColor =
+                    getColor(R.styleable.HSKTextView_clickedWordHanziColor, Color.WHITE)
+                clickedPinyinColor =
+                    getColor(R.styleable.HSKTextView_clickedWordPinyinColor, Color.WHITE)
 
-            typedArray.recycle()
+            }
         }
     }
 
@@ -109,13 +116,6 @@ class HSKTextView @JvmOverloads constructor(
             else {
                 wordsAdapter.hanziSize = value
             }
-        }
-
-    var displayPinYin: Boolean
-        get() = false
-        set(value) {
-            if (value)
-                throw UnsupportedOperationException("Not implemented yet")
         }
 
     var clickedBackgroundColor: Int
