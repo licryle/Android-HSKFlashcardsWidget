@@ -173,7 +173,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:src="@drawable/cloud_upload_24px"
-                android:contentDescription="@string/config_backup_cloud_icon_alt"/>
+                android:contentDescription="@string/config_backup_cloud_title"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"

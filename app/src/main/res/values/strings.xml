@@ -127,11 +127,9 @@ We recommend to choose the level your at plus the one below, or above depending 
     <string name="about_stats_text">%1$s words in dictionary.\n%2$s annotations.</string>
     <string name="config_restore_file">Restore from file</string>
     <string name="config_restore_file_choose">Choose file</string>
-    <string name="config_backup_cloud_icon_alt">Backup/Restore from Google</string>
     <string name="config_backup_cloud_title">Backup/Restore from Google</string>
     <string name="config_backup_cloud_account">Google Account</string>
     <string name="config_backup_cloud_account_notconfigured">Logged out</string>
-    <string name="config_backup_cloud_activate">Activate backup</string>
     <string name="config_backup_cloud_lastone">Last successful backup</string>
     <string name="config_backup_cloud_lastone_never">Never</string>
     <string name="config_backup_cloud_backupnow">Backup now</string>
