@@ -16,6 +16,7 @@
 
     <declare-styleable name="HSKWordView">
         <attr name="pinyin" format="string" />
+        <attr name="pinyinEditable" format="boolean" />
         <attr name="pinyinSize" format="dimension" />
         <attr name="pinyinStyle" format="enum">
             <enum name="normal" value="0" />

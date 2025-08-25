@@ -5,13 +5,17 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.widget.LinearLayout
+import androidx.core.view.children
+import androidx.core.view.setPadding
 
 import fr.berliat.hsktextviews.R
 import fr.berliat.hsktextviews.databinding.HskWordViewBinding
+import androidx.core.content.withStyledAttributes
 
-interface OnHSKWordClickListener {
+interface HSKWordClickListener {
     fun onWordClick(wordView: HSKWordView)
 }
 
@@ -20,53 +24,29 @@ class HSKWordView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : LinearLayout(context, attrs, defStyleAttr) {
-    private var clickListener: OnHSKWordClickListener? = null
+    private var clickListener: HSKWordClickListener? = null
     private val bindings = HskWordViewBinding.inflate(
         LayoutInflater.from(context),
         this,
         true
     )
 
-    init {
-        bindings.root.setOnClickListener { clickListener?.onWordClick(this) }
-
-        attrs?.let {
-            val typedArray = context.obtainStyledAttributes(it, R.styleable.HSKWordView, 0, 0)
-            pinyinText = typedArray.getString(R.styleable.HSKWordView_pinyin).toString()
-            hanziText = typedArray.getString(R.styleable.HSKWordView_hanzi).toString()
-            pinyinText = typedArray.getString(R.styleable.HSKWordView_pinyin) ?: ""
-            hanziText = typedArray.getString(R.styleable.HSKWordView_hanzi) ?: ""
-
-            pinyinSize = typedArray.getDimensionPixelSize(R.styleable.HSKWordView_pinyinSize, 27)
-            hanziSize = typedArray.getDimensionPixelSize(R.styleable.HSKWordView_hanziSize, 36)
-
-            pinyinColor = typedArray.getColor(R.styleable.HSKWordView_pinyinColor, Color.DKGRAY)
-            hanziColor = typedArray.getColor(R.styleable.HSKWordView_hanziColor, Color.BLACK)
-
-            pinyinStyle = typedArray.getInt(R.styleable.HSKWordView_pinyinStyle, Typeface.NORMAL)
-            hanziStyle = typedArray.getInt(R.styleable.HSKWordView_hanziStyle, Typeface.BOLD)
-
-            endSeparator = typedArray.getString(R.styleable.HSKWordView_endSeparator) ?: ""
-
-            isClicked = typedArray.getBoolean(R.styleable.HSKWordView_isClicked, false)
-            clickedBackgroundColor = typedArray.getColor(R.styleable.HSKWordView_clickedBackgroundColor, Color.BLACK)
-            clickedHanziColor = typedArray.getColor(R.styleable.HSKWordView_clickedHanziColor, Color.WHITE)
-            clickedPinyinColor = typedArray.getColor(R.styleable.HSKWordView_clickedPinyinColor, Color.WHITE)
-
-            typedArray.recycle()
-        }
-    }
-
-
-    @SuppressLint("SetTextI18n")
-    private fun updateHanziText() {
-        bindings.hanzi.text = hanziText + endSeparator
-    }
-
     var pinyinText: String
-        get() = bindings.pinyin.text.toString()
+        get() {
+            if (pinyinEditable) {
+                val pinyins = mutableListOf<String?>()
+                bindings.pinyinEditor.children.forEach {
+                    pinyins.add((it as HSKPinyinSelector).selectedPinyin)
+                }
+
+                return pinyins.filter { ! it.isNullOrEmpty() }.joinToString(" ")
+            } else {
+                return bindings.pinyinDisplay.text.toString()
+            }
+        }
         set(value) {
-            bindings.pinyin.text = value
+            bindings.pinyinDisplay.text = value
+            getPinyinSelectors().forEach { it.selectedPinyin = value }
         }
 
     var hanziText: String = ""
@@ -81,10 +61,13 @@ class HSKWordView @JvmOverloads constructor(
             updateHanziText()
         }
 
+    var _pinyinSize : Int = 27
     var pinyinSize: Int
-        get() = bindings.pinyin.textSize.toInt()
+        get() = _pinyinSize
         set(value) {
-            bindings.pinyin.textSize = value.toFloat()
+            _pinyinSize = value
+            bindings.pinyinDisplay.textSize = _pinyinSize.toFloat()
+            getPinyinSelectors().forEach { it.textSize = _pinyinSize }
         }
 
     var hanziSize: Int
@@ -97,7 +80,9 @@ class HSKWordView @JvmOverloads constructor(
         set(value) {
             field = value
             if (!isClicked)
-                bindings.pinyin.setTextColor(value)
+                bindings.pinyinDisplay.setTextColor(value)
+
+            getPinyinSelectors().forEach { it.textColor = value }
         }
 
     var hanziColor: Int = Color.BLACK
@@ -108,9 +93,11 @@ class HSKWordView @JvmOverloads constructor(
         }
 
     var pinyinStyle: Int
-        get() = bindings.pinyin.typeface.style
+        get() = bindings.pinyinDisplay.typeface?.style ?: Typeface.NORMAL
         set(value) {
-            bindings.pinyin.setTypeface(null, value)
+            bindings.pinyinDisplay.setTypeface(null, value)
+
+            getPinyinSelectors().forEach { it.textStyle = value }
         }
 
     var hanziStyle: Int
@@ -119,17 +106,31 @@ class HSKWordView @JvmOverloads constructor(
             bindings.hanzi.setTypeface(null, value)
         }
 
+    var pinyinEditable: Boolean = false
+        set(value) {
+            val displayedPinyin = pinyinText // before changing the value so we collect from the Display
+            field = value
+            recreatePinyinSelectors(displayedPinyin)
+            if (value) {
+                bindings.pinyinDisplay.visibility = GONE
+                bindings.pinyinEditor.visibility = VISIBLE
+            } else {
+                bindings.pinyinDisplay.visibility = VISIBLE
+                bindings.pinyinEditor.visibility = GONE
+            }
+        }
+
     var isClicked: Boolean = false
         set(value) {
             field = value
 
             if (value) {
                 setBackgroundColor(clickedBackgroundColor)
-                bindings.pinyin.setTextColor(clickedPinyinColor)
+                bindings.pinyinDisplay.setTextColor(clickedPinyinColor)
                 bindings.hanzi.setTextColor(clickedHanziColor)
             } else {
                 setBackgroundColor(Color.TRANSPARENT)
-                bindings.pinyin.setTextColor(pinyinColor)
+                bindings.pinyinDisplay.setTextColor(pinyinColor)
                 bindings.hanzi.setTextColor(hanziColor)
             }
         }
@@ -152,9 +153,109 @@ class HSKWordView @JvmOverloads constructor(
         set(value) {
             field = value
             if (isClicked)
-                bindings.pinyin.setTextColor(value)
+                bindings.pinyinDisplay.setTextColor(value)
         }
+
+    init {
+        bindings.root.setOnClickListener { clickListener?.onWordClick(this) }
+
+        attrs?.let {
+            context.withStyledAttributes(it, R.styleable.HSKWordView, 0, 0) {
+                pinyinText = getString(R.styleable.HSKWordView_pinyin) ?: ""
+                hanziText = getString(R.styleable.HSKWordView_hanzi) ?: ""
+
+                pinyinSize = getDimensionPixelSize(R.styleable.HSKWordView_pinyinSize, _pinyinSize)
+                hanziSize = getDimensionPixelSize(R.styleable.HSKWordView_hanziSize, 36)
+
+                pinyinColor = getColor(R.styleable.HSKWordView_pinyinColor, Color.DKGRAY)
+                hanziColor = getColor(R.styleable.HSKWordView_hanziColor, Color.BLACK)
+
+                pinyinStyle = getInt(R.styleable.HSKWordView_pinyinStyle, Typeface.NORMAL)
+                hanziStyle = getInt(R.styleable.HSKWordView_hanziStyle, Typeface.BOLD)
+
+                endSeparator = getString(R.styleable.HSKWordView_endSeparator) ?: ""
+
+                isClicked = getBoolean(R.styleable.HSKWordView_isClicked, false)
+                clickedBackgroundColor =
+                    getColor(R.styleable.HSKWordView_clickedBackgroundColor, Color.BLACK)
+                clickedHanziColor = getColor(R.styleable.HSKWordView_clickedHanziColor, Color.WHITE)
+                clickedPinyinColor =
+                    getColor(R.styleable.HSKWordView_clickedPinyinColor, Color.WHITE)
+
+                pinyinEditable = getBoolean(R.styleable.HSKWordView_pinyinEditable, false)
+            }
+        }
+    }
+
     fun setOnWordClickListener(listener: HSKWordClickListener) {
         clickListener = listener
+    }
+
+    private fun createPinyinSelector(h: Char, selectedPinyin: String, includeFlatTone: Boolean)
+        : HSKPinyinSelector {
+        val selector = HSKPinyinSelector(context)
+        selector.autoAddFlatTones = includeFlatTone
+        selector.hanzi = h
+        selector.selectedPinyin = selectedPinyin
+        selector.textSize = (pinyinSize * 0.90).toInt() // to account for dropdown arrow
+        selector.textStyle = pinyinStyle
+        selector.textColor = pinyinColor
+
+        val rightMargin = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_SP,
+            5f, // sp value
+            context.resources.displayMetrics
+        ).toInt()
+
+        val params = LayoutParams(
+            LayoutParams.WRAP_CONTENT,
+            LayoutParams.WRAP_CONTENT
+        )
+
+        // Set margins in pixels
+        params.setMargins(
+            0,   // left
+            0,   // top
+            rightMargin,   // right
+            0    // bottom
+        )
+
+        // Apply LayoutParams
+        selector.layoutParams = params
+
+        // Set padding inside spinner for text
+        selector.setPadding(0)
+
+        return selector
+    }
+
+    private fun recreatePinyinSelectors(pinyin: String) {
+        if (! pinyinEditable) return
+
+        bindings.pinyinEditor.removeAllViews()
+
+        val pinyins = pinyin.split(" ")
+
+        hanziText.forEachIndexed { i, hanzi ->
+            val includeFlatTone = i == (hanziText.length - 1)
+            val selector = createPinyinSelector(
+                hanzi,
+                pinyins.getOrElse(i) { "" },
+                includeFlatTone)
+
+            bindings.pinyinEditor.addView(selector)
+        }
+    }
+
+    private fun getPinyinSelectors() : List<HSKPinyinSelector> {
+        return bindings.pinyinEditor.children
+            .filterIsInstance<HSKPinyinSelector>()
+            .toList()
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun updateHanziText() {
+        bindings.hanzi.text = hanziText + endSeparator
+        recreatePinyinSelectors(pinyinText)
     }
 }
