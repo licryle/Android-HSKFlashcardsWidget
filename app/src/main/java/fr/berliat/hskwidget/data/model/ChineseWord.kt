@@ -159,7 +159,7 @@ data class ChineseWord(
 
     companion object {
         fun getBlank(simplified: String = ""): ChineseWord {
-            return ChineseWord(simplified, "", mapOf<Locale, String>(), HSK_Level.NOT_HSK,
+            return ChineseWord(simplified, "", mapOf<Locale, String>(), null,
                 null, null, "", Modality.UNKNOWN, Type.UNKNOWN,
                 "", "", "")
         }
