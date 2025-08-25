@@ -128,7 +128,7 @@ data class ChineseWord(
             fun from(findValue: String): Modality {
                 return try {
                     Modality.valueOf(findValue)
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     UNKNOWN
                 }
             }
@@ -150,7 +150,7 @@ data class ChineseWord(
             fun from(findValue: String): Type {
                 return try {
                     Type.valueOf(findValue)
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     UNKNOWN
                 }
             }
