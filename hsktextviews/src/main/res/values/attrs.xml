@@ -1,5 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <attr name="hanzi" format="string"/>
+
+    <declare-styleable name="HSKPinyinSelector">
+        <attr name="hanzi" />
+        <attr name="textSize" format="dimension" />
+        <attr name="textStyle" format="enum">
+            <enum name="normal" value="0" />
+            <enum name="bold" value="1" />
+            <enum name="italic" value="2" />
+        </attr>
+        <attr name="textColor" format="color" />
+        <attr name="autoAddFlatTones" format="boolean" />
+    </declare-styleable>
+
     <declare-styleable name="HSKWordView">
         <attr name="pinyin" format="string" />
         <attr name="pinyinSize" format="dimension" />
@@ -12,7 +26,7 @@
         <attr name="endSeparator" format="string" />
 
         <!-- Attributes for Hanzi TextView -->
-        <attr name="hanzi" format="string" />
+        <attr name="hanzi" />
         <attr name="hanziSize" format="dimension" />
         <attr name="hanziStyle" format="enum">
             <enum name="normal" value="0" />
