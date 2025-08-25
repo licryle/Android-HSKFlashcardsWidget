@@ -7,84 +7,9 @@ import os
 import argparse
 import logging
 from datetime import datetime
-from dotenv import load_dotenv
-import re  # <-- Add this import
+import re  #
 
-# Load environment variables
-load_dotenv()
-
-# Configuration
-BATCH_SIZE = 10  # Number of words to process in each batch
-API_ENDPOINT = os.getenv('LLM_API_ENDPOINT', 'http://localhost:1234/v1/chat/completions')  # LM Studio OpenAI-compatible endpoint
-MODEL_NAME = os.getenv('LLM_MODEL_NAME', 'Yi-1.5-6B-Chat-Q6_K')  # Default model name
-DB_FILE = '../app/src/main/assets/databases/Mandarin_Assistant.db'
-MAX_CONSECUTIVE_FAILURES = 10  # Maximum number of consecutive API failures before exiting
-
-# Chinese to English mappings for modality and type
-MODALITY_MAPPING = {
-    # English values
-    "ORAL": "ORAL",
-    "WRITTEN": "WRITTEN",
-    "ORAL_WRITTEN": "ORAL_WRITTEN",
-    "oral": "ORAL",
-    "written": "WRITTEN",
-    "oral and written": "ORAL_WRITTEN",
-    "written and oral": "ORAL_WRITTEN",
-    "N/A": "N/A",
-    # Chinese values
-    "口语": "ORAL",
-    "书面": "WRITTEN",
-    "口语和书面": "ORAL_WRITTEN",
-    "不适用": "N/A",
-    "未知": "N/A",
-    "": "N/A"
-}
-
-TYPE_MAPPING = {
-    # English values
-    "NOUN": "NOUN",
-    "VERB": "VERB",
-    "ADJECTIVE": "ADJECTIVE",
-    "CONJUNCTION": "CONJUNCTION",
-    "PREPOSITION": "PREPOSITION",
-    "INTERJECTION": "INTERJECTION",
-    "IDIOM": "IDIOM",
-    "noun": "NOUN",
-    "verb": "VERB",
-    "adjective": "ADJECTIVE",
-    "adverb": "ADVERB",
-    "ADVERB": "ADVERB",
-    "conjunction": "CONJUNCTION",
-    "preposition": "PREPOSITION",
-    "interjection": "INTERJECTION",
-    "idiom": "IDIOM",
-    "N/A": "N/A",
-    # Chinese values
-    "名词": "NOUN",
-    "动词": "VERB",
-    "形容词": "ADJECTIVE",
-    "副词": "ADVERB",
-    "连词": "CONJUNCTION",
-    "介词": "PREPOSITION",
-    "感叹词": "INTERJECTION",
-    "成语": "IDIOM",
-    "俗话": "IDIOM",
-    "不适用": "N/A",
-    "未知": "N/A",
-    "": "N/A"
-}
-
-# Database schema
-AI_COLUMNS = {
-    'definition': 'TEXT',
-    'examples': 'TEXT',
-    'modality': 'TEXT CHECK(modality IN ("ORAL", "WRITTEN", "ORAL_WRITTEN", "N/A"))',
-    'type': 'TEXT CHECK(type IN ("NOUN", "VERB", "ADJECTIVE", "ADVERB", "CONJUNCTION", "PREPOSITION", "INTERJECTION",  "IDIOM", "N/A"))',
-    'synonyms': 'TEXT',
-    'antonym': 'TEXT'
-}
-
-REQUIRED_FIELDS = list(AI_COLUMNS.keys()) + ['word']
+from conf import *
 
 def setup_logging():
     """Setup logging configuration."""
@@ -118,41 +43,7 @@ def setup_logging():
     
     return log_file
 
-def add_new_columns(cursor, conn):
-    """Add new columns to the chinese_word table if they don't exist."""
-    # First, get existing columns
-    cursor.execute("PRAGMA table_info(chinese_word)")
-    existing_columns = {row[1] for row in cursor.fetchall()}
-    
-    columns_added = False
-    for column_name, column_type in AI_COLUMNS.items():
-        if column_name not in existing_columns:
-            try:
-                cursor.execute(f'ALTER TABLE chinese_word ADD COLUMN {column_name} {column_type}')
-                logging.debug(f'Added column {column_name}')
-                columns_added = True
-            except sqlite3.OperationalError as e:
-                logging.error(f'Error adding column {column_name}: {e}')
-        else:
-            logging.debug(f'Column {column_name} already exists')
-    
-    # Commit schema changes if any columns were added
-    if columns_added:
-        conn.commit()
-        logging.info("Schema changes committed to database")
-
-def clear_ai_columns(cursor, conn):
-    """Clear all AI-generated columns in the database."""
-    try:
-        for column in AI_COLUMNS.keys():
-            cursor.execute(f'UPDATE chinese_word SET {column} = NULL')
-        conn.commit()
-        logging.info("Cleared all AI-generated columns")
-    except sqlite3.OperationalError as e:
-        logging.error(f"Error clearing columns: {e}")
-        conn.rollback()
-
-def get_words_without_definitions(cursor, limit: int) -> List[str]:
+def get_words_without_definitions(cursor, limit: int, where_clause) -> List[str]:
     """Get words that don't have HSK3 definitions yet, prioritizing HSK words."""
     # First, get HSK words without definitions
     cursor.execute('''
@@ -169,9 +60,9 @@ def get_words_without_definitions(cursor, limit: int) -> List[str]:
         cursor.execute('''
             SELECT simplified
             FROM chinese_word
-            WHERE examples IS NULL AND hsk_level = 'NOT_HSK'
+            WHERE examples IS NULL AND ?
             LIMIT ?
-        ''', (remaining,))
+        ''', (where_clause,remaining))
         non_hsk_words = [row[0] for row in cursor.fetchall()]
         hsk_words.extend(non_hsk_words)
         
@@ -262,7 +153,7 @@ def parse_json_permissive(s: str) -> Optional[List[Dict]]:
                     try:
                         obj_str = s[start_pos:i+1]
                         obj = json.loads(obj_str)
-                        if isinstance(obj, dict) and all(k in obj for k in REQUIRED_FIELDS):
+                        if isinstance(obj, dict) and all(k in obj for k in REQUIRED_AI_FIELDS):
                             valid_entries.append(obj)
                     except json.JSONDecodeError:
                         logging.debug(f"Failed to parse object at position {start_pos}")
@@ -375,18 +266,18 @@ def add_definition_to_json_map(json_string, new_key, new_value):
     definition_map[new_key] = new_value
     return json.dumps(definition_map, ensure_ascii=False)
 
-def update_word_definitions(cursor, definitions: List[Dict]):
-    """Update the database with the new definitions."""
+def update_word_ai_data(cursor, ai_data: List[Dict]):
+    """Update the database with the new ai_data."""
 
-    # Create a dictionary mapping simplified words to definitions
+    # Create a dictionary mapping simplified words to ai_data
     cursor.execute('SELECT simplified, definition FROM chinese_word')
     rows = cursor.fetchall()
     local_defs = {simplified: definition for simplified, definition in rows}
 
-    for def_data in definitions:
+    for def_data in ai_data:
         try:
             # Validate all required fields exist
-            missing_fields = [field for field in REQUIRED_FIELDS if field not in def_data]
+            missing_fields = [field for field in REQUIRED_AI_FIELDS if field not in def_data]
             if missing_fields:
                 logging.error(f"Missing required fields for word {def_data.get('word', 'UNKNOWN')}: {missing_fields}")
                 continue
@@ -411,8 +302,8 @@ def update_word_definitions(cursor, definitions: List[Dict]):
                     def_data[field] = ""  # Default to empty string if missing
 
             # Add hsk3 definition to existing set, or replace
-            definition = add_definition_to_json_map(local_defs[def_data['word']], "zh_CN_HSK03", def_data['definition'])
-            if "zh_CN_HSK03" not in definition:
+            definition = add_definition_to_json_map(local_defs[def_data['word']], DEFINITION_AI_LOCALE, def_data['definition'])
+            if DEFINITION_AI_LOCALE not in definition:
                 logging.error(f"Failed to add definition in HSK3 for word {def_data.get('word', 'UNKNOWN')}")
                 continue
             
@@ -435,35 +326,83 @@ def update_word_definitions(cursor, definitions: List[Dict]):
             logging.error(f"Error processing word {def_data.get('word', 'UNKNOWN')}: {str(e)}")
             continue
 
-def main():
+def clear_ai_columns(cursor, conn):
+    """Clear all AI-generated columns in the database."""
+    try:
+        for column in AI_COLUMNS.keys():
+            if column == "definition":
+                # ToDo Handle cleanup
+                continue
+            cursor.execute(f'UPDATE chinese_word SET {column} = NULL')
+        conn.commit()
+        logging.info("Cleared all AI-generated columns")
+    except sqlite3.OperationalError as e:
+        logging.error(f"Error clearing columns: {e}")
+        conn.rollback()
+
+def load_create_ai_cache_db(ai_cache_file):
+    # Load from ai_cache
+    conn = sqlite3.connect(ai_cache_file)
+    cursor = conn.cursor()
+
+    cursor.execute('''CREATE TABLE IF NOT EXISTS `chinese_word` (
+                        `simplified` TEXT NOT NULL,
+                        `definition` TEXT NOT NULL,
+                        `modality` TEXT DEFAULT 'N/A' CHECK(`modality` IN ('ORAL', 'WRITTEN', 'ORAL_WRITTEN', 'N/A')),
+                        `examples` TEXT DEFAULT '',
+                        `type` TEXT DEFAULT 'N/A' CHECK(`type` IN ('NOUN', 'VERB', 'ADJECTIVE', 'ADVERB', 'CONJUNCTION', 'PREPOSITION', 'INTERJECTION', 'IDIOM', 'N/A')),
+                        `synonyms` TEXT DEFAULT '',
+                        `antonym` TEXT DEFAULT '',
+                        PRIMARY KEY(`simplified`)
+                    )''')
+
+    print(f"Created/connected the ai cache db {ai_cache_file}")
+
+    return conn, cursor
+
+
+def populate_ai_columns(db_file, ai_cache_file: str, clear_first, where_clause):
     # Setup logging
     log_file = setup_logging()
     logging.info("Starting dictionary generation")
     logging.info("Log file: %s", log_file)
     
-    # Parse command line arguments
-    parser = argparse.ArgumentParser(description='Generate AI-enhanced Chinese dictionary entries')
-    parser.add_argument('--clear', action='store_true', help='Clear all AI-generated columns before starting')
-    args = parser.parse_args()
-    
     # Connect to the database
-    conn = sqlite3.connect(DB_FILE)
+    conn = sqlite3.connect(db_file)
     cursor = conn.cursor()
     
     try:
         # Clear AI columns if requested
-        if args.clear:
+        if clear_first:
             clear_ai_columns(cursor, conn)
         
-        # Add new columns if they don't exist
-        add_new_columns(cursor, conn)
-        
         # Get total count of words
-        cursor.execute('SELECT COUNT(*) FROM chinese_word')
+        cursor.execute('SELECT COUNT(*) FROM chinese_word WHERE ' + where_clause)
         total_words = cursor.fetchone()[0]
+        logging.info("Found %d to process", total_words)
+
+        # populate from ai_cache
+        conn_cache, cursor_cache = load_create_ai_cache_db(ai_cache_file)
+
+        cached_data = []
+        cursor_cache.execute('SELECT * FROM `chinese_word`')
+        columns = [desc[0] for desc in cursor_cache.description]
+        for row in cursor_cache.fetchall():
+            word_dict = dict(zip(columns, row))
+            word_dict['word'] = word_dict['simplified']  # To match AI output for update_word_ai_data function
+            del word_dict['simplified']
+
+            definitions = json.loads(word_dict['definition'])
+            word_dict['definition'] = definitions[DEFINITION_AI_LOCALE]
+            cached_data.append(word_dict)
+        logging.info("Retrieved %d cached records", len(cached_data))
+
+        update_word_ai_data(cursor, cached_data)
+        conn.commit()
+        logging.info("Write %d cached records to the main database", len(cached_data))
         
         # Get count of words without definitions
-        cursor.execute('SELECT COUNT(*) FROM chinese_word WHERE examples IS NULL')
+        cursor.execute('SELECT COUNT(*) FROM chinese_word WHERE examples IS NULL AND ' + where_clause)
         remaining_words = cursor.fetchone()[0]
         
         logging.info("Total words: %d", total_words)
@@ -473,7 +412,7 @@ def main():
         
         while remaining_words > 0:
             # Get batch of words without definitions
-            words = get_words_without_definitions(cursor, BATCH_SIZE)
+            words = get_words_without_definitions(cursor, BATCH_SIZE, where_clause)
             if not words:
                 break
                 
@@ -481,15 +420,19 @@ def main():
             
             # Generate prompt and call API
             prompt = generate_prompt(words)
-            definitions = call_llm_api(prompt)
+            ai_data = call_llm_api(prompt)
             
-            if definitions:
+            if ai_data:
                 # Reset failure counter on success
                 consecutive_failures = 0
                 
-                # Update database with new definitions
-                update_word_definitions(cursor, definitions)
+                # Update database with new ai_data
+                update_word_ai_data(cursor, ai_data)
                 conn.commit()  # Commit after each successful batch
+
+                # update the cache too!
+                update_word_ai_data(cursor_cache, ai_data)
+                conn_cache.commit()
                 
                 # Update remaining count
                 cursor.execute('SELECT COUNT(*) FROM chinese_word WHERE examples IS NULL')
@@ -514,4 +457,9 @@ def main():
         conn.close()  # Ensure connection is always closed
 
 if __name__ == "__main__":
-    main() 
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(description='Generate AI-enhanced Chinese dictionary entries')
+    parser.add_argument('--clear', action='store_true', help='Clear all AI-generated columns before starting')
+    args = parser.parse_args()
+
+    populate_ai_columns(DB_FILE, AI_CACHE_DB, args.clear, AI_WORDS_WHERE_CLAUSE)
