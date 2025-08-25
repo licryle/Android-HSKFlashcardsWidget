@@ -30,6 +30,12 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+    sourceSets {
+        getByName("main") {
+            // Include libs folder as a source for compilation
+            java.srcDirs("src/main/java", "libs")
+        }
+    }
 }
 
 kotlin {
@@ -49,4 +55,6 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
 
     implementation("com.google.android.flexbox:flexbox:3.0.0")
+
+    implementation(files("libs/pinyin4kot-1.1.0.jar"))
 }
