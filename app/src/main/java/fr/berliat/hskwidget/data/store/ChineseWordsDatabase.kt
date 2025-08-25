@@ -32,7 +32,8 @@ import java.util.concurrent.Executors
     ModalityConverter::class,
     DateConverter::class,
     DefinitionsConverter::class,
-    AnnotatedChineseWordsConverter::class)
+    AnnotatedChineseWordsConverter::class,
+    ListTypeConverter::class)
 
 abstract class ChineseWordsDatabase : RoomDatabase() {
     abstract fun annotatedChineseWordDAO(): AnnotatedChineseWordDAO

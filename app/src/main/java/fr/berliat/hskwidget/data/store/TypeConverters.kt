@@ -6,6 +6,7 @@ import com.google.gson.reflect.TypeToken
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWordAnnotation
+import fr.berliat.hskwidget.data.model.WordList
 import java.util.Date
 import java.util.Locale
 
@@ -98,6 +99,18 @@ object DateConverter {
     @TypeConverter
     @JvmStatic
     fun fromDate(date: Date?): Long? {
-        return if (date == null) null else date.getTime()
+        return date?.time
+    }
+}
+
+class ListTypeConverter {
+    @TypeConverter
+    fun fromListType(value: WordList.ListType): String {
+        return value.type
+    }
+
+    @TypeConverter
+    fun toListType(value: String): WordList.ListType {
+        return WordList.ListType.entries.first { it.type.equals(value, ignoreCase = true) }
     }
 }
