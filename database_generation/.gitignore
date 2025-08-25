@@ -1,3 +1,4 @@
 env
 annotations_*
 logs
+ai_fields_cache.db
