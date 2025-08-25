@@ -26,7 +26,7 @@ class HSKTextView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
-) : RecyclerView(context, attrs, defStyleAttr), OnHSKWordClickListener {
+) : RecyclerView(context, attrs, defStyleAttr), HSKWordClickListener {
     interface HSKTextSegmenter {
         var listener: HSKTextSegmenterListener?
 
@@ -178,15 +178,6 @@ class HSKTextView @JvmOverloads constructor(
     val wordsFrequency: Map<String, Int>
         get() = wordsAdapter.wordsFrequency
 
-    private fun hanziToPinyin(hanzi: String): String {
-        // @todo(Licryle): look up pinyin
-        return if (displayPinYin) {
-            "hanzi"
-        } else {
-            ""
-        }
-    }
-
     override fun onWordClick(wordView: HSKWordView) {
         listener?.onWordClick(wordView)
     }
@@ -198,7 +189,7 @@ class HSKTextView @JvmOverloads constructor(
     }
 
     class HSKWordsHolder(private val wordView: HSKWordView,
-                         private val listener: OnHSKWordClickListener)
+                         private val listener: HSKWordClickListener)
         : ViewHolder(wordView.rootView) {
 
         fun bind(word: Pair<String, String>, hanziSize: Int, wordSeparator: String,

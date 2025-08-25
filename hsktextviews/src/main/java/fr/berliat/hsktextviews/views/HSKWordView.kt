@@ -57,9 +57,6 @@ class HSKWordView @JvmOverloads constructor(
         }
     }
 
-    fun setOnWordClickListener(listener: OnHSKWordClickListener) {
-        clickListener = listener
-    }
 
     @SuppressLint("SetTextI18n")
     private fun updateHanziText() {
@@ -157,4 +154,7 @@ class HSKWordView @JvmOverloads constructor(
             if (isClicked)
                 bindings.pinyin.setTextColor(value)
         }
+    fun setOnWordClickListener(listener: HSKWordClickListener) {
+        clickListener = listener
+    }
 }

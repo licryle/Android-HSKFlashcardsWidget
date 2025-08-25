@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 
 class HSKWordsAdapter(private val context: Context,
-                      private val listener: OnHSKWordClickListener)
+                      private val listener: HSKWordClickListener)
     : RecyclerView.Adapter<HSKTextView.HSKWordsHolder>() {
 
     private val words = mutableListOf<Pair<String, String>>()
