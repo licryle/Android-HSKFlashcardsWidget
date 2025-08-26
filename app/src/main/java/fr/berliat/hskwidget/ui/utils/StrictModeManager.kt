@@ -23,7 +23,6 @@ class StrictModeManager {
          */
         private val STACKTRACE_WHITELIST = listOf(
             "android.widget.OverScroller.<init>", // Triggered in NavDrawer code
-            "com.yalantis.ucrop.UCropActivity.cropAndSaveImage", // From UCrop library
             "android.graphics.AwareBitmapCacher.-\$\$Nest\$mhandleCheckBgAndRelease", // Triggered at resume by OS?
             "android.hwtheme.HwThemeManager.getDataSkinThemePackages" // Triggered when Billing activities are summoned
         )

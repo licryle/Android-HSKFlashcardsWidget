@@ -146,8 +146,6 @@ dependencies {
     // Text features
     implementation("com.google.mlkit:text-recognition-chinese:16.0.1")
 
-    implementation("com.github.yalantis:ucrop:2.2.9-native")
-
     implementation("io.github.yrjyrj123:jieba-analysis:1.0.3")
 
     // Anki

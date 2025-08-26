@@ -73,10 +73,6 @@
                 <data android:mimeType="image/*" />
             </intent-filter>
         </activity>
-
-        <activity
-            android:name="com.yalantis.ucrop.UCropActivity"
-            android:theme="@style/Theme.CustomFullScreen"/>
             
         <service
             android:name=".domain.AnkiSyncService"

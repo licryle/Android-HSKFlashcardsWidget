@@ -1,18 +1,18 @@
 package fr.berliat.hskwidget.ui.OCR
 
 import android.Manifest
-import android.app.Activity
 import android.content.ContentValues
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.icu.text.SimpleDateFormat
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
+import android.util.Rational
 import android.view.LayoutInflater
 import android.view.ScaleGestureDetector
+import android.view.Surface
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
@@ -21,18 +21,15 @@ import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
+import androidx.camera.core.UseCaseGroup
+import androidx.camera.core.ViewPort
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.yalantis.ucrop.UCrop
 import fr.berliat.hskwidget.databinding.FragmentOcrCaptureBinding
 import fr.berliat.hskwidget.domain.Utils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.io.File
 import java.time.Instant
 import java.util.Locale
 import java.util.concurrent.ExecutorService
@@ -43,22 +40,6 @@ class CaptureImageFragment : Fragment() {
     private lateinit var viewBinding: FragmentOcrCaptureBinding
     private var imageCapture: ImageCapture? = null
     private lateinit var cameraExecutor: ExecutorService
-
-    private val cropActivityResultLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val resultUri: Uri? = UCrop.getOutput(result.data!!)
-                resultUri?.let {
-                    // Handle the cropped image Uri
-                    handleCroppedImage(it)
-                }
-            } else if (result.resultCode == UCrop.RESULT_ERROR) {
-                val cropError = UCrop.getError(result.data!!)
-                cropError?.let {
-                    Log.e(TAG, "Crop failed: $it")
-                }
-            }
-        }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -127,32 +108,41 @@ class CaptureImageFragment : Fragment() {
         }
 
     private fun startCamera() {
+        // Set scale type so the preview fills the view correctly
+        val previewView: PreviewView = viewBinding.viewFinder
+        previewView.scaleType = PreviewView.ScaleType.FILL_CENTER
+
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
-
         cameraProviderFuture.addListener({
-            // Used to bind the lifecycle of cameras to the lifecycle owner
-            val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
-
-            // Preview
+            // Creating the 2 outputs and bind them into a unique useCaseGroup around a unique ViewPort.
+            // This ensures we're capturing what we see on screen.
+            // Thank you https://github.com/AyusmaTech/CameraRectCropSample
+            // and https://stackoverflow.com/questions/59242315/how-to-crop-image-rectangle-in-camera-preview-on-camerax
             val preview = Preview.Builder()
                 .build()
                 .also {
-                    it.setSurfaceProvider(viewBinding.viewFinder.surfaceProvider)
+                    it.surfaceProvider = previewView.surfaceProvider
                 }
 
-            // Initialize image capture use case
-            imageCapture = ImageCapture.Builder().build()
+            imageCapture = ImageCapture.Builder()
+                .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+                .build()
 
-            // Select back camera as a default
-            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+            val viewPort = ViewPort.Builder(Rational(previewView.width, previewView.height), Surface.ROTATION_0).build()
+            val useCaseGroup = UseCaseGroup.Builder()
+                .addUseCase(preview) //your preview
+                .addUseCase(imageCapture!!)
+                .setViewPort(viewPort)
+                .build()
 
             try {
+                val cameraProvider = cameraProviderFuture.get()
                 // Unbind use cases before rebinding
                 cameraProvider.unbindAll()
 
                 // Bind use cases to camera
                 val camera = cameraProvider.bindToLifecycle(
-                    this, cameraSelector, preview, imageCapture)
+                    this, CameraSelector.DEFAULT_BACK_CAMERA, useCaseGroup)
 
                 // Enable pinch-to-zoom on PreviewView
                 val scaleGestureDetector = ScaleGestureDetector(
@@ -228,34 +218,15 @@ class CaptureImageFragment : Fragment() {
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
                     val msg = "Photo capture succeeded: ${output.savedUri}"
                     Log.d(TAG, msg)
-                    startCropActivity(output.savedUri!!)
+                    handleImage(output.savedUri!!)
                 }
             }
         )
     }
 
-    private fun startCropActivity(sourceUri: Uri) {
-        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-            val destinationUri = Uri.fromFile(File(requireContext().cacheDir, "cropped_image.jpg"))
-            val options = UCrop.Options().apply {
-                setCompressionQuality(100)
-                setCompressionFormat(Bitmap.CompressFormat.PNG)
-                setFreeStyleCropEnabled(true)
-                setShowCropFrame(true)
-            }
 
-            val uCrop = UCrop.of(sourceUri, destinationUri)
-                .withOptions(options)
-
-            withContext(Dispatchers.Main) {
-                Log.i(TAG, "Starting uCrop cropping activity")
-                cropActivityResultLauncher.launch(uCrop.getIntent(requireContext()))
-            }
-        }
-    }
-
-    private fun handleCroppedImage(imageUri: Uri) {
-        Log.i(TAG, "Crop succeeded to image path $imageUri")
+    private fun handleImage(imageUri: Uri) {
+        Log.i(TAG, "Processing image at path $imageUri")
 
         try {
             val action = CaptureImageFragmentDirections.displayOCR(imageUri.toString(), arguments?.getString("preText") ?: "")
