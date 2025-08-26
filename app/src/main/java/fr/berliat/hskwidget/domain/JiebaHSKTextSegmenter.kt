@@ -35,7 +35,7 @@ class JiebaHSKTextSegmenter: HSKTextView.HSKTextSegmenter {
             return null
         else {
             val words = mutableListOf<String>()
-            segmenter!!.process(text, JiebaSegmenter.SegMode.INDEX).forEach {
+            segmenter!!.process(text, JiebaSegmenter.SegMode.SEARCH).forEach {
                 words.add(it.word.toString())
             }
 
