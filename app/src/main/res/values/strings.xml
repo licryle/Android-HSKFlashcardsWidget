@@ -343,5 +343,6 @@ padding: 0;
     <string name="googledrive_restore_confirm_overwrite">"You're about to delete your local data and replace it with a backup from %s.\n\nThis is irrevocable. Proceed?"</string>
     <string name="googledrive_restore_failed">Restoration from Google Drive failed with error %s.</string>
     <string name="googledrive_logout_confirm">Would you like to logout of your Google Drive account?\nNo data will be deleted from Google Drive.</string>
+    <string name="ocr_display_pinyins">Show pinyins</string>
 
 </resources>

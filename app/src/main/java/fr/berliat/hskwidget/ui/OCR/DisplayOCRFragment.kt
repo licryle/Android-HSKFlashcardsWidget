@@ -20,6 +20,7 @@ import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.databinding.FragmentOcrDisplayBinding
 import fr.berliat.hskwidget.domain.Utils
 import androidx.core.net.toUri
+import fr.berliat.hsktextviews.views.HSKWordsAdapter.ShowPinyins
 import fr.berliat.hskwidget.MainActivity
 import fr.berliat.hskwidget.domain.SharedViewModel
 
@@ -60,16 +61,23 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
         viewBinding.ocrDisplayText.segmenter = segmenter
         viewBinding.ocrDisplayText.hanziTextSize = appConfig.readerTextSize
 
-        toggleWordSeparator(appConfig.readerSeparateWords)
         viewBinding.ocrDisplayText.listener = this
 
         viewBinding.ocrDisplayConfBigger.setOnClickListener { updateTextSize(2) }
         viewBinding.ocrDisplayConfSmaller.setOnClickListener { updateTextSize(-2) }
 
         viewBinding.ocrDisplaySeparator.isChecked = appConfig.readerSeparateWords
+        toggleWordSeparator(appConfig.readerSeparateWords)
         viewBinding.ocrDisplaySeparator.setOnClickListener {
             appConfig.readerSeparateWords = viewBinding.ocrDisplaySeparator.isChecked
             toggleWordSeparator(viewBinding.ocrDisplaySeparator.isChecked)
+        }
+
+        viewBinding.ocrDisplayPinyins.isChecked = appConfig.readerShowAllPinyins
+        toggleShowPinyins(appConfig.readerShowAllPinyins)
+        viewBinding.ocrDisplayPinyins.setOnClickListener {
+            appConfig.readerShowAllPinyins = viewBinding.ocrDisplayPinyins.isChecked
+            toggleShowPinyins(viewBinding.ocrDisplayPinyins.isChecked)
         }
 
         viewModel.isProcessing.observe(viewLifecycleOwner) { value ->
@@ -148,6 +156,13 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
             ""
     }
 
+    private fun toggleShowPinyins(showThem: Boolean) {
+        viewBinding.ocrDisplayText.showPinyins = if (showThem)
+            ShowPinyins.ALL
+        else
+            ShowPinyins.CLICKED
+    }
+
     private fun updateTextSize(increment: Int) {
         Log.d(TAG, "updateTextSize to $increment")
         val textSize = (appConfig.readerTextSize + increment).coerceAtLeast(10)
@@ -206,7 +221,6 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
     private fun showSelectedWord(simplified: String, annotatedWord: AnnotatedChineseWord?) {
         // Update the UI with the result
         if (annotatedWord == null) {
-            viewModel.clickedWords[simplified] = ""
             Utils.copyToClipBoard(requireContext(), simplified)
 
             val message = requireContext().getString(R.string.ocr_display_word_not_found, simplified)
