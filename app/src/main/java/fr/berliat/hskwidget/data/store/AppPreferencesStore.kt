@@ -124,4 +124,12 @@ class AppPreferencesStore(context: Context):
         set(enabled) {
             putBoolean("reader_separate_word", enabled)
         }
+
+    var readerShowAllPinyins: Boolean
+        get() {
+            return getBoolean("reader_show_pinyins", false)
+        }
+        set(enabled) {
+            putBoolean("reader_show_pinyins", enabled)
+        }
 }

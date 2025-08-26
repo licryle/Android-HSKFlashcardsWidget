@@ -22,6 +22,8 @@ import kotlinx.coroutines.withContext
 import kotlin.math.ceil
 import androidx.core.content.withStyledAttributes
 
+import fr.berliat.pinyin4kot.Hanzi2Pinyin
+import kotlin.text.forEach
 
 class HSKTextView @JvmOverloads constructor(
     context: Context,
@@ -72,13 +74,16 @@ class HSKTextView @JvmOverloads constructor(
 
         attrs?.let {
             context.withStyledAttributes(it, R.styleable.HSKTextView, 0, 0) {
-
                 text = getString(R.styleable.HSKTextView_text) ?: ""
                 wordSeparator = getString(R.styleable.HSKTextView_wordSeparator) ?: DEFAULT_WORD_SEPARATOR
                 hanziTextSize = getDimensionPixelSize(
                     R.styleable.HSKTextView_hanziTextSize,
                     wordsAdapter.hanziSize
                 )
+                pinyinColor =
+                    getColor(R.styleable.HSKTextView_pinyinColor, DEFAULT_PINYIN_COLOR)
+                hanziColor =
+                    getColor(R.styleable.HSKTextView_hanziColor, DEFAULT_HANZI_COLOR)
 
                 clickedBackgroundColor =
                     getColor(R.styleable.HSKTextView_clickedWordBackgroundColor, DEFAULT_CLICKED_BG_COLOR)
@@ -87,6 +92,7 @@ class HSKTextView @JvmOverloads constructor(
                 clickedPinyinColor =
                     getColor(R.styleable.HSKTextView_clickedWordPinyinColor, DEFAULT_CLICKED_TXT_COLOR)
 
+                showPinyins = HSKWordsAdapter.ShowPinyins.fromInt(getInt(R.styleable.HSKTextView_showPinyins, DEFAULT_SHOW_PINYINS))
             }
         }
     }
@@ -94,6 +100,12 @@ class HSKTextView @JvmOverloads constructor(
     var clickedWords: MutableMap<String, String> = mutableMapOf()
         set(value) {
             wordsAdapter.clickedWords = value
+        }
+
+    var showPinyins: HSKWordsAdapter.ShowPinyins
+        get() = wordsAdapter.showPinyins
+        set(value) {
+            wordsAdapter.showPinyins = value
         }
 
     var wordSeparator: String
@@ -111,6 +123,14 @@ class HSKTextView @JvmOverloads constructor(
                 wordsAdapter.hanziSize = value
             }
         }
+
+    var pinyinColor: Int
+        get() = wordsAdapter.pinyinColor
+        set(value) { wordsAdapter.pinyinColor = value }
+
+    var hanziColor: Int
+        get() = wordsAdapter.hanziColor
+        set(value) { wordsAdapter.hanziColor = value }
 
     var clickedBackgroundColor: Int
         get() = wordsAdapter.clickedBackgroundColor
@@ -149,7 +169,7 @@ class HSKTextView @JvmOverloads constructor(
 
                     cleanText.split("\n").forEach { paragraph ->
                         segmenter?.segment(paragraph)?.forEach { word ->
-                            words.add(Pair(word, ""))
+                            words.add(Pair(word, inferPinyin(word)))
                         }
                         words.add(Pair("\n", ""))
                     }
@@ -182,17 +202,34 @@ class HSKTextView @JvmOverloads constructor(
         coroutineScope.cancel()
     }
 
+    fun inferPinyin(word: String): String {
+        val pinyins = StringBuilder()
+        try {
+            word.forEach { hanzi ->
+                val py = h2p.getPinyin(hanzi)[0]
+                pinyins.append(h2p.numberedToTonal(py)).append(" ")
+            }
+        } catch (_: Exception) {
+            // Not a correct or known pinyin
+            pinyins.append("   ")
+        }
+
+        return pinyins.toString()
+    }
+
     class HSKWordsHolder(private val wordView: HSKWordView,
                          private val listener: HSKWordClickListener)
         : ViewHolder(wordView.rootView) {
 
-        fun bind(word: Pair<String, String>, hanziSize: Int, wordSeparator: String,
-                 clickedBackgroundColor: Int, clickedHanziColor: Int, clickedPinyinColor: Int,
-                 isClicked: Boolean) {
+        fun bind(word: Pair<String, String>, hanziSize: Int, hanziColor: Int, pinyinColor: Int,
+                 wordSeparator: String, clickedBackgroundColor: Int, clickedHanziColor: Int,
+                 clickedPinyinColor: Int, isClicked: Boolean, showPinyin: Boolean) {
             wordView.hanziText = word.first
             wordView.hanziSize = hanziSize
-            wordView.pinyinText = word.second
+            wordView.hanziColor = hanziColor
+            wordView.pinyinText = if (showPinyin) word.second else ""
             wordView.pinyinSize = ceil((hanziSize * 3 / 4).toDouble()).toInt()
+            wordView.pinyinColor = pinyinColor
             wordView.endSeparator = wordSeparator
             wordView.clickedBackgroundColor = clickedBackgroundColor
             wordView.clickedHanziColor = clickedHanziColor
@@ -221,11 +258,15 @@ class HSKTextView @JvmOverloads constructor(
     }
 
     companion object {
+        val h2p = Hanzi2Pinyin() // Tiny optim to keep in memory
         const val TAG = "HSKTextView"
 
         private const val DEFAULT_WORD_SEPARATOR = ""
         private const val DEFAULT_CLICKED_BG_COLOR = Color.BLACK
         private const val DEFAULT_CLICKED_TXT_COLOR = Color.WHITE
+        private const val DEFAULT_HANZI_COLOR = Color.BLACK
+        private const val DEFAULT_PINYIN_COLOR = Color.DKGRAY
+        private val DEFAULT_SHOW_PINYINS = HSKWordsAdapter.ShowPinyins.ALL.value
 
         fun containsChinese(text: String): Boolean {
             val pattern = Regex("[\u4e00-\u9fff]")
