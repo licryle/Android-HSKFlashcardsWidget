@@ -90,7 +90,7 @@ We recommend to choose the level your at plus the one below, or above depending 
     <string name="dictionary_loading_text">Loading results - standby!\nIf you can read this, consider upgrading your device :)</string>
     <string name="dictionary_noresult_icon">No result!</string>
     <string name="dictionary_search_loading">Loading results</string>
-    <string name="dictionary_search_filter_hasannotation_hint">Annotated only </string>
+    <string name="dictionary_search_filter_hasannotation_hint"> only</string>
 
     <string name="menu_ocr">OCR</string>
     <string name="image_capture_button" />
@@ -104,7 +104,7 @@ We recommend to choose the level your at plus the one below, or above depending 
     <string name="dbbackup_failure_write">Couldn\'t write / back-up the full database</string>
     <string name="dbbackup_failure_folderpermission">No folder permission to backup database</string>
     <string name="ocr_display_analysis_failure">Text Analysis failed - try again</string>
-    <string name="ocr_display_separator">Separate words</string>
+    <string name="ocr_display_separator">Space words</string>
     <string name="copied_to_clipboard">Copied %s to clipboard</string>
     <string name="config_backup_title">Backup/Restore from local file</string>
     <string name="config_backup_activate">Activate backup</string>
@@ -300,7 +300,7 @@ padding: 0;
     <string name="dictionary_item_synonyms">Synonym(s)</string>
     <string name="dictionary_item_examples">Example(s)</string>
     <string name="dictionary_item_altdefinition">Definition</string>
-    <string name="dictionary_search_filter_hsk3definition_hint">Definition in HSK3</string>
+    <string name="dictionary_search_filter_hsk3definition_hint">HSK3 Definition</string>
     <string name="dbrestore_start">Database restoration started</string>
     <string name="about_email_noapp">No email client found. Address copied to clipboard.</string>
     <string name="menu_support">Support the creator!</string>
