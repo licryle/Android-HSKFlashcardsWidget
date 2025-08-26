@@ -1,6 +1,5 @@
 package fr.berliat.hskwidget.ui.OCR
 
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -8,62 +7,39 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.Toast
-import androidx.annotation.OptIn
-import androidx.camera.core.ExperimentalGetImage
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.coroutineScope
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.flexbox.FlexboxLayoutManager
-import com.google.mlkit.vision.common.InputImage
-import com.google.mlkit.vision.text.Text
-import com.google.mlkit.vision.text.TextRecognition
-import com.google.mlkit.vision.text.TextRecognizer
-import com.google.mlkit.vision.text.chinese.ChineseTextRecognizerOptions
 import fr.berliat.hsktextviews.views.HSKTextView
 import fr.berliat.hsktextviews.views.HSKWordView
 import fr.berliat.hskwidget.R
 
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
-import fr.berliat.hskwidget.data.repo.ChineseWordFrequencyRepo
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
-import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.databinding.FragmentOcrDisplayBinding
-import fr.berliat.hskwidget.domain.SharedViewModel
 import fr.berliat.hskwidget.domain.Utils
-import kotlinx.coroutines.launch
 import androidx.core.net.toUri
 import fr.berliat.hskwidget.MainActivity
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import fr.berliat.hskwidget.domain.SharedViewModel
 
 class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.HSKTextSegmenterListener {
     private lateinit var viewBinding: FragmentOcrDisplayBinding
     private lateinit var segmenter: HSKTextView.HSKTextSegmenter
     private lateinit var viewModel: DisplayOCRViewModel
 
-    private suspend fun frequencyWordsRepo(): ChineseWordFrequencyRepo {
-        val db = ChineseWordsDatabase.getInstance(requireContext())
-        return ChineseWordFrequencyRepo(
-            db.chineseWordFrequencyDAO(),
-            db.annotatedChineseWordDAO()
-        )
-    }
-
-    private var isProcessing = false
-
     private lateinit var appConfig: AppPreferencesStore
-
-    private val DEFAULT_WORD_SEPARATOR = "·"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         segmenter = SharedViewModel.getInstance(this).segmenter
-        viewModel = ViewModelProvider(this)[DisplayOCRViewModel::class.java]
+
+        val mainApp = requireActivity() as MainActivity
+        val factory = DisplayOCRViewModelFactory(mainApp)
+        viewModel = ViewModelProvider(this, factory)[DisplayOCRViewModel::class.java]
 
         if (requireActivity().javaClass.simpleName == "MainActivity") {
-            (requireActivity() as MainActivity).setOCRReminderVisible()
+            mainApp.setOCRReminderVisible()
         }
     }
 
@@ -96,6 +72,18 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
             toggleWordSeparator(viewBinding.ocrDisplaySeparator.isChecked)
         }
 
+        viewModel.isProcessing.observe(viewLifecycleOwner) { value ->
+            toggleProcessing(value)
+        }
+
+        viewModel.text.observe(viewLifecycleOwner) { value ->
+            viewBinding.ocrDisplayText.text = value
+        }
+
+        viewModel.toastEvent.observe(viewLifecycleOwner) { value ->
+            Toast.makeText(requireContext(), value.first, value.second).show()
+        }
+
         setupSegmenter()
 
         return viewBinding.root // Return the root view of the binding
@@ -104,7 +92,6 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
     override fun onPause() {
         super.onPause()
         // Save the scroll position
-        viewModel.text = viewBinding.ocrDisplayText.text
         viewModel.scrollPosition = (viewBinding.ocrDisplayText.layoutManager as FlexboxLayoutManager).findFirstVisibleItemPosition()
     }
 
@@ -112,15 +99,18 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
         super.onResume()
 
         toggleProcessing(true)
-        viewBinding.ocrDisplayText.text = viewModel.text ?: ""
+        viewBinding.ocrDisplayText.text = viewModel.text.value ?: ""
 
-        if (viewModel.text != "") {
+        if (viewModel.text.value?.isNotEmpty() == true) {
             // Add Global Layout Listener
             val globalLayoutListener = object : ViewTreeObserver.OnPreDrawListener {
                 override fun onPreDraw(): Boolean {
                     // Restore scroll position
                     if (viewBinding.ocrDisplayText.adapter?.itemCount!! > viewModel.scrollPosition) {
-                        viewBinding.ocrDisplayText.scrollToPosition(viewModel.scrollPosition)
+                        val position = viewModel.scrollPosition.coerceAtMost(
+                            (viewBinding.ocrDisplayText.adapter?.itemCount ?: 0) - 1
+                        )
+                        viewBinding.ocrDisplayText.scrollToPosition(position)
                         // Remove the listener to prevent multiple calls
                         viewBinding.ocrDisplayText.viewTreeObserver.removeOnPreDrawListener(this)
                     }
@@ -132,7 +122,7 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
 
             viewBinding.ocrDisplayText.clickedWords = viewModel.clickedWords
             if (viewModel.selectedWord != null) {
-                fetchWordForDisplay(viewModel.selectedWord!!, ::showSelectedWord)
+                viewModel.fetchWordForDisplay(viewModel.selectedWord!!, ::showSelectedWord)
             }
         }
 
@@ -153,7 +143,7 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
 
     private fun toggleWordSeparator(separate: Boolean) {
         viewBinding.ocrDisplayText.wordSeparator = if (separate)
-            DEFAULT_WORD_SEPARATOR
+            WORD_SEPARATOR
         else
             ""
     }
@@ -180,102 +170,20 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
         if (imageUri != "") {
             Log.d(TAG, "processFromArguments: image was provided")
 
-            viewModel.text = text
+            viewModel.text.value = text
 
             if (text == "")
                 viewModel.resetText()
 
-            recognizeText(imageUri.toUri())
+            viewModel.recognizeText(imageUri.toUri())
             requireArguments().putString("imageUri", "") // Consume condition
         } else if (text != "") {
             Log.d(TAG, "processFromArguments: text was provided")
 
-            viewModel.text = text
-        } else if (text == "" && viewModel.text == "") {
+            viewModel.text.value = text
+        } else if (viewModel.text.value?.isNotEmpty() == true) { // text is empty
             Toast.makeText(requireContext(), "Oops - nothing to display", Toast.LENGTH_LONG).show()
         }
-    }
-
-    @OptIn(ExperimentalGetImage::class)
-    private fun recognizeText(uri: Uri) {
-        Log.d(TAG, "recognizeText starting")
-        // Convert the Uri to InputImage for OCR
-        lifecycleScope.launch(Dispatchers.IO) {
-            val image = InputImage.fromFilePath(requireContext(), uri)
-
-            val options = ChineseTextRecognizerOptions.Builder()
-                .build()
-
-            val recognizer: TextRecognizer = TextRecognition.getClient(options)
-
-            recognizer.process(image)
-                .addOnSuccessListener { visionText ->
-                    processTextRecognitionResult(visionText)
-                    Log.d(TAG, "Recognized text: ${visionText.text}")
-                }
-                .addOnFailureListener { e ->
-                    toggleProcessing(false)
-                    Toast.makeText(requireContext(), "Text recognition failed", Toast.LENGTH_LONG)
-                        .show()
-                    Log.e(TAG, "Text recognition failed: ", e)
-                    e.printStackTrace()
-
-                    Utils.logAnalyticsError(
-                        "OCR_DISPLAY",
-                        "TextRecognitionFailed",
-                        e.message ?: ""
-                    )
-                }
-        }
-    }
-
-    private fun processTextRecognitionResult(texts: Text) {
-        Log.d(TAG, "processTextRecognitionResult")
-        val blocks: List<Text.TextBlock> = texts.textBlocks
-        if (blocks.isEmpty()) {
-            toggleProcessing(false)
-            Toast.makeText(requireContext(), "No text found", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        var concatText = ""
-        for (i in blocks.indices) {
-            val lines: List<Text.Line> = blocks[i].lines
-            for (j in lines.indices) {
-                val elements: List<Text.Element> = lines[j].elements
-                for (k in elements.indices) {
-                    Log.d(TAG, elements[k].text)
-                    concatText += elements[k].text
-                }
-                Log.d(TAG, "END OF LINE")
-                concatText += "\n\n"
-            }
-            Log.d(TAG, "END OF BLOCK")
-        }
-
-        Log.i(TAG, "Text recognition extracted, moving to display fragment: \n$concatText")
-
-        if (viewBinding.ocrDisplayText.text != "")
-            concatText = "\n\n" + concatText
-
-        viewBinding.ocrDisplayText.text += concatText
-    }
-
-    private suspend fun fetchWord(hanzi: String): AnnotatedChineseWord? {
-        Log.d(TAG, "Searching for $hanzi")
-        val db = ChineseWordsDatabase.getInstance(requireContext())
-        val dao = db.annotatedChineseWordDAO()
-        try {
-            val word = dao.getFromSimplified(hanzi)
-            Log.d(TAG, "Search returned for $hanzi")
-
-            return word
-        } catch (e: Exception) {
-            // Code for handling the exception
-            Log.e(TAG, "$e")
-        }
-
-        return null
     }
 
     private fun toggleProcessing(itIs: Boolean) {
@@ -284,30 +192,15 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
         } else {
             viewBinding.ocrDisplayLoading.visibility = View.GONE
         }
-
-        isProcessing = itIs
-    }
-
-    private fun fetchWordForDisplay(simplified: String, callback: (String, AnnotatedChineseWord?) -> Unit) {
-        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-            // Switch to the IO dispatcher to perform background work
-            val result = fetchWord(simplified)
-
-            withContext(Dispatchers.Main) {
-                callback(simplified, result)
-            }
-        }
     }
 
     override fun onWordClick(word: HSKWordView) {
         Log.d(TAG, "onWordClick ${word.hanziText}")
 
-        fetchWordForDisplay(word.hanziText, ::showSelectedWord)
+        viewModel.fetchWordForDisplay(word.hanziText, ::showSelectedWord)
 
-        lifecycle.coroutineScope.launch(Dispatchers.IO) {
-            Log.d(TAG, "Augmenting Consulted Count for ${word.hanziText} by 1, if word exists")
-            frequencyWordsRepo().incrementConsulted(word.hanziText)
-        }
+        Log.d(TAG, "Augmenting Consulted Count for ${word.hanziText} by 1, if word exists")
+        viewModel.augmentWordFrequencyConsulted(word.hanziText)
     }
 
     private fun showSelectedWord(simplified: String, annotatedWord: AnnotatedChineseWord?) {
@@ -357,11 +250,9 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
     override fun onTextAnalysisSuccess() {
         toggleProcessing(false)
 
-        lifecycle.coroutineScope.launch(Dispatchers.IO) {
-            val wordFreq = viewBinding.ocrDisplayText.wordsFrequency
-            Log.d(TAG, "Augmenting Appeared Count for ${wordFreq.size} words (if they exist): $wordFreq")
-            frequencyWordsRepo().incrementAppeared(wordFreq)
-        }
+        val wordFreq = viewBinding.ocrDisplayText.wordsFrequency
+        viewModel.augmentWordFrequencyAppeared(wordFreq)
+        Log.d(TAG, "Augmenting Appeared Count for ${wordFreq.size} words (if they exist): $wordFreq")
     }
 
     override fun onIsSegmenterReady() {
@@ -371,5 +262,7 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
 
     companion object {
         private const val TAG = "DisplayOCRFragment"
+
+        private const val WORD_SEPARATOR = "·"
     }
 }
