@@ -55,7 +55,7 @@ class HSKWordView @JvmOverloads constructor(
             updateHanziText()
         }
 
-    var endSeparator: String = ""
+    var endSeparator: String = DEFAULT_END_SEPARATOR
         set(value) {
             field = value
             updateHanziText()
@@ -76,7 +76,7 @@ class HSKWordView @JvmOverloads constructor(
             bindings.hanzi.textSize = value.toFloat()
         }
 
-    var pinyinColor: Int = Color.DKGRAY
+    var pinyinColor: Int = DEFAULT_PINYIN_COLOR
         set(value) {
             field = value
             if (!isClicked)
@@ -85,7 +85,7 @@ class HSKWordView @JvmOverloads constructor(
             getPinyinSelectors().forEach { it.textColor = value }
         }
 
-    var hanziColor: Int = Color.BLACK
+    var hanziColor: Int = DEFAULT_HANZI_COLOR
         set(value) {
             field = value
             if (!isClicked)
@@ -93,7 +93,7 @@ class HSKWordView @JvmOverloads constructor(
         }
 
     var pinyinStyle: Int
-        get() = bindings.pinyinDisplay.typeface?.style ?: Typeface.NORMAL
+        get() = bindings.pinyinDisplay.typeface?.style ?: DEFAULT_PINYIN_STYLE
         set(value) {
             bindings.pinyinDisplay.setTypeface(null, value)
 
@@ -106,7 +106,7 @@ class HSKWordView @JvmOverloads constructor(
             bindings.hanzi.setTypeface(null, value)
         }
 
-    var pinyinEditable: Boolean = false
+    var pinyinEditable: Boolean = DEFAULT_PINYIN_EDITABLE
         set(value) {
             val displayedPinyin = pinyinText // before changing the value so we collect from the Display
             field = value
@@ -120,7 +120,7 @@ class HSKWordView @JvmOverloads constructor(
             }
         }
 
-    var isClicked: Boolean = false
+    var isClicked: Boolean = DEFAULT_IS_CLICKED
         set(value) {
             field = value
 
@@ -135,21 +135,21 @@ class HSKWordView @JvmOverloads constructor(
             }
         }
 
-    var clickedBackgroundColor: Int = Color.BLACK
+    var clickedBackgroundColor: Int = DEFAULT_CLICKED_BG_COLOR
         set(value) {
             field = value
             if (isClicked)
                 bindings.root.setBackgroundColor(value)
         }
 
-    var clickedHanziColor: Int = Color.WHITE
+    var clickedHanziColor: Int = DEFAULT_HANZI_COLOR
         set(value) {
             field = value
             if (isClicked)
                 bindings.hanzi.setTextColor(value)
         }
 
-    var clickedPinyinColor: Int = Color.WHITE
+    var clickedPinyinColor: Int = DEFAULT_PINYIN_COLOR
         set(value) {
             field = value
             if (isClicked)
