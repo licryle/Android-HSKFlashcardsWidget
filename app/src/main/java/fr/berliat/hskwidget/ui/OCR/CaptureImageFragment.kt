@@ -12,6 +12,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.ScaleGestureDetector
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
@@ -150,8 +151,27 @@ class CaptureImageFragment : Fragment() {
                 cameraProvider.unbindAll()
 
                 // Bind use cases to camera
-                cameraProvider.bindToLifecycle(
+                val camera = cameraProvider.bindToLifecycle(
                     this, cameraSelector, preview, imageCapture)
+
+                // Enable pinch-to-zoom on PreviewView
+                val scaleGestureDetector = ScaleGestureDetector(
+                    requireContext(),
+                    object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
+                        override fun onScale(detector: ScaleGestureDetector): Boolean {
+                            val currentZoomRatio =
+                                camera.cameraInfo.zoomState.value?.zoomRatio ?: 1f
+                            val delta = detector.scaleFactor
+                            camera.cameraControl.setZoomRatio(currentZoomRatio * delta)
+                            return true
+                        }
+                    })
+
+                viewBinding.viewFinder.setOnTouchListener { view, event ->
+                    view.performClick()
+                    scaleGestureDetector.onTouchEvent(event)
+                    true
+                }
 
                 Log.d(TAG, "Camera started")
             } catch(exc: Exception) {
