@@ -54,12 +54,6 @@ class HSKTextView @JvmOverloads constructor(
 
     private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    private val DEFAULT_HANZI_SIZE = 20
-    private val DEFAULT_WORD_SEPARATOR = ""
-
-    private val DEFAULT_CLICKED_BG_COLOR = Color.BLACK
-    private val DEFAULT_CLICKED_TXT_COLOR = Color.WHITE
-
     init {
         val loManager = FlexboxLayoutManager(context)
         loManager.flexDirection = FlexDirection.ROW
@@ -80,18 +74,18 @@ class HSKTextView @JvmOverloads constructor(
             context.withStyledAttributes(it, R.styleable.HSKTextView, 0, 0) {
 
                 text = getString(R.styleable.HSKTextView_text) ?: ""
-                wordSeparator = getString(R.styleable.HSKTextView_wordSeparator) ?: ""
+                wordSeparator = getString(R.styleable.HSKTextView_wordSeparator) ?: DEFAULT_WORD_SEPARATOR
                 hanziTextSize = getDimensionPixelSize(
                     R.styleable.HSKTextView_hanziTextSize,
                     wordsAdapter.hanziSize
                 )
 
                 clickedBackgroundColor =
-                    getColor(R.styleable.HSKTextView_clickedWordBackgroundColor, Color.BLACK)
+                    getColor(R.styleable.HSKTextView_clickedWordBackgroundColor, DEFAULT_CLICKED_BG_COLOR)
                 clickedHanziColor =
-                    getColor(R.styleable.HSKTextView_clickedWordHanziColor, Color.WHITE)
+                    getColor(R.styleable.HSKTextView_clickedWordHanziColor, DEFAULT_CLICKED_TXT_COLOR)
                 clickedPinyinColor =
-                    getColor(R.styleable.HSKTextView_clickedWordPinyinColor, Color.WHITE)
+                    getColor(R.styleable.HSKTextView_clickedWordPinyinColor, DEFAULT_CLICKED_TXT_COLOR)
 
             }
         }
@@ -228,5 +222,9 @@ class HSKTextView @JvmOverloads constructor(
 
     companion object {
         const val TAG = "HSKTextView"
+
+        private const val DEFAULT_WORD_SEPARATOR = ""
+        private const val DEFAULT_CLICKED_BG_COLOR = Color.BLACK
+        private const val DEFAULT_CLICKED_TXT_COLOR = Color.WHITE
     }
 }

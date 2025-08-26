@@ -61,7 +61,7 @@ class HSKWordView @JvmOverloads constructor(
             updateHanziText()
         }
 
-    var _pinyinSize : Int = 27
+    var _pinyinSize : Int = DEFAULT_PINYIN_SIZE
     var pinyinSize: Int
         get() = _pinyinSize
         set(value) {
@@ -165,24 +165,24 @@ class HSKWordView @JvmOverloads constructor(
                 hanziText = getString(R.styleable.HSKWordView_hanzi) ?: ""
 
                 pinyinSize = getDimensionPixelSize(R.styleable.HSKWordView_pinyinSize, _pinyinSize)
-                hanziSize = getDimensionPixelSize(R.styleable.HSKWordView_hanziSize, 36)
+                hanziSize = getDimensionPixelSize(R.styleable.HSKWordView_hanziSize, DEFAULT_HANZI_SIZE)
 
-                pinyinColor = getColor(R.styleable.HSKWordView_pinyinColor, Color.DKGRAY)
-                hanziColor = getColor(R.styleable.HSKWordView_hanziColor, Color.BLACK)
+                pinyinColor = getColor(R.styleable.HSKWordView_pinyinColor, DEFAULT_PINYIN_COLOR)
+                hanziColor = getColor(R.styleable.HSKWordView_hanziColor, DEFAULT_HANZI_COLOR)
 
-                pinyinStyle = getInt(R.styleable.HSKWordView_pinyinStyle, Typeface.NORMAL)
-                hanziStyle = getInt(R.styleable.HSKWordView_hanziStyle, Typeface.BOLD)
+                pinyinStyle = getInt(R.styleable.HSKWordView_pinyinStyle, DEFAULT_PINYIN_STYLE)
+                hanziStyle = getInt(R.styleable.HSKWordView_hanziStyle, DEFAULT_HANZI_STYLE)
 
-                endSeparator = getString(R.styleable.HSKWordView_endSeparator) ?: ""
+                endSeparator = getString(R.styleable.HSKWordView_endSeparator) ?: DEFAULT_END_SEPARATOR
 
-                isClicked = getBoolean(R.styleable.HSKWordView_isClicked, false)
+                isClicked = getBoolean(R.styleable.HSKWordView_isClicked, DEFAULT_IS_CLICKED)
                 clickedBackgroundColor =
-                    getColor(R.styleable.HSKWordView_clickedBackgroundColor, Color.BLACK)
-                clickedHanziColor = getColor(R.styleable.HSKWordView_clickedHanziColor, Color.WHITE)
+                    getColor(R.styleable.HSKWordView_clickedBackgroundColor, DEFAULT_CLICKED_BG_COLOR)
+                clickedHanziColor = getColor(R.styleable.HSKWordView_clickedHanziColor, DEFAULT_CLICKED_PINYIN_COLOR)
                 clickedPinyinColor =
-                    getColor(R.styleable.HSKWordView_clickedPinyinColor, Color.WHITE)
+                    getColor(R.styleable.HSKWordView_clickedPinyinColor, DEFAULT_CLICKED_HANZI_COLOR)
 
-                pinyinEditable = getBoolean(R.styleable.HSKWordView_pinyinEditable, false)
+                pinyinEditable = getBoolean(R.styleable.HSKWordView_pinyinEditable, DEFAULT_PINYIN_EDITABLE)
             }
         }
     }
@@ -257,5 +257,20 @@ class HSKWordView @JvmOverloads constructor(
     private fun updateHanziText() {
         bindings.hanzi.text = hanziText + endSeparator
         recreatePinyinSelectors(pinyinText)
+    }
+
+    companion object {
+        private const val DEFAULT_PINYIN_SIZE = 27
+        private const val DEFAULT_PINYIN_STYLE = Typeface.NORMAL
+        private const val DEFAULT_PINYIN_COLOR = Color.DKGRAY
+        private const val DEFAULT_END_SEPARATOR = ""
+        private const val DEFAULT_HANZI_SIZE = 36
+        private const val DEFAULT_HANZI_STYLE = Typeface.BOLD
+        private const val DEFAULT_HANZI_COLOR = Color.BLACK
+        private const val DEFAULT_IS_CLICKED = false
+        private const val DEFAULT_CLICKED_BG_COLOR = Color.BLACK
+        private const val DEFAULT_CLICKED_PINYIN_COLOR = Color.WHITE
+        private const val DEFAULT_CLICKED_HANZI_COLOR = Color.WHITE
+        private const val DEFAULT_PINYIN_EDITABLE = false
     }
 }

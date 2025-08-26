@@ -17,31 +17,31 @@ class HSKWordsAdapter(private val context: Context,
             notifyDataSetChanged()
         }
 
-    var hanziSize: Int = 20
+    var hanziSize: Int = DEFAULT_HANZI_SIZE
         set(size) {
             field = size
             notifyDataSetChanged()
         }
 
-    var wordSeparator: String = "/"
+    var wordSeparator: String = DEFAULT_WORD_SEPARATOR
         set(separator) {
             field = separator
             notifyDataSetChanged()
         }
 
-    var clickedBackgroundColor: Int = Color.BLACK
+    var clickedBackgroundColor: Int = DEFAULT_CLICKED_BG_COLOR
         set(color) {
             field = color
             notifyDataSetChanged()
         }
 
-    var clickedHanziColor: Int = Color.WHITE
+    var clickedHanziColor: Int = DEFAULT_CLICKED_TXT_COLOR
         set(color) {
             field = color
             notifyDataSetChanged()
         }
 
-    var clickedPinyinColor: Int = Color.WHITE
+    var clickedPinyinColor: Int = DEFAULT_CLICKED_TXT_COLOR
         set(color) {
             field = color
             notifyDataSetChanged()
@@ -86,5 +86,12 @@ class HSKWordsAdapter(private val context: Context,
         holder.bind(word, hanziSize, wordSeparator,
                     clickedBackgroundColor, clickedHanziColor, clickedPinyinColor,
             word.first in clickedWords)
+    }
+
+    companion object {
+        private const val DEFAULT_HANZI_SIZE = 20
+        private const val DEFAULT_WORD_SEPARATOR = "/"
+        private const val DEFAULT_CLICKED_BG_COLOR = Color.BLACK
+        private const val DEFAULT_CLICKED_TXT_COLOR = Color.WHITE
     }
 }

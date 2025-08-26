@@ -135,10 +135,10 @@ class HSKPinyinSelector @JvmOverloads constructor(
         attrs?.let {
             context.withStyledAttributes(it, R.styleable.HSKPinyinSelector, 0, 0) {
                 hanzi = getString(R.styleable.HSKPinyinSelector_hanzi).toString()[0]
-                textSize = getDimensionPixelSize(R.styleable.HSKPinyinSelector_textSize, 27)
-                textColor = getColor(R.styleable.HSKPinyinSelector_textColor, Color.DKGRAY)
-                textStyle = getInt(R.styleable.HSKPinyinSelector_textStyle, Typeface.NORMAL)
-                autoAddFlatTones = getBoolean(R.styleable.HSKPinyinSelector_autoAddFlatTones, false)
+                textSize = getDimensionPixelSize(R.styleable.HSKPinyinSelector_textSize, DEFAULT_TEXT_SIZE)
+                textStyle = getInt(R.styleable.HSKPinyinSelector_textStyle, DEFAULT_TEXT_STYLE)
+                textColor = getColor(R.styleable.HSKPinyinSelector_textColor, DEFAULT_TEXT_COLOR)
+                autoAddFlatTones = getBoolean(R.styleable.HSKPinyinSelector_autoAddFlatTones, DEFAULT_AUTO_ADD_FLAT_TONES)
             }
         }
 
@@ -148,5 +148,12 @@ class HSKPinyinSelector @JvmOverloads constructor(
         isClickable = false
         background = null
         adapter = internalAdapter
+    }
+
+    companion object {
+        private const val DEFAULT_TEXT_SIZE = 27
+        private const val DEFAULT_TEXT_STYLE = Typeface.NORMAL
+        private const val DEFAULT_TEXT_COLOR = Color.DKGRAY
+        private const val DEFAULT_AUTO_ADD_FLAT_TONES = false
     }
 }
