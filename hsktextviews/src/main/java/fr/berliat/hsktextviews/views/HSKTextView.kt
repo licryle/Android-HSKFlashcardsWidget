@@ -212,7 +212,7 @@ class HSKTextView @JvmOverloads constructor(
                     flexGrow = 1f // Allow it to grow and push items down
                 }
                 wordView.setBackgroundColor(Color.RED)
-            } else {
+            } else if (containsChinese(word.first)) {
                 wordView.setOnWordClickListener(listener)
             }
 
@@ -226,5 +226,10 @@ class HSKTextView @JvmOverloads constructor(
         private const val DEFAULT_WORD_SEPARATOR = ""
         private const val DEFAULT_CLICKED_BG_COLOR = Color.BLACK
         private const val DEFAULT_CLICKED_TXT_COLOR = Color.WHITE
+
+        fun containsChinese(text: String): Boolean {
+            val pattern = Regex("[\u4e00-\u9fff]")
+            return pattern.containsMatchIn(text)
+        }
     }
 }
