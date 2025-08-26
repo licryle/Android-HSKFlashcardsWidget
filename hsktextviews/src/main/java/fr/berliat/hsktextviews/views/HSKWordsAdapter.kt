@@ -80,7 +80,8 @@ class HSKWordsAdapter(private val context: Context,
 
     override fun onBindViewHolder(holder: HSKTextView.HSKWordsHolder, position: Int) {
         var word = words[position]
-        if (word.first in clickedWords)
+
+        if (word.first in clickedWords) // Showing pinyin when clicked, it's stored in clicked words
             word = word.copy(second = clickedWords[word.first].toString())
 
         holder.bind(word, hanziSize, wordSeparator,
