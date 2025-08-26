@@ -109,9 +109,19 @@
     </action>
 
     <action
+        android:id="@+id/see_dictionary"
+        app:destination="@id/nav_dictionary">
+    </action>
+
+    <action
         android:id="@+id/search"
         app:destination="@id/nav_dictionary">
         <!-- Query pulled automatically from the search box. -->
+    </action>
+
+    <action
+        android:id="@+id/see_lists"
+        app:destination="@id/nav_lists">
     </action>
 
     <action
