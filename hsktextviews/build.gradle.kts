@@ -56,5 +56,5 @@ dependencies {
 
     implementation("com.google.android.flexbox:flexbox:3.0.0")
 
-    implementation(files("libs/pinyin4kot-1.1.0.jar"))
+    implementation(project(":pinyin4kot"))
 }

@@ -7,3 +7,6 @@
 [submodule "googledrivebackup"]
 	path = googledrivebackup
 	url = https://github.com/licryle/GoogleDriveBackUp.git
+[submodule "pinyin4kot"]
+	path = pinyin4kot
+	url = https://github.com/licryle/Pinyin4Kot.git
