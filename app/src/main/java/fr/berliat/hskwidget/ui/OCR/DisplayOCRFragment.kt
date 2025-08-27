@@ -198,7 +198,7 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
             Log.d(TAG, "processFromArguments: text was provided")
 
             viewModel.text.value = text
-        } else if (viewModel.text.value?.isNotEmpty() == true) { // text is empty
+        } else if (viewModel.text.value?.isEmpty() == true) { // text is empty
             Toast.makeText(requireContext(), "Oops - nothing to display", Toast.LENGTH_LONG).show()
         }
     }
