@@ -157,9 +157,8 @@ class HSKTextView @JvmOverloads constructor(
             cleanText = cleanText.replace("(\\n|\\n\\r)".toRegex(), "\n")
 
             originalText = cleanText
-            wordsAdapter.clearData()
 
-            if (originalText != "") {
+            if (cleanText != "") {
                 listener?.onTextAnalysisStart()
 
                 coroutineScope.launch(Dispatchers.IO) {
@@ -177,6 +176,7 @@ class HSKTextView @JvmOverloads constructor(
                     Log.d(TAG, "Finished parsing")
                     withContext(Dispatchers.Main) {
                         Log.d(TAG, "Start rendering parsing")
+                        wordsAdapter.clearData()
                         wordsAdapter.addData(words)
                         Log.d(TAG, "Finished rendering parsing")
 
