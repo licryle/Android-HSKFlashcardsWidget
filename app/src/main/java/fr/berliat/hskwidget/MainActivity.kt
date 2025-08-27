@@ -4,12 +4,14 @@ import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetManager.ACTION_APPWIDGET_CONFIGURE
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -60,7 +62,9 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
         setupSharedViewModel()
 
         // Enable StrictMode in Debug mode
-        StrictModeManager.init()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            StrictModeManager.init()
+        }
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -325,6 +329,32 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         binding.navView.setupWithNavController(navController)
+        binding.navView.setNavigationItemSelectedListener { item ->
+             when (item.itemId) {
+                 R.id.nav_dictionary -> {
+                     navController.navigate(R.id.nav_dictionary)
+                 }
+                 R.id.nav_lists -> {
+                     navController.navigate(R.id.nav_lists)
+                 }
+                 R.id.nav_widgets -> {
+                     navController.navigate(R.id.nav_widgets)
+                 }
+                 R.id.nav_config -> {
+                     navController.navigate(R.id.nav_config)
+                 }
+                 R.id.nav_about -> {
+                     navController.navigate(R.id.nav_about)
+                 }
+                 R.id.nav_support -> {
+                     navController.navigate(R.id.nav_support)
+                 }
+             }
+
+             // Close the drawer
+             binding.drawerLayout.closeDrawer(GravityCompat.START)
+             true
+         }
     }
 
     private fun setupReminderView() {
