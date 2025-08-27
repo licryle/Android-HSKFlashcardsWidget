@@ -54,7 +54,7 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
 
         viewBinding.ocrDisplayAdd.setOnClickListener {
             val action =
-                CaptureImageFragmentDirections.processOCR(viewBinding.ocrDisplayText.text)
+                DisplayOCRFragmentDirections.appendOCR(viewBinding.ocrDisplayText.text)
             findNavController().navigate(action)
         }
 
