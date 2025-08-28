@@ -139,4 +139,15 @@
         app:restoreState="true">
         <!-- Query pulled automatically from the search box. -->
     </action>
+
+    <action
+        android:id="@+id/ocrImage"
+        app:destination="@id/nav_ocr_read">
+        <argument
+            android:name="imageUri"
+            app:argType="string" />
+        <argument
+            android:name="preText"
+            app:argType="string" />
+    </action>
 </navigation>

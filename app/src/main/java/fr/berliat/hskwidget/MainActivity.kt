@@ -32,12 +32,9 @@ import fr.berliat.hskwidget.domain.DatabaseBackup
 import fr.berliat.hskwidget.domain.DatabaseBackupCallbacks
 import fr.berliat.hskwidget.domain.SharedViewModel
 import fr.berliat.hskwidget.domain.Utils
-import fr.berliat.hskwidget.ui.OCR.CaptureImageFragmentDirections
 import fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragment
-import fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragmentDirections
 import fr.berliat.hskwidget.ui.utils.StrictModeManager
 import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
-import fr.berliat.hskwidget.ui.widgets.WidgetsListFragmentDirections
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -192,7 +189,7 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
                 val widgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
 
                 if (widgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
-                    val action = WidgetsListFragmentDirections.configureWidget(widgetId)
+                    val action = MobileNavigationDirections.configureWidget(widgetId)
                     navController.navigate(action)
                 }
             }
@@ -226,7 +223,7 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
             Log.i(TAG, "Received a shared image intent")
             (intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM))?.let { imageUri ->
                 // Handle the image URI here
-                val action = CaptureImageFragmentDirections.displayOCR(imageUri.toString(), "")
+                val action = MobileNavigationDirections.ocrImage(imageUri.toString(), "")
                 navController.navigate(action)
             }
         }
@@ -303,7 +300,7 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
                 if (currentFragment is DictionarySearchFragment && currentFragment.isAdded && currentFragment.view != null) {
                     currentFragment.performSearch()
                 } else {
-                    val action = DictionarySearchFragmentDirections.search()
+                    val action = MobileNavigationDirections.search()
                     navController.navigate(action)
                 }
 
