@@ -1,4 +1,4 @@
-package fr.berliat.hskwidget.ui.utils
+package fr.berliat.ankihelper
 
 import android.content.ComponentName
 import android.content.Context
@@ -10,13 +10,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ProcessLifecycleOwner
-import fr.berliat.hskwidget.domain.AnkiSyncService
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+
+import fr.berliat.ankihelper.AnkiSyncService.OperationState
+import kotlinx.coroutines.CompletableDeferred
 
 /**
  * Delegate for handling long operations with progress tracking and cancellation support.
@@ -28,7 +29,8 @@ import kotlinx.coroutines.launch
  * - Handle service lifecycle
  */
 class AnkiSyncServiceDelegate(
-    private val context: Context
+    private val context: Context,
+    private val serviceClass: Class<out AnkiSyncService>
 ) {
     companion object {
         private const val TAG = "AnkiSyncServiceDelegate"
@@ -36,19 +38,15 @@ class AnkiSyncServiceDelegate(
     
     private var service: AnkiSyncService? = null
     private var isBound = false
-    private var pendingStart: Boolean = false
+    private val serviceDeferred = CompletableDeferred<AnkiSyncService>()
     
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, binder: IBinder?) {
             val longOperationBinder = binder as AnkiSyncService.LongOperationBinder
             service = longOperationBinder.getService()
             isBound = true
+            serviceDeferred.complete(service!!)  // signal that service is ready
             Log.d(TAG, "Service connected")
-
-            if (pendingStart) {
-                pendingStart = false
-                startSyncToAnkiOperation() // retry now that we're bound
-            }
         }
         
         override fun onServiceDisconnected(name: ComponentName?) {
@@ -57,28 +55,22 @@ class AnkiSyncServiceDelegate(
             Log.d(TAG, "Service disconnected")
         }
     }
-    
+
     init {
-        bindService()
         observeOperationState()
     }
-    
+
     /**
      * Start a sync to Anki operation
      */
     fun startSyncToAnkiOperation() {
-        if (!isBound) {
-            Log.w(TAG, "Service not bound, queuing start ")
-            pendingStart = true
-            return
-        }
-        
-        val intent = Intent(context, AnkiSyncService::class.java).apply {
+        val intent = Intent(context, serviceClass).apply {
             action = AnkiSyncService.ACTION_START_OPERATION
             putExtra(AnkiSyncService.EXTRA_OPERATION_TYPE, AnkiSyncService.OPERATION_SYNC_TO_ANKI)
         }
-        
-        context.startService(intent)
+
+        context.startForegroundService(intent) // or startService if not foreground
+        bindService()
         Log.d(TAG, "Started sync to Anki operation")
     }
     
@@ -91,7 +83,7 @@ class AnkiSyncServiceDelegate(
             return
         }
         
-        val intent = Intent(context, AnkiSyncService::class.java).apply {
+        val intent = Intent(context, serviceClass).apply {
             action = AnkiSyncService.ACTION_CANCEL_OPERATION
         }
         
@@ -102,7 +94,7 @@ class AnkiSyncServiceDelegate(
     /**
      * Get the current operation state
      */
-    fun getOperationState(): StateFlow<AnkiSyncService.OperationState>? {
+    fun getOperationState(): StateFlow<OperationState>? {
         return service?.operationState
     }
 
@@ -110,27 +102,24 @@ class AnkiSyncServiceDelegate(
      * Return the end state only when done to propagate to AnkiDelegate (in most scenarios).
      */
     suspend fun awaitOperationCompletion(): Result<Unit> {
-        while (service == null) {
-            delay(50)
-        }
+        val service = serviceDeferred.await() // suspend until service is connected
 
-        val state =
-            service?.operationState
-                ?.filterNotNull()
-                ?.first { it is AnkiSyncService.OperationState.Completed
-                    || it is AnkiSyncService.OperationState.Cancelled
-                    || it is AnkiSyncService.OperationState.Error }
+        val state = service.operationState
+                .filterNotNull()
+                .first { it is OperationState.Completed
+                    || it is OperationState.Cancelled
+                    || it is OperationState.Error }
 
         return when (state) {
-            is AnkiSyncService.OperationState.Completed -> Result.success(Unit)
-            is AnkiSyncService.OperationState.Cancelled -> Result.failure(CancellationException())
-            is AnkiSyncService.OperationState.Error -> Result.failure(Exception(state.message))
+            is OperationState.Completed -> Result.success(Unit)
+            is OperationState.Cancelled -> Result.failure(CancellationException())
+            is OperationState.Error -> Result.failure(Exception(state.message))
             else -> Result.failure(Exception("Unexpected state"))
         }
     }
     
     private fun bindService() {
-        val intent = Intent(context, AnkiSyncService::class.java)
+        val intent = Intent(context, serviceClass)
         context.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
     }
     
@@ -144,24 +133,33 @@ class AnkiSyncServiceDelegate(
     private fun observeOperationState() {
         val lifecycleOwner = ProcessLifecycleOwner.get()
 
+        val delegate = this
+
         lifecycleOwner.lifecycleScope.launch {
             lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                service?.operationState?.collect { state ->
+                val service = serviceDeferred.await()
+                AnkiSharedEventBus.emit(AnkiSharedEventBus.UiEvent.AnkiServiceStarting(delegate))
+
+                service.operationState.collect { state ->
                     when (state) {
-                        is AnkiSyncService.OperationState.Idle -> {
+                        is OperationState.Idle -> {
                             Log.d(TAG, "Operation state: Idle")
                         }
-                        is AnkiSyncService.OperationState.Running -> {
+                        is OperationState.Running -> {
                             Log.d(TAG, "Operation state: Running - ${state.progress}/${state.total} - ${state.message}")
+                            AnkiSharedEventBus.emit(AnkiSharedEventBus.UiEvent.AnkiSyncProgress(state))
                         }
-                        is AnkiSyncService.OperationState.Completed -> {
+                        is OperationState.Completed -> {
                             Log.d(TAG, "Operation state: Completed")
+                            AnkiSharedEventBus.emit(AnkiSharedEventBus.UiEvent.AnkiSyncCompleted(state))
                         }
-                        is AnkiSyncService.OperationState.Cancelled -> {
+                        is OperationState.Cancelled -> {
                             Log.d(TAG, "Operation state: Cancelled")
+                            AnkiSharedEventBus.emit(AnkiSharedEventBus.UiEvent.AnkiSyncCancelled(state))
                         }
-                        is AnkiSyncService.OperationState.Error -> {
+                        is OperationState.Error -> {
                             Log.e(TAG, "Operation state: Error - ${state.message}")
+                            AnkiSharedEventBus.emit(AnkiSharedEventBus.UiEvent.AnkiSyncError(state))
                         }
                     }
                 }
