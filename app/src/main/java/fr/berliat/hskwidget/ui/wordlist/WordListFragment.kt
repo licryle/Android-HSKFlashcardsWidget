@@ -17,19 +17,20 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.model.WordList
 import fr.berliat.hskwidget.data.model.WordListWithCount
+import fr.berliat.hskwidget.data.repo.WordListRepository
 import fr.berliat.hskwidget.domain.Utils
-import fr.berliat.hskwidget.ui.utils.AnkiDelegate
+import fr.berliat.hskwidget.ui.utils.HSKAnkiDelegate
 import java.text.SimpleDateFormat
 import java.util.*
 
 class WordListFragment : Fragment() {
     private lateinit var viewModel: WordListViewModel
     private lateinit var adapter: WordListAdapter
-    private lateinit var ankiDelegate: AnkiDelegate
+    private lateinit var ankiDelegate: HSKAnkiDelegate
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        ankiDelegate = AnkiDelegate(this)
+        ankiDelegate = HSKAnkiDelegate(this)
     }
 
     override fun onResume() {
@@ -49,7 +50,7 @@ class WordListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel = WordListViewModel(ankiDelegate.wordListRepo)
+        viewModel = WordListViewModel(WordListRepository(requireContext()), ankiDelegate::delegateToAnki)
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.wordListRecyclerView)
         adapter = WordListAdapter(
@@ -73,7 +74,10 @@ class WordListFragment : Fragment() {
     }
 
     private fun showRenameDialog(list: WordListWithCount) {
-        val dialog = WordListReNameDialog.newInstance(listId = list.id, listName = list.name) {
+        val dialog = WordListReNameDialog.newInstance(
+            listId = list.id,
+            listName = list.name,
+            ankiDelegate::delegateToAnki) {
             _, _ -> refreshLists()
         }
 
@@ -81,7 +85,7 @@ class WordListFragment : Fragment() {
     }
 
     private fun showCreateListDialog() {
-        val dialog = WordListReNameDialog { _, _ ->
+        val dialog = WordListReNameDialog(ankiDelegate::delegateToAnki) { _, _ ->
             refreshLists()
         }
 

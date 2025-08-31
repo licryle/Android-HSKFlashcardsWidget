@@ -14,6 +14,8 @@ import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import fr.berliat.ankihelper.AnkiDelegate
+import fr.berliat.ankihelper.AnkiSyncServiceDelegate
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.databinding.FragmentConfigBinding
@@ -22,10 +24,10 @@ import fr.berliat.hskwidget.domain.DatabaseBackupCallbacks
 import fr.berliat.googledrivebackup.GoogleDriveBackup
 import fr.berliat.googledrivebackup.GoogleDriveBackupFile
 import fr.berliat.googledrivebackup.GoogleDriveBackupInterface
+import fr.berliat.hskwidget.data.repo.WordListRepository
 import fr.berliat.hskwidget.data.store.DatabaseHelper
 import fr.berliat.hskwidget.domain.Utils
-import fr.berliat.hskwidget.ui.utils.AnkiDelegate
-import fr.berliat.hskwidget.ui.utils.AnkiSyncServiceDelegate
+import fr.berliat.hskwidget.ui.utils.HSKAnkiDelegate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -43,7 +45,7 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
     private lateinit var binding: FragmentConfigBinding
     private lateinit var appConfig: AppPreferencesStore
     private lateinit var databaseDiskBackup : DatabaseDiskBackup
-    private lateinit var ankiDelegate: AnkiDelegate
+    private lateinit var ankiDelegate: HSKAnkiDelegate
     private var ankiSyncServiceDelegate: AnkiSyncServiceDelegate? = null
     private lateinit var gDriveBackUp : GoogleDriveBackup
 
@@ -54,7 +56,7 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
         super.onCreate(savedInstanceState)
         databaseDiskBackup = DatabaseDiskBackup(this, requireContext(), this)
 
-        ankiDelegate = AnkiDelegate(this)
+        ankiDelegate = HSKAnkiDelegate(this)
     }
 
     override fun onResume() {
@@ -110,7 +112,7 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
         binding.configAnkiActivateBtn.setOnClickListener { onAnkiIntegrationChanged(binding.configAnkiActivateBtn.isChecked) }
 
         // Setup progress UI
-        binding.ankiSyncCancelBtn.setOnClickListener { cancelServiceSync() }
+        binding.ankiSyncCancelBtn.setOnClickListener { cancelAnkiSyncService() }
 
         gDriveBackUp = GoogleDriveBackup(this, requireActivity(), getString(R.string.app_name))
         gDriveBackUp.transferChunkSize = 1024 * 1024 // 1 MB
@@ -178,50 +180,77 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
     }
 
     private fun onAnkiIntegrationChanged(enabled: Boolean) {
-        appConfig.ankiSaveNotes = enabled
         binding.configAnkiActivateBtn.isChecked = enabled
-        binding.ankiSyncProgressSection.visibility = Utils.hideViewIf(!enabled)
+
         if (enabled) {
-            Utils.requestPermissionNotification(requireActivity())
-            importsAllNotesToAnkiDroid()
+            appConfig.setAnkiSaveNotes(true) {
+                importsAllNotesToAnkiDroid()
+            }
             Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.CONFIG_ANKI_SYNC_ON)
         } else {
-            cancelServiceSync()
+            appConfig.ankiSaveNotes = false
+            cancelAnkiSyncService()
             Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.CONFIG_ANKI_SYNC_OFF)
         }
     }
 
-    private fun cancelServiceSync() {
+    private fun cancelAnkiSyncService() {
         ankiSyncServiceDelegate?.cancelCurrentOperation()
+    }
+
+    override fun onAnkiRequestPermissionGranted() {
+        appConfig.ankiSaveNotes = true
+        binding.configAnkiActivateBtn.isChecked = true
+
+        Utils.requestPermissionNotification(requireActivity())
     }
 
     override fun onAnkiRequestPermissionDenied() {
         appConfig.ankiSaveNotes = false
         binding.configAnkiActivateBtn.isChecked = false
+
+        binding.ankiSyncProgressSection.visibility = View.GONE
     }
 
     override fun onAnkiServiceStarting(serviceDelegate: AnkiSyncServiceDelegate) {
         ankiSyncServiceDelegate = serviceDelegate
+
+        binding.ankiSyncProgressBar.progress = 0
+        binding.ankiSyncProgressBar.isIndeterminate = true
+        binding.ankiSyncProgressTitle.text = getString(R.string.anki_sync_start_title)
+        binding.ankiSyncProgressMessage.text = getString(R.string.anki_sync_start_message)
+        binding.ankiSyncProgressSection.visibility = View.VISIBLE
+        binding.ankiSyncProgressBar.visibility = View.VISIBLE
+        binding.ankiSyncCancelBtn.visibility = View.VISIBLE
     }
 
     override fun onAnkiOperationSuccess() {
         Log.i(TAG, "onAnkiOperationSuccess: completed full import into Anki")
-        binding.ankiSyncProgressSection.visibility = View.GONE
+        val now = Instant.now()
+        val nowString = Utils.formatDate(now)
+
+        binding.ankiSyncProgressTitle.text = getString(R.string.anki_sync_success_title)
+        binding.ankiSyncProgressMessage.text = getString(R.string.anki_sync_success_message, nowString)
+        binding.ankiSyncProgressBar.visibility = View.GONE
+        binding.ankiSyncCancelBtn.visibility = View.GONE
     }
 
     override fun onAnkiOperationCancelled() {
         Log.i(TAG, "onAnkiOperationCancelled: full Anki import cancelled by user")
-        binding.ankiSyncProgressSection.visibility = View.GONE
+
+        binding.ankiSyncProgressTitle.text = getString(R.string.anki_sync_cancelled_title)
+        binding.ankiSyncProgressMessage.text = getString(R.string.anki_sync_cancelled_message)
+        binding.ankiSyncProgressBar.visibility = View.GONE
+        binding.ankiSyncCancelBtn.visibility = View.GONE
     }
 
     override fun onAnkiOperationFailed(e: Throwable) {
         Log.i(TAG, "onAnkiOperationFailed: failed full import into Anki")
 
-        binding.ankiSyncProgressSection.visibility = View.GONE
-        var message = requireContext().getString(R.string.anki_failed_import)
-        message = message.format(e.message)
-
-        Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+        binding.ankiSyncProgressTitle.text = getString(R.string.anki_sync_failure_title)
+        binding.ankiSyncProgressMessage.text = getString(R.string.anki_sync_failure_title, e.message ?: "")
+        binding.ankiSyncProgressBar.visibility = View.GONE
+        binding.ankiSyncCancelBtn.visibility = View.GONE
 
         Utils.logAnalyticsError(
             "ANKI_SYNC",
@@ -231,36 +260,27 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
     }
 
     override fun onAnkiSyncProgress(current: Int, total: Int, message: String) {
-        Log.i(TAG, "onAnkiImportProgress: ${current} / ${total}")
+        Log.i(TAG, "onAnkiImportProgress: $current / $total")
 
         binding.ankiSyncProgressSection.visibility = View.VISIBLE
+        binding.ankiSyncCancelBtn.visibility = View.VISIBLE
         binding.ankiSyncProgressMessage.text = message
         if (total > 0) {
             binding.ankiSyncProgressBar.max = total
             binding.ankiSyncProgressBar.progress = current
             binding.ankiSyncProgressBar.visibility = Utils.hideViewIf(current == total)
             binding.ankiSyncCancelBtn.visibility = Utils.hideViewIf(current == total)
+            binding.ankiSyncProgressBar.isIndeterminate = false
         } else {
             binding.ankiSyncProgressBar.isIndeterminate = true
         }
     }
 
-    override fun onAnkiRequestPermissionGranted() {
-        appConfig.ankiSaveNotes = true
-        binding.configAnkiActivateBtn.isChecked = true
-    }
-
     private fun importsAllNotesToAnkiDroid() {
         Log.i(TAG, "importsAllNotesToAnkiDroid: starting full import into Anki")
-        Toast.makeText(requireContext(), R.string.anki_import_started, Toast.LENGTH_LONG).show()
-
-        // Show progress UI
-        binding.ankiSyncProgressSection.visibility = View.VISIBLE
-        binding.ankiSyncProgressBar.progress = 0
-        binding.ankiSyncProgressMessage.text = getString(R.string.anki_import_started)
 
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-            ankiDelegate.wordListRepo.delegateToAnki(ankiDelegate.wordListRepo.syncListsToAnki())
+            ankiDelegate.delegateToAnki(WordListRepository(requireContext()).syncListsToAnki())
         }
     }
 

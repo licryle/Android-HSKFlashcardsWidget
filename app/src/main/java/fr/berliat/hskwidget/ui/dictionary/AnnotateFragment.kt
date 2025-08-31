@@ -14,12 +14,13 @@ import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWordAnnotation
+import fr.berliat.hskwidget.data.repo.WordListRepository
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.databinding.FragmentAnnotationEditBinding
 import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.domain.Utils.Companion.copyToClipBoard
 import fr.berliat.hskwidget.domain.Utils.Companion.playWordInBackground
-import fr.berliat.hskwidget.ui.utils.AnkiDelegate
+import fr.berliat.hskwidget.ui.utils.HSKAnkiDelegate
 import java.time.Instant
 import java.util.Date
 
@@ -27,14 +28,14 @@ import java.util.Date
 class AnnotateFragment: Fragment() {
     private lateinit var binding: FragmentAnnotationEditBinding
     private lateinit var annotateViewModel: AnnotateViewModel
-    private lateinit var ankiDelegate: AnkiDelegate
+    private lateinit var ankiDelegate: HSKAnkiDelegate
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setActionBarTitle(getString(R.string.menu_annotate))
 
-        ankiDelegate = AnkiDelegate(this)
+        ankiDelegate = HSKAnkiDelegate(this)
     }
 
     private fun setActionBarTitle(title: String) {
@@ -46,7 +47,7 @@ class AnnotateFragment: Fragment() {
     ): View {
         binding = FragmentAnnotationEditBinding.inflate(inflater, container, false)
 
-        annotateViewModel = AnnotateViewModel(requireContext(), ankiDelegate.wordListRepo)
+        annotateViewModel = AnnotateViewModel(requireContext(), WordListRepository(requireContext()), ankiDelegate::delegateToAnki)
         annotateViewModel.annotatedWord.observe(viewLifecycleOwner) { word ->
             updateUI(word)
         }

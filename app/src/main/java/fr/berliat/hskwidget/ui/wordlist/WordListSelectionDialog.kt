@@ -10,17 +10,18 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.model.WordListWithCount
+import fr.berliat.hskwidget.data.repo.WordListRepository
 import fr.berliat.hskwidget.databinding.FragmentWordlistDialogSelectItemBinding
 import fr.berliat.hskwidget.databinding.FragmentWordlistDialogSelectListsBinding
 import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.domain.CallbackNoParam
-import fr.berliat.hskwidget.ui.utils.AnkiDelegate
+import fr.berliat.hskwidget.ui.utils.HSKAnkiDelegate
 
 class WordListSelectionDialog : DialogFragment() {
     private lateinit var binding: FragmentWordlistDialogSelectListsBinding
     private lateinit var viewModel: WordListViewModel
     private lateinit var adapter: WordListSelectionAdapter
-    private lateinit var ankiDelegate: AnkiDelegate
+    private lateinit var ankiDelegate: HSKAnkiDelegate
     private var wordId: String? = null
 
     var onSave: CallbackNoParam? = null
@@ -29,7 +30,7 @@ class WordListSelectionDialog : DialogFragment() {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NORMAL, R.style.Theme_HSKFlashCardsWidget_Dialog)
 
-        ankiDelegate = AnkiDelegate(this)
+        ankiDelegate = HSKAnkiDelegate(this)
     }
 
     override fun onCreateView(
@@ -50,7 +51,7 @@ class WordListSelectionDialog : DialogFragment() {
             return
         }
 
-        viewModel = WordListViewModel(ankiDelegate.wordListRepo)
+        viewModel = WordListViewModel(WordListRepository(requireContext()), ankiDelegate::delegateToAnki)
 
         setupRecyclerView()
         setupButtons()
@@ -88,7 +89,7 @@ class WordListSelectionDialog : DialogFragment() {
     }
 
     private fun showCreateListDialog() {
-        val dialog = WordListReNameDialog() { _, _ -> loadData() }
+        val dialog = WordListReNameDialog(ankiDelegate::delegateToAnki) { _, _ -> loadData() }
         dialog.show(childFragmentManager, "CreateListDialog")
     }
 

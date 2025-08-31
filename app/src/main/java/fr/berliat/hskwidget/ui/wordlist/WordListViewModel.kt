@@ -1,11 +1,12 @@
 package fr.berliat.hskwidget.ui.wordlist
 
+import fr.berliat.ankihelper.AnkiDelegator
 import fr.berliat.hskwidget.data.model.WordList
 import fr.berliat.hskwidget.data.model.WordListWithCount
 import fr.berliat.hskwidget.data.repo.WordListRepository
 import kotlinx.coroutines.*
 
-class WordListViewModel(val wordListRepo: WordListRepository) {
+class WordListViewModel(val wordListRepo: WordListRepository, val ankiCaller: AnkiDelegator) {
     private val viewModelScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
 
@@ -57,7 +58,7 @@ class WordListViewModel(val wordListRepo: WordListRepository) {
 
     fun deleteList(list: WordList, callback: (Exception?) -> Unit) {
         launchSafe(callback) {
-            wordListRepo.delegateToAnki(wordListRepo.deleteList(list))
+            ankiCaller(wordListRepo.deleteList(list))
         }
     }
 
@@ -69,7 +70,7 @@ class WordListViewModel(val wordListRepo: WordListRepository) {
 
     fun updateWordListAssociations(simplified: String, listIds: List<Long>, callback: (Exception?) -> Unit) {
         launchSafe(callback) {
-            wordListRepo.delegateToAnki(
+            ankiCaller(
                 wordListRepo.updateWordListAssociations(simplified, listIds)
             )
         }

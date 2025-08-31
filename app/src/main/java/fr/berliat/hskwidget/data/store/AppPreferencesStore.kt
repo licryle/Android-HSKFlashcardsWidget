@@ -34,6 +34,9 @@ class AppPreferencesStore(context: Context):
         set(enabled) {
             putBoolean("anki_save_notes", enabled)
         }
+    fun setAnkiSaveNotes(ankiSaveNotes: Boolean, callback: Callback?) : Deferred<Preferences> {
+        return putBoolean("anki_save_notes", ankiSaveNotes, callback)
+    }
 
     var dbBackupCloudLastSuccess: Instant
         get() {

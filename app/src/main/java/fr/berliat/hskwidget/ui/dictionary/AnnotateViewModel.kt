@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import fr.berliat.ankihelper.AnkiDelegator
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWordAnnotation
@@ -15,7 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class AnnotateViewModel(val context: Context, val wordListRepo: WordListRepository) {
+class AnnotateViewModel(val context: Context, val wordListRepo: WordListRepository, val ankiCaller: AnkiDelegator) {
     private val viewModelScope = CoroutineScope(Dispatchers.Main)
 
     private val _annotatedWord = MutableLiveData<AnnotatedChineseWord>()
@@ -63,8 +64,8 @@ class AnnotateViewModel(val context: Context, val wordListRepo: WordListReposito
 
                 Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.ANNOTATION_SAVE)
 
-                wordListRepo.delegateToAnki(wordListRepo.addWordToSysAnnotatedList(annotatedWord))
-                wordListRepo.delegateToAnki(wordListRepo.updateInAllLists(simplified))
+                ankiCaller(wordListRepo.addWordToSysAnnotatedList(annotatedWord))
+                ankiCaller(wordListRepo.updateInAllLists(simplified))
             } catch (e: Exception) {
                 error = e
             }
@@ -85,7 +86,7 @@ class AnnotateViewModel(val context: Context, val wordListRepo: WordListReposito
                 Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.ANNOTATION_DELETE)
 
                 wordListRepo.touchAnnotatedList()
-                wordListRepo.delegateToAnki(wordListRepo.removeWordFromAllLists(simplified))
+                ankiCaller(wordListRepo.removeWordFromAllLists(simplified))
             } catch (e: Exception) {
                 error = e
             }

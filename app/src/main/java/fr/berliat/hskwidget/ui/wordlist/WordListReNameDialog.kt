@@ -6,12 +6,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
+import fr.berliat.ankihelper.AnkiDelegator
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.repo.WordListRepository
 import fr.berliat.hskwidget.databinding.FragmentWordlistDialogCreateListBinding
 import fr.berliat.hskwidget.domain.Utils
 
 class WordListReNameDialog(
+    private val ankiCaller: AnkiDelegator,
     private val onReNameResult: (success: Boolean, newName: String?) -> Unit) : DialogFragment() {
     private lateinit var binding: FragmentWordlistDialogCreateListBinding
     private lateinit var viewModel: WordListViewModel
@@ -21,12 +23,13 @@ class WordListReNameDialog(
         private const val ARG_LIST_NAME = "list_name"
 
         fun newInstance(listId: Long?, listName: String?,
+                        ankiCaller: AnkiDelegator,
                         onReNameResult: (success: Boolean, newName: String?) -> Unit): WordListReNameDialog {
             val args = Bundle().apply {
                 listId?.let { putLong(ARG_LIST_ID, it) }
                 listName?.let { putString(ARG_LIST_NAME, it) }
             }
-            return WordListReNameDialog(onReNameResult).apply {
+            return WordListReNameDialog(ankiCaller, onReNameResult).apply {
                 arguments = args
             }
         }
@@ -49,7 +52,7 @@ class WordListReNameDialog(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel = WordListViewModel(WordListRepository(requireContext()))
+        viewModel = WordListViewModel(WordListRepository(requireContext()), ankiCaller)
 
         val listId = arguments?.getLong(ARG_LIST_ID)
         val existingName = arguments?.getString(ARG_LIST_NAME)

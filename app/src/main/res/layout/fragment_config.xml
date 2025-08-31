@@ -293,7 +293,7 @@
                 android:id="@+id/googledrive_sync_progress_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/config_anki_sync_title"
+                android:text="@string/googledrive_backup_start_title"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:layout_marginBottom="8dp"/>
@@ -302,7 +302,7 @@
                 android:id="@+id/googledrive_sync_progress_message"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/config_anki_sync_progress"
+                android:text="@string/googledrive_backup_start_message"
                 android:textSize="14sp"
                 android:layout_marginBottom="8dp"/>
 
@@ -381,7 +381,7 @@
                 android:id="@+id/anki_sync_progress_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/config_anki_sync_title"
+                android:text="@string/anki_sync_start_title"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:layout_marginBottom="8dp"/>
@@ -390,7 +390,7 @@
                 android:id="@+id/anki_sync_progress_message"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/config_anki_sync_progress"
+                android:text="@string/anki_sync_start_message"
                 android:textSize="14sp"
                 android:layout_marginBottom="8dp"/>
 

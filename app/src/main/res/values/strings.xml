@@ -259,19 +259,20 @@ padding: 0;
 
 .mobile .disabled {display: none;visibility: hidden;}</string>
     <string name="config_anki_title">Anki integration</string>
-    <string name="config_anki_integration">Save notes in Anki automatically</string>
-    <string name="config_anki_sync_title">Anki sync in progress</string>
-    <string name="config_anki_sync_progress" formatted="false">Progress %d / %d</string>
-    <string name="config_anki_sync_cancelled">Anki Import cancelled</string>
-    <string name="config_anki_sync_completed">Anki Import complete</string>
+    <string name="config_anki_integration">Save lists and corresponding notes in Anki automatically</string>
+    <string name="anki_sync_start_title">Anki Import in progress</string>
+    <string name="anki_sync_start_message">Preparing for a full import of lists to Anki.</string>
+    <string name="anki_sync_progress_message" formatted="false">Syncing word %s to AnkiDroid: %d / %d</string>
+    <string name="anki_sync_cancelled_title">Anki Import cancelled</string>
+    <string name="anki_sync_cancelled_message">The Anki Import was cancelled.</string>
+    <string name="anki_sync_success_title">Anki Import complete</string>
+    <string name="anki_sync_success_message">Successfully imported %d cards to Anki %s.</string>
+    <string name="anki_sync_failure_title">Anki Import failed</string>
+    <string name="anki_sync_failure_message">Anki Import failed, try disabling/enabling again.\nError: %s.</string>
     <string name="anki_sync_notification_name">Anki Sync Progress</string>
     <string name="anki_sync_notification_description">Provides you with a progress notification for the Anki Sync.</string>
     <string name="anki_not_installed"><![CDATA[AnkiDroid is not installed, or runs a very old version (<2.5)]]></string>
-    <string name="anki_failed_import">Anki cards import failed, try disabling/enabling again: %s</string>
     <string name="anki_permission_denied">Permission to call AnkiDroid API denied.</string>
-    <string name="anki_import_completed">Successfully imported %d cards to Anki.</string>
-    <string name="anki_import_started">Starting the import into AnkiDroid</string>
-    <string name="anki_import_progress" formatted="false">Syncing word %s to AnkiDroid: %d / %d</string>
     <string name="anki_must_start">To save to Anki, Anki must be started. Starting Anki. Feel free to go back.</string>
     <string name="anki_operation_success">Successfully applied changes to Anki</string>
     <string name="anki_operation_failed">Failed to apply changes to Anki: %s</string>

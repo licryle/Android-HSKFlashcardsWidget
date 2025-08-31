@@ -73,9 +73,9 @@
                 <data android:mimeType="image/*" />
             </intent-filter>
         </activity>
-            
+        <!-- Library Service Declaration -->
         <service
-            android:name=".domain.AnkiSyncService"
+            android:name=".domain.AnkiSyncWordListsService"
             android:exported="false"
             android:foregroundServiceType="dataSync" />
     </application>

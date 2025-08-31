@@ -1,17 +1,15 @@
 package fr.berliat.hskwidget.data.repo
 
 import android.content.Context
+import fr.berliat.ankihelper.AnkiSyncServiceDelegate
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.WordList
 import fr.berliat.hskwidget.data.model.WordListEntry
 import fr.berliat.hskwidget.data.store.AnkiStore
 import fr.berliat.hskwidget.data.store.DatabaseHelper
 import fr.berliat.hskwidget.domain.AnkiDeck
-import fr.berliat.hskwidget.domain.AnkiSyncService
-import fr.berliat.hskwidget.ui.utils.AnkiSyncServiceDelegate
-import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
+import fr.berliat.hskwidget.domain.AnkiSyncWordListsService
+import kotlin.Result
 
 /**
  * WordListRepository is in charge for updating words into list, both on local and Anki storage.
@@ -33,7 +31,7 @@ import kotlinx.coroutines.flow.SharedFlow
  *         super.onCreate(savedInstanceState)
  *
  *         ankiDelegate = AnkiDelegate(this)
- *         ankiDelegate.workListRepo.delegateToAnki(ankiDelegate.insertWordToList(list, word))
+ *         ankiDelegate.delegateToAnki(wordListRepo.insertWordToList(list, word))
  *     }
  *
  * If you use a viewModel, make sure to use the same workListRepo from your AnkiDelegateHelper.
@@ -48,29 +46,6 @@ class WordListRepository(private val context: Context) {
     private suspend fun wordListDAO() = DatabaseHelper.getInstance(context).wordListDAO()
     private suspend fun annotatedChineseWordDAO() = DatabaseHelper.getInstance(context).annotatedChineseWordDAO()
 
-    object SharedEventBus {
-        private val _uiEvents = MutableSharedFlow<UiEvent>(
-            replay = 0,
-            extraBufferCapacity = 10,
-            onBufferOverflow = BufferOverflow.DROP_OLDEST
-        )
-        val uiEvents: SharedFlow<UiEvent> = _uiEvents
-
-        sealed class UiEvent {
-            data class TriggerAnkiSync(val action: suspend () -> Result<Unit>) : UiEvent()
-            data class ServiceStarting(val serviceDelegate: AnkiSyncServiceDelegate) : UiEvent()
-            data class ProgressUpdate(val state: AnkiSyncService.OperationState.Running) : UiEvent()
-        }
-
-        suspend fun emit(event: UiEvent) {
-            _uiEvents.emit(event)
-        }
-    }
-
-    suspend fun delegateToAnki(callback: (suspend () -> Result<Unit>)?) {
-        callback?.let { SharedEventBus.emit(SharedEventBus.UiEvent.TriggerAnkiSync(it)) }
-    }
-
     /****** NOT TOUCHING ANKI *******/
     suspend fun getAllLists() = wordListDAO().getAllLists()
     suspend fun getSystemLists() = wordListDAO().getSystemLists()
@@ -79,7 +54,7 @@ class WordListRepository(private val context: Context) {
 
     suspend fun isWordInList(wordList: WordList, simplified: String) : Boolean {
         val existingEntries = wordListDAO().getEntriesForWord(simplified)
-        return (existingEntries.filter { it.listId == wordList.id }.isNotEmpty())
+        return (existingEntries.any { it.listId == wordList.id })
     }
 
     suspend fun isNameUnique(name: String, excludeId: Long = 0): Boolean {
@@ -108,10 +83,8 @@ class WordListRepository(private val context: Context) {
     /****** ANKI ALTERING METHODS *******/
     suspend fun syncListsToAnki(): (suspend () -> Result<Unit>) {
         return suspend {
-            val serviceDelegate = AnkiSyncServiceDelegate(context)
+            val serviceDelegate = AnkiSyncServiceDelegate(context, AnkiSyncWordListsService::class.java)
             serviceDelegate.startSyncToAnkiOperation()
-
-            SharedEventBus.emit(SharedEventBus.UiEvent.ServiceStarting(serviceDelegate))
             serviceDelegate.awaitOperationCompletion()
         } // Returns result when done
     }
