@@ -84,6 +84,7 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
         handleIntents(intent)
 
         handleDbOperations()
+        handleAppUpdate()
     }
 
     private fun handleDbOperations() {
@@ -112,8 +113,6 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
         } else {
             handleBackUp()
         }
-
-        handleAppUpdate()
     }
 
     private fun handleAppUpdate() {
@@ -139,6 +138,7 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
                 val assetDbStream = { applicationContext.assets.open(DatabaseHelper.DATABASE_ASSET_PATH) }
                 val liveDbStream = { FileInputStream(db.DATABASE_LIVE_PATH) }
 
+                db.liveDatabase.flushToDisk()
                 val newDb = databaseBackup.replaceWordsDataInDB(liveDbStream,assetDbStream)
                 newDb.flushToDisk()
                 newDb.close()
