@@ -107,11 +107,10 @@ class WordListRepository(private val context: Context) {
 
     /****** ANKI ALTERING METHODS *******/
     suspend fun syncListsToAnki(): (suspend () -> Result<Unit>) {
-        val serviceDelegate = AnkiSyncServiceDelegate(context)
-
-        serviceDelegate.startSyncToAnkiOperation()
-
         return suspend {
+            val serviceDelegate = AnkiSyncServiceDelegate(context)
+            serviceDelegate.startSyncToAnkiOperation()
+
             SharedEventBus.emit(SharedEventBus.UiEvent.ServiceStarting(serviceDelegate))
             serviceDelegate.awaitOperationCompletion()
         } // Returns result when done
