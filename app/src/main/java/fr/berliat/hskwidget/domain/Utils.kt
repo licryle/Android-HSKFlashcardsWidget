@@ -510,6 +510,13 @@ class Utils {
             val pattern = Regex("[\u4e00-\u9fff]")
             return pattern.containsMatchIn(text)
         }
+
+        fun formatKBToMB(bytesReceived: Long, format: String = "%.2f"): String {
+            return String.format(
+                Locale.getDefault(),
+                format,
+                bytesReceived.toDouble() / 1024 / 1024)
+        }
     }
 
     enum class ANALYTICS_EVENTS {

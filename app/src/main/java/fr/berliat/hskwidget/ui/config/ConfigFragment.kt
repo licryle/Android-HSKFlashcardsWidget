@@ -375,9 +375,9 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
     }
 
     override fun onBackupProgress(fileName: String, fileIndex: Int, fileCount: Int, bytesSent: Long, bytesTotal: Long) {
-        val sentMB = String.format(Locale.getDefault(), "%.2f", bytesSent.toDouble() / 1024 / 1024)
-        val totalMB = String.format(Locale.getDefault(), "%.2f", bytesTotal.toDouble() / 1024 / 1024)
-        Log.i(TAG, "GoogleDriveBackup.onBackupProgress: ${sentMB} / ${totalMB}")
+        val sentMB = Utils.formatKBToMB(bytesSent)
+        val totalMB = Utils.formatKBToMB(bytesTotal)
+        Log.i(TAG, "GoogleDriveBackup.onBackupProgress: $sentMB / $totalMB")
 
         toggleGoogleDriveBackupInProgress(bytesTotal != bytesSent)
         binding.googledriveSyncProgressMessage.text =
