@@ -4,7 +4,6 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
 import android.database.sqlite.SQLiteException
 import android.graphics.BitmapFactory
@@ -259,7 +258,7 @@ class AnkiSyncService : LifecycleService() {
                 syncToAnki()
 
                 _operationState.value = OperationState.Completed
-            } catch (e: CancellationException) {
+            } catch (_: CancellationException) {
                 Log.i(TAG, "Sync operation cancelled")
                 _operationState.value = OperationState.Cancelled
             } catch (e: Exception) {
