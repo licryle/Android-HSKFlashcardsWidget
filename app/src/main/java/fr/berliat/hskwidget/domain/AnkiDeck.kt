@@ -4,7 +4,7 @@ import android.content.Context
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.model.WordList
 import fr.berliat.hskwidget.data.store.AnkiStore
-import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
+import fr.berliat.hskwidget.data.store.DatabaseHelper
 
 class AnkiDeck private constructor(private val context: Context,
                                    private val wordList: WordList
@@ -17,7 +17,7 @@ class AnkiDeck private constructor(private val context: Context,
     internal suspend fun setAnkiId(newAnkiId: Long) {
         _ankiId = newAnkiId
 
-        ChineseWordsDatabase.getInstance(context).wordListDAO()
+        DatabaseHelper.getInstance(context).wordListDAO()
             .updateAnkiDeckId(wordList.id, newAnkiId)
     }
 

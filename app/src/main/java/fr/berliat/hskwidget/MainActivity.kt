@@ -15,6 +15,7 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
@@ -26,6 +27,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.Purchase
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
+import fr.berliat.hskwidget.data.store.DatabaseHelper
 import fr.berliat.hskwidget.data.store.SupportDevStore
 import fr.berliat.hskwidget.databinding.ActivityMainBinding
 import fr.berliat.hskwidget.domain.DatabaseBackup
@@ -38,6 +40,7 @@ import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.FileInputStream
 
 class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
     companion object {
@@ -70,8 +73,6 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
 
         appConfig = AppPreferencesStore(applicationContext)
 
-        handleAppUpdate()
-
         setupSupporter()
         setupActionBar()
 
@@ -81,7 +82,38 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
         setupReminderView()
 
         handleIntents(intent)
-        handleBackUp()
+
+        handleDbOperations()
+    }
+
+    private fun handleDbOperations() {
+        DatabaseHelper.cleanTempDatabaseFiles(this)
+
+        if (shouldUpdateDatabaseFromAsset()) {
+            Toast.makeText(
+                applicationContext,
+                "Updating database, expect a screen refresh, backup will be delayed.",
+                Toast.LENGTH_LONG
+            ).show()
+
+            updateDatabaseFromAsset({
+                Toast.makeText(this, "Updated words database", Toast.LENGTH_LONG).show()
+
+                handleBackUp()
+            }, { e ->
+                Toast.makeText(
+                    this,
+                    "Error while updating words database: ${e.toString()}",
+                    Toast.LENGTH_LONG
+                ).show()
+
+                handleBackUp()
+            })
+        } else {
+            handleBackUp()
+        }
+
+        handleAppUpdate()
     }
 
     private fun handleAppUpdate() {
@@ -91,6 +123,34 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
             // Now we can upgrade stuff
             val widgetIds = FlashcardWidgetProvider().getWidgetIds(applicationContext)
             FlashcardWidgetProvider().onUpdate(applicationContext, AppWidgetManager.getInstance(applicationContext), widgetIds)
+        }
+    }
+
+    fun shouldUpdateDatabaseFromAsset(): Boolean {
+        return (appConfig.appVersionCode != BuildConfig.VERSION_CODE &&
+                (BuildConfig.VERSION_CODE >= 32 && appConfig.appVersionCode < 32)
+                )
+    }
+
+    private fun updateDatabaseFromAsset(successCallback: () -> Unit, failureCallback: (e: Exception) -> Unit) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val db = DatabaseHelper.getInstance(applicationContext)
+                val assetDbStream = { applicationContext.assets.open(DatabaseHelper.DATABASE_ASSET_PATH) }
+                val liveDbStream = { FileInputStream(db.DATABASE_LIVE_PATH) }
+
+                val newDb = databaseBackup.replaceWordsDataInDB(liveDbStream,assetDbStream)
+                newDb.flushToDisk()
+                newDb.close()
+                db.updateDatabaseFileOnDisk(applicationContext, newDb.databasePath)
+                DatabaseHelper.cleanTempDatabaseFiles(applicationContext)
+
+                withContext(Dispatchers.Main) {
+                    successCallback()
+                }
+            } catch (e: Exception) {
+                failureCallback(e)
+            }
         }
     }
 

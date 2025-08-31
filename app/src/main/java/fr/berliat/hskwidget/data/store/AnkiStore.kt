@@ -16,7 +16,7 @@ class AnkiStore(val context: Context):
     PrefixedPreferenceDataStoreBridge(context.dataStore, "anki") {
     val api: AnkiDAO = AnkiDAO(context)
 
-    private suspend fun database() = ChineseWordsDatabase.getInstance(context)
+    private suspend fun database() = DatabaseHelper.getInstance(context)
 
     suspend fun isStoreReady() : Boolean {
         return api.getDeckList() != null

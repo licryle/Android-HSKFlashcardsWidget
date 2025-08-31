@@ -5,7 +5,7 @@ import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.WordList
 import fr.berliat.hskwidget.data.model.WordListEntry
 import fr.berliat.hskwidget.data.store.AnkiStore
-import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
+import fr.berliat.hskwidget.data.store.DatabaseHelper
 import fr.berliat.hskwidget.domain.AnkiDeck
 import fr.berliat.hskwidget.domain.AnkiSyncService
 import fr.berliat.hskwidget.ui.utils.AnkiSyncServiceDelegate
@@ -45,8 +45,8 @@ import kotlinx.coroutines.flow.SharedFlow
 class WordListRepository(private val context: Context) {
     private val ankiStore = AnkiStore(context)
 
-    private suspend fun wordListDAO() = ChineseWordsDatabase.getInstance(context).wordListDAO()
-    private suspend fun annotatedChineseWordDAO() = ChineseWordsDatabase.getInstance(context).annotatedChineseWordDAO()
+    private suspend fun wordListDAO() = DatabaseHelper.getInstance(context).wordListDAO()
+    private suspend fun annotatedChineseWordDAO() = DatabaseHelper.getInstance(context).annotatedChineseWordDAO()
 
     object SharedEventBus {
         private val _uiEvents = MutableSharedFlow<UiEvent>(

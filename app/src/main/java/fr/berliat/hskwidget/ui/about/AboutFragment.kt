@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import fr.berliat.hskwidget.R
-import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
+import fr.berliat.hskwidget.data.store.DatabaseHelper
 import fr.berliat.hskwidget.databinding.FragmentAboutBinding
 import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.BuildConfig
@@ -57,7 +57,7 @@ class AboutFragment : Fragment() {
         Log.d(TAG, "fetching stats")
 
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-            val db = ChineseWordsDatabase.getInstance(requireContext())
+            val db = DatabaseHelper.getInstance(requireContext())
             val words = db.chineseWordDAO()
             val annotations = db.chineseWordAnnotationDAO()
             // Here we executed in the coRoutine Scope

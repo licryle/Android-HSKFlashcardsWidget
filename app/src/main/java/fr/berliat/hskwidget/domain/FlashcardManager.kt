@@ -6,7 +6,7 @@ import android.content.Intent
 import android.util.Log
 import fr.berliat.hskwidget.MainActivity
 import fr.berliat.hskwidget.data.model.ChineseWord
-import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
+import fr.berliat.hskwidget.data.store.DatabaseHelper
 import fr.berliat.hskwidget.data.store.FlashcardPreferencesStore
 import fr.berliat.hskwidget.ui.widget.FlashcardFragment
 import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
@@ -21,7 +21,7 @@ class FlashcardManager private constructor(private val context: Context,
     private val appWidgetMgr = AppWidgetManager.getInstance(context)
     private val coroutineScope = Utils.getAppScope(context)
 
-    private suspend fun AnnotatedChineseWordDAO() = ChineseWordsDatabase.getInstance(context).annotatedChineseWordDAO()
+    private suspend fun AnnotatedChineseWordDAO() = DatabaseHelper.getInstance(context).annotatedChineseWordDAO()
 
     fun getPreferenceStore(): FlashcardPreferencesStore {
         return FlashcardPreferencesStore(context, widgetId)

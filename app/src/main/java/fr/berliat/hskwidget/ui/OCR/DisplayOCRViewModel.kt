@@ -18,7 +18,7 @@ import com.google.mlkit.vision.text.TextRecognizer
 import com.google.mlkit.vision.text.chinese.ChineseTextRecognizerOptions
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.repo.ChineseWordFrequencyRepo
-import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
+import fr.berliat.hskwidget.data.store.DatabaseHelper
 import fr.berliat.hskwidget.domain.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -65,7 +65,7 @@ class DisplayOCRViewModel(private val savedStateHandle: SavedStateHandle, val ap
     }
 
     suspend fun frequencyWordsRepo(): ChineseWordFrequencyRepo {
-        val db = ChineseWordsDatabase.getInstance(application)
+        val db = DatabaseHelper.getInstance(application)
         return ChineseWordFrequencyRepo(
             db.chineseWordFrequencyDAO(),
             db.annotatedChineseWordDAO()
@@ -86,7 +86,7 @@ class DisplayOCRViewModel(private val savedStateHandle: SavedStateHandle, val ap
 
     suspend fun fetchWord(hanzi: String): AnnotatedChineseWord? {
         Log.d(TAG, "Searching for $hanzi")
-        val db = ChineseWordsDatabase.getInstance(application)
+        val db = DatabaseHelper.getInstance(application)
         val dao = db.annotatedChineseWordDAO()
         try {
             val word = dao.getFromSimplified(hanzi)

@@ -6,6 +6,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import fr.berliat.hskwidget.BuildConfig
 import fr.berliat.hskwidget.data.dao.AnnotatedChineseWordDAO
 import fr.berliat.hskwidget.data.dao.ChineseWordAnnotationDAO
 import fr.berliat.hskwidget.data.dao.ChineseWordDAO
@@ -18,14 +19,11 @@ import fr.berliat.hskwidget.data.model.ChineseWordFrequency
 import fr.berliat.hskwidget.data.model.WidgetListEntry
 import fr.berliat.hskwidget.data.model.WordList
 import fr.berliat.hskwidget.data.model.WordListEntry
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-import java.io.File
 import java.util.concurrent.Executors
 
 @Database(
     entities = [ChineseWordAnnotation::class, ChineseWord::class, ChineseWordFrequency::class,
-                WordList::class, WordListEntry::class, WidgetListEntry::class],
+        WordList::class, WordListEntry::class, WidgetListEntry::class],
     version = 1, exportSchema = true)
 @TypeConverters(ChineseWord.Pinyins::class,
     WordTypeConverter::class,
@@ -35,7 +33,7 @@ import java.util.concurrent.Executors
     AnnotatedChineseWordsConverter::class,
     ListTypeConverter::class)
 
-abstract class ChineseWordsDatabase : RoomDatabase() {
+abstract class ChineseWordsDatabase: RoomDatabase() {
     abstract fun annotatedChineseWordDAO(): AnnotatedChineseWordDAO
     abstract fun chineseWordAnnotationDAO(): ChineseWordAnnotationDAO
     abstract fun chineseWordDAO(): ChineseWordDAO
@@ -43,51 +41,34 @@ abstract class ChineseWordsDatabase : RoomDatabase() {
     abstract fun wordListDAO(): WordListDAO
     abstract fun widgetListDAO(): WidgetListDAO
 
+    val databasePath
+        get() = openHelper.writableDatabase.path.toString()
+
     companion object {
-        suspend fun getInstance(context: Context): ChineseWordsDatabase {
-            INSTANCE?.let { return it }
-
-            return mutex.withLock {
-                INSTANCE?.let { return it }
-
-                val instance = buildDatabase(context)
-
-                INSTANCE = instance
-                instance
-            }
-        }
-
         const val TAG = "ChineseWordsDatabase"
 
-        @Volatile
-        private var INSTANCE: ChineseWordsDatabase? = null
-        private val mutex = Mutex()
-
-        const val DATABASE_FILE = "Mandarin_Assistant.db"
-
-        private fun buildDatabase(context: Context) =
-            Room.databaseBuilder(
-                context.applicationContext,
-                ChineseWordsDatabase::class.java, DATABASE_FILE
-            )
-                .createFromAsset("databases/$DATABASE_FILE")
-                .setQueryCallback({ sqlQuery, bindArgs ->
-                    Log.d(TAG, "SQL Query: $sqlQuery SQL Args: $bindArgs")
-                }, Executors.newSingleThreadExecutor())
-                .build()
-
-        fun loadExternalDatabase(context: Context, dbFile: File) =
-            Room.databaseBuilder(
+        suspend fun createInstance(context: Context) : ChineseWordsDatabase {
+            val dbBuilder = Room.databaseBuilder(
                 context.applicationContext,
                 ChineseWordsDatabase::class.java,
-                dbFile.path
+                DatabaseHelper.DATABASE_FILENAME
             )
-                .createFromFile(dbFile) // instead of fromAsset
-                .build()
+                .createFromAsset(DatabaseHelper.DATABASE_ASSET_PATH)
+
+            if (BuildConfig.DEBUG) {
+                dbBuilder.setQueryCallback(
+                    { sqlQuery, bindArgs ->
+                        Log.d(TAG, "SQL Query: $sqlQuery SQL Args: $bindArgs")
+                    }, Executors.newSingleThreadExecutor()
+                )
+            }
+
+            return dbBuilder.build()
+        }
     }
 
-    suspend fun flushToDisk() {
-        val cur = this.query("PRAGMA wal_checkpoint(FULL)", null)
+    fun flushToDisk() {
+        val cur = query("PRAGMA wal_checkpoint(FULL)", null)
         cur.moveToFirst()
         cur.close()
     }

@@ -14,12 +14,12 @@ internal val Context.dataStore: DataStore<Preferences> by preferencesDataStore("
 class FlashcardPreferencesStore(private val context: Context, private val widgetId: Int):
     PrefixedPreferenceDataStoreBridge(context.dataStore, widgetId.toString()) {
     private suspend fun WidgetListsDAO(): WidgetListDAO {
-        val inst = ChineseWordsDatabase.getInstance(context)
+        val inst = DatabaseHelper.getInstance(context)
         val dao = inst.widgetListDAO()
 
         return dao
     }
-    private suspend fun WordListDAO() = ChineseWordsDatabase.getInstance(context).wordListDAO()
+    private suspend fun WordListDAO() = DatabaseHelper.getInstance(context).wordListDAO()
 
     var currentSimplified : String?
         get() = this.getString(PREFERENCE_CURRENT_SIMPLIFIED,null)

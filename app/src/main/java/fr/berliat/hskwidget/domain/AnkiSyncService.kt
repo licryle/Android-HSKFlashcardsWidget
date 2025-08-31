@@ -20,7 +20,7 @@ import fr.berliat.hskwidget.data.model.WordList
 import fr.berliat.hskwidget.data.repo.WordListRepository
 import fr.berliat.hskwidget.data.repo.WordListRepository.SharedEventBus.UiEvent
 import fr.berliat.hskwidget.data.store.AnkiStore
-import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
+import fr.berliat.hskwidget.data.store.DatabaseHelper
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -79,15 +79,15 @@ class AnkiSyncService : LifecycleService() {
     
     override fun onCreate() {
         super.onCreate()
-        notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         createNotificationChannel()
     }
-    
+
     override fun onBind(intent: Intent): IBinder {
         super.onBind(intent)
         return binder
     }
-    
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
         when (intent?.action) {
@@ -117,7 +117,7 @@ class AnkiSyncService : LifecycleService() {
             Log.w(TAG, "Operation already in progress, ignoring start request")
             return
         }
-        
+
         when (operationType) {
             OPERATION_SYNC_TO_ANKI -> {
                 startSyncToAnkiOperation(operationData)
@@ -131,8 +131,8 @@ class AnkiSyncService : LifecycleService() {
     }
 
     private suspend fun syncToAnki() {
-        val wordListDAO = ChineseWordsDatabase.getInstance(this).wordListDAO()
-        val annotatedChineseWordDAO = ChineseWordsDatabase.getInstance(this).annotatedChineseWordDAO()
+        val wordListDAO = DatabaseHelper.getInstance(this).wordListDAO()
+        val annotatedChineseWordDAO = DatabaseHelper.getInstance(this).annotatedChineseWordDAO()
         val ankiStore = AnkiStore(this)
 
         val lists = wordListDAO.getAllLists()

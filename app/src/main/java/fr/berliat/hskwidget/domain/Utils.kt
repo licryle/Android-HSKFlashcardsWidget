@@ -33,7 +33,7 @@ import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.repo.ChineseWordFrequencyRepo
-import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
+import fr.berliat.hskwidget.data.store.DatabaseHelper
 import fr.berliat.hskwidget.databinding.FragmentDictionarySearchItemBinding
 import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
 import kotlinx.coroutines.Dispatchers
@@ -165,7 +165,7 @@ class Utils {
 
         fun incrementConsultedWord(context: Context, word: String) {
            getAppScope(context).launch(Dispatchers.IO) {
-                val db = ChineseWordsDatabase.getInstance(context)
+                val db = DatabaseHelper.getInstance(context)
                 val frequencyWordsRepo = ChineseWordFrequencyRepo(
                     db.chineseWordFrequencyDAO(),
                     db.annotatedChineseWordDAO()

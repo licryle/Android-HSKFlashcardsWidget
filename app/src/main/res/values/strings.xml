@@ -99,12 +99,13 @@ We recommend to choose the level your at plus the one below, or above depending 
     <string name="ocr_display_loading">Processing your image</string>
     <string name="ocr_display_conf_smaller">Decrease Text Size</string>
     <string name="ocr_display_conf_bigger">Increase Text Size</string>
+    <string name="ocr_display_pinyins">Show pinyins</string>
+    <string name="ocr_display_analysis_failure">Text Analysis failed - try again</string>
+    <string name="ocr_display_separator">Space words</string>
 
     <string name="dbbackup_success">Successfully backed-up the full database</string>
     <string name="dbbackup_failure_write">Couldn\'t write / back-up the full database</string>
     <string name="dbbackup_failure_folderpermission">No folder permission to backup database</string>
-    <string name="ocr_display_analysis_failure">Text Analysis failed - try again</string>
-    <string name="ocr_display_separator">Space words</string>
     <string name="copied_to_clipboard">Copied %s to clipboard</string>
     <string name="config_backup_title">Backup/Restore from local file</string>
     <string name="config_backup_activate">Activate backup</string>
@@ -136,7 +137,7 @@ We recommend to choose the level your at plus the one below, or above depending 
     <string name="config_backup_cloud_restorenow">Restore now</string>
 
     <string name="dbrestore_failure_fileformat">File doesn\'t seem to be a backup for this app</string>
-    <string name="dbrestore_failure_import">Import failed</string>
+    <string name="dbrestore_failure_import">Restoration failed: %s</string>
     <string name="dbrestore_failure_nofileselected">No file select: restoration cancelled</string>
     <string name="dbrestore_success">Database successfully restored</string>
     <string name="widget_btn_copy">Copy to clipboard</string>
@@ -327,22 +328,26 @@ padding: 0;
     <string name="support_reviewed"><![CDATA[Thank you! If you click more than once, the dialog won\'t appear.]]></string>
 
     <string name="googledrive_backup_start_title">Backup in progress</string>
-    <string name="googledrive_backup_start_message">Preparing for backup</string>
+    <string name="googledrive_backup_start_message">Preparing for backup.</string>
     <string name="googledrive_backup_success_title">Backup complete</string>
     <string name="googledrive_backup_success_message">Backup succeeded at %s.</string>
     <string name="googledrive_backup_cancel_title">Backup cancelled</string>
     <string name="googledrive_backup_cancel_message">Backup cancelled.</string>
-    <string name="googledrive_backup_progress_message">Backup in progress: %1$s MB / %2$s MB</string>
+    <string name="googledrive_backup_progress_message">Backup in progress: %1$s MB / %2$s MB.</string>
     <string name="googledrive_backup_denied_scope">Google authorization not secured</string>
     <string name="googledrive_backup_failed_title">Backup failed</string>
-    <string name="googledrive_backup_failed_message">Backup failed with error message: %s</string>
+    <string name="googledrive_backup_failed_message">Backup failed with error message: %s.</string>
     <string name="googledrive_backup_noaccountselected">No Google account was selected, cancelling.</string>
-    <string name="googledrive_restore_emptyserver">No backup available on Google Drive</string>
-    <string name="googledrive_restore_started">Restoration from Google Drive started</string>
-    <string name="googledrive_restore_download_complete">Files from Google Drive downloaded</string>
+    <string name="googledrive_restore_empty_message">No backup available on Google Drive.</string>
+    <string name="googledrive_restore_start_title">Restoration starting</string>
+    <string name="googledrive_restore_start_message">Restoration from Google Drive started.</string>
+    <string name="googledrive_restore_success_title">Restoration download complete</string>
+    <string name="googledrive_restore_success_message">Files from Google Drive downloaded at %s.</string>
     <string name="googledrive_restore_confirm_overwrite">"You're about to delete your local data and replace it with a backup from %s.\n\nThis is irrevocable. Proceed?"</string>
-    <string name="googledrive_restore_failed">Restoration from Google Drive failed with error %s.</string>
+    <string name="googledrive_restore_cancel_title">Restoration cancelled</string>
+    <string name="googledrive_restore_cancel_message">Restoration cancelled.</string>
+    <string name="googledrive_restore_failed_title">Restoration failed</string>
+    <string name="googledrive_restore_failed_message">Restoration from Google Drive failed with error %s.</string>
     <string name="googledrive_logout_confirm">Would you like to logout of your Google Drive account?\nNo data will be deleted from Google Drive.</string>
-    <string name="ocr_display_pinyins">Show pinyins</string>
 
 </resources>

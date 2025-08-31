@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
-import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
+import fr.berliat.hskwidget.data.store.DatabaseHelper
 import fr.berliat.hskwidget.domain.Utils
 import kotlinx.coroutines.launch
 
@@ -175,7 +175,7 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
     // Simulate fetching search results based on the query and current page
     private suspend fun fetchResultsForPage(): List<AnnotatedChineseWord> {
         Log.d(TAG, "Searching for $searchQuery")
-        val dao = ChineseWordsDatabase.getInstance(requireContext()).annotatedChineseWordDAO()
+        val dao = DatabaseHelper.getInstance(requireContext()).annotatedChineseWordDAO()
         try {
             val annotatedOnly = binding.dictionarySearchFilterHasannotation.isChecked
 

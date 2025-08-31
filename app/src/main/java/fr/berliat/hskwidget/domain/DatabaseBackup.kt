@@ -9,10 +9,12 @@ import android.util.Log
 import androidx.activity.result.ActivityResultCaller
 import androidx.activity.result.contract.ActivityResultContracts
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
+import fr.berliat.hskwidget.data.store.DatabaseHelper
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
-import java.io.File
+import java.io.InputStream
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util.concurrent.Callable
 
 interface DatabaseBackupCallbacks {
     fun onBackupFolderSet(uri: Uri)
@@ -78,7 +80,7 @@ class DatabaseBackup(comp: ActivityResultCaller,
 
     suspend fun cleanOldBackups(destinationFolderUri: Uri, maxBackups: Int) {
         val documents = Utils.listFilesInSAFDirectory(context, destinationFolderUri)
-            .filter { it.name?.endsWith(ChineseWordsDatabase.DATABASE_FILE) == true }
+            .filter { it.name?.endsWith(DatabaseHelper.DATABASE_FILENAME) == true }
             .sortedByDescending { it.lastModified() }  // Most recent first
 
         if (documents.size > maxBackups) {
@@ -96,48 +98,69 @@ class DatabaseBackup(comp: ActivityResultCaller,
 
     suspend fun backUp(destinationFolderUri: Uri): Boolean {
         Log.d(TAG, "Initiating Database Backup")
-        val sourcePath = "${context.filesDir.path}/../databases/${ChineseWordsDatabase.DATABASE_FILE}"
+        val db = DatabaseHelper.getInstance(context)
+        val sourcePath = db.DATABASE_LIVE_PATH
 
         val current = LocalDateTime.now()
         val formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss")
-        val fileName = "${current.format(formatter)}_${ChineseWordsDatabase.DATABASE_FILE}"
+        val fileName = "${current.format(formatter)}_${DatabaseHelper.DATABASE_FILENAME}"
 
-        ChineseWordsDatabase.getInstance(context).flushToDisk()
+        db.flushToDisk()
 
         return Utils.copyFileUsingSAF(context, sourcePath, destinationFolderUri, fileName)
     }
 
-    suspend fun restoreDbFromFile(backupFile: File) {
+    suspend fun replaceUserDataInDB(dbToUpdate: ChineseWordsDatabase, updateWith: ChineseWordsDatabase) {
         Log.d(TAG, "Initiating Database Restoration: reading file")
-        val importedDb = ChineseWordsDatabase.loadExternalDatabase(context, backupFile)
-        val importedAnnotations = importedDb.chineseWordAnnotationDAO().getAll()
-        if (importedAnnotations.isEmpty()) {
+        val importedAnnotations = updateWith.chineseWordAnnotationDAO().getAll()
+        val importedListEntries = updateWith.wordListDAO().getAllListEntries()
+        val importedLists = updateWith.wordListDAO().getAllLists()
+        val importedWidgets = updateWith.widgetListDAO().getAllEntries()
+        val importedFreq = updateWith.chineseWordFrequencyDAO().getAll()
+        if (importedAnnotations.isEmpty() && importedListEntries.isEmpty()
+            && importedWidgets.isEmpty() && importedFreq.isEmpty()) {
             Log.i(TAG, "Backup is empty or incompatible, aborting")
             throw IllegalStateException("Database is empty")
         }
 
         // Impoooort
         Log.d(TAG, "Starting to import Annotations to local DB")
-        val localDb = ChineseWordsDatabase.getInstance(context)
-        localDb.chineseWordAnnotationDAO().deleteAll()
-        localDb.chineseWordAnnotationDAO().insertAll(importedAnnotations)
+        dbToUpdate.chineseWordAnnotationDAO().deleteAll()
+        dbToUpdate.chineseWordAnnotationDAO().insertAll(importedAnnotations)
 
         Log.d(TAG, "Starting to import Word_List to local DB")
-        localDb.wordListDAO().deleteAllEntries()
-        localDb.wordListDAO().deleteAllLists()
-        localDb.wordListDAO().insertAllLists(
-            importedDb.wordListDAO().getAllLists().map { it -> it.wordList })
-        localDb.wordListDAO().insertAllWords(importedDb.wordListDAO().getAllEntries())
+        dbToUpdate.wordListDAO().deleteAllEntries()
+        dbToUpdate.wordListDAO().deleteAllLists()
+        dbToUpdate.wordListDAO().insertAllLists(importedLists.map { it -> it.wordList })
+        dbToUpdate.wordListDAO().insertAllWords(importedListEntries)
 
         Log.d(TAG, "Starting to import WordFrequency to local DB")
-        localDb.chineseWordFrequencyDAO().deleteAll()
-        localDb.chineseWordFrequencyDAO().insertAll(importedDb.chineseWordFrequencyDAO().getAll())
+        dbToUpdate.chineseWordFrequencyDAO().deleteAll()
+        dbToUpdate.chineseWordFrequencyDAO().insertAll(importedFreq)
 
         Log.d(TAG, "Starting to import WidgetList to local DB")
-        localDb.widgetListDAO().deleteAllWidgets()
-        localDb.widgetListDAO().insertListsToWidget(importedDb.widgetListDAO().getAllEntries())
+        dbToUpdate.widgetListDAO().deleteAllWidgets()
+        dbToUpdate.widgetListDAO().insertListsToWidget(importedWidgets)
 
         Log.i(TAG, "Database import done")
+    }
+
+    suspend fun replaceWordsDataInDB(dbToUpdate: Callable<InputStream>, updateWith: Callable<InputStream>): ChineseWordsDatabase {
+        Log.d(TAG, "Initiating Database Update: reading file")
+        val importedDb = DatabaseHelper.loadExternalDatabase(context, updateWith)
+        val importedWordsCount = importedDb.chineseWordDAO().getCount()
+        if (importedWordsCount == 0) {
+            Log.i(TAG, "Update file is empty or incompatible, aborting")
+            throw IllegalStateException("Database is empty")
+        }
+
+        val userDataDb = DatabaseHelper.loadExternalDatabase(context, dbToUpdate)
+        // Doing the opposite for efficacy: let's get user data into the importedDb, then copy file
+        replaceUserDataInDB(importedDb, userDataDb)
+        importedDb.flushToDisk()
+
+        Log.i(TAG, "Database update done")
+        return importedDb
     }
 
     companion object {

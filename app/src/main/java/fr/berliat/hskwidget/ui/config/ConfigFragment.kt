@@ -22,12 +22,13 @@ import fr.berliat.hskwidget.domain.DatabaseBackupCallbacks
 import fr.berliat.googledrivebackup.GoogleDriveBackup
 import fr.berliat.googledrivebackup.GoogleDriveBackupFile
 import fr.berliat.googledrivebackup.GoogleDriveBackupInterface
-import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
+import fr.berliat.hskwidget.data.store.DatabaseHelper
 import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.ui.utils.AnkiDelegate
 import fr.berliat.hskwidget.ui.utils.AnkiSyncServiceDelegate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileInputStream
@@ -35,7 +36,6 @@ import java.io.FileOutputStream
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
 import java.time.Instant
-import java.util.Locale
 
 
 class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
@@ -47,6 +47,9 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
     private lateinit var ankiDelegate: AnkiDelegate
     private var ankiSyncServiceDelegate: AnkiSyncServiceDelegate? = null
     private lateinit var gDriveBackUp : GoogleDriveBackup
+
+    val cloudRestoreFilePath
+        get() = File("${requireContext().cacheDir}/restore/${DatabaseHelper.DATABASE_FILENAME}")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -120,7 +123,6 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
 
         binding.configBtnBackupCloudBackupnow.setOnClickListener { gDriveBackUp.login { backupToCloud() } }
         binding.configBtnBackupCloudRestorenow.setOnClickListener { gDriveBackUp.login { restoreFromCloud() } }
-        binding.googledriveSyncCancelBtn.setOnClickListener { gDriveBackUp.cancelBackup() }
 
         /*updateLoggedInAccount()
         binding.configBackupCloudAccount.setOnClickListener {
@@ -143,30 +145,32 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
     }*/
 
     private fun backupToCloud() {
-        val sourcePath =
-            "${requireContext().filesDir.path}/../databases/${ChineseWordsDatabase.DATABASE_FILE}"
+        toggleBackupRestoreButtonsClickable(false)
 
-        gDriveBackUp.backup(
-            listOf(GoogleDriveBackupFile.UploadFile(
-                "database.sqlite",
-                FileInputStream(sourcePath),
-                "application/octet-stream",
-                File(sourcePath).length()
-            ))
-        )
+        lifecycleScope.launch(Dispatchers.IO) {
+            val sourcePath = runBlocking { DatabaseHelper.getInstance(requireContext()).databasePath }
+
+            gDriveBackUp.backup(
+                listOf(GoogleDriveBackupFile.UploadFile(
+                    "database.sqlite",
+                    FileInputStream(sourcePath),
+                    "application/octet-stream",
+                    File(sourcePath).length()
+                ))
+            )
+        }
 
         Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.CONFIG_BACKUPCLOUD_BACKUP)
     }
 
     private fun restoreFromCloud() {
-        val sourcePath =
-            "${requireContext().cacheDir}/restore/${ChineseWordsDatabase.DATABASE_FILE}"
-        File(sourcePath).parentFile?.mkdirs()
+        toggleBackupRestoreButtonsClickable(false)
+        cloudRestoreFilePath.parentFile?.mkdirs()
 
         gDriveBackUp.restore(
             listOf(GoogleDriveBackupFile.DownloadFile(
                 "database.sqlite",
-                FileOutputStream(sourcePath)
+                FileOutputStream(cloudRestoreFilePath)
             ))
         )
 
@@ -277,11 +281,13 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
         ).show()
         Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.CONFIG_BACKUP_RESTORE)
 
-        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-            val file = Utils.copyUriToCacheDir(requireContext(), uri)
 
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             try {
-                databaseBackup.restoreDbFromFile(file)
+                val dbHelper = DatabaseHelper.getInstance(requireContext())
+                val file = Utils.copyUriToCacheDir(requireContext(), uri)
+                val sourceDb = DatabaseHelper.loadExternalDatabase(requireContext(), file)
+                databaseBackup.replaceUserDataInDB(dbHelper.liveDatabase, sourceDb)
 
                 withContext(Dispatchers.Main) {
                     Toast.makeText(
@@ -293,6 +299,8 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
                     val action = ConfigFragmentDirections.search()
                     findNavController().navigate(action)
                 }
+
+                file.delete()
             } catch (e: IllegalStateException) {
                 withContext(Dispatchers.Main) {
                     Toast.makeText(
@@ -311,7 +319,7 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
                 withContext(Dispatchers.Main) {
                     Toast.makeText(
                         requireContext(),
-                        getString(R.string.dbrestore_failure_import),
+                        getString(R.string.dbrestore_failure_import).format(e.message ?: ""),
                         Toast.LENGTH_LONG
                     ).show()
 
@@ -321,6 +329,8 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
                         e.message ?: ""
                     )
                 }
+            } finally {
+                DatabaseHelper.cleanTempDatabaseFiles(requireContext())
             }
         }
     }
@@ -366,6 +376,7 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
         Log.i(TAG, "GoogleDriveBackup.onBackupStarted")
         toggleGoogleDriveBackupInProgress(true)
 
+        binding.googledriveSyncCancelBtn.setOnClickListener { gDriveBackUp.cancelBackup() }
         binding.googledriveSyncProgressSection.visibility = View.VISIBLE
         binding.googledriveSyncProgressTitle.text =
             getString(R.string.googledrive_backup_start_title)
@@ -400,6 +411,8 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
             getString(R.string.googledrive_backup_success_message, nowString)
         binding.googledriveSyncProgressTitle.text =
             getString(R.string.googledrive_backup_success_title)
+
+        toggleBackupRestoreButtonsClickable(true)
     }
 
     override fun onBackupCancelled() {
@@ -409,6 +422,7 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
             getString(R.string.googledrive_backup_cancel_title)
         binding.googledriveSyncProgressMessage.text =
             getString(R.string.googledrive_backup_cancel_message)
+        toggleBackupRestoreButtonsClickable(true)
     }
 
     override fun onBackupFailed(e: Exception) {
@@ -418,55 +432,106 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
             getString(R.string.googledrive_backup_failed_title)
         binding.googledriveSyncProgressMessage.text =
             getString(R.string.googledrive_backup_failed_message, e.message)
+        toggleBackupRestoreButtonsClickable(true)
         Utils.logAnalyticsError(TAG,"CloudBackUpFailed", e.message?: "")
     }
 
     override fun onRestoreEmpty() {
-        Toast.makeText(requireContext(),
-            getString(R.string.googledrive_restore_emptyserver),Toast.LENGTH_LONG).show()
+        Log.i(TAG, "GoogleDriveBackup.onRestoreEmpty")
+        toggleGoogleDriveBackupInProgress(false)
+        binding.googledriveSyncProgressTitle.text =
+            getString(R.string.googledrive_restore_failed_title)
+        binding.googledriveSyncProgressMessage.text =
+            getString(R.string.googledrive_restore_empty_message)
+
+        toggleBackupRestoreButtonsClickable(true)
+        Utils.logAnalyticsError(TAG,"CloudRestoreEmpty", "")
     }
 
     override fun onRestoreStarted() {
-        Toast.makeText(requireContext(),
-            getString(R.string.googledrive_restore_started),Toast.LENGTH_LONG).show()
+        Log.i(TAG, "GoogleDriveBackup.onRestoreStarted")
+        toggleGoogleDriveBackupInProgress(true)
+
+        binding.googledriveSyncCancelBtn.setOnClickListener { gDriveBackUp.cancelRestore() }
+        binding.googledriveSyncProgressSection.visibility = View.VISIBLE
+        binding.googledriveSyncProgressTitle.text =
+            getString(R.string.googledrive_restore_start_title)
+        binding.googledriveSyncProgressBar.isIndeterminate = true
+        binding.googledriveSyncProgressMessage.text =
+            getString(R.string.googledrive_restore_start_message)
     }
 
     override fun onRestoreProgress(
         fileName: String,
         fileIndex: Int,
         fileCount: Int,
-        bytesSent: Long,
+        bytesReceived: Long,
         bytesTotal: Long
     ) {
-        //TODO("Not yet implemented")
+        val receivedMB = Utils.formatKBToMB(bytesReceived)
+        val totalMB = Utils.formatKBToMB(bytesTotal)
+        Log.i(TAG, "GoogleDriveBackup.onBackupProgress: $receivedMB / $totalMB")
+
+        toggleGoogleDriveBackupInProgress(bytesTotal != bytesReceived)
+        binding.googledriveSyncProgressMessage.text =
+            getString(R.string.googledrive_backup_progress_message, receivedMB, totalMB)
+
+        binding.googledriveSyncProgressBar.isIndeterminate = false
+        binding.googledriveSyncProgressBar.max = bytesTotal.toInt()
+        binding.googledriveSyncProgressBar.progress = bytesReceived.toInt()
     }
 
     override fun onRestoreSuccess(files: List<GoogleDriveBackupFile.DownloadFile>) {
+        Log.i(TAG, "GoogleDriveBackup.onRestoreSuccess")
         if (files.isEmpty() || files[0].name != "database.sqlite") {
-            throw Exception("ConfigFragement.onRestoreSuccess: Something went really wrong, wrong backup file")
+            throw Exception("ConfigFragement.onRestoreSuccess: Something went really wrong in GoogleDriveBackUp lib, wrong backup file")
         }
+        val now = Instant.now()
+        val nowString = Utils.formatDate(now)
 
-        Toast.makeText(requireContext(),
-            getString(R.string.googledrive_restore_download_complete),Toast.LENGTH_LONG).show()
+        toggleGoogleDriveBackupInProgress(false)
 
-        val sourcePath =
-            "${requireContext().filesDir.path}/../databases/${ChineseWordsDatabase.DATABASE_FILE}"
+        binding.googledriveSyncProgressMessage.text =
+            getString(R.string.googledrive_restore_success_message, nowString)
+        binding.googledriveSyncProgressTitle.text =
+            getString(R.string.googledrive_restore_success_title)
+
+        toggleBackupRestoreButtonsClickable(true)
+        binding.googledriveSyncProgressSection.visibility = View.GONE
 
         AlertDialog.Builder(requireContext())
             .setMessage(getString(R.string.googledrive_restore_confirm_overwrite, Utils.formatDate(files[0].modifiedTime ?: Instant.ofEpochMilli(0))))
-            .setPositiveButton(R.string.proceed) { _, _ -> onBackupFileSelected(File(sourcePath).toUri()) }   // user confirms
-            .setNegativeButton(R.string.cancel) { _, _ -> {} }
+            .setPositiveButton(R.string.proceed) { _, _ -> onBackupFileSelected(cloudRestoreFilePath.toUri()) }   // user confirms
+            .setNegativeButton(R.string.cancel) { _, _ -> onRestoreCancelled() }
             .setCancelable(true)                                 // allow dismiss by tapping outside
             .show()
     }
 
+    fun toggleBackupRestoreButtonsClickable(isClickable: Boolean) {
+        binding.configBtnBackupCloudRestorenow.isEnabled = isClickable
+        binding.configBtnBackupCloudBackupnow.isEnabled = isClickable
+        binding.configBtnRestoreChoosefile.isEnabled = isClickable
+    }
+
     override fun onRestoreCancelled() {
-        TODO("Not yet implemented")
+        Log.i(TAG, "GoogleDriveBackup.onBackupCancelled")
+        toggleGoogleDriveBackupInProgress(false)
+        binding.googledriveSyncProgressTitle.text =
+            getString(R.string.googledrive_restore_cancel_title)
+        binding.googledriveSyncProgressMessage.text =
+            getString(R.string.googledrive_restore_cancel_message)
+        toggleBackupRestoreButtonsClickable(true)
     }
 
     override fun onRestoreFailed(e: Exception) {
-        Toast.makeText(requireContext(),
-            getString(R.string.googledrive_restore_failed),Toast.LENGTH_LONG).show()
+        Log.i(TAG, "GoogleDriveBackup.onRestoreFailed")
+        toggleGoogleDriveBackupInProgress(false)
+        binding.googledriveSyncProgressTitle.text =
+            getString(R.string.googledrive_restore_failed_title)
+        binding.googledriveSyncProgressMessage.text =
+            getString(R.string.googledrive_restore_failed_message, e.message)
+
+        toggleBackupRestoreButtonsClickable(true)
         Utils.logAnalyticsError(TAG, "CloudRestoreFailed", e.message ?: e.toString())
     }
 

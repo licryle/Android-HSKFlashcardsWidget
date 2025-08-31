@@ -8,7 +8,7 @@ import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWordAnnotation
 import fr.berliat.hskwidget.data.repo.WordListRepository
-import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
+import fr.berliat.hskwidget.data.store.DatabaseHelper
 import fr.berliat.hskwidget.domain.Utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,7 +22,7 @@ class AnnotateViewModel(val context: Context, val wordListRepo: WordListReposito
     val annotatedWord: LiveData<AnnotatedChineseWord> get() = _annotatedWord
     val simplified: String get() = _annotatedWord.value?.simplified ?: ""
 
-    private suspend fun database() = ChineseWordsDatabase.getInstance(context)
+    private suspend fun database() = DatabaseHelper.getInstance(context)
 
     // Fetch annotated word for a given simplified word
     fun fetchAnnotatedWord(arguments: Bundle?) {
