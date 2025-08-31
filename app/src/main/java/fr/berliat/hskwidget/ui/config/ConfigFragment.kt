@@ -28,7 +28,6 @@ import fr.berliat.hskwidget.ui.utils.AnkiDelegate
 import fr.berliat.hskwidget.ui.utils.AnkiSyncServiceDelegate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileInputStream
@@ -148,14 +147,15 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
         toggleBackupRestoreButtonsClickable(false)
 
         lifecycleScope.launch(Dispatchers.IO) {
-            val sourcePath = runBlocking { DatabaseHelper.getInstance(requireContext()).databasePath }
+            val dbHelper = DatabaseHelper.getInstance(requireContext())
+            val snapshot = dbHelper.snapshotDatabase()
 
             gDriveBackUp.backup(
                 listOf(GoogleDriveBackupFile.UploadFile(
                     "database.sqlite",
-                    FileInputStream(sourcePath),
+                    FileInputStream(snapshot),
                     "application/octet-stream",
-                    File(sourcePath).length()
+                    snapshot.length()
                 ))
             )
         }
