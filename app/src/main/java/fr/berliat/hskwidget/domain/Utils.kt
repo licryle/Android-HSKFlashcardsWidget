@@ -528,7 +528,7 @@ class Utils {
         WIDGET_RECONFIGURE,
         WIDGET_CONFIG_VIEW,
         WIGDET_RESIZE,
-        WIGDET_ADD,
+        WIGDET_ADD, // Would be great to add
         WIDGET_EXPAND,
         WIDGET_COLLAPSE,
         WIGDET_REMOVE,
@@ -537,8 +537,8 @@ class Utils {
         CONFIG_BACKUP_ON,
         CONFIG_BACKUP_OFF,
         CONFIG_BACKUP_RESTORE,
-        CONFIG_BACKUPCLOUD_ON,
-        CONFIG_BACKUPCLOUD_OFF,
+        CONFIG_BACKUPCLOUD_ON, // Reserved for future use
+        CONFIG_BACKUPCLOUD_OFF, // Reserved for future use
         CONFIG_BACKUPCLOUD_RESTORE,
         CONFIG_BACKUPCLOUD_BACKUP,
         CONFIG_ANKI_SYNC_ON,
