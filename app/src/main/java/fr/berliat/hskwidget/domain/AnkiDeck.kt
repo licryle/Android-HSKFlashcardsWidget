@@ -15,10 +15,16 @@ class AnkiDeck private constructor(private val context: Context,
         get() = _ankiId
 
     internal suspend fun setAnkiId(newAnkiId: Long) {
-        _ankiId = newAnkiId
+        try {
+            if (_ankiId != newAnkiId) {
+                DatabaseHelper.getInstance(context).wordListDAO()
+                    .updateAnkiDeckId(wordList.id, newAnkiId)
+            }
+        } catch(_: Exception) {
 
-        DatabaseHelper.getInstance(context).wordListDAO()
-            .updateAnkiDeckId(wordList.id, newAnkiId)
+        }
+
+        _ankiId = newAnkiId
     }
 
     fun getAnkiDeckName(): String {
@@ -39,15 +45,14 @@ class AnkiDeck private constructor(private val context: Context,
             val decks = store.api.getDeckList()?: emptyMap()
 
             if (deck.ankiId == WordList.ANKI_ID_EMPTY || decks.none { it.key == deck.ankiId }) {
-                val ankiDeckId : Long
                 // So deckId is non-existent or a goner. Let's piggy back by name given we have a prefix
-                val sameNameDeck = decks.filterValues { it == deck.getAnkiDeckName() }
-                if (sameNameDeck.isNotEmpty()) {
-                    ankiDeckId = sameNameDeck.keys.first()
-                } else {
-                    ankiDeckId = store.api.addNewDeck(deck.getAnkiDeckName())
-                        ?: throw IllegalStateException("Couldn't fetch or create Deck in Anki.")
-                }
+                val ankiDeckId : Long
+                // Anki is StrInsensitive, let's also trim.
+                val trimmed = deck.getAnkiDeckName().lowercase().trim()
+                val sameNameDeck = decks.entries.find { it.value.lowercase().trim() == trimmed }
+                ankiDeckId = sameNameDeck?.key
+                    ?: (store.api.addNewDeck(deck.getAnkiDeckName())
+                        ?: throw IllegalStateException("Couldn't fetch or create Deck in Anki."))
 
                 deck.setAnkiId(ankiDeckId)
             }
