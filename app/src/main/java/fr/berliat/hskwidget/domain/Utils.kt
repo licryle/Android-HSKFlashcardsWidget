@@ -195,14 +195,11 @@ class Utils {
             return dir?.listFiles()?.toList() ?: emptyList()
         }
 
-        suspend fun copyFileUsingSAF(context: Context, sourcePath: String, destinationDir: Uri, fileName: String): Boolean {
+        suspend fun copyFileUsingSAF(context: Context, sourceFile: File, destinationDir: Uri, fileName: String): Boolean {
             return withContext(Dispatchers.IO) {
                 try {
-                    // Open InputStream from source file
-                    val file = File(sourcePath)
-
                     // Open input stream for the source database file
-                    val inputStream: InputStream = FileInputStream(file)
+                    val inputStream: InputStream = FileInputStream(sourceFile)
 
                     val dir = DocumentFile.fromTreeUri(context, destinationDir)
                     val destinationFile = dir?.createFile("application/octet-stream", fileName)
@@ -230,7 +227,7 @@ class Utils {
             }
         }
 
-        fun copyUriToCacheDir(context: Context, uri: Uri): File {
+        suspend fun copyUriToCacheDir(context: Context, uri: Uri): File {
             if (uri.scheme == "file") {
                 val file = File(uri.path!!)
                 if (file.absolutePath.startsWith(context.cacheDir.absolutePath)) {

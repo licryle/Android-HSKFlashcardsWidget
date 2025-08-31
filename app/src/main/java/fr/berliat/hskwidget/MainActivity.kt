@@ -30,7 +30,7 @@ import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.data.store.DatabaseHelper
 import fr.berliat.hskwidget.data.store.SupportDevStore
 import fr.berliat.hskwidget.databinding.ActivityMainBinding
-import fr.berliat.hskwidget.domain.DatabaseBackup
+import fr.berliat.hskwidget.domain.DatabaseDiskBackup
 import fr.berliat.hskwidget.domain.DatabaseBackupCallbacks
 import fr.berliat.hskwidget.domain.SharedViewModel
 import fr.berliat.hskwidget.domain.Utils
@@ -52,7 +52,7 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
     private lateinit var appConfig: AppPreferencesStore
-    private lateinit var databaseBackup: DatabaseBackup
+    private lateinit var databaseDiskBackup: DatabaseDiskBackup
     private lateinit var supportDevStore: SupportDevStore
     private var showOCRReminder: Boolean = true
 
@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        databaseBackup = DatabaseBackup(this, this, this)
+        databaseDiskBackup = DatabaseDiskBackup(this, this, this)
 
         appConfig = AppPreferencesStore(applicationContext)
 
@@ -88,7 +88,9 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
     }
 
     private fun handleDbOperations() {
-        DatabaseHelper.cleanTempDatabaseFiles(this)
+        lifecycleScope.launch(Dispatchers.IO) {
+            DatabaseHelper.getInstance(applicationContext).cleanTempDatabaseFiles()
+        }
 
         if (shouldUpdateDatabaseFromAsset()) {
             Toast.makeText(
@@ -133,23 +135,25 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
 
     private fun updateDatabaseFromAsset(successCallback: () -> Unit, failureCallback: (e: Exception) -> Unit) {
         lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val db = DatabaseHelper.getInstance(applicationContext)
-                val assetDbStream = { applicationContext.assets.open(DatabaseHelper.DATABASE_ASSET_PATH) }
-                val liveDbStream = { FileInputStream(db.DATABASE_LIVE_PATH) }
+            val dbHelper = DatabaseHelper.getInstance(applicationContext)
 
-                db.liveDatabase.flushToDisk()
-                val newDb = databaseBackup.replaceWordsDataInDB(liveDbStream,assetDbStream)
+            try {
+                val assetDbStream = { applicationContext.assets.open(DatabaseHelper.DATABASE_ASSET_PATH) }
+                val liveDbStream = { FileInputStream(dbHelper.DATABASE_LIVE_PATH) }
+
+                dbHelper.liveDatabase.flushToDisk()
+                val newDb = dbHelper.replaceWordsDataInDB(liveDbStream,assetDbStream)
                 newDb.flushToDisk()
                 newDb.close()
-                db.updateDatabaseFileOnDisk(applicationContext, newDb.databasePath)
-                DatabaseHelper.cleanTempDatabaseFiles(applicationContext)
+                dbHelper.updateDatabaseFileOnDisk(newDb.databasePath)
 
                 withContext(Dispatchers.Main) {
                     successCallback()
                 }
             } catch (e: Exception) {
                 failureCallback(e)
+            } finally {
+                dbHelper.cleanTempDatabaseFiles()
             }
         }
     }
@@ -207,10 +211,10 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
 
     override fun onBackupFolderSet(uri: Uri) {
         Utils.getAppScope(applicationContext).launch(Dispatchers.IO) {
-            val success = databaseBackup.backUp(uri)
+            val success = databaseDiskBackup.backUp(uri)
 
             if (success) {
-                databaseBackup.cleanOldBackups(uri, appConfig.dbBackUpMaxLocalFiles)
+                databaseDiskBackup.cleanOldBackups(uri, appConfig.dbBackUpMaxLocalFiles)
             }
 
             withContext(Dispatchers.Main) {
@@ -240,7 +244,7 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
 
     private fun handleBackUp() {
         if (appConfig.dbBackUpActive)
-            databaseBackup.getFolder()
+            databaseDiskBackup.getFolder()
     }
 
     private fun handleWidgetConfigIntent(intent: Intent?) {

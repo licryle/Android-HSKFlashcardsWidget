@@ -17,7 +17,7 @@ import androidx.navigation.fragment.findNavController
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.databinding.FragmentConfigBinding
-import fr.berliat.hskwidget.domain.DatabaseBackup
+import fr.berliat.hskwidget.domain.DatabaseDiskBackup
 import fr.berliat.hskwidget.domain.DatabaseBackupCallbacks
 import fr.berliat.googledrivebackup.GoogleDriveBackup
 import fr.berliat.googledrivebackup.GoogleDriveBackupFile
@@ -43,7 +43,7 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
         GoogleDriveBackupInterface {
     private lateinit var binding: FragmentConfigBinding
     private lateinit var appConfig: AppPreferencesStore
-    private lateinit var databaseBackup : DatabaseBackup
+    private lateinit var databaseDiskBackup : DatabaseDiskBackup
     private lateinit var ankiDelegate: AnkiDelegate
     private var ankiSyncServiceDelegate: AnkiSyncServiceDelegate? = null
     private lateinit var gDriveBackUp : GoogleDriveBackup
@@ -53,7 +53,7 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        databaseBackup = DatabaseBackup(this, requireContext(), this)
+        databaseDiskBackup = DatabaseDiskBackup(this, requireContext(), this)
 
         ankiDelegate = AnkiDelegate(this)
     }
@@ -104,8 +104,8 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
         if (bkDir != "")
             binding.configBtnBackupChangedir.text = URLDecoder.decode(bkDir, StandardCharsets.UTF_8.name())
 
-        binding.configBtnBackupChangedir.setOnClickListener { databaseBackup.selectFolder() }
-        binding.configBtnRestoreChoosefile.setOnClickListener { databaseBackup.selectBackupFile() }
+        binding.configBtnBackupChangedir.setOnClickListener { databaseDiskBackup.selectFolder() }
+        binding.configBtnRestoreChoosefile.setOnClickListener { databaseDiskBackup.selectBackupFile() }
 
         binding.configAnkiActivateBtn.isChecked = appConfig.ankiSaveNotes
         binding.configAnkiActivateBtn.setOnClickListener { onAnkiIntegrationChanged(binding.configAnkiActivateBtn.isChecked) }
@@ -283,11 +283,12 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
 
 
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+            val dbHelper = DatabaseHelper.getInstance(requireContext())
+
             try {
-                val dbHelper = DatabaseHelper.getInstance(requireContext())
                 val file = Utils.copyUriToCacheDir(requireContext(), uri)
-                val sourceDb = DatabaseHelper.loadExternalDatabase(requireContext(), file)
-                databaseBackup.replaceUserDataInDB(dbHelper.liveDatabase, sourceDb)
+                val sourceDb = dbHelper.loadExternalDatabase(file)
+                dbHelper.replaceUserDataInDB(dbHelper.liveDatabase, sourceDb)
 
                 withContext(Dispatchers.Main) {
                     Toast.makeText(
@@ -330,7 +331,7 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
                     )
                 }
             } finally {
-                DatabaseHelper.cleanTempDatabaseFiles(requireContext())
+                dbHelper.cleanTempDatabaseFiles()
             }
         }
     }

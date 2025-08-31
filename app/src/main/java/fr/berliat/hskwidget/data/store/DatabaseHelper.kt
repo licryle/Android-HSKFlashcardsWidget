@@ -2,14 +2,16 @@ package fr.berliat.hskwidget.data.store
 
 import android.content.Context
 import android.util.Log
+import androidx.core.net.toUri
 import androidx.room.Room
+import fr.berliat.hskwidget.domain.Utils
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.InputStream
 import java.util.UUID
 import java.util.concurrent.Callable
 
-class DatabaseHelper private constructor() {
+class DatabaseHelper private constructor(val context: Context) {
     fun annotatedChineseWordDAO() = liveDatabase.annotatedChineseWordDAO()
     fun chineseWordAnnotationDAO() = liveDatabase.chineseWordAnnotationDAO()
     fun chineseWordDAO() = liveDatabase.chineseWordDAO()
@@ -41,7 +43,7 @@ class DatabaseHelper private constructor() {
         suspend fun getInstance(context: Context): DatabaseHelper {
             INSTANCE?.let { return it }
 
-            val instance = DatabaseHelper()
+            val instance = DatabaseHelper(context)
             INSTANCE = instance
             instance._db = ChineseWordsDatabase.createInstance(context)
             instance.DATABASE_LIVE_DIR = getDatabaseLiveDir(context)
@@ -49,45 +51,45 @@ class DatabaseHelper private constructor() {
 
             return instance
         }
+    }
 
-        fun loadExternalDatabase(context: Context, dbFile: File) =
-            Room.databaseBuilder(
-                context.applicationContext,
-                ChineseWordsDatabase::class.java,
-                "Temp_HSK_DB_${UUID.randomUUID()}"
-            )
-                .createFromFile(dbFile) // instead of fromAsset
-                .build()
+    fun loadExternalDatabase(dbFile: File) =
+        Room.databaseBuilder(
+            context,
+            ChineseWordsDatabase::class.java,
+            "Temp_HSK_DB_${UUID.randomUUID()}"
+        )
+            .createFromFile(dbFile) // instead of fromAsset
+            .build()
 
-        fun loadExternalDatabase(context: Context, stream: Callable<InputStream>) =
-            Room.databaseBuilder(
-                context.applicationContext,
-                ChineseWordsDatabase::class.java,
-                "Temp_HSK_DB_${UUID.randomUUID()}"
-            )
-                .createFromInputStream(stream) // instead of fromAsset
-                .build()
+    fun loadExternalDatabase(stream: Callable<InputStream>) =
+        Room.databaseBuilder(
+            context,
+            ChineseWordsDatabase::class.java,
+            "Temp_HSK_DB_${UUID.randomUUID()}"
+        )
+            .createFromInputStream(stream) // instead of fromAsset
+            .build()
 
-        fun cleanTempDatabaseFiles(context: Context) {
-            val dir = File(getDatabaseLiveDir(context))
-            val filesToDelete = dir.listFiles { file ->
-                // Return true for files that match the pattern
-                file.name.contains("Temp_HSK_DB_")
-            }
+    fun cleanTempDatabaseFiles() {
+        val dir = File(getDatabaseLiveDir(context))
+        val filesToDelete = dir.listFiles { file ->
+            // Return true for files that match the pattern
+            file.name.contains("Temp_HSK_DB_")
+        }
 
-            // Delete the matching files
-            filesToDelete?.forEach { file ->
-                val deleted = file.delete()
-                if (deleted) {
-                    Log.d(TAG, "Deleted Temp DB file: ${file.absolutePath}")
-                } else {
-                    Log.d(TAG, "Failed to delete temp DB file: ${file.absolutePath}")
-                }
+        // Delete the matching files
+        filesToDelete?.forEach { file ->
+            val deleted = file.delete()
+            if (deleted) {
+                Log.d(TAG, "Deleted Temp DB file: ${file.absolutePath}")
+            } else {
+                Log.d(TAG, "Failed to delete temp DB file: ${file.absolutePath}")
             }
         }
     }
 
-    suspend fun updateDatabaseFileOnDisk(context: Context, newDatabasePath: String) {
+    suspend fun updateDatabaseFileOnDisk(newDatabasePath: String) {
         val newFile = File(newDatabasePath)
         val oldFile = File(getDatabaseLiveFile(context))
         if (!newFile.exists()) {
@@ -111,5 +113,64 @@ class DatabaseHelper private constructor() {
         }
 
         _db = ChineseWordsDatabase.createInstance(context)
+    }
+
+    suspend fun replaceUserDataInDB(dbToUpdate: ChineseWordsDatabase, updateWith: ChineseWordsDatabase) {
+        Log.d(TAG, "Initiating Database Restoration: reading file")
+        val importedAnnotations = updateWith.chineseWordAnnotationDAO().getAll()
+        val importedListEntries = updateWith.wordListDAO().getAllListEntries()
+        val importedLists = updateWith.wordListDAO().getAllLists()
+        val importedWidgets = updateWith.widgetListDAO().getAllEntries()
+        val importedFreq = updateWith.chineseWordFrequencyDAO().getAll()
+        if (importedAnnotations.isEmpty() && importedListEntries.isEmpty()
+            && importedWidgets.isEmpty() && importedFreq.isEmpty()) {
+            Log.i(TAG, "Backup is empty or incompatible, aborting")
+            throw IllegalStateException("Database is empty")
+        }
+
+        // Impoooort
+        Log.d(TAG, "Starting to import Annotations to local DB")
+        dbToUpdate.chineseWordAnnotationDAO().deleteAll()
+        dbToUpdate.chineseWordAnnotationDAO().insertAll(importedAnnotations)
+
+        Log.d(TAG, "Starting to import Word_List to local DB")
+        dbToUpdate.wordListDAO().deleteAllEntries()
+        dbToUpdate.wordListDAO().deleteAllLists()
+        dbToUpdate.wordListDAO().insertAllLists(importedLists.map { it -> it.wordList })
+        dbToUpdate.wordListDAO().insertAllWords(importedListEntries)
+
+        Log.d(TAG, "Starting to import WordFrequency to local DB")
+        dbToUpdate.chineseWordFrequencyDAO().deleteAll()
+        dbToUpdate.chineseWordFrequencyDAO().insertAll(importedFreq)
+
+        Log.d(TAG, "Starting to import WidgetList to local DB")
+        dbToUpdate.widgetListDAO().deleteAllWidgets()
+        dbToUpdate.widgetListDAO().insertListsToWidget(importedWidgets)
+
+        Log.i(Companion.TAG, "Database import done")
+    }
+
+    suspend fun replaceWordsDataInDB(dbToUpdate: Callable<InputStream>, updateWith: Callable<InputStream>): ChineseWordsDatabase {
+        Log.d(TAG, "Initiating Database Update: reading file")
+        val importedDb = loadExternalDatabase(updateWith)
+        val importedWordsCount = importedDb.chineseWordDAO().getCount()
+        if (importedWordsCount == 0) {
+            Log.i(TAG, "Update file is empty or incompatible, aborting")
+            throw IllegalStateException("Database is empty")
+        }
+
+        val userDataDb = loadExternalDatabase(dbToUpdate)
+        // Doing the opposite for efficacy: let's get user data into the importedDb, then copy file
+        replaceUserDataInDB(importedDb, userDataDb)
+        importedDb.flushToDisk()
+
+        Log.i(TAG, "Database update done")
+        return importedDb
+    }
+
+    suspend fun snapshotDatabase(): File {
+        flushToDisk()
+
+        return Utils.copyUriToCacheDir(context, File(DATABASE_LIVE_PATH).toUri())
     }
 }
