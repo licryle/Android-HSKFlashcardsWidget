@@ -128,6 +128,8 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
     }
 
     fun shouldUpdateDatabaseFromAsset(): Boolean {
+        if (appConfig.appVersionCode == 0) return false // first launch, nothing to update
+
         return (appConfig.appVersionCode != BuildConfig.VERSION_CODE &&
                 (BuildConfig.VERSION_CODE >= 32 && appConfig.appVersionCode < 32)
                 )
