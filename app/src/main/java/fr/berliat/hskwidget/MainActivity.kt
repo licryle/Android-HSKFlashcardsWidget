@@ -95,18 +95,18 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
         if (shouldUpdateDatabaseFromAsset()) {
             Toast.makeText(
                 applicationContext,
-                "Updating database, expect a screen refresh, backup will be delayed.",
+                getString(R.string.database_update_start),
                 Toast.LENGTH_LONG
             ).show()
 
             updateDatabaseFromAsset({
-                Toast.makeText(this, "Updated words database", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, getString(R.string.database_update_success), Toast.LENGTH_LONG).show()
 
                 handleBackUp()
             }, { e ->
                 Toast.makeText(
                     this,
-                    "Error while updating words database: ${e.toString()}",
+                    getString(R.string.database_update_failure, e.toString()),
                     Toast.LENGTH_LONG
                 ).show()
 
