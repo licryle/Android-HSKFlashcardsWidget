@@ -55,6 +55,7 @@ import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.UUID
 
 typealias CallbackNoParam = () -> Unit
 
@@ -230,10 +231,20 @@ class Utils {
         }
 
         fun copyUriToCacheDir(context: Context, uri: Uri): File {
-            val inputStream = context.contentResolver.openInputStream(uri)
-                ?: throw IllegalArgumentException("Cannot open input stream from URI")
+            if (uri.scheme == "file") {
+                val file = File(uri.path!!)
+                if (file.absolutePath.startsWith(context.cacheDir.absolutePath)) {
+                    return file // already in cacheDir, no need to copy
+                }
+            }
 
-            val outFile = File(context.cacheDir, "imported_backup.db")
+            val inputStream = when (uri.scheme) {
+                "content" -> context.contentResolver.openInputStream(uri)
+                "file" -> File(uri.path!!).inputStream()
+                else -> throw IllegalArgumentException("Unsupported URI scheme: ${uri.scheme}")
+            } ?: throw IllegalArgumentException("Cannot open input stream from URI")
+
+            val outFile = File(context.cacheDir, UUID.randomUUID().toString())
             outFile.outputStream().use { output ->
                 inputStream.copyTo(output)
             }
