@@ -8,7 +8,7 @@ import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.store.AnkiStore
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 
-class HSKAnkiDelegate(val fragment: Fragment)  : AnkiDelegate(fragment) {
+class HSKAnkiDelegate(val fragment: Fragment, handler: HandlerInterface? = null)  : AnkiDelegate(fragment, handler) {
     private val context = fragment.requireContext()
     private val appConfig = AppPreferencesStore(context)
     private val ankiStore = AnkiStore(context)

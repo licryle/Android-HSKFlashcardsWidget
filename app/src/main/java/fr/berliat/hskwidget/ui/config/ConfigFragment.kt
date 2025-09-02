@@ -56,7 +56,7 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
         super.onCreate(savedInstanceState)
         databaseDiskBackup = DatabaseDiskBackup(this, requireContext(), this)
 
-        ankiDelegate = HSKAnkiDelegate(this)
+        ankiDelegate = HSKAnkiDelegate(this, this)
     }
 
     override fun onResume() {
