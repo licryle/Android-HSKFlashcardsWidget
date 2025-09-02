@@ -73,7 +73,7 @@ open class AnkiDelegate(
     }
 
     suspend fun delegateToAnki(ankiAction: (suspend () -> Result<Unit>)?) {
-        ankiAction?.let { AnkiSharedEventBus.emit(AnkiSharedEventBus.UiEvent.TriggerAnkiSync(it)) }
+        ankiAction?.let { AnkiSharedEventBus.emit(AnkiSharedEventBus.UiEvent.AnkiAction(it)) }
     }
 
     /********** Anki Permissions ************/
@@ -142,7 +142,7 @@ open class AnkiDelegate(
                     fragment.requireActivity().lifecycleScope.launch(Dispatchers.Main) {
                         val appContext = fragment.activity?.applicationContext
                         when (event) {
-                            is AnkiSharedEventBus.UiEvent.TriggerAnkiSync -> {
+                            is AnkiSharedEventBus.UiEvent.AnkiAction -> {
                                 val result = safelyModifyAnkiDbIfAllowed {
                                     try {
                                         event.action() // action sync must happen on IO thread.
@@ -163,7 +163,7 @@ open class AnkiDelegate(
                                             onAnkiOperationFailed(appContext, e)
                                     }
                             }
-                            is AnkiSharedEventBus.UiEvent.AnkiSyncProgress -> {
+                            is AnkiSharedEventBus.UiEvent.AnkiServiceProgress -> {
                                 // Handle progress updates for long operations
                                 Log.d(TAG, "Progress update: ${event.state.progress}/${event.state.total} - ${event.state.message}")
 
@@ -173,13 +173,13 @@ open class AnkiDelegate(
                             is AnkiSharedEventBus.UiEvent.AnkiServiceStarting -> {
                                 onAnkiServiceStarting(appContext, event.serviceDelegate)
                             }
-                            is AnkiSharedEventBus.UiEvent.AnkiSyncCancelled -> {
+                            is AnkiSharedEventBus.UiEvent.AnkiServiceCancelled -> {
                                 onAnkiOperationCancelled(appContext)
                             }
-                            is AnkiSharedEventBus.UiEvent.AnkiSyncError -> {
+                            is AnkiSharedEventBus.UiEvent.AnkiServiceError -> {
                                 onAnkiOperationFailed(appContext, Exception(event.state.message))
                             }
-                            is AnkiSharedEventBus.UiEvent.AnkiSyncCompleted -> {
+                            is AnkiSharedEventBus.UiEvent.AnkiServiceCompleted -> {
                                 onAnkiOperationSuccess(appContext)
                             }
                         }
@@ -240,7 +240,7 @@ open class AnkiDelegate(
         callbackHandler?.onAnkiServiceStarting(serviceDelegate)
     }
 
-    protected open fun onAnkiSyncProgress(context: Context?, event: AnkiSharedEventBus.UiEvent.AnkiSyncProgress) {
+    protected open fun onAnkiSyncProgress(context: Context?, event: AnkiSharedEventBus.UiEvent.AnkiServiceProgress) {
         if (context == null) return
 
         // The service does the notification update

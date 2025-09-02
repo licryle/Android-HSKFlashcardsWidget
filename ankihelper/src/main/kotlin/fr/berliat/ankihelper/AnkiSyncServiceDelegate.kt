@@ -147,19 +147,19 @@ class AnkiSyncServiceDelegate(
                         }
                         is OperationState.Running -> {
                             Log.d(TAG, "Operation state: Running - ${state.progress}/${state.total} - ${state.message}")
-                            AnkiSharedEventBus.emit(AnkiSharedEventBus.UiEvent.AnkiSyncProgress(state))
+                            AnkiSharedEventBus.emit(AnkiSharedEventBus.UiEvent.AnkiServiceProgress(state))
                         }
                         is OperationState.Completed -> {
                             Log.d(TAG, "Operation state: Completed")
-                            AnkiSharedEventBus.emit(AnkiSharedEventBus.UiEvent.AnkiSyncCompleted(state))
+                            AnkiSharedEventBus.emit(AnkiSharedEventBus.UiEvent.AnkiServiceCompleted(state))
                         }
                         is OperationState.Cancelled -> {
                             Log.d(TAG, "Operation state: Cancelled")
-                            AnkiSharedEventBus.emit(AnkiSharedEventBus.UiEvent.AnkiSyncCancelled(state))
+                            AnkiSharedEventBus.emit(AnkiSharedEventBus.UiEvent.AnkiServiceCancelled(state))
                         }
                         is OperationState.Error -> {
                             Log.e(TAG, "Operation state: Error - ${state.message}")
-                            AnkiSharedEventBus.emit(AnkiSharedEventBus.UiEvent.AnkiSyncError(state))
+                            AnkiSharedEventBus.emit(AnkiSharedEventBus.UiEvent.AnkiServiceError(state))
                         }
                     }
                 }

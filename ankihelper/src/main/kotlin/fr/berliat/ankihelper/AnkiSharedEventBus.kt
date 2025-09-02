@@ -13,12 +13,12 @@ object AnkiSharedEventBus {
     val uiEvents: SharedFlow<UiEvent> = _uiEvents
 
     sealed class UiEvent {
-        data class TriggerAnkiSync(val action: suspend () -> Result<Unit>) : UiEvent()
+        data class AnkiAction(val action: suspend () -> Result<Unit>) : UiEvent()
         data class AnkiServiceStarting(val serviceDelegate: AnkiSyncServiceDelegate) : UiEvent()
-        data class AnkiSyncProgress(val state: AnkiSyncService.OperationState.Running) : UiEvent()
-        data class AnkiSyncCancelled(val state: AnkiSyncService.OperationState.Cancelled) : UiEvent()
-        data class AnkiSyncCompleted(val state: AnkiSyncService.OperationState.Completed) : UiEvent()
-        data class AnkiSyncError(val state: AnkiSyncService.OperationState.Error) : UiEvent()
+        data class AnkiServiceProgress(val state: AnkiSyncService.OperationState.Running) : UiEvent()
+        data class AnkiServiceCancelled(val state: AnkiSyncService.OperationState.Cancelled) : UiEvent()
+        data class AnkiServiceCompleted(val state: AnkiSyncService.OperationState.Completed) : UiEvent()
+        data class AnkiServiceError(val state: AnkiSyncService.OperationState.Error) : UiEvent()
     }
 
     suspend fun emit(event: UiEvent) {
