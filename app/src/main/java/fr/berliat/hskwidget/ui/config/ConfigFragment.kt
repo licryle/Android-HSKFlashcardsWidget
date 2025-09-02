@@ -248,7 +248,7 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
         Log.i(TAG, "onAnkiOperationFailed: failed full import into Anki")
 
         binding.ankiSyncProgressTitle.text = getString(R.string.anki_sync_failure_title)
-        binding.ankiSyncProgressMessage.text = getString(R.string.anki_sync_failure_title, e.message ?: "")
+        binding.ankiSyncProgressMessage.text = getString(R.string.anki_sync_failure_message, e.message ?: "")
         binding.ankiSyncProgressBar.visibility = View.GONE
         binding.ankiSyncCancelBtn.visibility = View.GONE
 

@@ -266,7 +266,7 @@ padding: 0;
     <string name="anki_sync_cancelled_title">Anki Import cancelled</string>
     <string name="anki_sync_cancelled_message">The Anki Import was cancelled.</string>
     <string name="anki_sync_success_title">Anki Import complete</string>
-    <string name="anki_sync_success_message">Successfully imported %d cards to Anki %s.</string>
+    <string name="anki_sync_success_message">Successfully imported all cards to Anki at %s.</string>
     <string name="anki_sync_failure_title">Anki Import failed</string>
     <string name="anki_sync_failure_message">Anki Import failed, try disabling/enabling again.\nError: %s.</string>
     <string name="anki_sync_notification_name">Anki Sync Progress</string>
