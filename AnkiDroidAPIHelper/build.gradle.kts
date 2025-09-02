@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "fr.berliat.ankihelper"
+    namespace = "fr.berliat.ankidroidhelper"
     compileSdk = 36
 
     defaultConfig {

@@ -1,4 +1,4 @@
-package fr.berliat.ankihelper
+package fr.berliat.ankidroidhelper
 
 import android.content.ComponentName
 import android.content.Context
@@ -11,13 +11,13 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ProcessLifecycleOwner
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-import fr.berliat.ankihelper.AnkiSyncService.OperationState
-import kotlinx.coroutines.CompletableDeferred
+import fr.berliat.ankidroidhelper.AnkiSyncService.OperationState
 
 /**
  * Delegate for handling long operations with progress tracking and cancellation support.

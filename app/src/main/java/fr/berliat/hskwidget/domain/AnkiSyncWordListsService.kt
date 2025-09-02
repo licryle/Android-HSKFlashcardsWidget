@@ -4,7 +4,7 @@ import android.database.sqlite.SQLiteException
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
-import fr.berliat.ankihelper.AnkiSyncService
+import fr.berliat.ankidroidhelper.AnkiSyncService
 import fr.berliat.hskwidget.MainActivity
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord

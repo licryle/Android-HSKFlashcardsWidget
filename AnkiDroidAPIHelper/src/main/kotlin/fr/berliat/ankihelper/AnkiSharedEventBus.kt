@@ -1,4 +1,4 @@
-package fr.berliat.ankihelper
+package fr.berliat.ankidroidhelper
 
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow

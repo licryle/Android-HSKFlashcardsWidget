@@ -1,6 +1,6 @@
 package fr.berliat.hskwidget.ui.wordlist
 
-import fr.berliat.ankihelper.AnkiDelegator
+import fr.berliat.ankidroidhelper.AnkiDelegator
 import fr.berliat.hskwidget.data.model.WordList
 import fr.berliat.hskwidget.data.model.WordListWithCount
 import fr.berliat.hskwidget.data.repo.WordListRepository

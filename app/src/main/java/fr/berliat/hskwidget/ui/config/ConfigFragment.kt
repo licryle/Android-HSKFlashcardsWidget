@@ -14,8 +14,8 @@ import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import fr.berliat.ankihelper.AnkiDelegate
-import fr.berliat.ankihelper.AnkiSyncServiceDelegate
+import fr.berliat.ankidroidhelper.AnkiDelegate
+import fr.berliat.ankidroidhelper.AnkiSyncServiceDelegate
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.databinding.FragmentConfigBinding

@@ -1,4 +1,4 @@
-package fr.berliat.ankihelper
+package fr.berliat.ankidroidhelper
 
 import android.app.Notification
 import android.app.NotificationChannel

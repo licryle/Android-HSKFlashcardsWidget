@@ -1,7 +1,7 @@
 package fr.berliat.hskwidget.data.repo
 
 import android.content.Context
-import fr.berliat.ankihelper.AnkiSyncServiceDelegate
+import fr.berliat.ankidroidhelper.AnkiSyncServiceDelegate
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.WordList
 import fr.berliat.hskwidget.data.model.WordListEntry

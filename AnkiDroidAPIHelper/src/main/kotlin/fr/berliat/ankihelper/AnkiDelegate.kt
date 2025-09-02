@@ -1,4 +1,4 @@
-package fr.berliat.ankihelper
+package fr.berliat.ankidroidhelper
 
 import android.content.ActivityNotFoundException
 import android.content.Context
