@@ -70,8 +70,9 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
     implementation("androidx.compose.material:material-ripple:1.9.0")
     implementation("androidx.constraintlayout:constraintlayout:2.2.1")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.9.2")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.2")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.9.3")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.3")
+    implementation("androidx.lifecycle:lifecycle-service:2.9.3")
     implementation("androidx.navigation:navigation-fragment-ktx:2.9.3")
     implementation("androidx.navigation:navigation-ui-ktx:2.9.3")
     implementation("androidx.work:work-runtime-ktx:2.10.3")
@@ -94,8 +95,6 @@ dependencies {
     implementation("androidx.datastore:datastore-rxjava3:1.1.7")
     implementation("androidx.datastore:datastore-preferences:1.1.7")
     implementation("androidx.datastore:datastore-preferences-core:1.1.7")
-
-    implementation("androidx.lifecycle:lifecycle-service:2.9.2")
 
     // Import the BoM for the Firebase platform
     implementation(platform("com.google.firebase:firebase-bom:33.14.0"))
