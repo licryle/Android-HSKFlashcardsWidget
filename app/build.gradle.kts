@@ -132,7 +132,7 @@ dependencies {
     implementation(project(":hsktextviews"))
     implementation(project(":floatlayouts"))
     implementation(project(":googledrivebackup"))
-    implementation(project(":ankidroidapihelper"))
+    implementation(project(":AnkiDroidAPIHelper"))
 
     val cameraxVersion = "1.4.2"
     implementation("androidx.camera:camera-core:${cameraxVersion}")
