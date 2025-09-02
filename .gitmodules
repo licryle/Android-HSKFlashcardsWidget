@@ -10,3 +10,6 @@
 [submodule "pinyin4kot"]
 	path = pinyin4kot
 	url = https://github.com/licryle/Pinyin4Kot.git
+[submodule "AnkiDroidAPIHelper"]
+	path = AnkiDroidAPIHelper
+	url = https://github.com/licryle/AnkiDroidAPIHelper.git
