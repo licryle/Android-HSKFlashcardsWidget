@@ -1,7 +1,6 @@
 package fr.berliat.hskwidget.data.repo
 
 import android.content.Context
-import fr.berliat.ankidroidhelper.AnkiSyncServiceDelegate
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.WordList
 import fr.berliat.hskwidget.data.model.WordListEntry
@@ -10,6 +9,7 @@ import fr.berliat.hskwidget.data.store.DatabaseHelper
 import fr.berliat.hskwidget.domain.AnkiDeck
 import fr.berliat.hskwidget.domain.AnkiSyncWordListsService
 import kotlin.Result
+import kotlin.reflect.KClass
 
 /**
  * WordListRepository is in charge for updating words into list, both on local and Anki storage.
@@ -81,12 +81,8 @@ class WordListRepository(private val context: Context) {
     }
 
     /****** ANKI ALTERING METHODS *******/
-    suspend fun syncListsToAnki(): (suspend () -> Result<Unit>) {
-        return suspend {
-            val serviceDelegate = AnkiSyncServiceDelegate(context, AnkiSyncWordListsService::class.java)
-            serviceDelegate.startSyncToAnkiOperation()
-            serviceDelegate.awaitOperationCompletion()
-        } // Returns result when done
+    fun syncListsToAnki(): KClass<out AnkiSyncWordListsService> {
+        return AnkiSyncWordListsService::class
     }
 
     suspend fun updateWordListAssociations(simplified: String, listIds: List<Long>): (suspend () -> Result<Unit>)? {
