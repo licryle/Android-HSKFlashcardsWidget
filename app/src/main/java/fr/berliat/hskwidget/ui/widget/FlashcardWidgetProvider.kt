@@ -239,6 +239,13 @@ class FlashcardWidgetProvider : AppWidgetProvider() {
         }
     }
 
+    fun updateAllFlashCardWidgets(
+        context: Context
+        ) {
+        val widgetIds = FlashcardWidgetProvider().getWidgetIds(context)
+        FlashcardWidgetProvider().onUpdate(context, AppWidgetManager.getInstance(context), widgetIds)
+    }
+
     fun getWidgetIds(context: Context) : IntArray {
         val appWidgetMgr = AppWidgetManager.getInstance(context)
 

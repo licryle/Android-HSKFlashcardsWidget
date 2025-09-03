@@ -122,8 +122,7 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
             appConfig.appVersionCode = BuildConfig.VERSION_CODE
 
             // Now we can upgrade stuff
-            val widgetIds = FlashcardWidgetProvider().getWidgetIds(applicationContext)
-            FlashcardWidgetProvider().onUpdate(applicationContext, AppWidgetManager.getInstance(applicationContext), widgetIds)
+            FlashcardWidgetProvider().updateAllFlashCardWidgets(applicationContext)
         }
     }
 

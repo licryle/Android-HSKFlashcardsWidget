@@ -28,6 +28,7 @@ import fr.berliat.hskwidget.data.repo.WordListRepository
 import fr.berliat.hskwidget.data.store.DatabaseHelper
 import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.ui.utils.HSKAnkiDelegate
+import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -320,6 +321,9 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
                     val action = ConfigFragmentDirections.search()
                     findNavController().navigate(action)
                 }
+
+                // Backup was successful, let's trigger widget updates, hoping any matches
+                FlashcardWidgetProvider().updateAllFlashCardWidgets(requireContext())
 
                 file.delete()
             } catch (e: IllegalStateException) {
