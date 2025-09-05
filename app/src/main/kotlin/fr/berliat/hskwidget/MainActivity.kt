@@ -16,7 +16,6 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
@@ -167,27 +166,17 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
     }
 
     private fun showOCRReminderIfActive() {
-        if (!showOCRReminder) return
+        if (!showOCRReminder) return // user asked to hide
 
         val nav = findNavController(R.id.nav_host_fragment_content_main)
-        val items = nav.currentBackStack.value
-
-        var lastOCRDisplay: NavBackStackEntry? = null
-        for (i in items.indices.reversed()) {
-            // Handle item from last to first
-            val item = items[i]
-
-            if (i == items.size - 1 && item.destination.id == R.id.nav_ocr_read) {
-                break // If we're in an OCR; we don't care about it
-            }
-
-            if (item.destination.id == R.id.nav_ocr_read) {
-                lastOCRDisplay = item
-                break
-            }
+        val ocrEntry = try {
+            nav.getBackStackEntry(R.id.nav_ocr_read)
+        } catch (_: IllegalArgumentException) {
+            null // Not in back stack
         }
+        val isOcrActive = ocrEntry != null
+                && (nav.currentDestination?.id != R.id.nav_ocr_read) // don't show reminder on self fragment
 
-        val isOcrActive = lastOCRDisplay != null
         val ocrStatusBar = binding.appBarMain.navHostContentMain.navHostOcrIndicator
         ocrStatusBar.visibility = if (isOcrActive && showOCRReminder) View.VISIBLE else View.GONE
         binding.appBarMain.navHostContentMain.navHostOcrIndicatorClose.setOnClickListener {
