@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
@@ -139,6 +140,12 @@ class WidgetsListFragment : Fragment() {
                 /* flags = */ PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
             appWidgetManager.requestPinAppWidget(myProvider, null, callbackIntent)
+        } else {
+            AlertDialog.Builder(requireContext())
+                .setTitle(R.string.widgets_add_widget)
+                .setMessage(R.string.widgets_add_widget_instructions)
+                .setPositiveButton(R.string.understood, null)
+                .show()
         }
     }
 
