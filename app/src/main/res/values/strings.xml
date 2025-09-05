@@ -107,7 +107,7 @@ We recommend to choose the level your at plus the one below, or above depending 
 
     <string name="dbbackup_success">Successfully backed-up the full database</string>
     <string name="dbbackup_failure_write">Couldn\'t write / back-up the full database</string>
-    <string name="dbbackup_failure_folderpermission">No folder permission to backup database</string>
+    <string name="dbbackup_failure_folderpermission">No folder allowed to perform local backup, cancelling</string>
     <string name="copied_to_clipboard">Copied %s to clipboard</string>
     <string name="config_backup_title">Backup/Restore from local file</string>
     <string name="config_backup_activate">Activate backup</string>

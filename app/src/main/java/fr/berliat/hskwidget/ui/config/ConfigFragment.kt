@@ -93,18 +93,22 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
         }
         // End: Max number of local files
 
-        binding.configBackupActivateBtn.setOnClickListener {
-            appConfig.dbBackUpActive = binding.configBackupActivateBtn.isChecked
-
-            var evt = Utils.ANALYTICS_EVENTS.CONFIG_BACKUP_OFF
-            if (appConfig.dbBackUpActive)
-                evt = Utils.ANALYTICS_EVENTS.CONFIG_BACKUP_ON
-            Utils.logAnalyticsEvent(evt)
-        }
-
         val bkDir = appConfig.dbBackUpDirectory.toString().substringAfterLast("%3A")
         if (bkDir != "")
             binding.configBtnBackupChangedir.text = URLDecoder.decode(bkDir, StandardCharsets.UTF_8.name())
+
+        binding.configBackupActivateBtn.setOnClickListener {
+            if (!binding.configBackupActivateBtn.isChecked) {
+                appConfig.dbBackUpActive = false
+                Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.CONFIG_BACKUP_OFF)
+            } else {
+                // Try to fetch, or collect folder
+                // Ends up triggering either onBackupFolderSet or onBackupFolderError where we set
+                // The active/inactive flag
+                databaseDiskBackup.getFolder()
+            }
+
+        }
 
         binding.configBtnBackupChangedir.setOnClickListener { databaseDiskBackup.selectFolder() }
         binding.configBtnRestoreChoosefile.setOnClickListener { databaseDiskBackup.selectBackupFile() }
@@ -286,11 +290,17 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
     }
 
     override fun onBackupFolderSet(uri: Uri) {
+        appConfig.dbBackUpActive = true
+        binding.configBackupActivateBtn.isChecked = true
+        Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.CONFIG_BACKUP_ON)
+
         appConfig.dbBackUpDirectory = uri
         binding.configBtnBackupChangedir.text = uri.toString().substringAfterLast("%3A")
     }
 
     override fun onBackupFolderError() {
+        appConfig.dbBackUpActive = false
+        binding.configBackupActivateBtn.isChecked = false
         Toast.makeText(requireContext(), getString(R.string.dbbackup_failure_folderpermission), Toast.LENGTH_LONG).show()
     }
 
