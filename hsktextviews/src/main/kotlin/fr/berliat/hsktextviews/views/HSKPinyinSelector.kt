@@ -98,7 +98,7 @@ class HSKPinyinSelector @JvmOverloads constructor(
 
     // Without a layout, that we don't use, the
     val internalAdapter = object: ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, mutableListOf<String>()) {
-        private fun drawView(position: Int, convertView: View?, parent: ViewGroup): View {
+        private fun drawView(position: Int, convertView: View?): View {
             val textView = convertView as? TextView ?: TextView(context)
             textView.text = getItem(position)
             textView.setTextColor(textColor)
@@ -108,11 +108,11 @@ class HSKPinyinSelector @JvmOverloads constructor(
         }
 
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-            return drawView(position, convertView, parent)
+            return drawView(position, convertView)
         }
 
         override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
-            return drawView(position, convertView, parent)
+            return drawView(position, convertView)
         }
     }
 
