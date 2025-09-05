@@ -134,7 +134,7 @@ class SupportDevStore private constructor(private val context: Context) : Purcha
                     null
                 } else {
                     Pair<SupportProduct, Int>(
-                        SupportProduct.fromProductId(it.skus.first().toString())!!,
+                        SupportProduct.fromProductId(it.products.first().toString())!!,
                         it.quantity
                     )
                 }
@@ -214,7 +214,7 @@ class SupportDevStore private constructor(private val context: Context) : Purcha
             triggerOnPurchaseSuccess(purchase)
 
             runCatching {
-                val product = SupportProduct.fromProductId(purchase.skus.first())!!
+                val product = SupportProduct.fromProductId(purchase.products.first())!!
                 purchases[product] = (purchases[product] ?:0) + purchase.quantity
             }
             triggerOnPurchaseHistoryUpdate()
