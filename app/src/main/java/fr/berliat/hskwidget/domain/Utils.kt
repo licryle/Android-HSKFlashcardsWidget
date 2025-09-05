@@ -80,14 +80,26 @@ class Utils {
         }
 
         fun sendEmail(context: Context, address: String, subject: String = "", body: String = "") {
-            val intent = getOpenURLIntent(
-                "mailto:$address?subject=" + Uri.encode(subject) + "&body=" + Uri.encode(body))
+            val intent = Intent(Intent.ACTION_SENDTO).apply {
+                data = "mailto:".toUri() // use only "mailto:", don't put address here
+                putExtra(Intent.EXTRA_EMAIL, arrayOf(address))
+                putExtra(Intent.EXTRA_SUBJECT, subject)
+                putExtra(Intent.EXTRA_TEXT, body)
+            }
 
             if (intent.resolveActivity(context.packageManager) != null) {
                 context.startActivity(intent)
             } else {
-                Toast.makeText(context, context.getString(R.string.about_email_noapp), Toast.LENGTH_LONG).show()
-                copyToClipBoard(context, address)
+                try {
+                    context.startActivity(Intent.createChooser(intent, "Send email with..."))
+                } catch (e: Exception) {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.about_email_noapp),
+                        Toast.LENGTH_LONG
+                    ).show()
+                    copyToClipBoard(context, address)
+                }
             }
         }
 
