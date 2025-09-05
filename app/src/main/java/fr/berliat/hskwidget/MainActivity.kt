@@ -110,6 +110,8 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
                     Toast.LENGTH_LONG
                 ).show()
 
+                Utils.logAnalyticsError(TAG, "UpdateDatabaseFromAssetFailure", e.message ?: "")
+
                 handleBackUp()
             })
         } else {
@@ -129,9 +131,11 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
     fun shouldUpdateDatabaseFromAsset(): Boolean {
         if (appConfig.appVersionCode == 0) return false // first launch, nothing to update
 
-        return (appConfig.appVersionCode != BuildConfig.VERSION_CODE &&
-                (BuildConfig.VERSION_CODE >= 32 && appConfig.appVersionCode < 32)
-                )
+        val updateDbVersions = listOf(32, 37)
+
+        return updateDbVersions.any { updateVersion ->
+            appConfig.appVersionCode < updateVersion && BuildConfig.VERSION_CODE >= updateVersion
+        }
     }
 
     private fun updateDatabaseFromAsset(successCallback: () -> Unit, failureCallback: (e: Exception) -> Unit) {
