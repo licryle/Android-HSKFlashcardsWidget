@@ -391,6 +391,14 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
         //updateLoggedInAccount()
     }
 
+    override fun onNoGoogleAPI(e: Exception) {
+        Log.i(TAG, "GoogleDriveBackup.onNoGoogleAPI")
+        Toast.makeText(
+            requireContext(),
+            R.string.googledrive_backup_nogoogleapi,
+            Toast.LENGTH_LONG).show()
+    }
+
     override fun onNoAccountSelected() {
         Log.i(TAG, "GoogleDriveBackup.onNoAccountSelected")
         Toast.makeText(

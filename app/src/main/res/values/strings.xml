@@ -340,6 +340,7 @@ padding: 0;
     <string name="googledrive_backup_denied_scope">Google authorization not secured</string>
     <string name="googledrive_backup_failed_title">Backup failed</string>
     <string name="googledrive_backup_failed_message">Backup failed with error message: %s.</string>
+    <string name="googledrive_backup_nogoogleapi">No Google API available on this device</string>
     <string name="googledrive_backup_noaccountselected">No Google account was selected, cancelling.</string>
     <string name="googledrive_restore_empty_message">No backup available on Google Drive.</string>
     <string name="googledrive_restore_start_title">Restoration starting</string>
