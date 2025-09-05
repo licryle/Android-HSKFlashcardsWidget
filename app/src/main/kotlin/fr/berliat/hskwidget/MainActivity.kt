@@ -34,6 +34,7 @@ import fr.berliat.hskwidget.domain.DatabaseDiskBackup
 import fr.berliat.hskwidget.domain.DatabaseBackupCallbacks
 import fr.berliat.hskwidget.domain.SharedViewModel
 import fr.berliat.hskwidget.domain.Utils
+import fr.berliat.hskwidget.domain.getParcelableExtraCompat
 import fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragment
 import fr.berliat.hskwidget.ui.utils.StrictModeManager
 import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
@@ -292,13 +293,12 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
     private fun handleImageOCRIntent(intent: Intent?) {
         if (intent?.action == Intent.ACTION_SEND && intent.type?.startsWith("image/") == true) {
             Log.i(TAG, "Received a shared image intent")
-            (intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM))?.let { imageUri ->
+            intent.getParcelableExtraCompat(Intent.EXTRA_STREAM, Uri::class.java)?.let { imageUri ->
                 // Handle the image URI here
                 val action = MobileNavigationDirections.ocrImage(imageUri.toString(), "")
                 navController.navigate(action)
             }
         }
-
     }
 
     private fun setupSupporter() {

@@ -11,6 +11,7 @@ import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Parcelable
 import android.provider.DocumentsContract
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -58,6 +59,15 @@ import java.time.format.DateTimeFormatter
 import java.util.UUID
 
 typealias CallbackNoParam = () -> Unit
+
+fun <T : Parcelable> Intent.getParcelableExtraCompat(key: String, clazz: Class<T>): T? {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        getParcelableExtra(key, clazz)
+    } else {
+        @Suppress("DEPRECATION")
+        getParcelableExtra(key) as? T
+    }
+}
 
 class Utils {
     class DummyWorker(context: Context, workerParams: WorkerParameters)
