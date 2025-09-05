@@ -160,7 +160,7 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
     }
 
     // Method to load more results with pagination
-    private suspend fun loadMoreResults() {
+    private suspend fun loadMoreResults() = withContext(Dispatchers.IO) {
         isLoading = true
 
         Log.d(TAG, "Load more results for currentSearch: $searchQuery")
@@ -173,7 +173,7 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
     }
 
     // Simulate fetching search results based on the query and current page
-    private suspend fun fetchResultsForPage(): List<AnnotatedChineseWord> {
+    private suspend fun fetchResultsForPage(): List<AnnotatedChineseWord> = withContext(Dispatchers.IO) {
         Log.d(TAG, "Searching for $searchQuery")
         val dao = DatabaseHelper.getInstance(requireContext()).annotatedChineseWordDAO()
         try {
@@ -191,13 +191,13 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
 
             currentPage++
 
-            return results
+            return@withContext results
         } catch (e: Exception) {
             // Code for handling the exception
             Log.e(TAG, "$e")
         }
 
-        return emptyList()
+        return@withContext emptyList()
     }
 
     private fun evaluateEmptyView() {

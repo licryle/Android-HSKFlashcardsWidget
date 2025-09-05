@@ -19,6 +19,8 @@ import fr.berliat.hskwidget.data.model.ChineseWordFrequency
 import fr.berliat.hskwidget.data.model.WidgetListEntry
 import fr.berliat.hskwidget.data.model.WordList
 import fr.berliat.hskwidget.data.model.WordListEntry
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.util.concurrent.Executors
 
 @Database(
@@ -47,7 +49,7 @@ abstract class ChineseWordsDatabase: RoomDatabase() {
     companion object {
         const val TAG = "ChineseWordsDatabase"
 
-        suspend fun createInstance(context: Context) : ChineseWordsDatabase {
+        suspend fun createInstance(context: Context) : ChineseWordsDatabase = withContext(Dispatchers.IO) {
             val dbBuilder = Room.databaseBuilder(
                 context.applicationContext,
                 ChineseWordsDatabase::class.java,
@@ -63,7 +65,7 @@ abstract class ChineseWordsDatabase: RoomDatabase() {
                 )
             }
 
-            return dbBuilder.build()
+            return@withContext dbBuilder.build()
         }
     }
 

@@ -5,6 +5,8 @@ import android.util.Log
 import androidx.core.net.toUri
 import androidx.room.Room
 import fr.berliat.hskwidget.domain.Utils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.InputStream
@@ -40,8 +42,8 @@ class DatabaseHelper private constructor(val context: Context) {
         fun getDatabaseLiveDir(context: Context) =  "${context.filesDir.path}/../databases"
         fun getDatabaseLiveFile(context: Context) = getDatabaseLiveDir(context) + "/${DATABASE_FILENAME}"
 
-        suspend fun getInstance(context: Context): DatabaseHelper {
-            INSTANCE?.let { return it }
+        suspend fun getInstance(context: Context): DatabaseHelper = withContext(Dispatchers.IO) {
+            INSTANCE?.let { return@withContext it }
 
             val instance = DatabaseHelper(context)
             INSTANCE = instance
@@ -49,7 +51,7 @@ class DatabaseHelper private constructor(val context: Context) {
             instance.DATABASE_LIVE_DIR = getDatabaseLiveDir(context)
             instance.DATABASE_LIVE_PATH = getDatabaseLiveFile(context)
 
-            return instance
+            return@withContext instance
         }
     }
 
@@ -89,7 +91,7 @@ class DatabaseHelper private constructor(val context: Context) {
         }
     }
 
-    suspend fun updateDatabaseFileOnDisk(newDatabasePath: String) {
+    suspend fun updateDatabaseFileOnDisk(newDatabasePath: String) = withContext(Dispatchers.IO) {
         val newFile = File(newDatabasePath)
         val oldFile = File(getDatabaseLiveFile(context))
         if (!newFile.exists()) {
@@ -115,7 +117,8 @@ class DatabaseHelper private constructor(val context: Context) {
         _db = ChineseWordsDatabase.createInstance(context)
     }
 
-    suspend fun replaceUserDataInDB(dbToUpdate: ChineseWordsDatabase, updateWith: ChineseWordsDatabase) {
+    suspend fun replaceUserDataInDB(dbToUpdate: ChineseWordsDatabase, updateWith: ChineseWordsDatabase)
+            = withContext(Dispatchers.IO) {
         Log.d(TAG, "Initiating Database Restoration: reading file")
         val importedAnnotations = updateWith.chineseWordAnnotationDAO().getAll()
         val importedListEntries = updateWith.wordListDAO().getAllListEntries()
@@ -150,7 +153,8 @@ class DatabaseHelper private constructor(val context: Context) {
         Log.i(Companion.TAG, "Database import done")
     }
 
-    suspend fun replaceWordsDataInDB(dbToUpdate: Callable<InputStream>, updateWith: Callable<InputStream>): ChineseWordsDatabase {
+    suspend fun replaceWordsDataInDB(dbToUpdate: Callable<InputStream>, updateWith: Callable<InputStream>): ChineseWordsDatabase
+            = withContext(Dispatchers.IO) {
         Log.d(TAG, "Initiating Database Update: reading file")
         val importedDb = loadExternalDatabase(updateWith)
         val importedWordsCount = importedDb.chineseWordDAO().getCount()
@@ -165,12 +169,12 @@ class DatabaseHelper private constructor(val context: Context) {
         importedDb.flushToDisk()
 
         Log.i(TAG, "Database update done")
-        return importedDb
+        return@withContext importedDb
     }
 
-    suspend fun snapshotDatabase(): File {
+    suspend fun snapshotDatabase(): File = withContext(Dispatchers.IO) {
         flushToDisk()
 
-        return Utils.copyUriToCacheDir(context, File(DATABASE_LIVE_PATH).toUri())
+        return@withContext Utils.copyUriToCacheDir(context, File(DATABASE_LIVE_PATH).toUri())
     }
 }

@@ -8,18 +8,19 @@ import fr.berliat.hskwidget.data.dao.WidgetListDAO
 import fr.berliat.hskwidget.data.model.WidgetListEntry
 import fr.berliat.hskwidget.data.model.WordListWithCount
 import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 internal val Context.dataStore: DataStore<Preferences> by preferencesDataStore("WidgetPreferenceStore")
 
 class FlashcardPreferencesStore(private val context: Context, private val widgetId: Int):
     PrefixedPreferenceDataStoreBridge(context.dataStore, widgetId.toString()) {
-    private suspend fun WidgetListsDAO(): WidgetListDAO {
+    private suspend fun widgetListsDAO(): WidgetListDAO = withContext(Dispatchers.IO) {
         val inst = DatabaseHelper.getInstance(context)
-        val dao = inst.widgetListDAO()
 
-        return dao
+        return@withContext inst.widgetListDAO()
     }
-    private suspend fun WordListDAO() = DatabaseHelper.getInstance(context).wordListDAO()
+    private suspend fun wordListDAO() = DatabaseHelper.getInstance(context).wordListDAO()
 
     var currentSimplified : String?
         get() = this.getString(PREFERENCE_CURRENT_SIMPLIFIED,null)
@@ -28,16 +29,16 @@ class FlashcardPreferencesStore(private val context: Context, private val widget
         return this.putString(PREFERENCE_CURRENT_SIMPLIFIED, word, callback)
     }
 
-    suspend fun getAllowedLists(): List<WordListWithCount> {
-        val widgetListIds = WidgetListsDAO().getListsForWidget(widgetId)
-        val lists = WordListDAO().getAllLists()
+    suspend fun getAllowedLists(): List<WordListWithCount> = withContext(Dispatchers.IO) {
+        val widgetListIds = widgetListsDAO().getListsForWidget(widgetId)
+        val lists = wordListDAO().getAllLists()
         val listIds = lists.map { it.wordList.id }
 
         // Lists to clean -- should be nothing but just in case
         val toDelete = widgetListIds.filter { wl -> ! listIds.contains(wl) }
-        WidgetListsDAO().deleteWidgetLists(toDelete.map { it -> WidgetListEntry(widgetId, it) })
+        widgetListsDAO().deleteWidgetLists(toDelete.map { it -> WidgetListEntry(widgetId, it) })
 
-        return lists.filter { widgetListIds.contains(it.wordList.id) }
+        return@withContext lists.filter { widgetListIds.contains(it.wordList.id) }
     }
 
     companion object {

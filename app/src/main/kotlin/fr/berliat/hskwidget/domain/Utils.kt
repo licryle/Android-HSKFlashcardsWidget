@@ -102,7 +102,7 @@ class Utils {
             } else {
                 try {
                     context.startActivity(Intent.createChooser(intent, "Send email with..."))
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     Toast.makeText(
                         context,
                         context.getString(R.string.about_email_noapp),
@@ -212,48 +212,48 @@ class Utils {
             return false
         }
 
-        suspend fun listFilesInSAFDirectory(context: Context, directoryUri: Uri): List<DocumentFile> {
+        suspend fun listFilesInSAFDirectory(context: Context, directoryUri: Uri): List<DocumentFile>
+            = withContext(Dispatchers.IO) {
             val dir = DocumentFile.fromTreeUri(context, directoryUri)
-            return dir?.listFiles()?.toList() ?: emptyList()
+            dir?.listFiles()?.toList() ?: emptyList()
         }
 
-        suspend fun copyFileUsingSAF(context: Context, sourceFile: File, destinationDir: Uri, fileName: String): Boolean {
-            return withContext(Dispatchers.IO) {
-                try {
-                    // Open input stream for the source database file
-                    val inputStream: InputStream = FileInputStream(sourceFile)
+        suspend fun copyFileUsingSAF(context: Context, sourceFile: File, destinationDir: Uri, fileName: String): Boolean
+            = withContext(Dispatchers.IO) {
+            try {
+                // Open input stream for the source database file
+                val inputStream: InputStream = FileInputStream(sourceFile)
 
-                    val dir = DocumentFile.fromTreeUri(context, destinationDir)
-                    val destinationFile = dir?.createFile("application/octet-stream", fileName)
+                val dir = DocumentFile.fromTreeUri(context, destinationDir)
+                val destinationFile = dir?.createFile("application/octet-stream", fileName)
 
-                    // Open OutputStream to the destination file
-                    context.contentResolver.openFileDescriptor(destinationFile!!.uri, "w")
-                        ?.use { parcelFileDescriptor ->
-                            FileOutputStream(parcelFileDescriptor.fileDescriptor).use { output ->
-                                // Copy data from source to destination
-                                inputStream.use { input ->
-                                    val buffer = ByteArray(1024)
-                                    var length: Int
-                                    while (input.read(buffer).also { length = it } > 0) {
-                                        output.write(buffer, 0, length)
-                                    }
+                // Open OutputStream to the destination file
+                context.contentResolver.openFileDescriptor(destinationFile!!.uri, "w")
+                    ?.use { parcelFileDescriptor ->
+                        FileOutputStream(parcelFileDescriptor.fileDescriptor).use { output ->
+                            // Copy data from source to destination
+                            inputStream.use { input ->
+                                val buffer = ByteArray(1024)
+                                var length: Int
+                                while (input.read(buffer).also { length = it } > 0) {
+                                    output.write(buffer, 0, length)
                                 }
                             }
                         }
+                    }
 
-                    true
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    false
-                }
+                true
+            } catch (e: Exception) {
+                e.printStackTrace()
+                false
             }
         }
 
-        suspend fun copyUriToCacheDir(context: Context, uri: Uri): File {
+        suspend fun copyUriToCacheDir(context: Context, uri: Uri): File = withContext(Dispatchers.IO) {
             if (uri.scheme == "file") {
                 val file = File(uri.path!!)
                 if (file.absolutePath.startsWith(context.cacheDir.absolutePath)) {
-                    return file // already in cacheDir, no need to copy
+                    return@withContext file // already in cacheDir, no need to copy
                 }
             }
 
@@ -268,7 +268,7 @@ class Utils {
                 inputStream.copyTo(output)
             }
 
-            return outFile
+            return@withContext outFile
         }
 
         fun hideKeyboard(context: Context, view: View) {

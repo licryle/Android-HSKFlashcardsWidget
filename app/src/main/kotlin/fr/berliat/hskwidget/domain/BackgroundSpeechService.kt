@@ -1,6 +1,5 @@
 package fr.berliat.hskwidget.domain
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
@@ -29,16 +28,15 @@ class BackgroundSpeechService(val context: Context, workerParams: WorkerParamete
         const val FAILURE_LANG_UNSUPPORTED = "FAILURE_LANG_UNSUPPORTED"
     }
 
-    @SuppressLint("RestrictedApi")
     override fun doWork(): Result {
-        Log.i(TAG, "Readying to play  ${word} out loud.")
+        Log.i(TAG, "Readying to play  $word out loud.")
         if (isMuted()) {
             Log.i(TAG, "But volume is muted. Aborting.")
             return buildErrorResult(FAILURE_MUTED)
         }
 
         while (initStatus == null) {
-            Log.i(TAG, "Not (yet) ready to play  ${word} out loud.")
+            Log.i(TAG, "Not (yet) ready to play  $word out loud.")
             sleep(10)
         }
 
@@ -47,7 +45,7 @@ class BackgroundSpeechService(val context: Context, workerParams: WorkerParamete
             return buildErrorResult(FAILURE_INIT_FAILED)
         }
 
-        Log.i(TAG, "Setting language to play  ${word} out loud.")
+        Log.i(TAG, "Setting language to play  $word out loud.")
         val result = textToSpeech.setLanguage(Locale.SIMPLIFIED_CHINESE)
         if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
             Log.e(TAG, "Simplified_chinese not supported on this phone.")
@@ -60,9 +58,9 @@ class BackgroundSpeechService(val context: Context, workerParams: WorkerParamete
             return buildErrorResult(FAILURE_LANG_UNSUPPORTED)
         }
 
-        Log.i(TAG, "Starting to play  ${word} out loud.")
+        Log.i(TAG, "Starting to play  $word out loud.")
         textToSpeech.speak(word, TextToSpeech.QUEUE_FLUSH, null, "")
-        Log.i(TAG, "Finishing to play  ${word} out loud.")
+        Log.i(TAG, "Finishing to play  $word out loud.")
 
         return Result.success()
     }

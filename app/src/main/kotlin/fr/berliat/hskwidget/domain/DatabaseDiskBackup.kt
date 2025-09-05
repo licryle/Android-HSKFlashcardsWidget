@@ -10,6 +10,8 @@ import androidx.activity.result.ActivityResultCaller
 import androidx.activity.result.contract.ActivityResultContracts
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.data.store.DatabaseHelper
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -75,7 +77,8 @@ class DatabaseDiskBackup(comp: ActivityResultCaller,
         }
     }
 
-    suspend fun cleanOldBackups(destinationFolderUri: Uri, maxBackups: Int) {
+    suspend fun cleanOldBackups(destinationFolderUri: Uri, maxBackups: Int)
+            = withContext(Dispatchers.IO) {
         val documents = Utils.listFilesInSAFDirectory(context, destinationFolderUri)
             .filter { it.name?.endsWith(DatabaseHelper.DATABASE_FILENAME) == true }
             .sortedByDescending { it.lastModified() }  // Most recent first
@@ -93,7 +96,7 @@ class DatabaseDiskBackup(comp: ActivityResultCaller,
         }
     }
 
-    suspend fun backUp(destinationFolderUri: Uri): Boolean {
+    suspend fun backUp(destinationFolderUri: Uri): Boolean = withContext(Dispatchers.IO) {
         Log.d(TAG, "Initiating Database Backup")
         val db = DatabaseHelper.getInstance(context)
 
@@ -102,7 +105,7 @@ class DatabaseDiskBackup(comp: ActivityResultCaller,
         val fileName = "${current.format(formatter)}_${DatabaseHelper.DATABASE_FILENAME}"
         val snapshotFile = db.snapshotDatabase()
 
-        return Utils.copyFileUsingSAF(context, snapshotFile, destinationFolderUri, fileName)
+        return@withContext Utils.copyFileUsingSAF(context, snapshotFile, destinationFolderUri, fileName)
     }
 
     companion object {

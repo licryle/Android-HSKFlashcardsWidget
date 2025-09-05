@@ -21,22 +21,24 @@ class FlashcardManager private constructor(private val context: Context,
     private val appWidgetMgr = AppWidgetManager.getInstance(context)
     private val coroutineScope = Utils.getAppScope(context)
 
-    private suspend fun AnnotatedChineseWordDAO() = DatabaseHelper.getInstance(context).annotatedChineseWordDAO()
+    private suspend fun AnnotatedChineseWordDAO() = withContext(Dispatchers.IO) {
+        DatabaseHelper.getInstance(context).annotatedChineseWordDAO()
+    }
 
     fun getPreferenceStore(): FlashcardPreferencesStore {
         return FlashcardPreferencesStore(context, widgetId)
     }
 
-    suspend fun getCurrentWord() : ChineseWord? {
-        if (flashCardPrefs.currentSimplified == null) return null
+    suspend fun getCurrentWord() : ChineseWord? = withContext(Dispatchers.IO) {
+        if (flashCardPrefs.currentSimplified == null) return@withContext null
 
         val currentWord = AnnotatedChineseWordDAO().getFromSimplified(flashCardPrefs.currentSimplified)
-            ?: return null
+            ?: return@withContext null
 
-        return currentWord.toChineseWord()
+        return@withContext currentWord.toChineseWord()
     }
 
-    suspend fun getNewWord(): ChineseWord? {
+    suspend fun getNewWord(): ChineseWord? = withContext(Dispatchers.IO) {
         val currentWord = AnnotatedChineseWordDAO().getFromSimplified(flashCardPrefs.currentSimplified)
 
         val allowedListIds = flashCardPrefs.getAllowedLists().map { it.wordList.id }
@@ -45,7 +47,7 @@ class FlashcardManager private constructor(private val context: Context,
         if (newWord == null) {
             Log.i(TAG, "getNewWord: No new word gotten, null returned.")
             flashCardPrefs.currentSimplified = null
-            return null
+            return@withContext null
         }
 
         Log.i(TAG, "getNewWord: Got a new word, maybe: %s".format(newWord))
@@ -53,7 +55,7 @@ class FlashcardManager private constructor(private val context: Context,
         // Persist it in preferences for cross-App convenience
         flashCardPrefs.setCurrentSimplified(newWord.simplified, null).await()
 
-        return newWord.toChineseWord()
+        return@withContext newWord.toChineseWord()
     }
 
     fun updateWord() {

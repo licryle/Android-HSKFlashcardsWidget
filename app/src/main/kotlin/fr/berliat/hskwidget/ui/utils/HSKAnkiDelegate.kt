@@ -7,6 +7,8 @@ import fr.berliat.ankidroidhelper.AnkiDelegate
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.store.AnkiStore
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class HSKAnkiDelegate(val fragment: Fragment, handler: HandlerInterface? = null)  : AnkiDelegate(fragment, handler) {
     private val context = fragment.requireContext()
@@ -32,13 +34,15 @@ class HSKAnkiDelegate(val fragment: Fragment, handler: HandlerInterface? = null)
         return result
     }
 
-    override suspend fun safelyModifyAnkiDbIfAllowed(ankiDbAction: suspend () -> Result<Unit>): Result<Unit> {
-        if (!appConfig.ankiSaveNotes) return Result.failure(AnkiOperationsFailures.AnkiFailure_Off)
+    override suspend fun safelyModifyAnkiDbIfAllowed(ankiDbAction: suspend () -> Result<Unit>): Result<Unit>
+            = withContext(Dispatchers.IO) {
+        if (!appConfig.ankiSaveNotes)
+            return@withContext Result.failure(AnkiOperationsFailures.AnkiFailure_Off)
 
-        return super.safelyModifyAnkiDbIfAllowed(ankiDbAction)
+        return@withContext super.safelyModifyAnkiDbIfAllowed(ankiDbAction)
     }
 
-    override suspend fun ensureAnkiDroidIsRunning() {
+    override suspend fun ensureAnkiDroidIsRunning() = withContext(Dispatchers.IO) {
         if (!ankiStore.isStoreReady()) {
             super.ensureAnkiDroidIsRunning()
         }

@@ -20,8 +20,12 @@ class FlashcardWidgetConfigFragment() : Fragment() {
     private lateinit var viewBinding: FlashcardWidgetConfigureBinding
     private var _widgetId: Int? = null
     private val prefListeners = mutableListOf<WidgetPreferenceListener>()
-    private suspend fun WidgetListsDAO() = DatabaseHelper.getInstance(requireContext()).widgetListDAO()
-    private suspend fun WordListDAO() = DatabaseHelper.getInstance(requireContext()).wordListDAO()
+    private suspend fun widgetListsDAO() = withContext(Dispatchers.IO) {
+        DatabaseHelper.getInstance(requireContext()).widgetListDAO()
+    }
+    private suspend fun wordListDAO() = withContext(Dispatchers.IO) {
+        DatabaseHelper.getInstance(requireContext()).wordListDAO()
+    }
 
     private val switchList = mutableMapOf<Long, MaterialSwitch>()
 
@@ -44,8 +48,8 @@ class FlashcardWidgetConfigFragment() : Fragment() {
             FlashcardWidgetConfigureBinding.inflate(inflater, container, false) // Inflate here
 
         lifecycleScope.launch(Dispatchers.IO) {
-            val widgetList = WidgetListsDAO().getListsForWidget(widgetId)
-            val allLists = WordListDAO().getAllLists()
+            val widgetList = widgetListsDAO().getListsForWidget(widgetId)
+            val allLists = wordListDAO().getAllLists()
 
             withContext(Dispatchers.Main) {
                 for (list in allLists) {
@@ -78,8 +82,8 @@ class FlashcardWidgetConfigFragment() : Fragment() {
                 fireWidgetPreferenceEmpty()
             } else {
                 lifecycleScope.launch(Dispatchers.IO) {
-                    WidgetListsDAO().deleteWidget(widgetId)
-                    WidgetListsDAO().insertListsToWidget(entriesToAdd)
+                    widgetListsDAO().deleteWidget(widgetId)
+                    widgetListsDAO().insertListsToWidget(entriesToAdd)
 
                     withContext(Dispatchers.Main) {
                         fireWidgetPreferenceSaved()

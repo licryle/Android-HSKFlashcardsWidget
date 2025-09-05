@@ -8,6 +8,8 @@ import fr.berliat.hskwidget.data.store.AnkiStore
 import fr.berliat.hskwidget.data.store.DatabaseHelper
 import fr.berliat.hskwidget.domain.AnkiDeck
 import fr.berliat.hskwidget.domain.AnkiSyncWordListsService
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlin.Result
 import kotlin.reflect.KClass
 
@@ -43,25 +45,25 @@ import kotlin.reflect.KClass
 class WordListRepository(private val context: Context) {
     private val ankiStore = AnkiStore(context)
 
-    private suspend fun wordListDAO() = DatabaseHelper.getInstance(context).wordListDAO()
-    private suspend fun annotatedChineseWordDAO() = DatabaseHelper.getInstance(context).annotatedChineseWordDAO()
+    private suspend fun wordListDAO() = withContext(Dispatchers.IO) { DatabaseHelper.getInstance(context).wordListDAO() }
+    private suspend fun annotatedChineseWordDAO() = withContext(Dispatchers.IO) { DatabaseHelper.getInstance(context).annotatedChineseWordDAO() }
 
     /****** NOT TOUCHING ANKI *******/
-    suspend fun getAllLists() = wordListDAO().getAllLists()
-    suspend fun getSystemLists() = wordListDAO().getSystemLists()
-    suspend fun getUserLists() = wordListDAO().getUserLists()
-    suspend fun getWordListsForWord(wordId: String) = wordListDAO().getWordListsForWord(wordId)
+    suspend fun getAllLists() = withContext(Dispatchers.IO) { wordListDAO().getAllLists() }
+    suspend fun getSystemLists() = withContext(Dispatchers.IO) { wordListDAO().getSystemLists() }
+    suspend fun getUserLists() = withContext(Dispatchers.IO) { wordListDAO().getUserLists() }
+    suspend fun getWordListsForWord(wordId: String) = withContext(Dispatchers.IO) { wordListDAO().getWordListsForWord(wordId) }
 
-    suspend fun isWordInList(wordList: WordList, simplified: String) : Boolean {
+    suspend fun isWordInList(wordList: WordList, simplified: String) : Boolean = withContext(Dispatchers.IO) {
         val existingEntries = wordListDAO().getEntriesForWord(simplified)
-        return (existingEntries.any { it.listId == wordList.id })
+        return@withContext (existingEntries.any { it.listId == wordList.id })
     }
 
-    suspend fun isNameUnique(name: String, excludeId: Long = 0): Boolean {
-        return wordListDAO().countByName(name, excludeId) == 0
+    suspend fun isNameUnique(name: String, excludeId: Long = 0): Boolean = withContext(Dispatchers.IO) {
+        wordListDAO().countByName(name, excludeId) == 0
     }
 
-    suspend fun createList(name: String) {
+    suspend fun createList(name: String) = withContext(Dispatchers.IO) {
         val list = WordList(name)
 
         if (!isNameUnique(name)) {
@@ -71,7 +73,7 @@ class WordListRepository(private val context: Context) {
         wordListDAO().insertList(list)
     }
 
-    suspend fun renameList(id: Long, newName: String) {
+    suspend fun renameList(id: Long, newName: String) = withContext(Dispatchers.IO) {
         if (!isNameUnique(newName, id)) {
             throw Exception("A word list with this name already exists")
         }
@@ -85,7 +87,8 @@ class WordListRepository(private val context: Context) {
         return AnkiSyncWordListsService::class
     }
 
-    suspend fun updateWordListAssociations(simplified: String, listIds: List<Long>): (suspend () -> Result<Unit>)? {
+    suspend fun updateWordListAssociations(simplified: String, listIds: List<Long>): (suspend () -> Result<Unit>)?
+            = withContext(Dispatchers.IO) {
         // First remove all existing associations for this word
         val entries = wordListDAO().getEntriesForWord(simplified)
 
@@ -102,7 +105,7 @@ class WordListRepository(private val context: Context) {
             wordListDAO().deleteWordFromList(entry.listId, simplified)
         }
 
-        return suspend { // Now do the Anki bidding by removing notes from entries
+        return@withContext suspend { // Now do the Anki bidding by removing notes from entries
             var nbErrors = 0
             for (toDel in toDelete) {
                 if (!ankiStore.deleteCard(toDel)) {
@@ -128,15 +131,15 @@ class WordListRepository(private val context: Context) {
         }
     }
 
-    suspend fun deleteList(list: WordList): (suspend () -> Result<Unit>)? {
+    suspend fun deleteList(list: WordList): (suspend () -> Result<Unit>)? = withContext(Dispatchers.IO) {
         val entries = wordListDAO().getListEntries(list.id)
         wordListDAO().deleteList(list)
 
-        if (entries.isEmpty()) return null
+        if (entries.isEmpty()) return@withContext null
 
         wordListDAO().deleteAllFromList(list.id)
 
-        return suspend {
+        return@withContext suspend {
             var nbErrors = 0
             for (entry in entries) {
                 if (!ankiStore.deleteCard(entry)) {
@@ -153,7 +156,8 @@ class WordListRepository(private val context: Context) {
         }
     }
 
-    suspend fun insertWordToList(wordList: WordList, word: AnnotatedChineseWord): (suspend () -> Result<Unit>)? {
+    suspend fun insertWordToList(wordList: WordList, word: AnnotatedChineseWord): (suspend () -> Result<Unit>)?
+            = withContext(Dispatchers.IO) {
         val entries = wordListDAO().getEntriesForWord(word.simplified)
         var entry = entries.find { it.listId == wordList.id }
 
@@ -163,10 +167,10 @@ class WordListRepository(private val context: Context) {
         }
 
         if (entry.ankiNoteId != WordList.ANKI_ID_EMPTY) {
-            return null
+            return@withContext null
         }
 
-        return suspend { // Will execute only if Anki integration is active, allowed and ready to fire
+        return@withContext suspend { // Will execute only if Anki integration is active, allowed and ready to fire
             val deck = AnkiDeck.getOrCreate(context, ankiStore, wordList)
 
             if (ankiStore.importOrUpdateCard(deck, entry, word) != null) {
@@ -177,8 +181,9 @@ class WordListRepository(private val context: Context) {
         }
     }
 
-    suspend fun removeWordFromList(wordList: WordList, simplified: String): (suspend () -> Result<Unit>)? {
-        if (!isWordInList(wordList, simplified)) return null
+    suspend fun removeWordFromList(wordList: WordList, simplified: String): (suspend () -> Result<Unit>)?
+            = withContext(Dispatchers.IO) {
+        if (!isWordInList(wordList, simplified)) return@withContext null
 
         val entries = wordListDAO().getEntriesForWord(simplified)
         val entry = entries.find { it.listId == wordList.id }
@@ -186,7 +191,7 @@ class WordListRepository(private val context: Context) {
         // Checked on first list of function
         wordListDAO().deleteWordFromList(entry!!.listId, entry.simplified)
 
-        return suspend { // Will execute only if Anki integration is active, allowed and ready to fire
+        return@withContext suspend { // Will execute only if Anki integration is active, allowed and ready to fire
             if (ankiStore.deleteCard(entry)) {
                 Result.success(Unit)
             } else {
@@ -197,14 +202,15 @@ class WordListRepository(private val context: Context) {
         }
     }
 
-    suspend fun removeWordFromAllLists(simplified: String): (suspend () -> Result<Unit>)? {
-        if (wordListDAO().getEntriesForWord(simplified).isEmpty()) return null
+    suspend fun removeWordFromAllLists(simplified: String): (suspend () -> Result<Unit>)?
+            = withContext(Dispatchers.IO) {
+        if (wordListDAO().getEntriesForWord(simplified).isEmpty()) return@withContext null
 
         // saving entries for callback before deleting in DB
         val entries = wordListDAO().getEntriesForWord(simplified)
         wordListDAO().removeWordFromAllLists(simplified)
 
-        return suspend { // Will execute only if Anki integration is active, allowed and ready to fire
+        return@withContext suspend { // Will execute only if Anki integration is active, allowed and ready to fire
             var nbErrors = 0
             for (entry in entries) {
                 if (!ankiStore.deleteCard(entry)) {
@@ -222,7 +228,8 @@ class WordListRepository(private val context: Context) {
         }
     }
 
-    suspend fun addWordToList(wordList: WordList, word: AnnotatedChineseWord): (suspend () -> Result<Unit>)? {
+    suspend fun addWordToList(wordList: WordList, word: AnnotatedChineseWord): (suspend () -> Result<Unit>)?
+            = withContext(Dispatchers.IO) {
         var entry = wordListDAO().getEntriesForWord(word.simplified).find { it.listId == wordList.id }
 
         if (entry == null) {
@@ -232,9 +239,9 @@ class WordListRepository(private val context: Context) {
         }
 
         // Anki now
-        if (entry.ankiNoteId != WordList.ANKI_ID_EMPTY) return null
+        if (entry.ankiNoteId != WordList.ANKI_ID_EMPTY) return@withContext null
 
-        return suspend { // Will execute only if Anki integration is active, allowed and ready to fire
+        return@withContext suspend { // Will execute only if Anki integration is active, allowed and ready to fire
             // Create deck if needed (shouldn't)
             val deck = AnkiDeck.getOrCreate(context, ankiStore, wordList)
 
@@ -246,28 +253,30 @@ class WordListRepository(private val context: Context) {
         }
     }
 
-    suspend fun addWordToSysAnnotatedList(word: AnnotatedChineseWord): (suspend () -> Result<Unit>)? {
+    suspend fun addWordToSysAnnotatedList(word: AnnotatedChineseWord): (suspend () -> Result<Unit>)?
+            = withContext(Dispatchers.IO) {
         val wordList = getSystemLists()
 
         val annotList = wordList.find { it.name == WordList.SYSTEM_ANNOTATED_NAME }
-        if (annotList == null) return null
+        if (annotList == null) return@withContext null
 
-        return addWordToList(annotList.wordList, word)
+        return@withContext addWordToList(annotList.wordList, word)
     }
 
-    suspend fun touchAnnotatedList() : Boolean {
+    suspend fun touchAnnotatedList() : Boolean = withContext(Dispatchers.IO) {
         val wordList = getSystemLists()
 
         val annotList = wordList.find { it.name == WordList.SYSTEM_ANNOTATED_NAME }
-        if (annotList == null) return false
+        if (annotList == null) return@withContext false
 
-        return wordListDAO().touchList(annotList.id) > 0
+        return@withContext wordListDAO().touchList(annotList.id) > 0
     }
 
-    suspend fun updateInAllLists(simplified: String): (suspend () -> Result<Unit>)? {
-        if (wordListDAO().getEntriesForWord(simplified).isEmpty()) return null
+    suspend fun updateInAllLists(simplified: String): (suspend () -> Result<Unit>)?
+            = withContext(Dispatchers.IO) {
+        if (wordListDAO().getEntriesForWord(simplified).isEmpty()) return@withContext null
 
-        return suspend { // Will execute only if Anki integration is active, allowed and ready to fire
+        return@withContext suspend { // Will execute only if Anki integration is active, allowed and ready to fire
             val entries = wordListDAO().getEntriesForWord(simplified)
 
             var nbErrors = 0

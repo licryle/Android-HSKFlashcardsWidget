@@ -5,6 +5,8 @@ import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.model.WordList
 import fr.berliat.hskwidget.data.store.AnkiStore
 import fr.berliat.hskwidget.data.store.DatabaseHelper
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class AnkiDeck private constructor(private val context: Context,
                                    private val wordList: WordList
@@ -14,7 +16,7 @@ class AnkiDeck private constructor(private val context: Context,
     val ankiId: Long
         get() = _ankiId
 
-    internal suspend fun setAnkiId(newAnkiId: Long) {
+    internal suspend fun setAnkiId(newAnkiId: Long) = withContext(Dispatchers.IO) {
         try {
             if (_ankiId != newAnkiId) {
                 DatabaseHelper.getInstance(context).wordListDAO()
@@ -40,7 +42,7 @@ class AnkiDeck private constructor(private val context: Context,
             context: Context,
             store: AnkiStore,
             wordList: WordList
-        ): AnkiDeck {
+        ): AnkiDeck = withContext(Dispatchers.IO) {
             val deck = AnkiDeck(context, wordList)
             val decks = store.api.getDeckList()?: emptyMap()
 
@@ -57,7 +59,7 @@ class AnkiDeck private constructor(private val context: Context,
                 deck.setAnkiId(ankiDeckId)
             }
 
-            return deck
+            return@withContext deck
         }
     }
 }

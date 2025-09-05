@@ -64,9 +64,9 @@ class DisplayOCRViewModel(private val savedStateHandle: SavedStateHandle, val ap
         clickedWords.clear()
     }
 
-    suspend fun frequencyWordsRepo(): ChineseWordFrequencyRepo {
+    suspend fun frequencyWordsRepo(): ChineseWordFrequencyRepo = withContext(Dispatchers.IO) {
         val db = DatabaseHelper.getInstance(application)
-        return ChineseWordFrequencyRepo(
+        return@withContext ChineseWordFrequencyRepo(
             db.chineseWordFrequencyDAO(),
             db.annotatedChineseWordDAO()
         )
@@ -84,7 +84,7 @@ class DisplayOCRViewModel(private val savedStateHandle: SavedStateHandle, val ap
         }
     }
 
-    suspend fun fetchWord(hanzi: String): AnnotatedChineseWord? {
+    suspend fun fetchWord(hanzi: String): AnnotatedChineseWord? = withContext(Dispatchers.IO) {
         Log.d(TAG, "Searching for $hanzi")
         val db = DatabaseHelper.getInstance(application)
         val dao = db.annotatedChineseWordDAO()
@@ -92,11 +92,11 @@ class DisplayOCRViewModel(private val savedStateHandle: SavedStateHandle, val ap
             val word = dao.getFromSimplified(hanzi)
             Log.d(TAG, "Search returned for $hanzi")
 
-            return word
+            return@withContext word
         } catch (e: Exception) {
             // Code for handling the exception
             Log.e(TAG, "$e")
-            return null
+            return@withContext null
         }
     }
 

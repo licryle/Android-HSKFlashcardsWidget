@@ -10,19 +10,21 @@ import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.WordList
 import fr.berliat.hskwidget.data.model.WordListEntry
 import fr.berliat.hskwidget.domain.AnkiDeck
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.util.Locale
 
 class AnkiStore(val context: Context):
     PrefixedPreferenceDataStoreBridge(context.dataStore, "anki") {
     val api: AnkiDAO = AnkiDAO(context)
 
-    private suspend fun database() = DatabaseHelper.getInstance(context)
+    private suspend fun database() = withContext(Dispatchers.IO) { DatabaseHelper.getInstance(context) }
 
-    suspend fun isStoreReady() : Boolean {
-        return api.getDeckList() != null
+    suspend fun isStoreReady() : Boolean = withContext(Dispatchers.IO) {
+        api.getDeckList() != null
     }
 
-    suspend fun getOrCreateModelId(): Long? {
+    suspend fun getOrCreateModelId(): Long? = withContext(Dispatchers.IO) {
         var mid : Long? = getModelId()
 
         if (mid == null || mid.toInt() == 0 || !api.isModelExist(mid)) {
@@ -31,18 +33,18 @@ class AnkiStore(val context: Context):
 
             if (mid == null) {
                 Log.i(TAG, "findOrCreateModelIdByName: Couldn't add model to Anki")
-                return null
+                return@withContext null
             }
 
             Log.i(TAG, "findOrCreateModelIdByName: Inserted new Model into Anki")
             setModelId(mid)
         }
 
-        return mid
+        return@withContext mid
     }
 
-    suspend fun deleteCard(word: WordListEntry): Boolean {
-        return word.ankiNoteId.let { api.deleteNote(it) }
+    suspend fun deleteCard(word: WordListEntry): Boolean = withContext(Dispatchers.IO) {
+        word.ankiNoteId.let { api.deleteNote(it) }
     }
 
     private fun setModelId(modelId: Long) {
@@ -55,8 +57,8 @@ class AnkiStore(val context: Context):
 
     private fun getModelName() : String { return context.getString(R.string.app_name) }
 
-    private suspend fun createModel() : Long? {
-        return api.addNewCustomModel(
+    private suspend fun createModel() : Long? = withContext(Dispatchers.IO) {
+        api.addNewCustomModel(
             getModelName(),
             FIELDS,
             CARD_NAMES,
@@ -74,9 +76,10 @@ class AnkiStore(val context: Context):
         )
     }
 
-    suspend fun importOrUpdateCard(deck: AnkiDeck, wordEntry: WordListEntry, word: AnnotatedChineseWord): Long? {
+    suspend fun importOrUpdateCard(deck: AnkiDeck, wordEntry: WordListEntry, word: AnnotatedChineseWord): Long?
+            = withContext(Dispatchers.IO) {
         Log.d(TAG, "importOrUpdateCard: ${word.simplified} to Anki")
-        val modelId = getOrCreateModelId() ?: return null
+        val modelId = getOrCreateModelId() ?: return@withContext null
         if (deck.ankiId == WordList.ANKI_ID_EMPTY) throw IllegalStateException("Couldn't create a new Deck in Anki")
 
         with (word.annotation) {
@@ -111,7 +114,7 @@ class AnkiStore(val context: Context):
                 api.updateNoteFields(note.id, fields)
                 api.updateNoteTags(note.id, tags)
                 api.updateNoteDeck(note.id, deck.ankiId)
-                return note.id
+                return@withContext note.id
             } else {
                 val ankiNoteId = api.addNote(modelId, deck.ankiId, fields, tags)
 
@@ -119,7 +122,7 @@ class AnkiStore(val context: Context):
                     database().wordListDAO().updateAnkiNoteId(wordEntry.listId, wordEntry.simplified, ankiNoteId)
                 }
 
-                return ankiNoteId
+                return@withContext ankiNoteId
             }
         }
     }

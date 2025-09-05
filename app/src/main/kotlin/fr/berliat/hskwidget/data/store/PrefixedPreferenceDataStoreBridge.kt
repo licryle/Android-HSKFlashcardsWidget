@@ -123,7 +123,7 @@ open class PrefixedPreferenceDataStoreBridge(private val dataStore: DataStore<Pr
         }
     }
 
-    suspend fun getAllKeys(stripPrefix: Boolean) : Array<String> {
+    suspend fun getAllKeys(stripPrefix: Boolean) : Array<String> = withContext(Dispatchers.IO) {
         val prefs = dataStore.data.map {
                 preferences ->
             preferences.asMap().filter {
@@ -137,6 +137,6 @@ open class PrefixedPreferenceDataStoreBridge(private val dataStore: DataStore<Pr
             }
         }.first()
 
-        return prefs.toTypedArray()
+        return@withContext prefs.toTypedArray()
     }
 }

@@ -23,7 +23,7 @@ class AnnotateViewModel(val context: Context, val wordListRepo: WordListReposito
     val annotatedWord: LiveData<AnnotatedChineseWord> get() = _annotatedWord
     val simplified: String get() = _annotatedWord.value?.simplified ?: ""
 
-    private suspend fun database() = DatabaseHelper.getInstance(context)
+    private suspend fun database() = withContext(Dispatchers.IO) { DatabaseHelper.getInstance(context) }
 
     // Fetch annotated word for a given simplified word
     fun fetchAnnotatedWord(arguments: Bundle?) {
@@ -43,9 +43,10 @@ class AnnotateViewModel(val context: Context, val wordListRepo: WordListReposito
         }
     }
 
-    suspend fun getAnnotatedChineseWord(simplifiedWord: String): AnnotatedChineseWord {
+    suspend fun getAnnotatedChineseWord(simplifiedWord: String): AnnotatedChineseWord
+            = withContext(Dispatchers.IO) {
         val annot = database().annotatedChineseWordDAO().getFromSimplified(simplifiedWord)
-        return if (annot == null || !annot.hasAnnotation()) {
+        return@withContext if (annot == null || !annot.hasAnnotation()) {
             AnnotatedChineseWord(
                 annot?.word ?: ChineseWord.getBlank(simplifiedWord),
                 ChineseWordAnnotation.getBlank(simplifiedWord)
