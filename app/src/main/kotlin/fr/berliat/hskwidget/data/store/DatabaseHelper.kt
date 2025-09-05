@@ -150,7 +150,7 @@ class DatabaseHelper private constructor(val context: Context) {
         dbToUpdate.widgetListDAO().deleteAllWidgets()
         dbToUpdate.widgetListDAO().insertListsToWidget(importedWidgets)
 
-        Log.i(Companion.TAG, "Database import done")
+        Log.i(TAG, "Database import done")
     }
 
     suspend fun replaceWordsDataInDB(dbToUpdate: Callable<InputStream>, updateWith: Callable<InputStream>): ChineseWordsDatabase

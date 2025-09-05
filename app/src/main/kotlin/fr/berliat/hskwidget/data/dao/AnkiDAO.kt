@@ -55,7 +55,7 @@ class AnkiDAO(context: Context) {
                 val rowsUpdated = resolver.update(contentUri, values, null, null)
                 toUpdate = rowsUpdated > 0
                 i += 1
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 toUpdate = false
                 Log.d(TAG, "Updated $i cards for note $noteId")
             }
