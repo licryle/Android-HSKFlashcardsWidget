@@ -5,6 +5,7 @@ plugins {
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
     id("com.google.devtools.ksp")
+    kotlin("kapt")
 }
 
 android {
@@ -16,7 +17,7 @@ android {
         minSdk = 26
         //noinspection EditedTargetSdkVersion
         targetSdk = 36
-        versionCode = 37
+        versionCode = 38
         versionName = "3.8.4"
         buildConfigField("String", "APP_VERSION", "\"$versionName-$versionCode\"")
 
@@ -66,7 +67,7 @@ dependencies {
 
     implementation("androidx.core:core-ktx:1.17.0")
     implementation("androidx.appcompat:appcompat:1.7.1")
-    implementation("com.google.android.material:material:1.12.0")
+    implementation("com.google.android.material:material:1.13.0")
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
     implementation("androidx.compose.material:material-ripple:1.9.0")
     implementation("androidx.constraintlayout:constraintlayout:2.2.1")

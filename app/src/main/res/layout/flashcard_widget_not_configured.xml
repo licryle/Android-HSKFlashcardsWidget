@@ -13,6 +13,7 @@
         android:id="@+id/flashcard_loading_icon"
         android:layout_width="50dp"
         android:layout_height="50dp"
+        android:contentDescription="@string/app_name"
         android:maxWidth="50dp"
         android:src="@mipmap/ic_launcher_round"
         android:foreground="@drawable/round_foreground"

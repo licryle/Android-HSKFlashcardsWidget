@@ -15,6 +15,7 @@
         android:layout_height="50dp"
         android:layout_gravity="center"
         android:layout_margin="30dp"
+        android:contentDescription="@string/app_name"
         android:maxWidth="50dp"
         android:src="@mipmap/ic_launcher_round"
         android:foreground="@drawable/round_foreground"

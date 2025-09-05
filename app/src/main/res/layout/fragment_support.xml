@@ -60,6 +60,7 @@
                     android:id="@+id/tierIcon"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
+                    android:contentDescription="@string/support_status"
                     android:src="@drawable/bakery_dining_24px" />
 
                 <TextView

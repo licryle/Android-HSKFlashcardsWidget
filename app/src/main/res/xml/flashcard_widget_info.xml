@@ -4,7 +4,7 @@
     android:description="@string/app_widget_description"
     android:initialKeyguardLayout="@layout/flashcard_widget"
 
-    android:previewImage="@drawable/flashcard_widget_example"
+    android:previewImage="@mipmap/flashcard_widget_example"
     android:initialLayout="@layout/flashcard_widget_loading"
     android:previewLayout="@layout/flashcard_widget"
 
