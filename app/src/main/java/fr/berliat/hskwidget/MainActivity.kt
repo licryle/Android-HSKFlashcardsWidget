@@ -152,7 +152,9 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
                     successCallback()
                 }
             } catch (e: Exception) {
-                failureCallback(e)
+                withContext(Dispatchers.Main) {
+                    failureCallback(e)
+                }
             } finally {
                 dbHelper.cleanTempDatabaseFiles()
             }
