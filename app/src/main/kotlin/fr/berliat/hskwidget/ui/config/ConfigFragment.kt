@@ -31,6 +31,8 @@ import fr.berliat.hskwidget.ui.utils.HSKAnkiDelegate
 import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileInputStream
@@ -49,6 +51,8 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
     private lateinit var ankiDelegate: HSKAnkiDelegate
     private var ankiSyncServiceDelegate: AnkiSyncServiceDelegate? = null
     private lateinit var gDriveBackUp : GoogleDriveBackup
+    private var gDriveBackupSnapshot : File? = null
+    private var gDriveBackupSnapMutex = Mutex()
 
     val cloudRestoreFilePath
         get() = File("${requireContext().cacheDir}/restore/${DatabaseHelper.DATABASE_FILENAME}")
@@ -150,21 +154,35 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
             binding.configBackupCloudAccount.text = getString(R.string.config_backup_cloud_account_notconfigured)
     }*/
 
+    private fun deleteBackupSnapshot() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            gDriveBackupSnapMutex.withLock {
+                if (gDriveBackupSnapshot?.exists() == true) gDriveBackupSnapshot?.delete()
+                gDriveBackupSnapshot = null // technically not needed
+            }
+        }
+    }
+
     private fun backupToCloud() {
         toggleBackupRestoreButtonsClickable(false)
 
         lifecycleScope.launch(Dispatchers.IO) {
             val dbHelper = DatabaseHelper.getInstance(requireContext())
-            val snapshot = dbHelper.snapshotDatabase()
 
-            gDriveBackUp.backup(
-                listOf(GoogleDriveBackupFile.UploadFile(
-                    "database.sqlite",
-                    FileInputStream(snapshot),
-                    "application/octet-stream",
-                    snapshot.length()
-                ))
-            )
+            gDriveBackupSnapMutex.withLock {
+                gDriveBackupSnapshot = dbHelper.snapshotDatabase()
+
+                gDriveBackUp.backup(
+                    listOf(
+                        GoogleDriveBackupFile.UploadFile(
+                            "database.sqlite",
+                            FileInputStream(gDriveBackupSnapshot),
+                            "application/octet-stream",
+                            gDriveBackupSnapshot!!.length()
+                        )
+                    )
+                )
+            }
         }
 
         Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.CONFIG_BACKUPCLOUD_BACKUP)
@@ -456,6 +474,8 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
             getString(R.string.googledrive_backup_success_title)
 
         toggleBackupRestoreButtonsClickable(true)
+
+        deleteBackupSnapshot()
     }
 
     override fun onBackupCancelled() {
@@ -466,6 +486,8 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
         binding.googledriveSyncProgressMessage.text =
             getString(R.string.googledrive_backup_cancel_message)
         toggleBackupRestoreButtonsClickable(true)
+
+        deleteBackupSnapshot()
     }
 
     override fun onBackupFailed(e: Exception) {
@@ -477,6 +499,8 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
             getString(R.string.googledrive_backup_failed_message, e.message)
         toggleBackupRestoreButtonsClickable(true)
         Utils.logAnalyticsError(TAG,"CloudBackUpFailed", e.message?: "")
+
+        deleteBackupSnapshot()
     }
 
     override fun onRestoreEmpty() {

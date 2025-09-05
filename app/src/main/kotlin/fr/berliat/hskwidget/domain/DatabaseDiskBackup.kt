@@ -105,7 +105,11 @@ class DatabaseDiskBackup(comp: ActivityResultCaller,
         val fileName = "${current.format(formatter)}_${DatabaseHelper.DATABASE_FILENAME}"
         val snapshotFile = db.snapshotDatabase()
 
-        return@withContext Utils.copyFileUsingSAF(context, snapshotFile, destinationFolderUri, fileName)
+        val success = Utils.copyFileUsingSAF(context, snapshotFile, destinationFolderUri, fileName)
+
+        snapshotFile.delete()
+
+        return@withContext success
     }
 
     companion object {
