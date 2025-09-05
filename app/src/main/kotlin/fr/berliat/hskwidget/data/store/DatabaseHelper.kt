@@ -24,8 +24,6 @@ class DatabaseHelper private constructor(val context: Context) {
     fun flushToDisk() = liveDatabase.flushToDisk()
     val liveDatabase
         get() = _db!!
-    val databasePath
-        get() = liveDatabase.databasePath
 
     private var _db: ChineseWordsDatabase? = null
     var DATABASE_LIVE_PATH : String = ""
