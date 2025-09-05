@@ -298,7 +298,7 @@ class SupportDevStore private constructor(private val context: Context) : Purcha
     companion object {
         const val TAG = "SupportDevStore"
 
-        @SuppressLint("StaticFieldLeak") // always using applicationContext
+        @SuppressLint("StaticFieldLeak") // GetInstance uses context.applicationContext
         @Volatile
         private var instance: SupportDevStore? = null
 

@@ -1,5 +1,6 @@
 package fr.berliat.hskwidget.data.store
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import androidx.core.net.toUri
@@ -33,6 +34,7 @@ class DatabaseHelper private constructor(val context: Context) {
         private set
 
     companion object {
+        @SuppressLint("StaticFieldLeak") // GetInstance uses context.applicationContext
         @Volatile
         private var INSTANCE: DatabaseHelper? = null
         const val DATABASE_FILENAME = "Mandarin_Assistant.db"
@@ -45,13 +47,17 @@ class DatabaseHelper private constructor(val context: Context) {
         suspend fun getInstance(context: Context): DatabaseHelper = withContext(Dispatchers.IO) {
             INSTANCE?.let { return@withContext it }
 
-            val instance = DatabaseHelper(context)
-            INSTANCE = instance
-            instance._db = ChineseWordsDatabase.createInstance(context)
+            val instance = DatabaseHelper(context.applicationContext)
+            instance._db = ChineseWordsDatabase.createInstance(context.applicationContext)
             instance.DATABASE_LIVE_DIR = getDatabaseLiveDir(context)
             instance.DATABASE_LIVE_PATH = getDatabaseLiveFile(context)
 
-            return@withContext instance
+            // safely assign singleton
+            synchronized(this) {
+                INSTANCE = INSTANCE ?: instance
+            }
+
+            return@withContext INSTANCE!!
         }
     }
 
