@@ -20,8 +20,10 @@ import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.databinding.FragmentOcrDisplayBinding
 import fr.berliat.hskwidget.domain.Utils
 import androidx.core.net.toUri
+import com.google.mlkit.vision.common.InputImage
 import fr.berliat.hsktextviews.views.HSKWordsAdapter.ShowPinyins
 import fr.berliat.hskwidget.MainActivity
+import fr.berliat.hskwidget.data.store.DatabaseHelper
 import fr.berliat.hskwidget.domain.SharedViewModel
 
 class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.HSKTextSegmenterListener {
@@ -36,7 +38,10 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
         segmenter = SharedViewModel.getInstance(this).segmenter
 
         val mainApp = requireActivity() as MainActivity
-        val factory = DisplayOCRViewModelFactory(mainApp)
+        val factory = DisplayOCRViewModelFactory(
+            { DatabaseHelper.getInstance(requireContext()).annotatedChineseWordDAO() },
+            { DatabaseHelper.getInstance(requireContext()).chineseWordFrequencyDAO() }
+        )
         viewModel = ViewModelProvider(this, factory)[DisplayOCRViewModel::class.java]
 
         if (requireActivity().javaClass.simpleName == "MainActivity") {
@@ -192,7 +197,7 @@ class DisplayOCRFragment : Fragment(), HSKTextView.HSKTextListener, HSKTextView.
             if (text == "")
                 viewModel.resetText()
 
-            viewModel.recognizeText(imageUri.toUri())
+            viewModel.recognizeText{ InputImage.fromFilePath(requireContext(), imageUri.toUri()) }
             requireArguments().putString("imageUri", "") // Consume condition
         } else if (text != "") {
             Log.d(TAG, "processFromArguments: text was provided")

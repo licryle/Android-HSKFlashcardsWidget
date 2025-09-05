@@ -1,10 +1,8 @@
 package fr.berliat.hskwidget.ui.OCR
 
-import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.annotation.OptIn
-import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.ExperimentalGetImage
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
@@ -16,29 +14,62 @@ import com.google.mlkit.vision.text.Text
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.TextRecognizer
 import com.google.mlkit.vision.text.chinese.ChineseTextRecognizerOptions
+import fr.berliat.hskwidget.data.dao.AnnotatedChineseWordDAO
+import fr.berliat.hskwidget.data.dao.ChineseWordFrequencyDAO
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.repo.ChineseWordFrequencyRepo
-import fr.berliat.hskwidget.data.store.DatabaseHelper
 import fr.berliat.hskwidget.domain.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class DisplayOCRViewModelFactory(
-    private val application: AppCompatActivity
+    private val createAnnotatedChineseWordDAO: suspend () -> AnnotatedChineseWordDAO,
+    private val createChineseWordFrequencyDAO: suspend () -> ChineseWordFrequencyDAO
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(DisplayOCRViewModel::class.java)) {
             // Provide a SavedStateHandle manually
             val savedStateHandle = SavedStateHandle()
             @Suppress("UNCHECKED_CAST")
-            return DisplayOCRViewModel(savedStateHandle, application) as T
+            return DisplayOCRViewModel(savedStateHandle,
+                createAnnotatedChineseWordDAO,
+                createChineseWordFrequencyDAO) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
 
-class DisplayOCRViewModel(private val savedStateHandle: SavedStateHandle, val application: AppCompatActivity) : ViewModel() {
+class DisplayOCRViewModel(private val savedStateHandle: SavedStateHandle,
+                          private val createAnnotatedChineseWordDAO: suspend () -> AnnotatedChineseWordDAO,
+                          private val createChineseWordFrequencyDAO: suspend () -> ChineseWordFrequencyDAO) : ViewModel() {
+    private var _annotatedChineseWordDAO: AnnotatedChineseWordDAO? = null
+    suspend fun annotatedChineseWordDAO(): AnnotatedChineseWordDAO = withContext(Dispatchers.IO) {
+        if (_annotatedChineseWordDAO == null) {
+            _annotatedChineseWordDAO = createAnnotatedChineseWordDAO.invoke()
+        }
+        return@withContext _annotatedChineseWordDAO!!
+    }
+
+    private var _chineseWordFrequencyDAO: ChineseWordFrequencyDAO? = null
+    suspend fun chineseWordFrequencyDAO(): ChineseWordFrequencyDAO = withContext(Dispatchers.IO) {
+        if (_chineseWordFrequencyDAO == null) {
+            _chineseWordFrequencyDAO = createChineseWordFrequencyDAO.invoke()
+        }
+        return@withContext _chineseWordFrequencyDAO!!
+    }
+
+    private var _frequencyWordsRepo : ChineseWordFrequencyRepo? = null
+    suspend fun frequencyWordsRepo(): ChineseWordFrequencyRepo = withContext(Dispatchers.IO) {
+        if (_frequencyWordsRepo == null) {
+            _frequencyWordsRepo = ChineseWordFrequencyRepo(
+                chineseWordFrequencyDAO(),
+                annotatedChineseWordDAO()
+            )
+        }
+
+        return@withContext _frequencyWordsRepo!!
+    }
 
     val clickedWords: MutableMap<String, String> = mutableMapOf()
     var selectedWord: String? = null
@@ -64,14 +95,6 @@ class DisplayOCRViewModel(private val savedStateHandle: SavedStateHandle, val ap
         clickedWords.clear()
     }
 
-    suspend fun frequencyWordsRepo(): ChineseWordFrequencyRepo = withContext(Dispatchers.IO) {
-        val db = DatabaseHelper.getInstance(application)
-        return@withContext ChineseWordFrequencyRepo(
-            db.chineseWordFrequencyDAO(),
-            db.annotatedChineseWordDAO()
-        )
-    }
-
     fun augmentWordFrequencyAppeared(words: Map<String, Int>) {
         viewModelScope.launch(Dispatchers.IO) {
             frequencyWordsRepo().incrementAppeared(words)
@@ -86,10 +109,9 @@ class DisplayOCRViewModel(private val savedStateHandle: SavedStateHandle, val ap
 
     suspend fun fetchWord(hanzi: String): AnnotatedChineseWord? = withContext(Dispatchers.IO) {
         Log.d(TAG, "Searching for $hanzi")
-        val db = DatabaseHelper.getInstance(application)
-        val dao = db.annotatedChineseWordDAO()
+
         try {
-            val word = dao.getFromSimplified(hanzi)
+            val word = annotatedChineseWordDAO().getFromSimplified(hanzi)
             Log.d(TAG, "Search returned for $hanzi")
 
             return@withContext word
@@ -112,42 +134,44 @@ class DisplayOCRViewModel(private val savedStateHandle: SavedStateHandle, val ap
     }
 
     @OptIn(ExperimentalGetImage::class)
-    fun recognizeText(uri: Uri) {
-        Log.d(TAG, "recognizeText starting")
-        // Convert the Uri to InputImage for OCR
-        val image = InputImage.fromFilePath(application, uri)
+    fun recognizeText(image: suspend () -> InputImage) {
+        viewModelScope.launch(Dispatchers.IO) {
+            Log.d(TAG, "recognizeText starting")
 
-        val options = ChineseTextRecognizerOptions.Builder()
-            .build()
+            val options = ChineseTextRecognizerOptions.Builder()
+                .build()
 
-        val recognizer: TextRecognizer = TextRecognition.getClient(options)
+            val recognizer: TextRecognizer = TextRecognition.getClient(options)
 
-        recognizer.process(image)
-            .addOnSuccessListener { visionText ->
-                processTextRecognitionResult(visionText)
-                Log.d(TAG, "Recognized text: ${visionText.text}")
-            }
-            .addOnFailureListener { e ->
-                isProcessing.value = false
-                toastEvent.value = Pair("Text recognition failed", Toast.LENGTH_LONG)
-                Log.e(TAG, "Text recognition failed: ", e)
-                e.printStackTrace()
+            recognizer.process(image.invoke())
+                .addOnSuccessListener { visionText ->
+                    Log.d(TAG, "Recognized text: ${visionText.text}")
+                    viewModelScope.launch(Dispatchers.Default) {
+                        processTextRecognitionResult(visionText)
+                    }
+                }
+                .addOnFailureListener { e ->
+                    isProcessing.value = false
+                    toastEvent.value = Pair("Text recognition failed", Toast.LENGTH_LONG)
+                    Log.e(TAG, "Text recognition failed: ", e)
+                    e.printStackTrace()
 
-                Utils.logAnalyticsError(
-                    "OCR_DISPLAY",
-                    "TextRecognitionFailed",
-                    e.message ?: ""
-                )
-            }
+                    Utils.logAnalyticsError(
+                        "OCR_DISPLAY",
+                        "TextRecognitionFailed",
+                        e.message ?: ""
+                    )
+                }
+        }
     }
 
-    private fun processTextRecognitionResult(texts: Text) {
+    private suspend fun processTextRecognitionResult(texts: Text) = withContext(Dispatchers.Default) {
         Log.d(TAG, "processTextRecognitionResult")
         val blocks: List<Text.TextBlock> = texts.textBlocks
         if (blocks.isEmpty()) {
             isProcessing.value = false
             toastEvent.value = Pair("No text found", Toast.LENGTH_SHORT)
-            return
+            return@withContext
         }
 
         val concatText = StringBuilder()
@@ -170,7 +194,7 @@ class DisplayOCRViewModel(private val savedStateHandle: SavedStateHandle, val ap
         if (text.value?.isNotEmpty() == true)
             concatText.insert(0, "\n\n")
 
-        text.value += concatText.toString()
+        text.postValue(text.value + concatText.toString())
     }
 
     companion object {
