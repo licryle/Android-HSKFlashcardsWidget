@@ -176,7 +176,7 @@ class FlashcardWidgetProvider : AppWidgetProvider() {
 
             // Switch back to the main thread to update UI
             withContext(Dispatchers.Main) {
-                var views: RemoteViews? = null
+                var views: RemoteViews?
                 if (word == null) {
                     Log.i(TAG, "updateFlashCardWidget ID $appWidgetId , but no word available")
 
