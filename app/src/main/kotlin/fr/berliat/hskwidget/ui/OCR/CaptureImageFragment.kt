@@ -28,6 +28,7 @@ import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.databinding.FragmentOcrCaptureBinding
 import fr.berliat.hskwidget.domain.Utils
 import java.time.Instant
@@ -188,7 +189,7 @@ class CaptureImageFragment : Fragment() {
             put(MediaStore.MediaColumns.DISPLAY_NAME, name)
             put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/CameraX-Image")
+                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/" + getString(R.string.app_name) + " OCR")
             }
         }
 
