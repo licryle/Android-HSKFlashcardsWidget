@@ -71,7 +71,6 @@ class WidgetsListFragment : Fragment() {
         val context = requireActivity().applicationContext
         val widgetIds = FlashcardWidgetProvider().getWidgetIds(context)
 
-
         if (widgetIds.isEmpty()) {
             tabsLayout.visibility = View.GONE
             widgetPager.visibility = View.GONE
@@ -83,17 +82,18 @@ class WidgetsListFragment : Fragment() {
             demoFlashcard.visibility = View.GONE
             widgetsIntro.visibility = View.GONE
 
-            widgetPager.adapter = WidgetPagerAdapter(childFragmentManager, viewLifecycleOwner.lifecycle, widgetIds)
+            // Handle intent asking to configure, in particular sets expectsActivityResult
+            handleIntent(arguments)
+            val intentPosition = viewModel.getLastTabPosition()
+
+            widgetPager.adapter = WidgetPagerAdapter(childFragmentManager,
+                viewLifecycleOwner.lifecycle, widgetIds, viewModel.expectsActivityResult)
             TabLayoutMediator(tabsLayout, widgetPager) { tab, position ->
                 tab.text = "Widget $position"
             }.attach()
 
-            // Handle intent asking to configure
-            handleIntent(arguments)
-
-            val prevTabPos = viewModel.getLastTabPosition()
-            if (prevTabPos < widgetIds.size) {
-                tabsLayout.selectTab(binding.widgetsTabs.getTabAt(prevTabPos))
+            if (intentPosition < widgetIds.size) {
+                tabsLayout.selectTab(binding.widgetsTabs.getTabAt(intentPosition))
             }
         }
 
@@ -101,22 +101,31 @@ class WidgetsListFragment : Fragment() {
     }
 
     private fun handleIntent(arguments: Bundle?) {
-        if (arguments == null) return
-
-        val intentWidgetId = arguments.getInt("widgetId", AppWidgetManager.INVALID_APPWIDGET_ID)
+        val intentWidgetId = arguments?.getInt("widgetId", AppWidgetManager.INVALID_APPWIDGET_ID) ?: AppWidgetManager.INVALID_APPWIDGET_ID
         if (intentWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
-            val context = requireActivity().applicationContext
-            val widgetIds = FlashcardWidgetProvider().getWidgetIds(context)
-
-            val position = widgetIds.indexOf(intentWidgetId)
-            viewModel.onToggleTab(position)
-            Utils.logAnalyticsWidgetAction(Utils.ANALYTICS_EVENTS.WIDGET_RECONFIGURE, intentWidgetId)
-            // Consume condition so we don't come back here until next intent
-            arguments.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
-
-            val adapter = binding.widgetsTabsConfigure.adapter as WidgetPagerAdapter
-            adapter.setFragmentToFireIntent(intentWidgetId)
+            setSingleWidgetConfigMode(intentWidgetId)
+        } else {
+            setSingleWidgetConfigMode(AppWidgetManager.INVALID_APPWIDGET_ID)
         }
+    }
+
+    fun setSingleWidgetConfigMode(intentWidgetId: Int) {
+        viewModel.expectsActivityResult = intentWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID
+        if (!viewModel.expectsActivityResult) return
+
+        val context = requireActivity().applicationContext
+        val widgetIds = FlashcardWidgetProvider().getWidgetIds(context)
+
+        val position = widgetIds.indexOf(intentWidgetId)
+        viewModel.onToggleTab(position)
+        Utils.logAnalyticsWidgetAction(Utils.ANALYTICS_EVENTS.WIDGET_RECONFIGURE, intentWidgetId)
+        // Consume condition so we don't come back here until next intent
+        arguments?.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
+
+        binding
+        //binding.widgetsIntro.visibility = Utils.hideViewIf(viewModel.expectsActivityResult)
+        //binding.widgetsAddNewWidget.visibility = Utils.hideViewIf(viewModel.expectsActivityResult)
+        //binding.widgetsTabs.visibility = Utils.hideViewIf(viewModel.expectsActivityResult)
     }
 
     override fun onDestroyView() {
@@ -149,8 +158,11 @@ class WidgetsListFragment : Fragment() {
         }
     }
 
-    class WidgetPagerAdapter(fragMgr: FragmentManager, lifecycle: Lifecycle,
-                             private val widgetIds : IntArray) :
+    class WidgetPagerAdapter(
+        fragMgr: FragmentManager, lifecycle: Lifecycle,
+        private val widgetIds: IntArray,
+        private val expectsActivityResult: Boolean
+    ) :
                              FragmentStateAdapter(fragMgr, lifecycle) {
         // TODO: Someday, is the API evolves, find a better way to access the fragment that cache
         // it here. I don't know when items are removed.
@@ -163,23 +175,14 @@ class WidgetsListFragment : Fragment() {
 
         override fun createFragment(position: Int): WidgetsWidgetConfPreviewFragment {
             val widgetId = widgetIds[position]
-            val newFragment = WidgetsWidgetConfPreviewFragment.newInstance(widgetId)
+            val newFragment = WidgetsWidgetConfPreviewFragment.newInstance(widgetId, expectsActivityResult)
             fragMap[widgetId] = newFragment
 
             if (fragToFireIntent.contains(widgetId)) {
-                newFragment.widgetExpectsIntent = true
                 fragToFireIntent.remove(widgetId)
             }
 
             return newFragment
-        }
-
-        fun setFragmentToFireIntent(widgetId: Int) {
-            if (fragMap.contains(widgetId)) {
-                fragMap[widgetId]!!.widgetExpectsIntent = true
-            } else {
-                fragToFireIntent.add(widgetId)
-            }
         }
     }
 

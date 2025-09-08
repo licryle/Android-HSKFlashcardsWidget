@@ -16,7 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class FlashcardWidgetConfigFragment() : Fragment() {
+class FlashcardWidgetConfigFragment(val expectsActivityResult: Boolean = false) : Fragment() {
     private lateinit var viewBinding: FlashcardWidgetConfigureBinding
     private var _widgetId: Int? = null
     private val prefListeners = mutableListOf<WidgetPreferenceListener>()
@@ -67,10 +67,19 @@ class FlashcardWidgetConfigFragment() : Fragment() {
 
                     viewBinding.flashcardConfigureContainer.addView(newView)
                 }
+
+                var btnTextRes = R.string.conf_widget_btn
+                when {
+                    // Brand new widget (in theory)
+                    expectsActivityResult && widgetList.isEmpty() -> btnTextRes = R.string.add_close_widget_btn
+                    expectsActivityResult -> btnTextRes = R.string.conf_close_widget_btn
+                }
+
+                viewBinding.flashcardWidgetConfigureConfwidget.text = getString(btnTextRes)
             }
         }
 
-        viewBinding.flashcardWidgetConfigureAddwidget.setOnClickListener {
+        viewBinding.flashcardWidgetConfigureConfwidget.setOnClickListener {
             val entriesToAdd = mutableListOf<WidgetListEntry>()
             for ((listId, switch) in switchList) {
                 if (switch.isChecked) {
@@ -133,8 +142,8 @@ class FlashcardWidgetConfigFragment() : Fragment() {
          * @return A new instance of fragment WidgetsWidgetConfPreviewFragment.
          */
         @JvmStatic
-        fun newInstance(widgetId: Int) =
-            FlashcardWidgetConfigFragment().apply {
+        fun newInstance(widgetId: Int, expectsActivityResult: Boolean) =
+            FlashcardWidgetConfigFragment(expectsActivityResult).apply {
                 arguments = Bundle().apply {
                     putInt(ARG_WIDGETID, widgetId)
                 }

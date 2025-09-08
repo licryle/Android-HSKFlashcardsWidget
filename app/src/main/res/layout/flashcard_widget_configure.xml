@@ -30,9 +30,9 @@
     </ScrollView>
 
     <Button
-        android:id="@+id/flashcard_widget_configure_addwidget"
+        android:id="@+id/flashcard_widget_configure_confwidget"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        android:text="@string/add_widget_btn"/>
+        android:text="@string/conf_widget_btn"/>
 </LinearLayout>

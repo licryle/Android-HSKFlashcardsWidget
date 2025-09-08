@@ -23,8 +23,8 @@ private const val ARG_WIDGETID = "WIDGETID"
  * Use the [WidgetsWidgetConfPreviewFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class WidgetsWidgetConfPreviewFragment : Fragment(), FlashcardWidgetConfigFragment.WidgetPreferenceListener  {
-    var widgetExpectsIntent: Boolean = false
+class WidgetsWidgetConfPreviewFragment(val expectsActivityResult: Boolean = false)
+    : Fragment(), FlashcardWidgetConfigFragment.WidgetPreferenceListener  {
     private var _widgetId: Int? = null
     private var _root: View ? = null
     private var _confFragment: FlashcardWidgetConfigFragment? = null
@@ -43,7 +43,7 @@ class WidgetsWidgetConfPreviewFragment : Fragment(), FlashcardWidgetConfigFragme
             _widgetId = it.getInt(ARG_WIDGETID)
         }
 
-        _confFragment = FlashcardWidgetConfigFragment.newInstance(widgetId)
+        _confFragment = FlashcardWidgetConfigFragment.newInstance(widgetId, expectsActivityResult)
         confFragment.addWidgetPreferenceListener(this)
         _previewFragment = FlashcardFragment.newInstance(widgetId)
 
@@ -107,11 +107,11 @@ class WidgetsWidgetConfPreviewFragment : Fragment(), FlashcardWidgetConfigFragme
             Toast.LENGTH_SHORT
         ).show()
 
-        if (widgetExpectsIntent) {
+        if (expectsActivityResult) {
             val resultIntent = Intent()
             resultIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
             activity.setResult(Activity.RESULT_OK, activity.intent)
-            widgetExpectsIntent = false
+            activity.finish()
         }
     }
 
@@ -124,8 +124,8 @@ class WidgetsWidgetConfPreviewFragment : Fragment(), FlashcardWidgetConfigFragme
          * @return A new instance of fragment WidgetsWidgetConfPreviewFragment.
          */
         @JvmStatic
-        fun newInstance(widgetId: Int) =
-            WidgetsWidgetConfPreviewFragment().apply {
+        fun newInstance(widgetId: Int, expectsActivityResult: Boolean) =
+            WidgetsWidgetConfPreviewFragment(expectsActivityResult).apply {
                 arguments = Bundle().apply {
                     putInt(ARG_WIDGETID, widgetId)
                 }
