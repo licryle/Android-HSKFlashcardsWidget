@@ -37,8 +37,6 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.net.URLDecoder
-import java.nio.charset.StandardCharsets
 import java.time.Instant
 
 
@@ -97,9 +95,7 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
         }
         // End: Max number of local files
 
-        val bkDir = appConfig.dbBackUpDirectory.toString().substringAfterLast("%3A")
-        if (bkDir != "")
-            binding.configBtnBackupChangedir.text = URLDecoder.decode(bkDir, StandardCharsets.UTF_8.name())
+        setBackUpFolderButtonText(appConfig.dbBackUpDirectory)
 
         binding.configBackupActivateBtn.setOnClickListener {
             if (!binding.configBackupActivateBtn.isChecked) {
@@ -145,6 +141,13 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
         }*/
 
         return binding.root
+    }
+
+    private fun setBackUpFolderButtonText(uri: Uri) {
+        val dirPath = uri.path?.substringAfterLast(":") ?: ""
+
+        if (dirPath != "")
+            binding.configBtnBackupChangedir.text = dirPath
     }
 
     /*private fun updateLoggedInAccount() {
@@ -313,7 +316,7 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
         Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.CONFIG_BACKUP_ON)
 
         appConfig.dbBackUpDirectory = uri
-        binding.configBtnBackupChangedir.text = uri.toString().substringAfterLast("%3A")
+        setBackUpFolderButtonText(uri)
     }
 
     override fun onBackupFolderError() {
