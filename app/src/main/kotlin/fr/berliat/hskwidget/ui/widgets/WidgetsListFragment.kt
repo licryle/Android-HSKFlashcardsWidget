@@ -121,11 +121,6 @@ class WidgetsListFragment : Fragment() {
         Utils.logAnalyticsWidgetAction(Utils.ANALYTICS_EVENTS.WIDGET_RECONFIGURE, intentWidgetId)
         // Consume condition so we don't come back here until next intent
         arguments?.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
-
-        binding
-        //binding.widgetsIntro.visibility = Utils.hideViewIf(viewModel.expectsActivityResult)
-        //binding.widgetsAddNewWidget.visibility = Utils.hideViewIf(viewModel.expectsActivityResult)
-        //binding.widgetsTabs.visibility = Utils.hideViewIf(viewModel.expectsActivityResult)
     }
 
     override fun onDestroyView() {
