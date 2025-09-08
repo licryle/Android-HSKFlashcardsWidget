@@ -13,9 +13,12 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
 import android.provider.DocumentsContract
+import android.provider.Settings
+import android.speech.tts.TextToSpeech
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.documentfile.provider.DocumentFile
@@ -138,6 +141,7 @@ class Utils {
                     ) {
 
                         val errStringId: Int
+                        var errRemedyIntent: String? = null
                         if (value.state == WorkInfo.State.FAILED) {
                             var errId =
                                 value.outputData.getString(BackgroundSpeechService.FAILURE_REASON)
@@ -145,12 +149,15 @@ class Utils {
                                 BackgroundSpeechService.FAILURE_MUTED
                                     -> errStringId = R.string.speech_failure_toast_muted
 
-                                BackgroundSpeechService.FAILURE_INIT_FAILED
-                                    -> errStringId = R.string.speech_failure_toast_init
+                                BackgroundSpeechService.FAILURE_INIT_FAILED -> {
+                                    errStringId = R.string.speech_failure_toast_init
+                                    errRemedyIntent = Settings.ACTION_ACCESSIBILITY_SETTINGS
+                                }
 
-                                BackgroundSpeechService.FAILURE_LANG_UNSUPPORTED
-                                    -> errStringId =
-                                    R.string.speech_failure_toast_chinese_unsupported
+                                BackgroundSpeechService.FAILURE_LANG_UNSUPPORTED -> {
+                                    errStringId = R.string.speech_failure_toast_chinese_unsupported
+                                    errRemedyIntent = TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA
+                                }
 
                                 else -> {
                                     errStringId = R.string.speech_failure_toast_unknown
@@ -159,10 +166,24 @@ class Utils {
                             }
 
                             logAnalyticsError("SPEECH", errId, "")
-                            Toast.makeText(
-                                context, context.getString(errStringId),
-                                Toast.LENGTH_LONG
-                            ).show()
+
+                            if (errRemedyIntent == null) {
+                                Toast.makeText(
+                                    context, context.getString(errStringId),
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            } else {
+                                AlertDialog.Builder(context)
+                                    .setTitle(R.string.dialog_tts_error)
+                                    .setMessage(errStringId)
+                                    .setPositiveButton(R.string.fix_it) { _, _ ->
+                                        val intent = Intent(errRemedyIntent)
+                                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                                        context.startActivity(intent)
+                                }
+                                    .setNegativeButton(R.string.cancel, null)
+                                    .show()
+                            }
                         }
 
                         workMgr.getWorkInfoByIdLiveData(speechRequest.id)

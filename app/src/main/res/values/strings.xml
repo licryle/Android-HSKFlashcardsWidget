@@ -11,6 +11,7 @@
     <string name="understood">Understood</string>
     <string name="settings">Settings</string>
     <string name="about">About</string>
+    <string name="fix_it">Attempt to fix it</string>
 
     <string name="nav_header_desc">Navigation header</string>
 
@@ -64,8 +65,8 @@ We recommend to choose the level your at plus the one below, or above depending 
     <string name="about_btn_email2">Email the developer</string>
     <string name="speech_failure_toast_unknown">Unknown speech error</string>
     <string name="speech_failure_toast_muted">Unmute to hear the word</string>
-    <string name="speech_failure_toast_chinese_unsupported">Please install the "Chinese (China)" voice</string>
-    <string name="speech_failure_toast_init">Failed to initialize Text-To-Speech</string>
+    <string name="speech_failure_toast_chinese_unsupported">The "Chinese (China)" voice if missing from your Text-To-Speech. Please install it.</string>
+    <string name="speech_failure_toast_init">Failed to initialize the Text-To-Speech service, we need to activate, download or configure it in Settings.</string>
     <string name="menu_dictionary">Dictionary</string>
     <string name="menu_lists">Lists</string>
     <string name="menu_annotate">Annotate a word</string>
@@ -351,5 +352,6 @@ padding: 0;
     <string name="database_update_start">Updating base dictionary, backup will be delayed.</string>
     <string name="database_update_success">Updated base dictionary</string>
     <string name="database_update_failure">Error while updating base dictionary: %1$s</string>
+    <string name="dialog_tts_error">Text-to-Speech Error</string>
 
 </resources>
