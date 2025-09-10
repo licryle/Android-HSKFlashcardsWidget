@@ -17,7 +17,7 @@ android {
         minSdk = 26
         //noinspection EditedTargetSdkVersion
         targetSdk = 36
-        versionCode = 41
+        versionCode = 43
         versionName = "3.8.6"
         buildConfigField("String", "APP_VERSION", "\"$versionName-$versionCode\"")
 

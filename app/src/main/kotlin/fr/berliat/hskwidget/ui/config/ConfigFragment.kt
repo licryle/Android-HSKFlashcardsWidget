@@ -250,6 +250,15 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
         binding.ankiSyncCancelBtn.visibility = View.VISIBLE
     }
 
+    override fun onAnkiNotInstalled() {
+        appConfig.ankiSaveNotes = false
+        binding.configAnkiActivateBtn.isChecked = false
+
+        binding.ankiSyncProgressSection.visibility = View.GONE
+
+        // onAnkiOperationFailed() is also called
+    }
+
     override fun onAnkiOperationSuccess() {
         Log.i(TAG, "onAnkiOperationSuccess: completed full import into Anki")
         val now = Instant.now()

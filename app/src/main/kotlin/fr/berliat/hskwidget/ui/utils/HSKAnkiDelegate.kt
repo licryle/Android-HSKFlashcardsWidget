@@ -1,6 +1,5 @@
 package fr.berliat.hskwidget.ui.utils
 
-import android.content.Context
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import fr.berliat.ankidroidhelper.AnkiDelegate
@@ -34,10 +33,10 @@ class HSKAnkiDelegate(val fragment: Fragment, handler: HandlerInterface? = null)
         return result
     }
 
-    override suspend fun safelyModifyAnkiDbIfAllowed(ankiDbAction: suspend () -> Result<Unit>): Result<Unit>
+    override suspend fun safelyModifyAnkiDbIfAllowed(ankiDbAction: suspend () -> Result<Unit>): Result<Unit>?
             = withContext(Dispatchers.IO) {
         if (!appConfig.ankiSaveNotes)
-            return@withContext Result.failure(AnkiOperationsFailures.AnkiFailure_Off)
+            return@withContext Result.failure(AnkiOperationsFailures.CustomError("AnkiBackupNotActive"))
 
         return@withContext super.safelyModifyAnkiDbIfAllowed(ankiDbAction)
     }
@@ -49,37 +48,31 @@ class HSKAnkiDelegate(val fragment: Fragment, handler: HandlerInterface? = null)
     }
 
     /*********** CallBacks ***********/
-    override fun onAnkiOperationFailed(context: Context?, e: Throwable) {
-        if (!(e is AnkiOperationsFailures.AnkiFailure_Deferred
-            || e is AnkiOperationsFailures.AnkiFailure_Off
-            || context == null
-        )) {
+    override fun onAnkiOperationFailed(e: Throwable) {
+        if (!(e is AnkiOperationsFailures.AnkiFailure_NoPermission
+                    || e is AnkiOperationsFailures.AnkiFailure_NotInstalled)) {
             var message = context.getString(R.string.anki_operation_failed)
             message = message.format(e.message)
-            appContextToast(context, message)
+            appContextToast(message)
         }
 
-        super.onAnkiOperationFailed(context, e)
+        super.onAnkiOperationFailed(e)
     }
 
-    override fun onAnkiOperationSuccess(context: Context?) {
-        context?.let {
-            appContextToast(context, context.getString(R.string.anki_operation_success))
-        }
+    override fun onAnkiOperationSuccess() {
+        appContextToast(context.getString(R.string.anki_operation_success))
 
-        super.onAnkiOperationSuccess(context)
+        super.onAnkiOperationSuccess()
     }
 
-    override fun onAnkiOperationCancelled(context: Context?) {
-        context?.let {
-            appContextToast(context, context.getString(R.string.anki_operation_cancelled))
-        }
+    override fun onAnkiOperationCancelled() {
+        appContextToast(context.getString(R.string.anki_operation_cancelled))
 
-        super.onAnkiOperationCancelled(context)
+        super.onAnkiOperationCancelled()
     }
 
     override fun onAnkiNotInstalled() {
-        appContextToast(context, context.getString(R.string.anki_not_installed))
+        appContextToast(context.getString(R.string.anki_not_installed))
         appConfig.ankiSaveNotes = false
 
         super.onAnkiNotInstalled()
