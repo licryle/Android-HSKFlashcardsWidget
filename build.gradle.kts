@@ -9,4 +9,7 @@ plugins {
     id("com.google.devtools.ksp") version "2.2.10-2.0.2" apply false
     id("androidx.navigation.safeargs.kotlin") version "2.9.3" apply false
     id("com.android.library") version "8.13.0" apply false
+    id("org.jetbrains.kotlin.multiplatform") version "2.2.10" apply false
+    id("com.android.kotlin.multiplatform.library") version "8.13.0" apply false
+    id("com.android.lint") version "8.13.0" apply false
 }

@@ -5,6 +5,9 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
+}
 
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
@@ -22,3 +25,5 @@ include(":floatlayouts")
 include(":googledrivebackup")
 include(":pinyin4kot")
 include(":AnkiDroidAPIHelper")
+include(":crossPlatform")
+include(":crossPlatform:androidmain")

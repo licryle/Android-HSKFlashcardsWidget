@@ -134,6 +134,7 @@ dependencies {
     implementation(project(":floatlayouts"))
     implementation(project(":googledrivebackup"))
     implementation(project(":AnkiDroidAPIHelper"))
+    implementation(project(":crossPlatform"))
 
     val cameraxVersion = "1.4.2"
     implementation("androidx.camera:camera-core:${cameraxVersion}")
