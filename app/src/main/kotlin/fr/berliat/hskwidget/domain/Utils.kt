@@ -288,6 +288,7 @@ class Utils {
             outFile.outputStream().use { output ->
                 inputStream.copyTo(output)
             }
+            inputStream.close()
 
             return@withContext outFile
         }
