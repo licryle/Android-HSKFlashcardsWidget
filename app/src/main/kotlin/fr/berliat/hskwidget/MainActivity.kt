@@ -102,6 +102,8 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
             updateDatabaseFromAsset({
                 Toast.makeText(this, getString(R.string.database_update_success), Toast.LENGTH_LONG).show()
 
+                Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.DATABASE_UPDATE)
+
                 handleBackUp()
             }, { e ->
                 Toast.makeText(
@@ -212,6 +214,8 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
 
             if (success) {
                 databaseDiskBackup.cleanOldBackups(uri, appConfig.dbBackUpMaxLocalFiles)
+
+                Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.BACKUP_DISK_BACKUP)
             }
 
             withContext(Dispatchers.Main) {

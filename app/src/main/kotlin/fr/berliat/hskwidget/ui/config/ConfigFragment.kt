@@ -188,7 +188,7 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
             }
         }
 
-        Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.CONFIG_BACKUPCLOUD_BACKUP)
+        Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.BACKUP_CLOUD_BACKUP)
     }
 
     private fun restoreFromCloud() {
@@ -202,7 +202,7 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
             ))
         )
 
-        Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.CONFIG_BACKUPCLOUD_RESTORE)
+        Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.BACKUP_CLOUD_RESTORE)
     }
 
     private fun onAnkiIntegrationChanged(enabled: Boolean) {
@@ -331,7 +331,7 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
             getString(R.string.dbrestore_start),
             Toast.LENGTH_LONG
         ).show()
-        Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.CONFIG_BACKUP_RESTORE)
+        Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.BACKUP_DISK_RESTORE)
 
 
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
