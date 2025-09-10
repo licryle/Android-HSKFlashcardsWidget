@@ -90,7 +90,7 @@ class DisplayOCRViewModel(private val savedStateHandle: SavedStateHandle,
 
     fun resetText() {
         scrollPosition = 0
-        text.value = ""
+        text.postValue("")
         selectedWord = null
         clickedWords.clear()
     }
@@ -151,8 +151,8 @@ class DisplayOCRViewModel(private val savedStateHandle: SavedStateHandle,
                     }
                 }
                 .addOnFailureListener { e ->
-                    isProcessing.value = false
-                    toastEvent.value = Pair("Text recognition failed", Toast.LENGTH_LONG)
+                    isProcessing.postValue(false)
+                    toastEvent.postValue(Pair("Text recognition failed", Toast.LENGTH_LONG))
                     Log.e(TAG, "Text recognition failed: ", e)
                     e.printStackTrace()
 
@@ -169,8 +169,8 @@ class DisplayOCRViewModel(private val savedStateHandle: SavedStateHandle,
         Log.d(TAG, "processTextRecognitionResult")
         val blocks: List<Text.TextBlock> = texts.textBlocks
         if (blocks.isEmpty()) {
-            isProcessing.value = false
-            toastEvent.value = Pair("No text found", Toast.LENGTH_SHORT)
+            isProcessing.postValue(false)
+            toastEvent.postValue(Pair("No text found", Toast.LENGTH_SHORT))
             return@withContext
         }
 
