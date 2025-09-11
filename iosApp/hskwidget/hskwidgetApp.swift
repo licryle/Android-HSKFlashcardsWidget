@@ -12,7 +12,7 @@ import crossPlatformKit
 struct hskwidgetApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView(viewModel: .init(loginRepository: LoginRepository(dataSource: LoginDataSource()), loginValidator: LoginDataValidator()))
+            ContentView(viewModel: .init())
         }
     }
 }

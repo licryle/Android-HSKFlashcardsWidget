@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		1C8A8BF82E733E1B00B8E39B /* crossPlatformKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C8A8BF72E733E1B00B8E39B /* crossPlatformKit.framework */; };
+		1C8A8BF92E733E1B00B8E39B /* crossPlatformKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1C8A8BF72E733E1B00B8E39B /* crossPlatformKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		1C7166E42E71E189000B4154 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -23,10 +28,25 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		1C8A8BFA2E733E1B00B8E39B /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				1C8A8BF92E733E1B00B8E39B /* crossPlatformKit.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		1C7166D52E71E186000B4154 /* hskwidget.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = hskwidget.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1C7166E32E71E189000B4154 /* hskwidgetTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = hskwidgetTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1C7166ED2E71E189000B4154 /* hskwidgetUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = hskwidgetUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		1C8A8BF72E733E1B00B8E39B /* crossPlatformKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = crossPlatformKit.framework; path = "../crossPlatform/build/xcode-frameworks/Debug/iphonesimulator/crossPlatformKit.framework"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -52,6 +72,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1C8A8BF82E733E1B00B8E39B /* crossPlatformKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +99,7 @@
 				1C7166D72E71E186000B4154 /* hskwidget */,
 				1C7166E62E71E189000B4154 /* hskwidgetTests */,
 				1C7166F02E71E189000B4154 /* hskwidgetUITests */,
+				1C8A8BF62E733E1B00B8E39B /* Frameworks */,
 				1C7166D62E71E186000B4154 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -92,6 +114,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		1C8A8BF62E733E1B00B8E39B /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1C8A8BF72E733E1B00B8E39B /* crossPlatformKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -103,6 +133,7 @@
 				1C7166D12E71E186000B4154 /* Sources */,
 				1C7166D22E71E186000B4154 /* Frameworks */,
 				1C7166D32E71E186000B4154 /* Resources */,
+				1C8A8BFA2E733E1B00B8E39B /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -249,7 +280,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\ncd \"$SRCROOT/..\"\n./gradlew :crossPlatform:embedAndSignAppleFrameworkForXcode -PXCFRAMEWORKS_DIR=build/xcode-frameworks\n";
+			shellScript = "#!/bin/sh\ncd \"$SRCROOT/..\"\n\n# Let Gradle pick up Xcode's environment variables\nCONFIGURATION=Debug TARGET_BUILD_DIR=some_dir FRAMEWORKS_FOLDER_PATH=other_dir SDK_NAME=iphonesimulator ARCHS=x86_64 ./gradlew :crossPlatform:embedAndSignAppleFrameworkForXcode\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -417,6 +448,8 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Mandaring Assistant HSK Widget";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -436,10 +469,11 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				XROS_DEPLOYMENT_TARGET = 2.5;
 			};
 			name = Debug;
@@ -456,6 +490,8 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Mandaring Assistant HSK Widget";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -475,10 +511,11 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				XROS_DEPLOYMENT_TARGET = 2.5;
 			};
 			name = Release;

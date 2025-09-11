@@ -2,22 +2,13 @@ import SwiftUI
 import crossPlatformKit
 
 struct ContentView: View {
-    @State private var username: String = ""
-    @State private var password: String = ""
+    @State private var text: String = Greeting().greet()
 
     @ObservedObject var viewModel: ContentView.ViewModel
 
     var body: some View {
         VStack(spacing: 15.0) {
-            ValidatedTextField(titleKey: "Username", secured: false, text: $username, errorMessage: viewModel.formState.usernameError, onChange: {
-                viewModel.loginDataChanged(username: username, password: password)
-            })
-            ValidatedTextField(titleKey: "Password", secured: true, text: $password, errorMessage: viewModel.formState.passwordError, onChange: {
-                viewModel.loginDataChanged(username: username, password: password)
-            })
-            Button("Login") {
-                viewModel.login(username: username, password: password)
-            }.disabled(!viewModel.formState.isDataValid || (username.isEmpty && password.isEmpty))
+            ValidatedTextField(titleKey: "Platform", secured: false, text:$text)
         }
         .padding(.all)
     }
@@ -27,8 +18,6 @@ struct ValidatedTextField: View {
     let titleKey: String
     let secured: Bool
     @Binding var text: String
-    let errorMessage: String?
-    let onChange: () -> ()
 
     @ViewBuilder var textField: some View {
         if secured {
@@ -42,16 +31,6 @@ struct ValidatedTextField: View {
         ZStack {
             textField
                 .textFieldStyle(RoundedBorderTextFieldStyle())
-                .autocapitalization(.none)
-                .onChange(of: text) { _ in
-                    onChange()
-                }
-            if let errorMessage = errorMessage {
-                HStack {
-                    Spacer()
-                    FieldTextErrorHint(error: errorMessage)
-                }.padding(.horizontal, 5)
-            }
         }
     }
 }
@@ -84,26 +63,13 @@ extension ContentView {
     class ViewModel: ObservableObject {
         @Published var formState = LoginFormState(usernameError: nil, passwordError: nil)
 
-        let loginValidator: LoginDataValidator
-        let loginRepository: LoginRepository
-
-        init(loginRepository: LoginRepository, loginValidator: LoginDataValidator) {
-            self.loginRepository = loginRepository
-            self.loginValidator = loginValidator
+        init() {
         }
 
         func login(username: String, password: String) {
-            if let result = loginRepository.login(username: username, password: password) as? ResultSuccess  {
-                print("Successful login. Welcome, \(result.data.displayName)")
-            } else {
-                print("Error while logging in")
-            }
         }
 
         func loginDataChanged(username: String, password: String) {
-            formState = LoginFormState(
-                usernameError: (loginValidator.checkUsername(username: username) as? LoginDataValidator.ResultError)?.message,
-                passwordError: (loginValidator.checkPassword(password: password) as? LoginDataValidator.ResultError)?.message)
         }
     }
 }
