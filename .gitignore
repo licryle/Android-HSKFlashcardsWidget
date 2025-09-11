@@ -24,3 +24,5 @@ app/src/main/assets/databases/chinese_words.db-wal
 *.pem
 .vscode
 logs/*
+*.xcuserstate
+*.xcbkptlist
