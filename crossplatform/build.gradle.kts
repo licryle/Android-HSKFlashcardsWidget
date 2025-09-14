@@ -6,6 +6,7 @@ plugins {
     id("com.android.kotlin.multiplatform.library")
     id("org.jetbrains.compose") version "1.8.2"
     id("org.jetbrains.kotlin.plugin.compose") version "2.2.20"
+    id("com.google.devtools.ksp") version "2.2.10-2.0.2"
 }
 
 kotlin {
@@ -55,45 +56,39 @@ kotlin {
     // common to share sources between related targets.
     // See: https://kotlinlang.org/docs/multiplatform-hierarchy.html
     sourceSets {
-        commonMain {
+        val commonMain by getting {
             dependencies {
-                implementation("org.jetbrains.kotlin:kotlin-stdlib:2.2.20")
-                implementation("org.jetbrains.compose.runtime:runtime:1.8.2")
-                // Compose Foundation (layout, drawing, gestures)
-                implementation("org.jetbrains.compose.foundation:foundation:1.8.2")
-                // Compose Material3
-                implementation("org.jetbrains.compose.material3:material3:1.8.2")
-                // Compose Resources generator (for multi-platform Res)
-                implementation("org.jetbrains.compose.components:components-resources:1.8.2")
-                // Add KMP dependencies here
-                implementation("network.chaintech:cmptoast:1.0.7")
-                implementation("co.touchlab:kermit:2.0.8") //Add latest version
+                implementation(libs.kotlin.stdlib)
+                implementation(libs.compose.runtime)
+                implementation(libs.compose.foundation)
+                implementation(libs.compose.material3)
+                implementation(libs.compose.resources)
+                implementation(libs.cmptoast)
+                implementation(libs.kermit)
             }
         }
 
-        commonTest {
+        val commonTest by getting {
             dependencies {
                 implementation("org.jetbrains.kotlin:kotlin-test:2.2.20")
             }
         }
 
-        androidMain {
+        val androidMain by getting {
             dependencies {
-                // Add Android-specific dependencies here. Note that this source set depends on
-                // commonMain by default and will correctly pull the Android artifacts of any KMP
-                // dependencies declared in commonMain.
-                implementation("androidx.compose.ui:ui-tooling:1.9.1")
-                implementation("androidx.compose.ui:ui-tooling-preview:1.9.1")
+                implementation(libs.compose.ui.tooling)
+                implementation(libs.compose.ui.tooling.preview)
+                implementation(libs.room.runtime)
+                implementation(libs.sqlite.bundled)
             }
-            // This explicitly includes the common compose resources as Android assets
             resources.srcDirs("src/commonMain/composeResources")
         }
 
         getByName("androidDeviceTest") {
             dependencies {
-                implementation("androidx.test:runner:1.7.0")
-                implementation("androidx.test:core:1.7.0")
-                implementation("androidx.test.ext:junit:1.3.0")
+                implementation(libs.androidx.test.runner)
+                implementation(libs.androidx.test.core)
+                implementation(libs.androidx.test.junit.ext)
             }
         }
 
@@ -109,7 +104,12 @@ kotlin {
     }
 }
 
-//because the dependency on the compose library is a project dependency
+// KSP for Room compiler (Android only)
+dependencies {
+    ksp(libs.room.compiler)
+}
+
+// Compose resources
 compose.resources {
     generateResClass = always
     publicResClass = true
