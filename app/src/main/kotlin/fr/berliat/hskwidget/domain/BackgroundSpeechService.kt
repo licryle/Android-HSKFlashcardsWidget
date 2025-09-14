@@ -14,7 +14,6 @@ import java.util.Locale
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-
 class BackgroundSpeechService(val context: Context, workerParams: WorkerParameters) :
     Worker(context, workerParams) {
     private val word = inputData.getString("word")

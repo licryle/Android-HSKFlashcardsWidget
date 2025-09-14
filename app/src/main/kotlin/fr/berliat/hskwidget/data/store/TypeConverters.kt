@@ -3,12 +3,12 @@ package fr.berliat.hskwidget.data.store
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import fr.berliat.hskwidget.core.Locale
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWordAnnotation
 import fr.berliat.hskwidget.data.model.WordList
 import java.util.Date
-import java.util.Locale
 
 
 object DefinitionsConverter {
@@ -24,8 +24,9 @@ object DefinitionsConverter {
         if (s == null)
             return mapOf<Locale, String>()
 
-        val mapType = object : TypeToken<Map<Locale, String>>() {}.type
-        return Gson().fromJson(s, mapType)
+        val mapType = object : TypeToken<Map<String, String>>() {}.type
+        val stringMap: Map<String, String> = Gson().fromJson(s, mapType)
+        return stringMap.mapKeys { Locale.fromCode(it.key)!! }
     }
 }
 

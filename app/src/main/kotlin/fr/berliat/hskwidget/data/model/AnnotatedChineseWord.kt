@@ -1,7 +1,7 @@
 package fr.berliat.hskwidget.data.model
 
 import androidx.room.Embedded
-import java.util.Locale
+import fr.berliat.hskwidget.core.Locale
 
 data class AnnotatedChineseWord (
     @Embedded val word: ChineseWord?,

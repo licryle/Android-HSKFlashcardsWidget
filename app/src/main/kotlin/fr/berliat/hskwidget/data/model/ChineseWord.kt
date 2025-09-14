@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
 import java.text.Normalizer
 
-import java.util.Locale
+import fr.berliat.hskwidget.core.Locale
 
 @Entity(
     tableName = "chinese_word",
@@ -163,7 +163,5 @@ data class ChineseWord(
                 null, null, "", Modality.UNKNOWN, Type.UNKNOWN,
                 "", "", "")
         }
-
-        val CN_HSK3 : Locale = Locale.Builder().setLanguage("zh").setRegion("CN").setVariant("HSK03").build()
     }
 }

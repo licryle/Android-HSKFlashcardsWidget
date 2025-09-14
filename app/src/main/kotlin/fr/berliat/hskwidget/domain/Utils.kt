@@ -47,13 +47,12 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.InputStream
-import java.util.Locale
 import java.util.concurrent.TimeUnit
 import androidx.fragment.app.FragmentActivity
 import fr.berliat.hskwidget.ui.wordlist.WordListSelectionDialog
 import androidx.core.view.isVisible
 import fr.berliat.hskwidget.HSKHelperApp
-import fr.berliat.hskwidget.data.model.ChineseWord.Companion.CN_HSK3
+import fr.berliat.hskwidget.core.Locale
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import java.time.Instant
 import java.time.ZoneId
@@ -287,7 +286,7 @@ class Utils {
                 definition = word.annotation?.notes ?: ""
                 annotation = ""
             }
-            var altDef = word.word?.definition?.get(CN_HSK3) ?: ""
+            var altDef = word.word?.definition?.get(Locale.CN_HSK3) ?: ""
 
             val appConfig = AppPreferencesStore(navController.context)
             if (appConfig.dictionaryShowHSK3Definition && altDef.isNotEmpty()) {
@@ -521,7 +520,6 @@ class Utils {
 
         fun formatKBToMB(bytesReceived: Long, format: String = "%.2f"): String {
             return String.format(
-                Locale.getDefault(),
                 format,
                 bytesReceived.toDouble() / 1024 / 1024)
         }
