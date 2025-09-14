@@ -6,7 +6,8 @@ plugins {
     id("com.android.kotlin.multiplatform.library")
     id("org.jetbrains.compose") version "1.8.2"
     id("org.jetbrains.kotlin.plugin.compose") version "2.2.20"
-    id("com.google.devtools.ksp") version "2.2.10-2.0.2"
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.room)
 }
 
 kotlin {
@@ -104,13 +105,21 @@ kotlin {
     }
 }
 
-// KSP for Room compiler (Android only)
 dependencies {
-    ksp(libs.room.compiler)
+    // KSP support for Room Compiler.
+    add("kspAndroid", libs.room.compiler)
+    add("kspIosSimulatorArm64", libs.room.compiler)
+    add("kspIosX64", libs.room.compiler)
+    add("kspIosArm64", libs.room.compiler)
 }
 
 // Compose resources
 compose.resources {
     generateResClass = always
     publicResClass = true
+}
+
+// set schema
+room {
+    schemaDirectory("$projectDir/schemas")
 }
