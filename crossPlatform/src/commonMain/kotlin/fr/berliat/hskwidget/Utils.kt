@@ -1,4 +1,4 @@
-package fr.berliat.hskwidget.crossPlatform
+package fr.berliat.hskwidget
 
 expect object Utils {
     fun openLink(url: String)

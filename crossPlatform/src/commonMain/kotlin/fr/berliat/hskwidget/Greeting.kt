@@ -1,4 +1,4 @@
-package fr.berliat.hskwidget.crossPlatform
+package fr.berliat.hskwidget
 
 class Greeting {
     fun greet(): String {

@@ -1,4 +1,4 @@
-package fr.berliat.hskwidget.crossPlatform
+package fr.berliat.hskwidget
 
 import android.content.Intent
 import android.content.Context

@@ -61,7 +61,7 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
         super.onCreate(savedInstanceState)
 
         multiplatform.network.cmptoast.AppContext.apply { set(applicationContext) }
-        fr.berliat.hskwidget.crossPlatform.Utils.init { applicationContext }
+        fr.berliat.hskwidget.Utils.init { applicationContext }
 
         setupSharedViewModel()
 

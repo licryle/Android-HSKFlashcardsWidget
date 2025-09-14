@@ -1,4 +1,4 @@
-package fr.berliat.hskwidget.crossPlatform
+package fr.berliat.hskwidget
 
 import platform.UIKit.UIDevice
 import platform.Foundation.NSURL

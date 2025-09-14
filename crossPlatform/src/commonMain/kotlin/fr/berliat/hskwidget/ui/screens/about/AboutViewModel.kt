@@ -1,7 +1,7 @@
-package fr.berliat.hskwidget.crossPlatform.ui.screens.about
+package fr.berliat.hskwidget.ui.screens.about
 
 import co.touchlab.kermit.Logger
-import fr.berliat.hskwidget.crossPlatform.Utils
+import fr.berliat.hskwidget.Utils
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
