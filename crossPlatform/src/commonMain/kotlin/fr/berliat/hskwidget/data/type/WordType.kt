@@ -1,6 +1,6 @@
 package fr.berliat.hskwidget.data.type
 
-enum class Type(val typ: String) {
+enum class WordType(val wordType: String) {
     NOUN("NOUN"),
     VERB("VERB"),
     ADJECTIVE("ADJECTIVE"),
@@ -12,9 +12,9 @@ enum class Type(val typ: String) {
     UNKNOWN("N/A");
 
     companion object {
-        fun from(findValue: String): Type {
+        fun from(findValue: String): WordType {
             return try {
-                Type.valueOf(findValue)
+                WordType.valueOf(findValue)
             } catch (_: Exception) {
                 UNKNOWN
             }

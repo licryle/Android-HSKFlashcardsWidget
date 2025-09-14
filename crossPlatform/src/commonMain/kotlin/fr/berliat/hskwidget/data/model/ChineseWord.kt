@@ -12,7 +12,7 @@ import fr.berliat.hskwidget.core.Locale
 import fr.berliat.hskwidget.data.type.HSK_Level
 import fr.berliat.hskwidget.data.type.Modality
 import fr.berliat.hskwidget.data.type.Pinyins
-import fr.berliat.hskwidget.data.type.Type
+import fr.berliat.hskwidget.data.type.WordType
 
 @Entity(
     tableName = "chinese_word",
@@ -27,7 +27,7 @@ data class ChineseWord(
     @ColumnInfo(name = "popularity") val popularity: Int?,
     @ColumnInfo(name = "examples", defaultValue = "") val examples: String? = "",
     @ColumnInfo(name = "modality", defaultValue = "N/A") val modality: Modality? = Modality.UNKNOWN,
-    @ColumnInfo(name = "type", defaultValue = "N/A") val type: Type? = Type.UNKNOWN,
+    @ColumnInfo(name = "type", defaultValue = "N/A") val wordType: WordType? = WordType.UNKNOWN,
     @ColumnInfo(name = "synonyms", defaultValue = "") val synonyms: String? = "",
     @ColumnInfo(name = "antonym", defaultValue = "") val antonym: String? = "",
     @ColumnInfo(name = "searchable_text", defaultValue = "") var searchable_text: String = ""
@@ -41,7 +41,7 @@ data class ChineseWord(
     companion object {
         fun getBlank(simplified: String = ""): ChineseWord {
             return ChineseWord(simplified, "", mapOf<Locale, String>(), null,
-                null, null, "", Modality.UNKNOWN, Type.UNKNOWN,
+                null, null, "", Modality.UNKNOWN, WordType.UNKNOWN,
                 "", "", "")
         }
     }

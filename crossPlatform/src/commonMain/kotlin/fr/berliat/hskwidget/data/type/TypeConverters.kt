@@ -28,11 +28,11 @@ object DefinitionsConverter {
 
 object WordTypeConverter {
     @TypeConverter
-    fun fromType(value: String?): Type =
-        value?.let { Type.from(it) } ?: Type.UNKNOWN
+    fun fromType(value: String?): WordType =
+        value?.let { WordType.from(it) } ?: WordType.UNKNOWN
 
     @TypeConverter
-    fun toType(type: Type): String = type.typ
+    fun toType(wordType: WordType): String = wordType.wordType
 }
 
 object ModalityConverter {

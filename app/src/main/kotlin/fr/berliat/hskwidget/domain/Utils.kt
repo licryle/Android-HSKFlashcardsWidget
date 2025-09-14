@@ -55,7 +55,7 @@ import fr.berliat.hskwidget.core.Locale
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.data.type.HSK_Level
 import fr.berliat.hskwidget.data.type.Modality
-import fr.berliat.hskwidget.data.type.Type
+import fr.berliat.hskwidget.data.type.WordType
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -370,14 +370,14 @@ class Utils {
             binding.dictionaryItemModality.text = capitalizeStr(modality)
             binding.dictionaryItemModality.visibility = hideViewIf(modality == Modality.UNKNOWN)
 
-            val type = word.word?.type ?: Type.UNKNOWN
-            binding.dictionaryItemType.text = capitalizeStr(type)
-            binding.dictionaryItemType.visibility = hideViewIf(type == Type.UNKNOWN)
+            val wordType = word.word?.wordType ?: WordType.UNKNOWN
+            binding.dictionaryItemType.text = capitalizeStr(wordType)
+            binding.dictionaryItemType.visibility = hideViewIf(wordType == WordType.UNKNOWN)
 
             // Hide all if all empty
             val nothingMore = (altDef + examples + antonym + synonyms).isEmpty()
                     && (modality == Modality.UNKNOWN)
-                    && (type == Type.UNKNOWN)
+                    && (wordType == WordType.UNKNOWN)
 
             binding.dictionaryItemToggle.visibility = hideViewIf(nothingMore)
 
