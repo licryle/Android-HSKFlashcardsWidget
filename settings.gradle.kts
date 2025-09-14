@@ -3,6 +3,7 @@ pluginManagement {
         google()
         mavenCentral()
         gradlePluginPortal()
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
 }
 plugins {
@@ -26,4 +27,3 @@ include(":googledrivebackup")
 include(":pinyin4kot")
 include(":AnkiDroidAPIHelper")
 include(":crossPlatform")
-include(":crossPlatform:androidmain")

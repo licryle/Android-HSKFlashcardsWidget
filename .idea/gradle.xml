@@ -4,17 +4,21 @@
   <component name="GradleSettings">
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
+        <option name="testRunner" value="CHOOSE_PER_TEST" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="gradleJvm" value="#GRADLE_LOCAL_JAVA_HOME" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/ankidroidapihelper" />
+            <option value="$PROJECT_DIR$/AnkiDroidAPIHelper" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/crossPlatform" />
+            <option value="$PROJECT_DIR$/floatlayouts" />
+            <option value="$PROJECT_DIR$/googledrivebackup" />
             <option value="$PROJECT_DIR$/hsktextviews" />
+            <option value="$PROJECT_DIR$/pinyin4kot" />
           </set>
         </option>
-        <option name="resolveExternalAnnotations" value="false" />
       </GradleProjectSettings>
     </option>
   </component>

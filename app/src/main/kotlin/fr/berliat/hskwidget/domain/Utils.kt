@@ -49,7 +49,6 @@ import java.io.FileOutputStream
 import java.io.InputStream
 import java.util.Locale
 import java.util.concurrent.TimeUnit
-import androidx.core.net.toUri
 import androidx.fragment.app.FragmentActivity
 import fr.berliat.hskwidget.ui.wordlist.WordListSelectionDialog
 import androidx.core.view.isVisible
@@ -83,37 +82,6 @@ class Utils {
     companion object {
         fun getAppContext() : HSKHelperApp {
             return HSKHelperApp.instance
-        }
-
-        fun getOpenURLIntent(url: String): Intent {
-            return Intent(
-                Intent.ACTION_VIEW,
-                url.toUri()
-            ).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
-
-        fun sendEmail(context: Context, address: String, subject: String = "", body: String = "") {
-            val intent = Intent(Intent.ACTION_SENDTO).apply {
-                data = "mailto:".toUri() // use only "mailto:", don't put address here
-                putExtra(Intent.EXTRA_EMAIL, arrayOf(address))
-                putExtra(Intent.EXTRA_SUBJECT, subject)
-                putExtra(Intent.EXTRA_TEXT, body)
-            }
-
-            if (intent.resolveActivity(context.packageManager) != null) {
-                context.startActivity(intent)
-            } else {
-                try {
-                    context.startActivity(Intent.createChooser(intent, "Send email with..."))
-                } catch (_: Exception) {
-                    Toast.makeText(
-                        context,
-                        context.getString(R.string.about_email_noapp),
-                        Toast.LENGTH_LONG
-                    ).show()
-                    copyToClipBoard(context, address)
-                }
-            }
         }
 
         fun formatDate(time: Instant) : String {

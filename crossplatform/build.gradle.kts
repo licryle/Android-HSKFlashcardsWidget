@@ -1,30 +1,34 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 
 plugins {
-    id("org.jetbrains.kotlin.multiplatform")
+    kotlin("multiplatform") version "2.2.10"
     id("com.android.kotlin.multiplatform.library")
-    id("com.android.lint")
+    id("org.jetbrains.compose") version "1.8.2"
+    id("org.jetbrains.kotlin.plugin.compose") version "2.2.20"
 }
 
 kotlin {
-
-    // Target declarations - add or remove as needed below. These define
-    // which platforms this KMP module supports.
-    // See: https://kotlinlang.org/docs/multiplatform-discover-project.html#targets
     androidLibrary {
         namespace = "fr.berliat.hskwidget.crossPlatform"
         compileSdk = 36
-        minSdk = 26
+        minSdk = 24
 
-        withHostTestBuilder {
-        }
-
+        withJava() // enable java compilation support
+        withHostTestBuilder {}.configure {}
         withDeviceTestBuilder {
             sourceSetTreeName = "test"
-        }.configure {
-            instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        }
+
+        compilations.all {
+            compileTaskProvider.configure {
+                compilerOptions {
+                    jvmTarget.set(JvmTarget.JVM_11)
+                }
+            }
         }
     }
+
 
     // For iOS targets, this is also where you should
     // configure native binary output. For more information, see:
@@ -54,7 +58,16 @@ kotlin {
         commonMain {
             dependencies {
                 implementation("org.jetbrains.kotlin:kotlin-stdlib:2.2.20")
+                implementation("org.jetbrains.compose.runtime:runtime:1.8.2")
+                // Compose Foundation (layout, drawing, gestures)
+                implementation("org.jetbrains.compose.foundation:foundation:1.8.2")
+                // Compose Material3
+                implementation("org.jetbrains.compose.material3:material3:1.8.2")
+                // Compose Resources generator (for multi-platform Res)
+                implementation("org.jetbrains.compose.components:components-resources:1.8.2")
                 // Add KMP dependencies here
+                implementation("network.chaintech:cmptoast:1.0.7")
+                implementation("co.touchlab:kermit:2.0.8") //Add latest version
             }
         }
 
@@ -69,7 +82,11 @@ kotlin {
                 // Add Android-specific dependencies here. Note that this source set depends on
                 // commonMain by default and will correctly pull the Android artifacts of any KMP
                 // dependencies declared in commonMain.
+                implementation("androidx.compose.ui:ui-tooling:1.9.1")
+                implementation("androidx.compose.ui:ui-tooling-preview:1.9.1")
             }
+            // This explicitly includes the common compose resources as Android assets
+            resources.srcDirs("src/commonMain/composeResources")
         }
 
         getByName("androidDeviceTest") {
@@ -90,6 +107,10 @@ kotlin {
             }
         }
     }
-
 }
 
+//because the dependency on the compose library is a project dependency
+compose.resources {
+    generateResClass = always
+    publicResClass = true
+}

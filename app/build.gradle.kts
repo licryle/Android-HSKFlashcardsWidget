@@ -5,6 +5,8 @@ plugins {
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
     id("com.google.devtools.ksp")
+    id("org.jetbrains.kotlin.plugin.compose") version "2.2.20"
+    id("org.jetbrains.compose") version "1.8.2"
     kotlin("kapt")
 }
 
@@ -46,6 +48,7 @@ android {
         viewBinding = true
         buildConfig = true
         dataBinding = true
+        compose = true
     }
     packaging {
         resources {
@@ -64,7 +67,6 @@ kotlin {
 }
 
 dependencies {
-
     implementation("androidx.core:core-ktx:1.17.0")
     implementation("androidx.appcompat:appcompat:1.7.1")
     implementation("com.google.android.material:material:1.13.0")
@@ -88,6 +90,7 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
     implementation("androidx.constraintlayout:constraintlayout:2.2.1")
     implementation("androidx.activity:activity-ktx:1.10.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.3")
     implementation("androidx.fragment:fragment-ktx:1.8.9")
 
     implementation("androidx.datastore:datastore:1.1.7")
@@ -160,4 +163,39 @@ dependencies {
     // Let's adk the user for reviews
     implementation("com.google.android.play:review:2.0.2")
     implementation("com.google.android.play:review-ktx:2.0.2")
+
+    // Ensure the resource library is included
+    api(compose.components.resources)
+
+    // Correctly import your crossPlatform module
+    implementation(project(":crossPlatform"))
+
+    // This is important for the app module to access the common resources
+    // Make sure the version matches the one in your crossPlatform module
+    implementation("org.jetbrains.compose.components:components-resources:1.8.2")
+    implementation("network.chaintech:cmptoast:1.0.7")
+}
+
+// TODO: Remove that unhappy hack. I've search for a while and couldn't find why my resources aren't exported despite export configuration.
+tasks.register<Delete>("cleanCopyCrossPlatformResources") {
+    description = "Deletes the old cross-platform resources."
+    delete("$rootDir/app/build/intermediates/assets/debug/mergeDebugAssets/composeResources/hskflashcardswidget.crossplatform.generated.resources")
+}
+val copyCrossPlatformResources = tasks.register<Copy>("copyCrossPlatformResources") {
+    group = "build"
+    description = "Copies my resources from CrossPlatform output to App input"
+
+    from("$rootDir/crossPlatform/build/generated/compose/resourceGenerator/preparedResources/commonMain/composeResources")
+    into("$rootDir/app/build/intermediates/assets/debug/mergeDebugAssets/composeResources/hskflashcardswidget.crossplatform.generated.resources")
+
+    dependsOn("cleanCopyCrossPlatformResources")
+}
+
+tasks.named("preBuild").configure {
+    dependsOn(":crossPlatform:assemble")
+    dependsOn(copyCrossPlatformResources)
+}
+
+compose.resources {
+    generateResClass = always
 }

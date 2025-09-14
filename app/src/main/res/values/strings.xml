@@ -50,19 +50,7 @@ We recommend to choose the level your at plus the one below, or above depending 
 \nYou can come back to this screen at any time to set up a new widget, or reconfigure existing ones.]]></string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="widgets_add_widget">Add a new widget</string>
-    <string name="about_btn_view_source">View source code</string>
     <string name="widgets_add_widget_instructions">Your launcher does not support automatically adding widgets.\nPlease add the Flashcard widget manually:\nLong press on the home screen → Widgets → Mandarin Assistant.</string>
-    <string name="about_intro1">HSK Flashcard Widget (v%1$s) is an open source project by Cyrille Berliat that stems from a personal need to learn Mandarin. \n \nIf it\'s useful to you, please consider supporting me and my countless hours of development :)</string>
-    <string name="about_intro2">If you have any suggestions, feedback or issues, feel free to email me.</string>
-    <string name="about_intro3">Privacy policy: I use Google Analytics to track usage, such as which tab is visited the most on which device class (Tablet, Smartphone). \nNo Personal Identifiable Information (PII) data should be collected nor sent to me or Google Analytics.
-\n
-\nLicense: GNU GPLv3. In a nutshell, you can do whatever you want with it, but must display credit for the work and use the same license downstream.
-\n
-\nThis project uses the awesome projects of:
-\n- Full CN-EN from CC-CEDICT list from https://www.mdbg.net/chinese/
-\n- HSK list from https://github.com/krmanik/HSK-3.0
-\n- Dictionary metadata in Chinese (BETA!) was generated using Yi 1.5 6B - Q6_K LLM from 01.AI.</string>
-    <string name="about_btn_email2">Email the developer</string>
     <string name="speech_failure_toast_unknown">Unknown speech error</string>
     <string name="speech_failure_toast_muted">Unmute to hear the word</string>
     <string name="speech_failure_toast_chinese_unsupported">The "Chinese (China)" voice if missing from your Text-To-Speech. Please install it.</string>
@@ -120,10 +108,6 @@ We recommend to choose the level your at plus the one below, or above depending 
         <item>10 (~500MB)</item>
     </string-array>
 
-    <string name="about_stats_title">Statistics</string>
-    <string name="about_terms_conditions_title"><![CDATA[Privacy Policy & Licences]]></string>
-    <string name="about_stats">Loading…</string>
-    <string name="about_stats_text">%1$s words in dictionary.\n%2$s annotations.</string>
     <string name="config_restore_file">Restore from file</string>
     <string name="config_restore_file_choose">Choose file</string>
     <string name="config_backup_cloud_title">Backup/Restore from Google</string>
@@ -302,7 +286,6 @@ padding: 0;
     <string name="dictionary_item_altdefinition">Definition</string>
     <string name="dictionary_search_filter_hsk3definition_hint">HSK3 Definition</string>
     <string name="dbrestore_start">Database restoration started</string>
-    <string name="about_email_noapp">No email client found. Address copied to clipboard.</string>
     <string name="menu_support">Support the creator!</string>
 
     <string name="support_devintro_title">🥐 Support the creator 🥐</string>

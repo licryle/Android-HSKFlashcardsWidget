@@ -59,6 +59,10 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        multiplatform.network.cmptoast.AppContext.apply { set(applicationContext) }
+        fr.berliat.hskwidget.crossPlatform.Utils.init { applicationContext }
+
         setupSharedViewModel()
 
         // Enable StrictMode in Debug mode

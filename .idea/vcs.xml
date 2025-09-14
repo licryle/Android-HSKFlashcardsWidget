@@ -3,5 +3,9 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/AnkiDroidAPIHelper" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/googledrivebackup" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/pinyin4kot" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/pinyin4kot/src/main/python/pinyin4net" vcs="Git" />
   </component>
 </project>
