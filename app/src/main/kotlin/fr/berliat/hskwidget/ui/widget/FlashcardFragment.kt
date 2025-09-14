@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import fr.berliat.hskwidget.core.Locale
-import fr.berliat.hskwidget.data.model.ChineseWord
+import fr.berliat.hskwidget.data.type.HSK_Level
 import fr.berliat.hskwidget.domain.FlashcardManager
 import fr.berliat.hskwidget.domain.Utils
 import kotlinx.coroutines.Dispatchers
@@ -125,7 +125,7 @@ class FlashcardFragment : Fragment() {
 
                     with(configuredBindings.flashcardHsklevel) {
                         visibility =
-                            Utils.hideViewIf(currentWord.hskLevel == ChineseWord.HSK_Level.NOT_HSK)
+                            Utils.hideViewIf(currentWord.hskLevel == HSK_Level.NOT_HSK)
                         setOnClickListener { openDictionary() }
                         text = currentWord.hskLevel.toString()
                     }

@@ -12,17 +12,19 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
-import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWordAnnotation
 import fr.berliat.hskwidget.data.repo.WordListRepository
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
+import fr.berliat.hskwidget.data.type.ClassLevel
+import fr.berliat.hskwidget.data.type.ClassType
+import fr.berliat.hskwidget.data.type.HSK_Level
+import fr.berliat.hskwidget.data.type.Pinyins
 import fr.berliat.hskwidget.databinding.FragmentAnnotationEditBinding
 import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.domain.Utils.Companion.copyToClipBoard
 import fr.berliat.hskwidget.domain.Utils.Companion.playWordInBackground
 import fr.berliat.hskwidget.ui.utils.HSKAnkiDelegate
-import java.time.Instant
-import java.util.Date
+import kotlinx.datetime.Clock
 
 
 class AnnotateFragment: Fragment() {
@@ -66,8 +68,7 @@ class AnnotateFragment: Fragment() {
 
     private fun updateUI(annotatedWord: AnnotatedChineseWord) {
         // Populate the ClassType Spinner programmatically
-        val classTypes =
-            ChineseWordAnnotation.ClassType.entries.map { it.type }  // Convert enum to list of strings
+        val classTypes = ClassType.entries.map { it.type }  // Convert enum to list of strings
         val classTypeAdapter = ArrayAdapter(
             requireContext(),
             android.R.layout.simple_spinner_item,
@@ -77,7 +78,7 @@ class AnnotateFragment: Fragment() {
         binding.annotationEditClassType.adapter = classTypeAdapter
 
         // Populate the ClassLevel Spinner programmatically
-        val classLevels = ChineseWordAnnotation.ClassLevel.entries.map { it.lvl }
+        val classLevels = ClassLevel.entries.map { it.lvl }
         val classLevelAdapter = ArrayAdapter(
             requireContext(),
             android.R.layout.simple_spinner_item,
@@ -97,7 +98,8 @@ class AnnotateFragment: Fragment() {
 
         binding.dictionaryItemHskLevel.text = annotatedWord.word?.hskLevel.toString()
         binding.dictionaryItemHskLevel.visibility =
-            if (annotatedWord.word?.hskLevel == null || annotatedWord.word.hskLevel == ChineseWord.HSK_Level.NOT_HSK) {
+                // TODO REMOVE !!
+            if (annotatedWord.word?.hskLevel == null || annotatedWord.word!!.hskLevel == HSK_Level.NOT_HSK) {
                     View.INVISIBLE
             } else {
                 View.VISIBLE
@@ -108,7 +110,8 @@ class AnnotateFragment: Fragment() {
         binding.annotationEditNotes.setText(annotatedWord.annotation?.notes)
         if (annotatedWord.hasAnnotation()) {
             binding.annotationEditClassType.setSelection(annotatedWord.annotation!!.classType!!.ordinal)
-            binding.annotationEditClassLevel.setSelection(annotatedWord.annotation.level!!.ordinal)
+            // TODO REMOVE !!
+            binding.annotationEditClassLevel.setSelection(annotatedWord.annotation!!.level!!.ordinal)
         } else {
             binding.annotationEditClassType.setSelection(prefStore.lastAnnotatedClassType.ordinal)
             binding.annotationEditClassLevel.setSelection(prefStore.lastAnnotatedClassLevel.ordinal)
@@ -170,14 +173,14 @@ class AnnotateFragment: Fragment() {
     private fun onSaveClick() {            // Save the updated annotation fields
         var firstSeen = annotateViewModel.annotatedWord.value?.annotation?.firstSeen
         if (firstSeen == null)
-            firstSeen = Date(Instant.now().toEpochMilli())
+            firstSeen = Clock.System.now()
 
         val updatedAnnotation = ChineseWordAnnotation(
             simplified = annotateViewModel.simplified.trim(),
-            pinyins = ChineseWord.Pinyins.fromString(binding.annotationEditChinese.pinyinText),
+            pinyins = Pinyins.fromString(binding.annotationEditChinese.pinyinText),
             notes = binding.annotationEditNotes.text.toString(),
-            classType = ChineseWordAnnotation.ClassType.entries[binding.annotationEditClassType.selectedItemPosition],
-            level = ChineseWordAnnotation.ClassLevel.entries[binding.annotationEditClassLevel.selectedItemPosition],
+            classType = ClassType.entries[binding.annotationEditClassType.selectedItemPosition],
+            level = ClassLevel.entries[binding.annotationEditClassLevel.selectedItemPosition],
             themes = binding.annotationEditThemes.text.toString(),
             firstSeen = firstSeen,  // Handle date logic
             isExam = binding.annotationEditIsExam.isChecked

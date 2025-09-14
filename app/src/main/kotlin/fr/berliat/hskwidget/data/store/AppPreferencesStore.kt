@@ -2,8 +2,8 @@ package fr.berliat.hskwidget.data.store
 
 import android.content.Context
 import android.net.Uri
-import fr.berliat.hskwidget.data.model.ChineseWordAnnotation.ClassLevel
-import fr.berliat.hskwidget.data.model.ChineseWordAnnotation.ClassType
+import fr.berliat.hskwidget.data.type.ClassLevel
+import fr.berliat.hskwidget.data.type.ClassType
 import androidx.core.net.toUri
 import androidx.datastore.preferences.core.Preferences
 import kotlinx.coroutines.Deferred

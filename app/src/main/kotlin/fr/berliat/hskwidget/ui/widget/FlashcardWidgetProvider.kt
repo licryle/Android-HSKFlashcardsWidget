@@ -13,7 +13,6 @@ import android.widget.RemoteViews
 import androidx.work.WorkManager
 import fr.berliat.hskwidget.MainActivity
 import fr.berliat.hskwidget.R
-import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.domain.FlashcardManager
 import fr.berliat.hskwidget.domain.Utils
 import kotlinx.coroutines.Dispatchers
@@ -21,6 +20,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 import fr.berliat.hskwidget.core.Locale
+import fr.berliat.hskwidget.data.type.HSK_Level
 
 internal const val ACTION_SPEAK = "fr.berliat.hskwidget.ACTION_WIDGET_SPEAK"
 internal const val ACTION_DICTIONARY = "fr.berliat.hskwidget.ACTION_DICTIONARY"
@@ -229,7 +229,7 @@ class FlashcardWidgetProvider : AppWidgetProvider() {
                         setTextViewText(R.id.flashcard_hsklevel, word.hskLevel.toString())
                         setViewVisibility(
                             R.id.flashcard_hsklevel,
-                            Utils.hideViewIf(word.hskLevel == ChineseWord.HSK_Level.NOT_HSK)
+                            Utils.hideViewIf(word.hskLevel == HSK_Level.NOT_HSK)
                         )
                     }
                 }

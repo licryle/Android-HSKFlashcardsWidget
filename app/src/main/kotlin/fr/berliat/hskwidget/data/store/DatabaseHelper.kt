@@ -21,7 +21,7 @@ class DatabaseHelper private constructor(val context: Context) {
     fun chineseWordFrequencyDAO() = liveDatabase.chineseWordFrequencyDAO()
     fun wordListDAO() = liveDatabase.wordListDAO()
     fun widgetListDAO() = liveDatabase.widgetListDAO()
-    fun flushToDisk() = liveDatabase.flushToDisk()
+    suspend fun flushToDisk() = liveDatabase.flushToDisk()
     val liveDatabase
         get() = _db!!
 
@@ -46,7 +46,7 @@ class DatabaseHelper private constructor(val context: Context) {
             INSTANCE?.let { return@withContext it }
 
             val instance = DatabaseHelper(context.applicationContext)
-            instance._db = ChineseWordsDatabase.createInstance(context.applicationContext)
+            instance._db = fr.berliat.hskwidget.Utils.getDatabaseInstance()
             instance.DATABASE_LIVE_DIR = getDatabaseLiveDir(context)
             instance.DATABASE_LIVE_PATH = getDatabaseLiveFile(context)
 
@@ -118,7 +118,7 @@ class DatabaseHelper private constructor(val context: Context) {
             it.renameTo(File(oldFile.absoluteFile.toString() + ext))
         }
 
-        _db = ChineseWordsDatabase.createInstance(context)
+        _db = fr.berliat.hskwidget.Utils.getDatabaseInstance()
     }
 
     suspend fun replaceUserDataInDB(dbToUpdate: ChineseWordsDatabase, updateWith: ChineseWordsDatabase)

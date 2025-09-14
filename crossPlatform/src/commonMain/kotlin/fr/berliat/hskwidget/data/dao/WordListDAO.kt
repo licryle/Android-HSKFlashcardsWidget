@@ -6,7 +6,8 @@ import fr.berliat.hskwidget.data.model.WordList
 import fr.berliat.hskwidget.data.model.WordListEntry
 import fr.berliat.hskwidget.data.model.WordListWithCount
 import kotlinx.coroutines.flow.Flow
-import java.time.Instant
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 private const val wordlist_with_count =
     "SELECT wl.*, COUNT(wle.simplified) AS word_count\n" +
@@ -82,8 +83,9 @@ interface WordListDAO {
     @Query("UPDATE word_list SET last_modified = :lastModified WHERE id = :listId")
     suspend fun _touchList(listId: Long, lastModified: Long): Int
 
+    @OptIn(ExperimentalTime::class)
     suspend fun touchList(listId: Long): Int {
-        return _touchList(listId, Instant.now().toEpochMilli())
+        return _touchList(listId, Clock.System.now().toEpochMilliseconds())
     }
 
     @Transaction

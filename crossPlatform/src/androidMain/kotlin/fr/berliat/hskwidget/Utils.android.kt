@@ -3,6 +3,10 @@ package fr.berliat.hskwidget
 import android.content.Intent
 import android.content.Context
 import android.net.Uri
+import androidx.room.Room
+import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 actual object Utils {
     private var contextProvider: (() -> Context)? = null
@@ -52,4 +56,37 @@ actual object Utils {
 
     actual fun logAnalyticsScreenView(screen: String) {
     }
+
+
+    private var databasePath = ""
+    actual suspend fun getDatabaseInstance(): ChineseWordsDatabase = withContext(
+        Dispatchers.IO) {
+            val dbBuilder = Room.databaseBuilder(
+                contextProvider!!.invoke().applicationContext,
+                ChineseWordsDatabase::class.java,
+                DATABASE_FILENAME
+            )
+                .createFromAsset(DATABASE_ASSET_PATH)
+
+            /*if (BuildConfig.DEBUG) {
+                dbBuilder.setQueryCallback(
+                    { sqlQuery, bindArgs ->
+                        Logger.d(tag = TAG, messageString = "SQL Query: $sqlQuery SQL Args: $bindArgs")
+                    }, Executors.newSingleThreadExecutor()
+                )
+            }*/
+
+            val db = dbBuilder.build()
+
+            databasePath = db.openHelper.writableDatabase.path.toString()
+
+            return@withContext db
+        }
+
+    actual fun getDatabasePath(): String {
+        return databasePath
+    }
+
+    const val DATABASE_FILENAME = "Mandarin_Assistant.db"
+    const val DATABASE_ASSET_PATH = "databases/$DATABASE_FILENAME"
 }

@@ -174,6 +174,8 @@ dependencies {
     // Make sure the version matches the one in your crossPlatform module
     implementation("org.jetbrains.compose.components:components-resources:1.8.2")
     implementation("network.chaintech:cmptoast:1.0.7")
+
+    implementation(libs.kotlinx.datetime)
 }
 
 // TODO: Remove that unhappy hack. I've search for a while and couldn't find why my resources aren't exported despite export configuration.

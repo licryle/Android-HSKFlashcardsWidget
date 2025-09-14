@@ -6,57 +6,46 @@ import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWordAnnotation
 import fr.berliat.hskwidget.data.model.WordList
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
-import kotlin.jvm.JvmStatic
-import kotlin.time.ExperimentalTime
-import kotlin.time.Instant
+import kotlinx.datetime.Instant
 
 import kotlinx.serialization.json.Json
 
 object DefinitionsConverter {
     @TypeConverter
-    @JvmStatic
     fun fromStringMap(value: Map<Locale, String>?): String? {
         return Json.encodeToString(value)
     }
 
     @TypeConverter
-    @JvmStatic
     fun fromString(s: String?): Map<Locale, String>? {
         if (s == null)
             return mapOf()
 
-        return Json.decodeFromString<Map<Locale, String>>(s)
+        val defs = Json.decodeFromString<Map<String, String>>(s)
+        return defs.mapKeys { Locale.fromCode(it.key)!! }
     }
 }
 
 object WordTypeConverter {
     @TypeConverter
-    @JvmStatic
     fun fromType(value: String?): Type =
         value?.let { Type.from(it) } ?: Type.UNKNOWN
 
     @TypeConverter
-    @JvmStatic
     fun toType(type: Type): String = type.typ
 }
 
 object ModalityConverter {
     @TypeConverter
-    @JvmStatic
     fun fromModality(value: String?): Modality =
         value?.let { Modality.from(it) } ?: Modality.UNKNOWN
 
     @TypeConverter
-    @JvmStatic
     fun toModality(modality: Modality): String = modality.mod
 }
 
 object AnnotatedChineseWordsConverter {
     @TypeConverter
-    @JvmStatic
     fun fromMapToList(m: Map<ChineseWordAnnotation, List<ChineseWord>>): List<AnnotatedChineseWord> {
         val words = mutableSetOf<AnnotatedChineseWord>()
 
@@ -68,7 +57,6 @@ object AnnotatedChineseWordsConverter {
     }
 
     @TypeConverter
-    @JvmStatic
     fun fromMapToFirst(m: Map<ChineseWordAnnotation, List<ChineseWord>>): AnnotatedChineseWord? {
         val words = fromMapToList(m)
 
@@ -79,7 +67,6 @@ object AnnotatedChineseWordsConverter {
     }
 
     @TypeConverter
-    @JvmStatic
     fun fromListToMap(l: List<Map<ChineseWordAnnotation, List<ChineseWord>>>): Map<String, AnnotatedChineseWord> {
         val words = mutableMapOf<String, AnnotatedChineseWord>()
 
@@ -92,23 +79,15 @@ object AnnotatedChineseWordsConverter {
     }
 }
 
-object DateConverter {
-    @OptIn(ExperimentalTime::class)
+object InstantConverter {
     @TypeConverter
-    @JvmStatic
-    fun toDate(dateLong: Long?): LocalDate? {
-        return dateLong?.let {
-            Instant.fromEpochMilliseconds(it)
-                .toLocalDateTime(TimeZone.UTC)
-                .date
-        }
+    fun toInstant(epochMillis: Long?): Instant? {
+        return epochMillis?.let { Instant.fromEpochMilliseconds(epochMillis) }
     }
 
-    @OptIn(ExperimentalTime::class)
     @TypeConverter
-    @JvmStatic
-    fun fromDate(date: LocalDate?): Long? {
-        return date?.toEpochDays()
+    fun fromInstant(instant: Instant?): Long? {
+        return instant?.toEpochMilliseconds()
     }
 }
 

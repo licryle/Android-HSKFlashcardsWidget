@@ -4,6 +4,7 @@ import androidx.room.Embedded
 import fr.berliat.hskwidget.core.Locale
 import fr.berliat.hskwidget.data.type.HSK_Level
 import fr.berliat.hskwidget.data.type.Pinyins
+import kotlin.time.ExperimentalTime
 
 data class AnnotatedChineseWord (
     @Embedded val word: ChineseWord?,
@@ -23,6 +24,7 @@ data class AnnotatedChineseWord (
         }
     }
 
+    @OptIn(ExperimentalTime::class)
     fun hasAnnotation(): Boolean {
         return annotation?.firstSeen != null
     }

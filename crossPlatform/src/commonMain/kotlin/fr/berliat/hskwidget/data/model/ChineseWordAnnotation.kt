@@ -10,7 +10,7 @@ import doist.x.normalize.normalize
 import fr.berliat.hskwidget.data.type.ClassLevel
 import fr.berliat.hskwidget.data.type.ClassType
 import fr.berliat.hskwidget.data.type.Pinyins
-import kotlinx.datetime.LocalDate
+import kotlinx.datetime.Instant
 
 @Entity(
     tableName = "chinese_word_annotation",
@@ -23,7 +23,7 @@ data class ChineseWordAnnotation (
     @ColumnInfo(name = "class_level") val level: ClassLevel?,
     @ColumnInfo(name = "themes") val themes: String?,
 
-    @ColumnInfo(name = "first_seen") val firstSeen: LocalDate?,
+    @ColumnInfo(name = "first_seen") val firstSeen: Instant?,
     @ColumnInfo(name = "is_exam") val isExam: Boolean?
 ) {
     @ColumnInfo(name = "a_searchable_text", defaultValue = "") var a_searchable_text: String = ""

@@ -1,9 +1,15 @@
 package fr.berliat.hskwidget
 
+import androidx.room.Room
+import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
+import kotlinx.cinterop.ExperimentalForeignApi
 import platform.UIKit.UIDevice
 import platform.Foundation.NSURL
 import platform.UIKit.UIApplication
 import platform.Foundation.NSBundle
+import platform.Foundation.NSDocumentDirectory
+import platform.Foundation.NSFileManager
+import platform.Foundation.NSUserDomainMask
 
 actual object Utils {
     actual fun openLink(url: String) {
@@ -29,4 +35,29 @@ actual object Utils {
     
     actual fun logAnalyticsScreenView(screen: String) {
     }
+
+    @OptIn(ExperimentalForeignApi::class)
+    private fun documentDirectory(): String {
+        val documentDirectory = NSFileManager.defaultManager.URLForDirectory(
+            directory = NSDocumentDirectory,
+            inDomain = NSUserDomainMask,
+            appropriateForURL = null,
+            create = false,
+            error = null,
+        )
+        return requireNotNull(documentDirectory?.path)
+    }
+
+    actual suspend fun getDatabaseInstance(): ChineseWordsDatabase {
+        val dbFilePath = getDatabasePath()
+        return Room.databaseBuilder<ChineseWordsDatabase>(
+            name = dbFilePath,
+        ).build()
+    }
+
+    actual fun getDatabasePath(): String {
+        return documentDirectory() + "/$DATABASE_FILENAME"
+    }
+
+    const val DATABASE_FILENAME = "Mandarin_Assistant.db"
 }

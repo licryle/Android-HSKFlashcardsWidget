@@ -35,7 +35,6 @@ import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.ktx.Firebase
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
-import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.repo.ChineseWordFrequencyRepo
 import fr.berliat.hskwidget.data.store.DatabaseHelper
 import fr.berliat.hskwidget.databinding.FragmentDictionarySearchItemBinding
@@ -54,6 +53,9 @@ import androidx.core.view.isVisible
 import fr.berliat.hskwidget.HSKHelperApp
 import fr.berliat.hskwidget.core.Locale
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
+import fr.berliat.hskwidget.data.type.HSK_Level
+import fr.berliat.hskwidget.data.type.Modality
+import fr.berliat.hskwidget.data.type.Type
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -306,7 +308,8 @@ class Utils {
             }
 
             binding.dictionaryItemHskLevel.visibility = hideViewIf(
-                word.word?.hskLevel == null || word.word.hskLevel == ChineseWord.HSK_Level.NOT_HSK
+                // TODO REMOVE !!
+                word.word?.hskLevel == null || word.word!!.hskLevel == HSK_Level.NOT_HSK
             )
             binding.dictionaryItemHskLevel.text = word.word?.hskLevel.toString()
 
@@ -363,18 +366,18 @@ class Utils {
             binding.dictionaryItemSynonyms.text = synonyms
             binding.dictionaryItemSynonymsContainer.visibility = hideViewIf(synonyms.isEmpty())
 
-            val modality = word.word?.modality ?: ChineseWord.Modality.UNKNOWN
+            val modality = word.word?.modality ?: Modality.UNKNOWN
             binding.dictionaryItemModality.text = capitalizeStr(modality)
-            binding.dictionaryItemModality.visibility = hideViewIf(modality == ChineseWord.Modality.UNKNOWN)
+            binding.dictionaryItemModality.visibility = hideViewIf(modality == Modality.UNKNOWN)
 
-            val type = word.word?.type ?: ChineseWord.Type.UNKNOWN
+            val type = word.word?.type ?: Type.UNKNOWN
             binding.dictionaryItemType.text = capitalizeStr(type)
-            binding.dictionaryItemType.visibility = hideViewIf(type == ChineseWord.Type.UNKNOWN)
+            binding.dictionaryItemType.visibility = hideViewIf(type == Type.UNKNOWN)
 
             // Hide all if all empty
             val nothingMore = (altDef + examples + antonym + synonyms).isEmpty()
-                    && (modality == ChineseWord.Modality.UNKNOWN)
-                    && (type == ChineseWord.Type.UNKNOWN)
+                    && (modality == Modality.UNKNOWN)
+                    && (type == Type.UNKNOWN)
 
             binding.dictionaryItemToggle.visibility = hideViewIf(nothingMore)
 
