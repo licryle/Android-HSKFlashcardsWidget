@@ -7,6 +7,9 @@ import androidx.room.PrimaryKey
 
 import doist.x.normalize.Form
 import doist.x.normalize.normalize
+import fr.berliat.hskwidget.data.type.ClassLevel
+import fr.berliat.hskwidget.data.type.ClassType
+import fr.berliat.hskwidget.data.type.Pinyins
 import kotlinx.datetime.LocalDate
 
 @Entity(
@@ -14,7 +17,7 @@ import kotlinx.datetime.LocalDate
     indices = [Index(value = ["a_searchable_text"])])
 data class ChineseWordAnnotation (
     @PrimaryKey @ColumnInfo(name = "a_simplified") val simplified: String = "",
-    @ColumnInfo(name = "a_pinyins") val pinyins: ChineseWord.Pinyins?,
+    @ColumnInfo(name = "a_pinyins") val pinyins: Pinyins?,
     @ColumnInfo(name = "notes") val notes: String?,
     @ColumnInfo(name = "class_type") val classType: ClassType?,
     @ColumnInfo(name = "class_level") val level: ClassLevel?,
@@ -29,34 +32,6 @@ data class ChineseWordAnnotation (
         val cleanPinyins = pinyins.toString().replace(" ", "")
         a_searchable_text = "$cleanPinyins $notes $themes $simplified".normalize(Form.NFD)
             .replace("\\p{Mn}+".toRegex(), "")
-    }
-
-    enum class ClassType (val type: String) {
-        Speaking("口语"),
-        Writing("写作"),
-        Reading("精读"),
-        Listening("听力"),
-        FastReading("阅读"),
-        NotFromClass("其他");
-        companion object {
-            infix fun from(findValue: String): ClassType = ClassType.valueOf(findValue)
-        }
-    }
-    enum class ClassLevel (val lvl: String) {
-        Elementary1("初一"),
-        Elementary2("初二"),
-        Elementary3("初三"),
-        Elementary4("初四"),
-        Intermediate1("中一"),
-        Intermediate2("中二"),
-        Intermediate3("中三"),
-        Advanced1("高一"),
-        Advanced2("高二"),
-        Advanced3("高三"),
-        NotFromClass("其他");
-        companion object {
-            infix fun from(findValue: String): ClassLevel = ClassLevel.valueOf(findValue)
-        }
     }
 
     companion object {

@@ -2,6 +2,8 @@ package fr.berliat.hskwidget.data.model
 
 import androidx.room.Embedded
 import fr.berliat.hskwidget.core.Locale
+import fr.berliat.hskwidget.data.type.HSK_Level
+import fr.berliat.hskwidget.data.type.Pinyins
 
 data class AnnotatedChineseWord (
     @Embedded val word: ChineseWord?,
@@ -35,8 +37,8 @@ data class AnnotatedChineseWord (
         if (hasAnnotation()) {
             return ChineseWord(simplified, "",
                 mapOf(Pair<Locale,String>(Locale.ENGLISH, annotation?.notes ?: "")),
-                ChineseWord.HSK_Level.NOT_HSK,
-                ChineseWord.Pinyins(""),
+                HSK_Level.NOT_HSK,
+                Pinyins(""),
                 0)
         }
 

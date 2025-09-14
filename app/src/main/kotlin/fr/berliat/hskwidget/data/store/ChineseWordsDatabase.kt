@@ -14,11 +14,18 @@ import fr.berliat.hskwidget.data.dao.ChineseWordFrequencyDAO
 import fr.berliat.hskwidget.data.dao.WidgetListDAO
 import fr.berliat.hskwidget.data.dao.WordListDAO
 import fr.berliat.hskwidget.data.model.ChineseWord
+import fr.berliat.hskwidget.data.type.Pinyins
 import fr.berliat.hskwidget.data.model.ChineseWordAnnotation
 import fr.berliat.hskwidget.data.model.ChineseWordFrequency
 import fr.berliat.hskwidget.data.model.WidgetListEntry
 import fr.berliat.hskwidget.data.model.WordList
 import fr.berliat.hskwidget.data.model.WordListEntry
+import fr.berliat.hskwidget.data.type.AnnotatedChineseWordsConverter
+import fr.berliat.hskwidget.data.type.DateConverter
+import fr.berliat.hskwidget.data.type.DefinitionsConverter
+import fr.berliat.hskwidget.data.type.ListTypeConverter
+import fr.berliat.hskwidget.data.type.ModalityConverter
+import fr.berliat.hskwidget.data.type.WordTypeConverter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.concurrent.Executors
@@ -27,7 +34,7 @@ import java.util.concurrent.Executors
     entities = [ChineseWordAnnotation::class, ChineseWord::class, ChineseWordFrequency::class,
         WordList::class, WordListEntry::class, WidgetListEntry::class],
     version = 1, exportSchema = true)
-@TypeConverters(ChineseWord.Pinyins::class,
+@TypeConverters(Pinyins::class,
     WordTypeConverter::class,
     ModalityConverter::class,
     DateConverter::class,
