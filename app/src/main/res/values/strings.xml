@@ -120,7 +120,7 @@ We recommend to choose the level your at plus the one below, or above depending 
 
     <string name="dbrestore_failure_fileformat">File doesn\'t seem to be a backup for this app</string>
     <string name="dbrestore_failure_import">Restoration failed: %s</string>
-    <string name="dbrestore_failure_nofileselected">No file select: restoration cancelled</string>
+    <string name="dbrestore_failure_nofileselected">No file selected: restoration cancelled</string>
     <string name="dbrestore_success">Database successfully restored</string>
     <string name="widget_btn_copy">Copy to clipboard</string>
 
