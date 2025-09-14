@@ -72,6 +72,7 @@ kotlin {
 
                 implementation(libs.normalize)
                 implementation(libs.kotlinx.datetime)
+                implementation(libs.kotlinx.serialization.json)
             }
         }
 

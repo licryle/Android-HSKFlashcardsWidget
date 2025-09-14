@@ -1,55 +1,57 @@
-package fr.berliat.hskwidget.data.store
+package fr.berliat.hskwidget.data.type
 
 import androidx.room.TypeConverter
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import fr.berliat.hskwidget.core.Locale
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWordAnnotation
 import fr.berliat.hskwidget.data.model.WordList
-import java.util.Date
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import kotlin.jvm.JvmStatic
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
+import kotlinx.serialization.json.Json
 
 object DefinitionsConverter {
     @TypeConverter
     @JvmStatic
     fun fromStringMap(value: Map<Locale, String>?): String? {
-        return Gson().toJson(value)
+        return Json.encodeToString(value)
     }
 
     @TypeConverter
     @JvmStatic
     fun fromString(s: String?): Map<Locale, String>? {
         if (s == null)
-            return mapOf<Locale, String>()
+            return mapOf()
 
-        val mapType = object : TypeToken<Map<String, String>>() {}.type
-        val stringMap: Map<String, String> = Gson().fromJson(s, mapType)
-        return stringMap.mapKeys { Locale.fromCode(it.key)!! }
+        return Json.decodeFromString<Map<Locale, String>>(s)
     }
 }
 
 object WordTypeConverter {
     @TypeConverter
     @JvmStatic
-    fun fromType(value: String?): ChineseWord.Type =
-        value?.let { ChineseWord.Type.from(it) } ?: ChineseWord.Type.UNKNOWN
+    fun fromType(value: String?): Type =
+        value?.let { Type.from(it) } ?: Type.UNKNOWN
 
     @TypeConverter
     @JvmStatic
-    fun toType(type: ChineseWord.Type): String = type.typ
+    fun toType(type: Type): String = type.typ
 }
 
 object ModalityConverter {
     @TypeConverter
     @JvmStatic
-    fun fromModality(value: String?): ChineseWord.Modality =
-        value?.let { ChineseWord.Modality.from(it) } ?: ChineseWord.Modality.UNKNOWN
+    fun fromModality(value: String?): Modality =
+        value?.let { Modality.from(it) } ?: Modality.UNKNOWN
 
     @TypeConverter
     @JvmStatic
-    fun toModality(modality: ChineseWord.Modality): String = modality.mod
+    fun toModality(modality: Modality): String = modality.mod
 }
 
 object AnnotatedChineseWordsConverter {
@@ -91,16 +93,22 @@ object AnnotatedChineseWordsConverter {
 }
 
 object DateConverter {
+    @OptIn(ExperimentalTime::class)
     @TypeConverter
     @JvmStatic
-    fun toDate(dateLong: Long?): Date? {
-        return if (dateLong == null) null else Date(dateLong)
+    fun toDate(dateLong: Long?): LocalDate? {
+        return dateLong?.let {
+            Instant.fromEpochMilliseconds(it)
+                .toLocalDateTime(TimeZone.UTC)
+                .date
+        }
     }
 
+    @OptIn(ExperimentalTime::class)
     @TypeConverter
     @JvmStatic
-    fun fromDate(date: Date?): Long? {
-        return date?.time
+    fun fromDate(date: LocalDate?): Long? {
+        return date?.toEpochDays()
     }
 }
 
