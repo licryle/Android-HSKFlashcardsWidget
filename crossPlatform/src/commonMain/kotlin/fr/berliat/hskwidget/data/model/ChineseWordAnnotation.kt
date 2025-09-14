@@ -4,8 +4,10 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import java.text.Normalizer
-import java.util.Date
+
+import doist.x.normalize.Form
+import doist.x.normalize.normalize
+import kotlinx.datetime.LocalDate
 
 @Entity(
     tableName = "chinese_word_annotation",
@@ -18,15 +20,15 @@ data class ChineseWordAnnotation (
     @ColumnInfo(name = "class_level") val level: ClassLevel?,
     @ColumnInfo(name = "themes") val themes: String?,
 
-    @ColumnInfo(name = "first_seen") val firstSeen: Date?,
+    @ColumnInfo(name = "first_seen") val firstSeen: LocalDate?,
     @ColumnInfo(name = "is_exam") val isExam: Boolean?
 ) {
     @ColumnInfo(name = "a_searchable_text", defaultValue = "") var a_searchable_text: String = ""
 
     fun updateSearchable() {
         val cleanPinyins = pinyins.toString().replace(" ", "")
-        a_searchable_text = Normalizer.normalize("$cleanPinyins $notes $themes $simplified",
-            Normalizer.Form.NFD).replace("\\p{Mn}+".toRegex(), "")
+        a_searchable_text = "$cleanPinyins $notes $themes $simplified".normalize(Form.NFD)
+            .replace("\\p{Mn}+".toRegex(), "")
     }
 
     enum class ClassType (val type: String) {

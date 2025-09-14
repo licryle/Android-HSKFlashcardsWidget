@@ -1,6 +1,16 @@
 package fr.berliat.hskwidget.data.model
 
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.Index
+import androidx.room.PrimaryKey
+import androidx.room.TypeConverter
+
+import doist.x.normalize.Form
+import doist.x.normalize.normalize
+
 import fr.berliat.hskwidget.core.Locale
+import kotlin.jvm.JvmStatic
 
 @Entity(
     tableName = "chinese_word",
@@ -27,37 +37,31 @@ data class ChineseWord(
             .normalize(Form.NFD).replace("\\p{Mn}+".toRegex(), "")
     }
 
-    class Pinyins: ArrayList<Pinyin> {
-        constructor(s: String) : this(fromString(s)) {
-        }
+    class Pinyins(
+        private val items: MutableList<Pinyin> = mutableListOf()
+    ) : MutableList<Pinyin> by items {
 
-        constructor(pinyins: ArrayList<Pinyin>) {
-            this.addAll(pinyins)
-        }
+        constructor(s: String) : this(fromString(s).items)
 
-        override fun toString() = toString(this)
+        override fun toString(): String = toString(this)
 
         companion object {
             @TypeConverter
             @JvmStatic
             fun fromString(value: String?): Pinyins {
-                val pinyins = ArrayList<Pinyin>()
-                if (value == null)
-                    return Pinyins(pinyins)
+                if (value.isNullOrBlank()) return Pinyins()
 
-                val pinStrings = value.split(" ").toTypedArray()
-                var tone: Pinyin.Tone = Pinyin.Tone.NEUTRAL
+                val pinyins = mutableListOf<Pinyin>()
+                val pinStrings = value.split(" ")
+
                 pinStrings.forEach { syllable ->
-                    if (syllable.contains(Regex("[àèìòùǜ]"))) {
-                        tone = Pinyin.Tone.FALLING
-                    } else if (syllable.contains(Regex("[áéíóúǘ]"))) {
-                        tone = Pinyin.Tone.RISING
-                    } else if (syllable.contains(Regex("[ǎěǐǒǔǚ]"))) {
-                        tone = Pinyin.Tone.FALLING_RISING
-                    } else if (syllable.contains(Regex("[āēīōūǖ]"))) {
-                        tone = Pinyin.Tone.FLAT
+                    val tone = when {
+                        syllable.contains(Regex("[àèìòùǜ]")) -> Pinyin.Tone.FALLING
+                        syllable.contains(Regex("[áéíóúǘ]")) -> Pinyin.Tone.RISING
+                        syllable.contains(Regex("[ǎěǐǒǔǚ]")) -> Pinyin.Tone.FALLING_RISING
+                        syllable.contains(Regex("[āēīōūǖ]")) -> Pinyin.Tone.FLAT
+                        else -> Pinyin.Tone.NEUTRAL
                     }
-
                     pinyins.add(Pinyin(syllable, tone))
                 }
 
@@ -68,17 +72,11 @@ data class ChineseWord(
             @JvmStatic
             fun toString(pinyins: Pinyins?): String {
                 if (pinyins == null) return ""
-
-                var s = ""
-
-                pinyins.forEach() { pinyin ->
-                    s += pinyin.syllable + ' '
-                }
-
-                return s.dropLast(1)
+                return pinyins.joinToString(" ") { it.syllable }
             }
         }
     }
+
 
     data class Pinyin (val syllable: String, val tone: Tone) {
         enum class Tone(val toneId: Int) {

@@ -5,16 +5,16 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import fr.berliat.hskwidget.data.model.WordList.ListType
-import java.time.Instant
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 @Entity(tableName = "word_list")
-data class WordList(
+data class WordList @OptIn(ExperimentalTime::class) constructor(
     val name: String,
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
-    @ColumnInfo(name = "creation_date") val creationDate: Long = Instant.now().toEpochMilli(),
-    @ColumnInfo(name = "last_modified") val lastModified: Long = Instant.now().toEpochMilli(), // Add this field with current timestamp as default
+    @ColumnInfo(name = "creation_date") val creationDate: Long = Clock.System.now().toEpochMilliseconds(),
+    @ColumnInfo(name = "last_modified") val lastModified: Long = Clock.System.now().toEpochMilliseconds(), // Add this field with current timestamp as default
     @ColumnInfo(name = "anki_deck_id") val ankiDeckId: Long = 0,
     @ColumnInfo(name = "list_type") val listType: ListType = ListType.USER
 ) {
@@ -60,7 +60,7 @@ data class WordListWithCount(
     @ColumnInfo(name = "creation_date") val creationDate: Long,
     @ColumnInfo(name = "last_modified") val lastModified: Long,
     @ColumnInfo(name = "anki_deck_id") val ankiDeckId: Long,
-    @ColumnInfo(name = "list_type") val listType: ListType,
+    @ColumnInfo(name = "list_type") val listType: WordList.ListType,
     @ColumnInfo(name = "word_count") val wordCount: Int
 ) {
     val wordList: WordList

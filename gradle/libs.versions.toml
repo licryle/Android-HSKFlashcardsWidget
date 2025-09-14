@@ -1,6 +1,7 @@
 [versions]
 kotlin = "2.2.20"
 compose = "1.8.2"
+kotlinxDatetime = "0.7.1"
 normalize = "1.2.0"
 room = "2.8.0"
 sqlite = "2.6.0"
@@ -20,6 +21,7 @@ compose-resources = { module = "org.jetbrains.compose.components:components-reso
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose_ui" }
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose_ui" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 normalize = { module = "com.doist.x:normalize", version.ref = "normalize" }
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }

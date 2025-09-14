@@ -71,6 +71,7 @@ kotlin {
                 implementation(libs.sqlite.bundled)
 
                 implementation(libs.normalize)
+                implementation(libs.kotlinx.datetime)
             }
         }
 
@@ -108,6 +109,11 @@ kotlin {
         }
     }
 }
+
+tasks.matching { it.name.startsWith("extract") && it.name.endsWith("Annotations") }
+    .configureEach {
+        mustRunAfter(tasks.matching { it.name.startsWith("ksp") })
+    }
 
 dependencies {
     // KSP support for Room Compiler.
