@@ -40,12 +40,12 @@ class AboutViewModel {
         Logger.d(tag = TAG, messageString = "fetching stats")
 
         viewModelScope.launch(Dispatchers.IO) {
-            /*val db = DatabaseHelper.getInstance(null)
+            val db = Utils.getDatabaseInstance()
             val words = db.chineseWordDAO()
-            val annotations = db.chineseWordAnnotationDAO()*/
+            val annotations = db.chineseWordAnnotationDAO()
             // Here we executed in the coRoutine Scope
-            val wordsCnt = 10//words.getCount()
-            val annotationsCnt = 11//annotations.getCount()
+            val wordsCnt = words.getCount()
+            val annotationsCnt = annotations.getCount()
 
             // Switch back to the main thread to update UI
             // Update the UI with the result
