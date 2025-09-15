@@ -27,7 +27,7 @@ class SearchQuery() {
             val sq = SearchQuery()
             sq.query = extractQuery(query)
 
-            flags.forEach { flag, value ->
+            flags.forEach { (flag, value) ->
                 when (flag) {
                     "list" -> sq.inListName = value
                     "ignAnnot" -> sq.ignoreAnnotation = true

@@ -2,9 +2,9 @@ package fr.berliat.hskwidget.data.repo
 
 import fr.berliat.hskwidget.data.dao.AnnotatedChineseWordDAO
 import fr.berliat.hskwidget.data.dao.ChineseWordFrequencyDAO
-import fr.berliat.hskwidget.data.dao.ChineseWordFrequencyDAO.Companion.CHINESE_REGEX
 import fr.berliat.hskwidget.data.model.ChineseWordFrequency
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 
 class ChineseWordFrequencyRepo(private val frequencyDAO: ChineseWordFrequencyDAO,
@@ -21,7 +21,7 @@ class ChineseWordFrequencyRepo(private val frequencyDAO: ChineseWordFrequencyDAO
         val dictionary = annotationDAO.getFromSimplified(words)
         val indexedDict = dictionary.associate { it.simplified to it.word }
 
-        val regex = Regex(CHINESE_REGEX)
+        val regex = Regex(ChineseWordFrequencyDAO.Companion.CHINESE_REGEX)
         val newFreq: MutableList<ChineseWordFrequency> = mutableListOf()
 
         freq.forEach {
