@@ -1,5 +1,6 @@
 package fr.berliat.hskwidget.ui.dictionary
 
+import HSKWordView
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -23,6 +24,8 @@ import fr.berliat.hskwidget.databinding.FragmentAnnotationEditBinding
 import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.domain.Utils.Companion.copyToClipBoard
 import fr.berliat.hskwidget.domain.Utils.Companion.playWordInBackground
+import fr.berliat.hskwidget.domain.hanziStyle
+import fr.berliat.hskwidget.domain.pinyinStyle
 import fr.berliat.hskwidget.ui.utils.HSKAnkiDelegate
 import kotlinx.datetime.Clock
 
@@ -31,6 +34,8 @@ class AnnotateFragment: Fragment() {
     private lateinit var binding: FragmentAnnotationEditBinding
     private lateinit var annotateViewModel: AnnotateViewModel
     private lateinit var ankiDelegate: HSKAnkiDelegate
+
+    private var pinyins = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,13 +92,23 @@ class AnnotateFragment: Fragment() {
         classLevelAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.annotationEditClassLevel.adapter = classLevelAdapter
 
-        // Update UI with ChineseWord fields
-        binding.annotationEditChinese.hanziText = annotatedWord.word?.simplified.toString()
-        if (! annotatedWord.hasWord()) {
-            binding.annotationEditChinese.pinyinEditable = true
-            binding.annotationEditChinese.pinyinText = annotatedWord.annotation?.pinyins.toString()
+
+        pinyins = if (! annotatedWord.hasWord()) {
+            annotatedWord.annotation?.pinyins.toString()
         } else {
-            binding.annotationEditChinese.pinyinText = annotatedWord.word?.pinyins.toString()
+            annotatedWord.word?.pinyins.toString()
+        }
+
+        binding.annotationEditChinese.setContent {
+            HSKWordView(
+                hanziText = annotatedWord.word?.simplified.toString(),
+                pinyinText = pinyins,
+                pinyinEditable = ! annotatedWord.hasWord(),
+                isClicked = false,
+                hanziStyle = hanziStyle,
+                pinyinStyle = pinyinStyle,
+                onPinyinChange = { p -> pinyins = p }
+            )
         }
 
         binding.dictionaryItemHskLevel.text = annotatedWord.word?.hskLevel.toString()
@@ -177,7 +192,7 @@ class AnnotateFragment: Fragment() {
 
         val updatedAnnotation = ChineseWordAnnotation(
             simplified = annotateViewModel.simplified.trim(),
-            pinyins = Pinyins.fromString(binding.annotationEditChinese.pinyinText),
+            pinyins = Pinyins.fromString(pinyins),
             notes = binding.annotationEditNotes.text.toString(),
             classType = ClassType.entries[binding.annotationEditClassType.selectedItemPosition],
             level = ClassLevel.entries[binding.annotationEditClassLevel.selectedItemPosition],

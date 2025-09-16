@@ -41,20 +41,10 @@
                 android:foregroundTint="?android:attr/colorBackground"
                 android:src="@drawable/content_copy_24px" />
 
-            <fr.berliat.hsktextviews.views.HSKWordView
+            <androidx.compose.ui.platform.ComposeView
                 android:id="@+id/annotation_edit_chinese"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-
-
-                app:pinyin="@string/widget_default_pinyin"
-                app:pinyinSize="8sp"
-                app:pinyinColor="@android:color/darker_gray"
-
-                app:hanzi="@string/widget_default_chinese"
-                android:textSize="18sp"
-                android:textColor="@android:color/black"
-                app:hanziStyle="bold"
 
                 app:layout_constraintStart_toEndOf="@id/dictionary_item_copy"
                 app:layout_constraintTop_toTopOf="parent"

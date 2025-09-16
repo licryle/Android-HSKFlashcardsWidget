@@ -6,7 +6,6 @@ plugins {
     id("com.google.firebase.crashlytics")
     id("com.google.devtools.ksp")
     id("org.jetbrains.kotlin.plugin.compose") version "2.2.20"
-    id("org.jetbrains.compose") version "1.8.2"
     kotlin("kapt")
 }
 
@@ -164,21 +163,21 @@ dependencies {
     implementation("com.google.android.play:review:2.0.2")
     implementation("com.google.android.play:review-ktx:2.0.2")
 
-    // Ensure the resource library is included
-    api(compose.components.resources)
+    implementation("androidx.compose.ui:ui:1.9.1")
+    implementation("androidx.compose.material3:material3:1.3.2")
 
     // Correctly import your crossPlatform module
     implementation(project(":crossPlatform"))
 
     // This is important for the app module to access the common resources
     // Make sure the version matches the one in your crossPlatform module
-    implementation("org.jetbrains.compose.components:components-resources:1.8.2")
     implementation("network.chaintech:cmptoast:1.0.7")
+    implementation("androidx.compose.runtime:runtime-livedata:1.9.1")
 
     implementation(libs.kotlinx.datetime)
 }
 
-// TODO: Remove that unhappy hack. I've search for a while and couldn't find why my resources aren't exported despite export configuration.
+// TODO: Remove these unhappy hacks. I've search for a while and couldn't find why my resources aren't exported despite export configuration.
 tasks.register<Delete>("cleanCopyCrossPlatformResources") {
     description = "Deletes the old cross-platform resources."
     delete("$rootDir/app/build/intermediates/assets/debug/mergeDebugAssets/composeResources/hskflashcardswidget.crossplatform.generated.resources")
@@ -187,17 +186,44 @@ val copyCrossPlatformResources = tasks.register<Copy>("copyCrossPlatformResource
     group = "build"
     description = "Copies my resources from CrossPlatform output to App input"
 
-    from("$rootDir/crossPlatform/build/generated/compose/resourceGenerator/preparedResources/commonMain/composeResources")
+    val sourceDir = file("$rootDir/crossPlatform/build/generated/compose/resourceGenerator/preparedResources/commonMain/composeResources")
+    from(sourceDir)
     into("$rootDir/app/build/intermediates/assets/debug/mergeDebugAssets/composeResources/hskflashcardswidget.crossplatform.generated.resources")
 
+    inputs.dir(sourceDir)
     dependsOn("cleanCopyCrossPlatformResources")
+    dependsOn(project(":crossPlatform").tasks.named("prepareComposeResourcesTaskForCommonMain"))
+    dependsOn(project(":crossPlatform").tasks.named("copyNonXmlValueResourcesForCommonMain"))
+    dependsOn(project(":crossPlatform").tasks.named("convertXmlValueResourcesForCommonMain"))
 }
 
 tasks.named("preBuild").configure {
-    dependsOn(":crossPlatform:assemble")
+    dependsOn(":crossPlatform:convertXmlValueResourcesForCommonMain")
     dependsOn(copyCrossPlatformResources)
 }
 
-compose.resources {
-    generateResClass = always
+
+tasks.register<Delete>("cleanCopyHSKViewsResources") {
+    description = "Deletes the old HSK Vews Resources resources."
+    delete("$rootDir/app/build/intermediates/assets/debug/mergeDebugAssets/composeResources/hskflashcardswidget.hsktextviews.generated.resources")
+}
+
+val copyHSKViewsResources = tasks.register<Copy>("copyHSKViewsResources") {
+    group = "build"
+    description = "Copies my resources from CrossPlatform output to App input"
+
+    val sourceDir = file("$rootDir/hsktextviews/build/generated/compose/resourceGenerator/preparedResources/commonMain/composeResources")
+    from(sourceDir)
+    into("$rootDir/app/build/intermediates/assets/debug/mergeDebugAssets/composeResources/hskflashcardswidget.hsktextviews.generated.resources")
+
+    inputs.dir(sourceDir) // <-- Gradle now knows this directory is an input
+    dependsOn("cleanCopyHSKViewsResources")
+    dependsOn(project(":hsktextviews").tasks.named("prepareComposeResourcesTaskForCommonMain"))
+    dependsOn(project(":hsktextviews").tasks.named("copyNonXmlValueResourcesForCommonMain"))
+    dependsOn(project(":hsktextviews").tasks.named("convertXmlValueResourcesForCommonMain"))
+}
+
+tasks.named("preBuild").configure {
+    dependsOn(":hsktextviews:convertXmlValueResourcesForCommonMain")
+    dependsOn(copyHSKViewsResources)
 }

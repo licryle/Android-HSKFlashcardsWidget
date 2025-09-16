@@ -127,18 +127,12 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <fr.berliat.hsktextviews.views.HSKTextView
+    <androidx.compose.ui.platform.ComposeView
         android:id="@+id/ocr_display_text"
-        android:layout_height="0dp"
-        app:text=""
         app:layout_constraintTop_toBottomOf="@id/ocr_display_conf"
         app:layout_constraintBottom_toTopOf="@id/ocr_display_add"
-        app:clickedWordBackgroundColor="?attr/colorSecondaryContainer"
-        app:clickedWordHanziColor="@color/md_theme_light_scrim"
-        app:clickedWordPinyinColor="@color/md_theme_light_outline"
-        app:pinyinColor="@color/md_theme_light_outline"
-        app:hanziColor="@color/md_theme_light_scrim"
-        android:layout_width="match_parent"/>
+        android:layout_width="match_parent"
+        android:layout_height="0dp"/>
 
     <LinearLayout
         android:id="@+id/ocr_display_add"
@@ -159,29 +153,6 @@
             android:layout_gravity="center"
             app:layout_constraintBottom_toBottomOf="parent"
             android:text="@string/ocr_display_add" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/ocr_display_loading"
-        android:elevation="10dp"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:background="@color/md_theme_light_background"
-        app:layout_constraintTop_toBottomOf="@id/ocr_display_conf"
-        app:layout_constraintBottom_toBottomOf="parent"  >
-        <ProgressBar
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_gravity="center"
-            android:indeterminate="true" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:text="@string/ocr_display_loading" />
     </LinearLayout>
 
 

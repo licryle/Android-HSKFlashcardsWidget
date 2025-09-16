@@ -21,9 +21,10 @@ dependencyResolutionManagement {
 
 rootProject.name = "HSKFlashcardsWidget"
 include(":app")
+include(":pinyin4kot")
 include(":hsktextviews")
 include(":floatlayouts")
 include(":googledrivebackup")
-include(":pinyin4kot")
 include(":AnkiDroidAPIHelper")
 include(":crossPlatform")
+

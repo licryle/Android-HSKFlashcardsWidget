@@ -49,20 +49,10 @@
                 android:textColor="@android:color/black">
 
                 <!-- Chinese Character -->
-                <fr.berliat.hsktextviews.views.HSKWordView
+                <androidx.compose.ui.platform.ComposeView
                     android:id="@+id/dictionary_item_chinese"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@android:color/holo_green_dark"
-
-                    app:pinyin="@string/widget_default_pinyin"
-                    app:pinyinSize="8sp"
-                    app:pinyinColor="@android:color/darker_gray"
-
-                    app:hanzi="@string/widget_default_chinese"
-                    app:hanziSize="13sp"
-                    app:hanziColor="@android:color/black"
-                    app:hanziStyle="bold"
 
                     android:paddingStart="0dp"
                     android:paddingEnd="5dp"

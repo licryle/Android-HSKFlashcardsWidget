@@ -2,12 +2,13 @@ package fr.berliat.hskwidget.domain
 
 import android.util.Log
 import com.huaban.analysis.jieba.JiebaSegmenter
-import fr.berliat.hsktextviews.views.HSKTextView
+import fr.berliat.hsktextviews.HSKTextSegmenter
+import fr.berliat.hsktextviews.HSKTextSegmenterListener
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class JiebaHSKTextSegmenter: HSKTextView.HSKTextSegmenter {
-    override var listener: HSKTextView.HSKTextSegmenterListener? = null
+class JiebaHSKTextSegmenter: HSKTextSegmenter {
+    override var listener: HSKTextSegmenterListener? = null
     var segmenter: JiebaSegmenter? = null
         private set
 

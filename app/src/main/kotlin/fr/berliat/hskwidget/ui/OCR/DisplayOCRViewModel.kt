@@ -71,7 +71,7 @@ class DisplayOCRViewModel(private val savedStateHandle: SavedStateHandle,
         return@withContext _frequencyWordsRepo!!
     }
 
-    val clickedWords: MutableMap<String, String> = mutableMapOf()
+    val clickedWords = MutableLiveData<Map<String, String>>(emptyMap())
     var selectedWord: String? = null
 
     // Key for scroll position
@@ -92,7 +92,7 @@ class DisplayOCRViewModel(private val savedStateHandle: SavedStateHandle,
         scrollPosition = 0
         text.value = ""
         selectedWord = null
-        clickedWords.clear()
+        clickedWords.postValue(emptyMap())
     }
 
     fun augmentWordFrequencyAppeared(words: Map<String, Int>) {

@@ -1,12 +1,15 @@
 package fr.berliat.hskwidget.domain
 
+import HSKWordView
 import android.Manifest
 import android.app.Activity
 import android.appwidget.AppWidgetManager
 import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.ColorStateList
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.net.Uri
 import android.os.Build
@@ -19,6 +22,8 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.documentfile.provider.DocumentFile
@@ -56,12 +61,18 @@ import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.data.type.HSK_Level
 import fr.berliat.hskwidget.data.type.Modality
 import fr.berliat.hskwidget.data.type.WordType
+import fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragmentDirections
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.UUID
+import androidx.compose.ui.graphics.Color
 
 typealias CallbackNoParam = () -> Unit
+
+val hanziStyle = TextStyle(fontSize = 34.sp, color = Color.Black)
+val pinyinStyle = TextStyle(fontSize = 20.sp, color = Color.Black)
+val hanziClickedBackground = Color.Yellow
 
 fun <T : Parcelable> Intent.getParcelableExtraCompat(key: String, clazz: Class<T>): T? {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -302,9 +313,11 @@ class Utils {
             if (pinyins == "")
                 pinyins = word.annotation?.pinyins?.toString() ?: ""
 
-            with(binding.dictionaryItemChinese) {
-                hanziText = word.simplified
-                pinyinText = pinyins
+            binding.dictionaryItemChinese.setContent {
+                HSKWordView(
+                    hanziText = word.simplified,
+                    pinyinText = pinyins
+                )
             }
 
             binding.dictionaryItemHskLevel.visibility = hideViewIf(
@@ -320,18 +333,18 @@ class Utils {
             with(binding.dictionaryItemFavorite) {
                 if (word.hasAnnotation()) {
                     setImageResource(R.drawable.bookmark_heart_24px)
-                    imageTintList = android.content.res.ColorStateList.valueOf(
+                    imageTintList = ColorStateList.valueOf(
                         ContextCompat.getColor(context, R.color.md_theme_dark_inversePrimary)
                     )
                 } else {
                     setImageResource(R.drawable.bookmark_24px)
-                    imageTintList = android.content.res.ColorStateList.valueOf(
+                    imageTintList = ColorStateList.valueOf(
                         ContextCompat.getColor(context, R.color.md_theme_dark_surface)
                     )
                 }
 
                 setOnClickListener {
-                    val action = fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragmentDirections.annotateWord(word.simplified, false)
+                    val action = DictionarySearchFragmentDirections.annotateWord(word.simplified, false)
 
                     navController.navigate(action)
                 }
@@ -421,7 +434,7 @@ class Utils {
         fun copyToClipBoard(context: Context, s: String) {
             // https://stackoverflow.com/a/28780585/3059536
             val clipboard =
-                context.getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+                context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clip = ClipData.newPlainText("Copied Text", s)
             clipboard.setPrimaryClip(clip)
 
