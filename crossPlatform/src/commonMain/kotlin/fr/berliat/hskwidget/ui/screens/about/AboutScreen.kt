@@ -66,7 +66,7 @@ fun AboutScreen(viewModel: AboutViewModel) {
             Button(onClick = onClick) {
                 drawable?.let {
                     Icon(
-                        painter = painterResource(drawable), // <- your svg
+                        painter = painterResource(drawable),
                         contentDescription = null,
                         modifier = Modifier.size(20.dp)
                     )
@@ -87,7 +87,7 @@ fun AboutScreen(viewModel: AboutViewModel) {
         floatingActionButton = {
             FloatingActionButton(onClick = { handleEmailClick() }) {
                 Icon(
-                    painter = painterResource(Res.drawable.ic_email), // <- your svg
+                    painter = painterResource(Res.drawable.ic_email),
                     contentDescription = null,
                     modifier = Modifier.size(20.dp)
                 )
