@@ -27,7 +27,7 @@
                 android:padding="0dp"
                 style="@style/Widget.HSKFlashCardsWidget.Icons"
                 app:shapeAppearanceOverlay="@style/RoundImageView"
-                android:contentDescription="@string/dictionary_item_lists"
+                android:contentDescription="@string/wordlist_rename_button"
                 android:src="@drawable/edit_24px" />
         </LinearLayout>
 
