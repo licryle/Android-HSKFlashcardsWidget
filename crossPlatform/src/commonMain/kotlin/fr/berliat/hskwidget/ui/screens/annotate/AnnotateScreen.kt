@@ -25,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 
 import fr.berliat.hskwidget.data.type.ClassLevel
 import fr.berliat.hskwidget.data.type.ClassType
@@ -49,10 +50,15 @@ import org.jetbrains.compose.resources.stringResource
 fun AnnotateScreen(
     word: String,
     viewModel: AnnotateViewModel,
+    onSpeak: (String) -> Unit,
+    onCopy: (String) -> Unit,
+    onSave: (word: AnnotatedChineseWord, pinyins: String, notes: String, themes: String, isExam: Boolean, cType: ClassType, cLevel: ClassLevel) -> Unit,
+    onDelete: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val annotatedWord by viewModel.annotatedWord.collectAsState()
 
+    var pinyins by remember { mutableStateOf("") }
     var notes by remember { mutableStateOf("") }
     var themes by remember { mutableStateOf("") }
     var isExam by remember { mutableStateOf(false) }
@@ -71,23 +77,6 @@ fun AnnotateScreen(
         }
     }
 
-    fun handleSaveResult(e: Error) {
-        /*val msgRes : Int = when {
-            action == ACTION.DELETE && e == null -> Res.string.annotation_edit_delete_success
-            action == ACTION.DELETE && e != null -> Res.string.annotation_edit_delete_failure
-            action == ACTION.UPDATE && e == null -> Res.string.annotation_edit_save_success
-            action == ACTION.UPDATE && e != null -> Res.string.annotation_edit_save_failure
-            else -> 0 // We'll crash
-        }
-
-        if (e == null) {
-            Toast.makeText(context, getString(msgRes, annotateViewModel.simplified), Toast.LENGTH_LONG).show()
-            findNavController().popBackStack()
-        } else {
-            Toast.makeText(context, getString(msgRes, annotateViewModel.simplified, e), Toast.LENGTH_LONG).show()
-        }*/
-    }
-
     if (annotatedWord == null) {
         // loading screen
         return
@@ -101,8 +90,8 @@ fun AnnotateScreen(
     ) {
         DetailedWordView(
             word = annotatedWord!!,
-            onSpeakClick = { viewModel.speakWord() },
-            onCopyClick = { viewModel.copyWord() },
+            onSpeakClick = { onSpeak(annotatedWord!!.simplified) },
+            onCopyClick = { onCopy(annotatedWord!!.simplified) },
             showHSK3Definition = false,
             onFavoriteClick = null,
             onListsClick = null
@@ -160,12 +149,7 @@ fun AnnotateScreen(
             }
 
             Button(
-                onClick = {
-                    viewModel.saveWord(
-                        notes, themes, isExam, selectedClassType, selectedClassLevel) {
-                        e -> handleSaveResult(e)
-                    }
-                },
+                onClick = { onSave(viewModel.annotatedWord.value!!, pinyins, notes, themes, isExam, selectedClassType, selectedClassLevel) },
                 modifier = Modifier.weight(1f)
             ) {
                 Text(stringResource(Res.string.save))
@@ -183,7 +167,7 @@ fun AnnotateScreen(
                 Text(text = stringResource(Res.string.annotation_edit_delete_confirm_message))
             },
             confirmButton = {
-                TextButton(onClick = { viewModel.deleteAnnotation() }) {
+                TextButton(onClick = { onDelete(annotatedWord!!.simplified) }) {
                     Text(stringResource(Res.string.delete))
                 }
             },
