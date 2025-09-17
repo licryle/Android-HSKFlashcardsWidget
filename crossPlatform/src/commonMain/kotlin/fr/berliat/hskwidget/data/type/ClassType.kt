@@ -10,4 +10,8 @@ enum class ClassType (val type: String) {
     companion object {
         infix fun from(findValue: String): ClassType = ClassType.valueOf(findValue)
     }
+
+    override fun toString(): String {
+        return "$type / $name"
+    }
 }

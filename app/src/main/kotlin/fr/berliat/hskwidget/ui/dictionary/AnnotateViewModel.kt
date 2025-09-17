@@ -4,18 +4,23 @@ import android.content.Context
 import android.os.Bundle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.google.android.gms.common.api.ResultCallback
 import fr.berliat.ankidroidhelper.AnkiDelegator
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWordAnnotation
 import fr.berliat.hskwidget.data.repo.WordListRepository
 import fr.berliat.hskwidget.data.store.DatabaseHelper
+import fr.berliat.hskwidget.data.type.ClassLevel
+import fr.berliat.hskwidget.data.type.ClassType
+import fr.berliat.hskwidget.data.type.Pinyins
 import fr.berliat.hskwidget.domain.Utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-
+import kotlinx.datetime.Clock
+/*
 class AnnotateViewModel(val context: Context, val wordListRepo: WordListRepository, val ankiCaller: AnkiDelegator) {
     private val viewModelScope = CoroutineScope(Dispatchers.Main)
 
@@ -97,4 +102,31 @@ class AnnotateViewModel(val context: Context, val wordListRepo: WordListReposito
             }
         }
     }
-}
+
+    fun saveWord(resultCallback: ((Error) -> Unit)) {
+        var firstSeen = annotateViewModel.annotatedWord.value?.annotation?.firstSeen
+        if (firstSeen == null)
+            firstSeen = Clock.System.now()
+
+        val updatedAnnotation = ChineseWordAnnotation(
+            simplified = annotateViewModel.simplified.trim(),
+            pinyins = Pinyins.fromString(pinyins),
+            notes = binding.annotationEditNotes.text.toString(),
+            classType = ClassType.entries[binding.annotationEditClassType.selectedItemPosition],
+            level = ClassLevel.entries[binding.annotationEditClassLevel.selectedItemPosition],
+            themes = binding.annotationEditThemes.text.toString(),
+            firstSeen = firstSeen,  // Handle date logic
+            isExam = binding.annotationEditIsExam.isChecked
+        )
+
+        val annotatedWord = AnnotatedChineseWord(annotateViewModel.annotatedWord.value!!.word, updatedAnnotation)
+        annotateViewModel.updateAnnotation(annotatedWord) { err -> resultCallback?.invoke(err) }
+
+        Utils.incrementConsultedWord(requireContext(), annotateViewModel.simplified)
+
+        if (annotatedWord.hasAnnotation()) {
+            AppPreferencesStore(requireContext()).lastAnnotatedClassType = updatedAnnotation.classType!!
+            AppPreferencesStore(requireContext()).lastAnnotatedClassLevel = updatedAnnotation.level!!
+        }
+    }
+}*/

@@ -89,4 +89,7 @@ actual object Utils {
 
     const val DATABASE_FILENAME = "Mandarin_Assistant.db"
     const val DATABASE_ASSET_PATH = "databases/$DATABASE_FILENAME"
+
+    actual fun logAnalyticsEvent(event: ANALYTICS_EVENTS) {
+    }
 }

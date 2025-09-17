@@ -57,21 +57,8 @@ We recommend to choose the level your at plus the one below, or above depending 
     <string name="speech_failure_toast_init">Failed to initialize the Text-To-Speech service, we need to activate, download or configure it in Settings.</string>
     <string name="menu_dictionary">Dictionary</string>
     <string name="menu_lists">Lists</string>
-    <string name="menu_annotate">Annotate a word</string>
-    <string name="annotation_edit_is_exam_hint">Is it at the exam?</string>
-    <string name="annotation_edit_themes_hint">Themes covered:</string>
-    <string name="annotation_edit_class_level_hint">Class level:</string>
-    <string name="annotation_edit_class_type_hint">Class type:</string>
-    <string name="annotation_edit_notes_hint">Enter your notes:</string>
-    <string name="annotation_edit_delete_success">%1$s successfully deleted</string>
-    <string name="annotation_edit_delete_failure">Couldn\'t delete %1$s: %2$s</string>
-    <string name="annotation_edit_save_success">%1$s successfully saved</string>
-    <string name="annotation_edit_save_failure">Couldn\'t save %1$s: %2$s</string>
-    <string name="annotation_edit_delete_confirm_title">Confirm deletion</string>
-    <string name="annotation_edit_delete_confirm_message">Are you sure you want to *delete* this annotation?</string>
     <string name="dictionary_item_favorite">Annotated</string>
     <string name="dictionary_item_hsk">HSK3</string>
-    <string name="dictionary_item_lists">Manage lists for this word</string>
     <string name="dictionary_noresult_text">%s not in dictionary, add annotation?</string>
     <string name="dictionary_loading_text">Loading results - standby!\nIf you can read this, consider upgrading your device :)</string>
     <string name="dictionary_noresult_icon">No result!</string>
@@ -279,11 +266,6 @@ padding: 0;
     <string name="wordlist_rename_button">Rename list</string>
     <string name="wordlist_list_name_dupe">This list name already exist, use another one.</string>
     <string name="deck_name_global">All words</string>
-    <string name="dictionary_item_toggle">Expand/Fold more info</string>
-    <string name="dictionary_item_antonym">Antonym</string>
-    <string name="dictionary_item_synonyms">Synonym(s)</string>
-    <string name="dictionary_item_examples">Example(s)</string>
-    <string name="dictionary_item_altdefinition">Definition</string>
     <string name="dictionary_search_filter_hsk3definition_hint">HSK3 Definition</string>
     <string name="dbrestore_start">Database restoration started</string>
     <string name="menu_support">Support the creator!</string>
@@ -337,4 +319,9 @@ padding: 0;
     <string name="database_update_failure">Error while updating base dictionary: %1$s</string>
     <string name="dialog_tts_error">Text-to-Speech Error</string>
 
+
+
+
+    // To move
+    <string name="menu_annotate">Annotate a word</string>
 </resources>

@@ -166,7 +166,6 @@ dependencies {
     implementation("androidx.compose.ui:ui:1.9.1")
     implementation("androidx.compose.material3:material3:1.3.2")
 
-    // Correctly import your crossPlatform module
     implementation(project(":crossPlatform"))
 
     // This is important for the app module to access the common resources

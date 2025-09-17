@@ -1,4 +1,9 @@
 <resources>
+    <string name="delete">Delete</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+
+
     <string name="about_btn_view_source">View source code</string>
     <string name="about_intro1">HSK Flashcard Widget (v%1$s) is an open source project by Cyrille Berliat that stems from a personal need to learn Mandarin. \n \nIf it's useful to you, please consider supporting me and my countless hours of development :)</string>
     <string name="about_intro2">If you have any suggestions, feedback or issues, feel free to email me.</string>
@@ -15,4 +20,31 @@
     <string name="about_stats">Loading…</string>
     <string name="about_stats_text">%1$s words in dictionary.\n%2$s annotations.</string>
     <string name="about_email_noapp">No email client found. Address copied to clipboard.</string>
+
+    <string name="dictionary_item_toggle">Expand/Fold more info</string>
+    <string name="dictionary_item_antonym">Antonym</string>
+    <string name="dictionary_item_synonyms">Synonym(s)</string>
+    <string name="dictionary_item_examples">Example(s)</string>
+    <string name="dictionary_item_altdefinition">Definition</string>
+    <string name="dictionary_item_lists">Manage lists for this word</string>
+    <string name="dictionary_item_annotate">Annotate a word</string>
+
+
+    <string name="widget_btn_speak">Listen to this word</string>
+    <string name="widget_btn_copy">Copy to clipboard</string>
+
+
+    <string name="annotation_edit_notes_hint">Enter your notes:</string>
+    <string name="annotation_edit_is_exam_hint">Is it at the exam?</string>
+    <string name="annotation_edit_themes_hint">Themes covered:</string>
+    <string name="annotation_edit_class_level_hint">Class level:</string>
+    <string name="annotation_edit_class_type_hint">Class type:</string>
+
+
+    <string name="annotation_edit_delete_success">%1$s successfully deleted</string>
+    <string name="annotation_edit_delete_failure">Couldn\'t delete %1$s: %2$s</string>
+    <string name="annotation_edit_save_success">%1$s successfully saved</string>
+    <string name="annotation_edit_save_failure">Couldn\'t save %1$s: %2$s</string>
+    <string name="annotation_edit_delete_confirm_title">Confirm deletion</string>
+    <string name="annotation_edit_delete_confirm_message">Are you sure you want to *delete* this annotation?</string>
 </resources>

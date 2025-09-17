@@ -15,4 +15,8 @@ enum class ClassLevel (val lvl: String) {
     companion object {
         infix fun from(findValue: String): ClassLevel = ClassLevel.valueOf(findValue)
     }
+
+    override fun toString(): String {
+        return "$lvl / $name"
+    }
 }

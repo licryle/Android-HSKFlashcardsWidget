@@ -73,6 +73,7 @@ kotlin {
                 implementation(libs.normalize)
                 implementation(libs.kotlinx.datetime)
                 implementation(libs.kotlinx.serialization.json)
+                implementation(project(":hsktextviews"))
             }
         }
 

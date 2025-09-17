@@ -1,6 +1,5 @@
 package fr.berliat.hskwidget.domain
 
-import HSKWordView
 import android.Manifest
 import android.app.Activity
 import android.appwidget.AppWidgetManager
@@ -9,7 +8,6 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.res.ColorStateList
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.net.Uri
 import android.os.Build
@@ -54,19 +52,15 @@ import java.io.InputStream
 import java.util.concurrent.TimeUnit
 import androidx.fragment.app.FragmentActivity
 import fr.berliat.hskwidget.ui.wordlist.WordListSelectionDialog
-import androidx.core.view.isVisible
 import fr.berliat.hskwidget.HSKHelperApp
-import fr.berliat.hskwidget.core.Locale
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
-import fr.berliat.hskwidget.data.type.HSK_Level
-import fr.berliat.hskwidget.data.type.Modality
-import fr.berliat.hskwidget.data.type.WordType
 import fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragmentDirections
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.UUID
 import androidx.compose.ui.graphics.Color
+import fr.berliat.hskwidget.ui.components.DetailedWordView
 
 typealias CallbackNoParam = () -> Unit
 
@@ -291,126 +285,26 @@ class Utils {
                                         word: AnnotatedChineseWord, navController: NavController,
                                         wordListChangedCallback: CallbackNoParam
         ) {
-            // Definition vs. HSK definition -- which one to show?
-            // Collect then invert if needed
-            var definition = word.word?.definition?.get(Locale.ENGLISH) ?: ""
-            var annotation = word.annotation?.notes ?: ""
-            if (definition == "") {
-                definition = word.annotation?.notes ?: ""
-                annotation = ""
-            }
-            var altDef = word.word?.definition?.get(Locale.CN_HSK3) ?: ""
-
             val appConfig = AppPreferencesStore(navController.context)
-            if (appConfig.dictionaryShowHSK3Definition && altDef.isNotEmpty()) {
-                val tmp = altDef
-                altDef = definition
-                definition = tmp
-            }
-
-            // Populate the "top part"
-            var pinyins = word.word?.pinyins.toString()
-            if (pinyins == "")
-                pinyins = word.annotation?.pinyins?.toString() ?: ""
-
-            binding.dictionaryItemChinese.setContent {
-                HSKWordView(
-                    hanziText = word.simplified,
-                    pinyinText = pinyins
-                )
-            }
-
-            binding.dictionaryItemHskLevel.visibility = hideViewIf(
-                // TODO REMOVE !!
-                word.word?.hskLevel == null || word.word!!.hskLevel == HSK_Level.NOT_HSK
-            )
-            binding.dictionaryItemHskLevel.text = word.word?.hskLevel.toString()
-
-            binding.dictionaryItemDefinition.text = definition
-            binding.dictionaryItemAnnotation.text = annotation
-            binding.dictionaryItemAnnotation.visibility = hideViewIf(annotation.isEmpty())
-
-            with(binding.dictionaryItemFavorite) {
-                if (word.hasAnnotation()) {
-                    setImageResource(R.drawable.bookmark_heart_24px)
-                    imageTintList = ColorStateList.valueOf(
-                        ContextCompat.getColor(context, R.color.md_theme_dark_inversePrimary)
-                    )
-                } else {
-                    setImageResource(R.drawable.bookmark_24px)
-                    imageTintList = ColorStateList.valueOf(
-                        ContextCompat.getColor(context, R.color.md_theme_dark_surface)
-                    )
-                }
-
-                setOnClickListener {
-                    val action = DictionarySearchFragmentDirections.annotateWord(word.simplified, false)
-
-                    navController.navigate(action)
-                }
-            }
-
             val context = navController.context
-            binding.dictionaryItemSpeak.setOnClickListener {
-                playWordInBackground(context, word.simplified)
-            }
-            binding.dictionaryItemCopy.setOnClickListener { copyToClipBoard(context, word.simplified) }
 
-            binding.dictionaryItemLists.setOnClickListener {
-                val dialog = WordListSelectionDialog.newInstance(word.simplified)
-                dialog.onSave = wordListChangedCallback
-                dialog.show((context as FragmentActivity).supportFragmentManager, "WordListSelectionDialog")
-            }
-            // Done with "top part"
+            binding.dictionaryItemContainer.setContent {
+                DetailedWordView(
+                    word,
+                    appConfig.dictionaryShowHSK3Definition,
+                    {
+                        val action = DictionarySearchFragmentDirections.annotateWord(word.simplified, false)
 
-            // Populate the "more part"
-            binding.dictionaryItemAltdefinition.text = altDef
-            binding.dictionaryItemAltdefinitionContainer.visibility = hideViewIf(altDef.isEmpty())
-
-            val examples = word.word?.examples ?: ""
-            binding.dictionaryItemExample.text = examples
-            binding.dictionaryItemExampleContainer.visibility = hideViewIf(examples.isEmpty())
-
-            val antonym = word.word?.antonym ?: ""
-            binding.dictionaryItemAntonyms.text = word.word?.antonym.toString()
-            binding.dictionaryItemAntonymContainer.visibility = hideViewIf(antonym.isEmpty())
-
-            val synonyms = word.word?.synonyms ?: ""
-            binding.dictionaryItemSynonyms.text = synonyms
-            binding.dictionaryItemSynonymsContainer.visibility = hideViewIf(synonyms.isEmpty())
-
-            val modality = word.word?.modality ?: Modality.UNKNOWN
-            binding.dictionaryItemModality.text = capitalizeStr(modality)
-            binding.dictionaryItemModality.visibility = hideViewIf(modality == Modality.UNKNOWN)
-
-            val wordType = word.word?.wordType ?: WordType.UNKNOWN
-            binding.dictionaryItemType.text = capitalizeStr(wordType)
-            binding.dictionaryItemType.visibility = hideViewIf(wordType == WordType.UNKNOWN)
-
-            // Hide all if all empty
-            val nothingMore = (altDef + examples + antonym + synonyms).isEmpty()
-                    && (modality == Modality.UNKNOWN)
-                    && (wordType == WordType.UNKNOWN)
-
-            binding.dictionaryItemToggle.visibility = hideViewIf(nothingMore)
-
-            if (! nothingMore) {
-                binding.dictionaryItemContainer.setOnClickListener {
-                    val isMoreShown = binding.dictionaryItemMore.isVisible
-
-                    var evt : ANALYTICS_EVENTS
-                    if (isMoreShown) {
-                        binding.dictionaryItemMore.visibility = View.GONE
-                        binding.dictionaryItemToggle.setImageResource(R.drawable.keyboard_arrow_down_24px)
-                        evt = ANALYTICS_EVENTS.WIDGET_COLLAPSE
-                    } else {
-                        binding.dictionaryItemMore.visibility = View.VISIBLE
-                        binding.dictionaryItemToggle.setImageResource(R.drawable.keyboard_arrow_up_24px)
-                        evt = ANALYTICS_EVENTS.WIDGET_EXPAND
+                        navController.navigate(action)
+                    },
+                    { playWordInBackground(context, word.simplified) },
+                    { copyToClipBoard(context, word.simplified) },
+                    {
+                        val dialog = WordListSelectionDialog.newInstance(word.simplified)
+                        dialog.onSave = wordListChangedCallback
+                        dialog.show((context as FragmentActivity).supportFragmentManager, "WordListSelectionDialog")
                     }
-
-                    logAnalyticsEvent(evt)
-                }
+                    )
             }
         }
 
