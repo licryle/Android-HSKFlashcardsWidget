@@ -159,7 +159,7 @@ fun DetailedWordView (
                         Text(
                             annotation,
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSecondary
+                            color = Color.Blue
                         )
                     }
 

@@ -1,65 +1,59 @@
 package fr.berliat.hskwidget.ui.dictionary
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
+import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
-import androidx.navigation.NavController
+import androidx.fragment.app.FragmentActivity
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 
 import fr.berliat.hskwidget.R
-import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
-import fr.berliat.hskwidget.data.store.DatabaseHelper
 import fr.berliat.hskwidget.domain.Utils
-import kotlinx.coroutines.launch
 
-import fr.berliat.hskwidget.databinding.FragmentDictionarySearchBinding
-import fr.berliat.hskwidget.databinding.FragmentDictionarySearchItemBinding
-import fr.berliat.hskwidget.domain.CallbackNoParam
 import fr.berliat.hskwidget.domain.SearchQuery
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import java.time.Instant
+import fr.berliat.hskwidget.ui.screens.dictionary.DictionarySearchScreen
+import fr.berliat.hskwidget.ui.screens.dictionary.DictionaryViewModel
+import fr.berliat.hskwidget.ui.wordlist.WordListSelectionDialog
 
-class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResultChangedListener {
-    private lateinit var searchAdapter: DictionarySearchAdapter
-    private lateinit var binding: FragmentDictionarySearchBinding
+class DictionarySearchFragment : Fragment() {
     private lateinit var appConfig: AppPreferencesStore
 
-    private var isLoading = false
-    private var currentPage = 0
-    private var itemsPerPage = 20
-    private val searchQuery: SearchQuery
-        get() {
-            return SearchQuery.fromString(activity?.findViewById<SearchView>(R.id.appbar_search)?.query.toString())
-        }
+    private val viewModel = DictionaryViewModel(
+        { SearchQuery.fromString(activity?.findViewById<SearchView>(R.id.appbar_search)?.query.toString()) }
+    )
 
-    private var lastFullSearchStartTime = Instant.now().toEpochMilli()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        searchAdapter = DictionarySearchAdapter(requireParentFragment(),
-            this,
-            { performSearch() })
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentDictionarySearchBinding.inflate(layoutInflater)
         appConfig = AppPreferencesStore(requireContext())
 
-        setupRecyclerView()
+        ComposeView(requireContext())
 
-        return binding.root
+        return ComposeView(requireContext()).apply {
+            setContent {
+                DictionarySearchScreen(
+                    viewModel,
+                    onSpeak = { Utils.playWordInBackground(requireContext(), it) },
+                    onAnnotate = {
+                        val action = DictionarySearchFragmentDirections.annotateWord(it, false)
+
+                        findNavController().navigate(action)
+                    },
+                    onCopy = { Utils.copyToClipBoard(requireContext(), it) },
+                    onListChange = {
+                        val dialog = WordListSelectionDialog.newInstance(it)
+                        dialog.onSave = { performSearch() }
+                        dialog.show((context as FragmentActivity).supportFragmentManager, "WordListSelectionDialog")
+                    }
+                )
+            }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -73,175 +67,8 @@ class DictionarySearchFragment : Fragment(), DictionarySearchAdapter.SearchResul
         Utils.logAnalyticsScreenView("DictionarySearch")
     }
 
-    private fun setupRecyclerView() {
-        binding.dictionarySearchResults.layoutManager = LinearLayoutManager(context)
-        binding.dictionarySearchResults.adapter = searchAdapter
-
-        binding.dictionarySearchFilterHasannotation.isChecked = appConfig.searchFilterHasAnnotation
-        binding.dictionaryShowHsk3definition.isChecked = appConfig.dictionaryShowHSK3Definition
-
-        // Infinite scroll for pagination
-        binding.dictionarySearchResults.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-
-                if (dx >= 10 || dy >= 10)
-                    Utils.hideKeyboard(requireContext(), requireView())
-
-                val layoutManager = recyclerView.layoutManager as LinearLayoutManager
-                val totalItemCount = layoutManager.itemCount
-                val lastVisibleItem = layoutManager.findLastVisibleItemPosition()
-
-                // Load more if at the bottom and not already loading
-                if (!isLoading && totalItemCount <= (lastVisibleItem + 2)) {
-                    viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) { loadMoreResults() }
-                }
-            }
-        })
-
-        binding.dictionarySearchFilterHasannotation.setOnClickListener {
-            appConfig.setSearchFilterHasAnnotation(binding.dictionarySearchFilterHasannotation.isChecked) {
-                performSearch()
-
-                var evt = Utils.ANALYTICS_EVENTS.DICT_ANNOTATION_OFF
-                if (appConfig.searchFilterHasAnnotation) {
-                    evt = Utils.ANALYTICS_EVENTS.DICT_ANNOTATION_ON
-                }
-
-                Utils.logAnalyticsEvent(evt)
-            }
-        }
-
-        binding.dictionaryShowHsk3definition.setOnClickListener {
-            appConfig.setDictionaryShowHSK3Definition(binding.dictionaryShowHsk3definition.isChecked) {
-                searchAdapter.notifyDataSetChanged()
-
-                var evt = Utils.ANALYTICS_EVENTS.DICT_HSK3_OFF
-                if (appConfig.searchFilterHasAnnotation) {
-                    evt = Utils.ANALYTICS_EVENTS.DICT_HSK3_ON
-                }
-
-                Utils.logAnalyticsEvent(evt)
-            }
-        }
-    }
-
-    // Search logic: Fetch new data based on the search query
     fun performSearch() {
-        // Clear current results and reset pagination
-        isLoading = true
-        searchAdapter.clearData()
-        currentPage = 0
-
-        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-            // Here we executed in the coRoutine Scope
-            val result: Pair<Long, List<AnnotatedChineseWord>> = Pair(
-                Instant.now().toEpochMilli(),
-                fetchResultsForPage()
-            )
-
-            withContext(Dispatchers.Main) {
-                // Switch back to the main thread to update UI
-                // Protecting against concurrent searches (typing fast etc)
-                if (result.first >= lastFullSearchStartTime) {
-                    lastFullSearchStartTime = result.first
-                    searchAdapter.clearData()
-                    currentPage = 1
-                }
-
-                // Update the UI with the result
-                isLoading = false
-                searchAdapter.addData(result.second)
-                binding.dictionarySearchResults.scrollToPosition(0)
-            }
-        }
-
-        Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.DICT_SEARCH)
-    }
-
-    // Method to load more results with pagination
-    private suspend fun loadMoreResults() = withContext(Dispatchers.IO) {
-        isLoading = true
-
-        Log.d(TAG, "Load more results for currentSearch: $searchQuery")
-        val newResults = fetchResultsForPage()
-        isLoading = false
-
-        withContext(Dispatchers.Main) {
-            searchAdapter.addData(newResults)
-        }
-    }
-
-    // Simulate fetching search results based on the query and current page
-    private suspend fun fetchResultsForPage(): List<AnnotatedChineseWord> = withContext(Dispatchers.IO) {
-        Log.d(TAG, "Searching for $searchQuery")
-        val dao = DatabaseHelper.getInstance(requireContext()).annotatedChineseWordDAO()
-        try {
-            val annotatedOnly = binding.dictionarySearchFilterHasannotation.isChecked
-
-            val listName = searchQuery.inListName
-            val results = if (listName != null) {
-                // Search within the specified word list
-                dao.searchFromWordList(listName, annotatedOnly && !searchQuery.ignoreAnnotation, currentPage, itemsPerPage)
-                    .filter { it.toString().contains(searchQuery.query) }
-            } else {
-                dao.searchFromStrLike(searchQuery.query, annotatedOnly && !searchQuery.ignoreAnnotation, currentPage, itemsPerPage)
-            }
-            Log.d(TAG, "Search returned for $searchQuery")
-
-            currentPage++
-
-            return@withContext results
-        } catch (e: Exception) {
-            // Code for handling the exception
-            Log.e(TAG, "$e")
-        }
-
-        return@withContext emptyList()
-    }
-
-    private fun evaluateEmptyView() {
-        if (isLoading) {
-            binding.dictionarySearchLoading.visibility = View.VISIBLE
-            binding.dictionarySearchNoresults.visibility = View.GONE
-            return
-        }
-
-        // Not loading
-        binding.dictionarySearchLoading.visibility = View.GONE
-
-        // Does the search have an exact match in dictionary?
-        if (searchQuery.query.isEmpty()
-            || ! searchAdapter.getData().none { it.simplified == searchQuery.query }
-            || ! Utils.containsChinese(searchQuery.query)) {
-            binding.dictionarySearchNoresults.visibility = View.GONE
-        } else {
-            val text = binding.dictionaryNoresultText
-            text.text = getString(R.string.dictionary_noresult_text).format(searchQuery.query)
-
-            binding.dictionarySearchNoresults.setOnClickListener {
-                val action =
-                    DictionarySearchFragmentDirections.annotateWord(searchQuery.query, true)
-
-                findNavController().navigate(action)
-            }
-
-            binding.dictionarySearchNoresults.visibility = View.VISIBLE
-        }
-    }
-
-    override fun onDataChanged(newData: List<AnnotatedChineseWord>) {
-        evaluateEmptyView()
-    }
-
-    class SearchResultItem(private val binding: FragmentDictionarySearchItemBinding,
-                           private val navController: NavController,
-                           private val wordListChangedCallback: CallbackNoParam
-    ) : RecyclerView.ViewHolder(binding.root) {
-
-        fun bind(result: AnnotatedChineseWord) {
-            Utils.populateDictionaryEntryView(binding, result, navController, wordListChangedCallback)
-        }
+        viewModel.performSearch()
     }
 
     companion object {

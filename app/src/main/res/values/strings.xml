@@ -57,19 +57,11 @@ We recommend to choose the level your at plus the one below, or above depending 
     <string name="speech_failure_toast_init">Failed to initialize the Text-To-Speech service, we need to activate, download or configure it in Settings.</string>
     <string name="menu_dictionary">Dictionary</string>
     <string name="menu_lists">Lists</string>
-    <string name="dictionary_item_favorite">Annotated</string>
-    <string name="dictionary_item_hsk">HSK3</string>
-    <string name="dictionary_noresult_text">%s not in dictionary, add annotation?</string>
-    <string name="dictionary_loading_text">Loading results - standby!\nIf you can read this, consider upgrading your device :)</string>
-    <string name="dictionary_noresult_icon">No result!</string>
-    <string name="dictionary_search_loading">Loading results</string>
-    <string name="dictionary_search_filter_hasannotation_hint"> only</string>
 
     <string name="menu_ocr">OCR</string>
     <string name="image_capture_button" />
     <string name="appbar_ocr">Start OCR</string>
     <string name="ocr_display_add">Analyze more text and add below</string>
-    <string name="ocr_display_loading">Processing your image</string>
     <string name="ocr_display_conf_smaller">Decrease Text Size</string>
     <string name="ocr_display_conf_bigger">Increase Text Size</string>
     <string name="ocr_display_pinyins">Show pinyins</string>
@@ -266,7 +258,6 @@ padding: 0;
     <string name="wordlist_rename_button">Rename list</string>
     <string name="wordlist_list_name_dupe">This list name already exist, use another one.</string>
     <string name="deck_name_global">All words</string>
-    <string name="dictionary_search_filter_hsk3definition_hint">HSK3 Definition</string>
     <string name="dbrestore_start">Database restoration started</string>
     <string name="menu_support">Support the creator!</string>
 

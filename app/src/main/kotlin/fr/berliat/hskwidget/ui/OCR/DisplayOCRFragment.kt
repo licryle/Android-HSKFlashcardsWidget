@@ -6,27 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.CircularProgressIndicator
+
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -38,7 +24,7 @@ import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.databinding.FragmentOcrDisplayBinding
 import fr.berliat.hskwidget.domain.Utils
-import androidx.core.net.toUri
+
 import com.google.mlkit.vision.common.InputImage
 import fr.berliat.hsktextviews.HSKTextSegmenter
 import fr.berliat.hsktextviews.HSKTextSegmenterListener
@@ -49,6 +35,10 @@ import fr.berliat.hskwidget.domain.SharedViewModel
 import fr.berliat.hskwidget.domain.hanziClickedBackground
 import fr.berliat.hskwidget.domain.hanziStyle
 import fr.berliat.hskwidget.domain.pinyinStyle
+import fr.berliat.hskwidget.ui.components.LoadingView
+import hskflashcardswidget.crossplatform.generated.resources.Res
+import hskflashcardswidget.crossplatform.generated.resources.ocr_display_loading
+
 import kotlin.collections.emptyMap
 
 class DisplayOCRFragment : Fragment(), HSKTextSegmenterListener {
@@ -71,33 +61,6 @@ class DisplayOCRFragment : Fragment(), HSKTextSegmenterListener {
 
         if (requireActivity().javaClass.simpleName == "MainActivity") {
             mainApp.setOCRReminderVisible()
-        }
-    }
-
-    @Composable
-    fun OCRDisplayLoading(
-        modifier: Modifier = Modifier,
-        backgroundColor: Color = Color(0xFFFFFFFF), // replace with theme color if needed
-        loadingText: String = stringResource(id = R.string.ocr_display_loading)
-    ) {
-        Column(
-            modifier = modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.5f) // adjust if needed
-                .background(backgroundColor)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            CircularProgressIndicator(
-                modifier = Modifier.size(50.dp),
-                strokeWidth = 4.dp
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = loadingText,
-                textAlign = TextAlign.Center
-            )
         }
     }
 
@@ -140,7 +103,7 @@ class DisplayOCRFragment : Fragment(), HSKTextSegmenterListener {
                     clickedHanziStyle = hanziStyle.copy(fontSize = appConfig.readerTextSize.sp),
                     clickedPinyinStyle = pinyinStyle,
                     clickedBackgroundColor = hanziClickedBackground,
-                    loadingComposable = {  OCRDisplayLoading() },
+                    loadingComposable = { LoadingView(loadingText = Res.string.ocr_display_loading) },
                     emptyComposable = { OCRDisplayEmpty() },
                     onWordClick = { word -> this@DisplayOCRFragment.onWordClick(word) },
                     showPinyins = if (appConfig.readerShowAllPinyins) ShowPinyins.ALL else ShowPinyins.CLICKED,

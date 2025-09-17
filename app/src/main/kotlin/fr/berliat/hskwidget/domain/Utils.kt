@@ -304,7 +304,7 @@ class Utils {
                         dialog.onSave = wordListChangedCallback
                         dialog.show((context as FragmentActivity).supportFragmentManager, "WordListSelectionDialog")
                     }
-                    )
+                )
             }
         }
 

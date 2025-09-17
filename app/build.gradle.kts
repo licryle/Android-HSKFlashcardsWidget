@@ -174,6 +174,7 @@ dependencies {
     implementation("androidx.compose.runtime:runtime-livedata:1.9.1")
 
     implementation(libs.kotlinx.datetime)
+    implementation(libs.compose.resources)
 }
 
 // TODO: Remove these unhappy hacks. I've search for a while and couldn't find why my resources aren't exported despite export configuration.
