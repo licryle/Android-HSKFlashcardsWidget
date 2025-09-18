@@ -49,16 +49,20 @@ fun HSKWordView(
     ) {
         var pinyinIndex = -1
         hanziText.forEachIndexed { index, hanzi ->
-            val pinyin = if (hanzi.isHanzi()) {
+            var pinyin = ""
+            var onCharPinyinChange: ((String) -> Unit) = { }
+            if (hanzi.isHanzi()) {
                 pinyinIndex++
 
-                if (pinyinIndex >= pinyinList.size) {
-                    ""
-                } else { // Did not "getOrElse" because it could create an element and cause a refresh
-                    pinyinList[pinyinIndex].value
+                if (pinyinIndex < pinyinList.size) {
+                    // Did not "getOrElse" because it could create an element and cause a refresh
+                    val pinyinEntry = pinyinList[pinyinIndex]
+                    pinyin = pinyinEntry.value
+                    onCharPinyinChange = { newPinyin ->
+                        pinyinEntry.value = newPinyin
+                        onPinyinChange(pinyinList.map {it.value}.joinToString(" "))
+                    }
                 }
-            } else {
-                ""
             }
 
             HSKCharView(
@@ -66,10 +70,7 @@ fun HSKWordView(
                 pinyin,
                 pinyinEditable,
                 index == hanziText.length - 1,
-                { newPinyin ->
-                    pinyinList[pinyinIndex].value = newPinyin
-                    onPinyinChange(pinyinList.map {it.value}.joinToString(" "))
-                },
+                onCharPinyinChange,
                 if (isClicked) clickedPinyinStyle else pinyinStyle,
                 if (isClicked) clickedHanziStyle else hanziStyle,
                 modifier = Modifier.background(if (isClicked) clickedBackgroundColor else Color.Transparent)
