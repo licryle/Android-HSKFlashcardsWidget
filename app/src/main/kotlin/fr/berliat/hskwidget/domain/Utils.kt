@@ -53,7 +53,7 @@ import java.util.concurrent.TimeUnit
 import androidx.fragment.app.FragmentActivity
 import fr.berliat.hskwidget.ui.wordlist.WordListSelectionDialog
 import fr.berliat.hskwidget.HSKHelperApp
-import fr.berliat.hskwidget.data.store.AppPreferencesStore
+import fr.berliat.hskwidget.data.store.OldAppPreferencesStore
 import fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragmentDirections
 import java.time.Instant
 import java.time.ZoneId
@@ -285,7 +285,7 @@ class Utils {
                                         word: AnnotatedChineseWord, navController: NavController,
                                         wordListChangedCallback: CallbackNoParam
         ) {
-            val appConfig = AppPreferencesStore(navController.context)
+            val appConfig = OldAppPreferencesStore(navController.context)
             val context = navController.context
 
             binding.dictionaryItemContainer.setContent {

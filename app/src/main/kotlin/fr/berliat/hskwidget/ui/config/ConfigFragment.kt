@@ -17,7 +17,7 @@ import androidx.navigation.fragment.findNavController
 import fr.berliat.ankidroidhelper.AnkiDelegate
 import fr.berliat.ankidroidhelper.AnkiSyncServiceDelegate
 import fr.berliat.hskwidget.R
-import fr.berliat.hskwidget.data.store.AppPreferencesStore
+import fr.berliat.hskwidget.data.store.OldAppPreferencesStore
 import fr.berliat.hskwidget.databinding.FragmentConfigBinding
 import fr.berliat.hskwidget.domain.DatabaseDiskBackup
 import fr.berliat.hskwidget.domain.DatabaseBackupCallbacks
@@ -44,7 +44,7 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
         ActivityCompat.OnRequestPermissionsResultCallback, AnkiDelegate.HandlerInterface,
         GoogleDriveBackupInterface {
     private lateinit var binding: FragmentConfigBinding
-    private lateinit var appConfig: AppPreferencesStore
+    private lateinit var appConfig: OldAppPreferencesStore
     private lateinit var databaseDiskBackup : DatabaseDiskBackup
     private lateinit var ankiDelegate: HSKAnkiDelegate
     private var ankiSyncServiceDelegate: AnkiSyncServiceDelegate? = null
@@ -74,7 +74,7 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentConfigBinding.inflate(inflater, container, false)
-        appConfig = AppPreferencesStore(requireContext())
+        appConfig = OldAppPreferencesStore(requireContext())
 
         binding.configBackupActivateBtn.isChecked = appConfig.dbBackUpActive
 

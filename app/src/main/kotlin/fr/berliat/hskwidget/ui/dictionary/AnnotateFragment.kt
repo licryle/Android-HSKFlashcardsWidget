@@ -15,8 +15,8 @@ import fr.berliat.hskwidget.data.repo.WordListRepository
 import fr.berliat.hskwidget.domain.Utils
 
 import fr.berliat.hskwidget.ui.screens.annotate.AnnotateScreen
-import fr.berliat.hskwidget.ui.screens.annotate.AnnotateViewModel
 import fr.berliat.hskwidget.ui.utils.HSKAnkiDelegate
+import fr.berliat.hskwidget.getAppPreferencesStore
 
 import hskflashcardswidget.crossplatform.generated.resources.Res
 import hskflashcardswidget.crossplatform.generated.resources.annotation_edit_delete_failure
@@ -55,13 +55,13 @@ class AnnotateFragment: Fragment() {
         val baseView = ComposeView(requireContext())
         Utils.hideKeyboard(requireContext(), baseView)
 
+        val appPreferences2 = getAppPreferencesStore()
+
         // Use ComposeView and setContent with a proper @Composable lambda
         return baseView.apply {
             setContent {
-                //binding.annotationEditClassType.setSelection(prefStore.lastAnnotatedClassType.ordinal)
-                //binding.annotationEditClassLevel.setSelection(prefStore.lastAnnotatedClassLevel.ordinal)
                 AnnotateScreen(
-                    simplifiedWord, AnnotateViewModel(),
+                    simplifiedWord,
                     onSpeak = { Utils.playWordInBackground(requireContext(), it) },
                     onCopy = { Utils.copyToClipBoard(requireContext(), it) },
                     onSave = {
@@ -69,6 +69,8 @@ class AnnotateFragment: Fragment() {
                             annotateViewModel.saveWord(word, pinyins, notes, themes, isExam, cType, cLevel) {
                                     word, e -> handleSaveResult(word.simplified, ACTION.UPDATE, e)
                             }
+                            appPreferences2.lastAnnotatedClassType.value = cType
+                            appPreferences2.lastAnnotatedClassLevel.value = cLevel
                     },
                     onDelete = { word ->
                         annotateViewModel.deleteAnnotation(word) { word, e -> handleSaveResult(word, ACTION.DELETE, e) }

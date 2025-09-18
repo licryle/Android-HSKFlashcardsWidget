@@ -21,7 +21,7 @@ import fr.berliat.hskwidget.R
 import androidx.compose.runtime.livedata.observeAsState
 
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
-import fr.berliat.hskwidget.data.store.AppPreferencesStore
+import fr.berliat.hskwidget.data.store.OldAppPreferencesStore
 import fr.berliat.hskwidget.databinding.FragmentOcrDisplayBinding
 import fr.berliat.hskwidget.domain.Utils
 
@@ -46,7 +46,7 @@ class DisplayOCRFragment : Fragment(), HSKTextSegmenterListener {
     private lateinit var segmenter: HSKTextSegmenter
     private lateinit var viewModel: DisplayOCRViewModel
 
-    private lateinit var appConfig: AppPreferencesStore
+    private lateinit var appConfig: OldAppPreferencesStore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,7 +75,7 @@ class DisplayOCRFragment : Fragment(), HSKTextSegmenterListener {
     ): View {
         viewBinding =
             FragmentOcrDisplayBinding.inflate(inflater, container, false) // Inflate here
-        appConfig = AppPreferencesStore(requireContext())
+        appConfig = OldAppPreferencesStore(requireContext())
 
         viewBinding.ocrDisplayAdd.setOnClickListener {
             val action =

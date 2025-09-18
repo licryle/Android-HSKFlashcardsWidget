@@ -6,13 +6,13 @@ import androidx.fragment.app.Fragment
 import fr.berliat.ankidroidhelper.AnkiDelegate
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.store.AnkiStore
-import fr.berliat.hskwidget.data.store.AppPreferencesStore
+import fr.berliat.hskwidget.data.store.OldAppPreferencesStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class HSKAnkiDelegate(val fragment: Fragment, handler: HandlerInterface? = null)  : AnkiDelegate(fragment, handler) {
     private val context = fragment.requireContext()
-    private val appConfig = AppPreferencesStore(context)
+    private val appConfig = OldAppPreferencesStore(context)
     private val ankiStore = AnkiStore(context)
 
     override fun onAnkiRequestPermissionsResult(granted: Boolean) {

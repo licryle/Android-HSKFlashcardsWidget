@@ -11,7 +11,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.navigation.fragment.findNavController
 
 import fr.berliat.hskwidget.R
-import fr.berliat.hskwidget.data.store.AppPreferencesStore
+import fr.berliat.hskwidget.data.store.OldAppPreferencesStore
 import fr.berliat.hskwidget.domain.Utils
 
 import fr.berliat.hskwidget.domain.SearchQuery
@@ -20,7 +20,7 @@ import fr.berliat.hskwidget.ui.screens.dictionary.DictionaryViewModel
 import fr.berliat.hskwidget.ui.wordlist.WordListSelectionDialog
 
 class DictionarySearchFragment : Fragment() {
-    private lateinit var appConfig: AppPreferencesStore
+    private lateinit var appConfig: OldAppPreferencesStore
 
     private val viewModel = DictionaryViewModel(
         { SearchQuery.fromString(activity?.findViewById<SearchView>(R.id.appbar_search)?.query.toString()) }
@@ -31,7 +31,7 @@ class DictionarySearchFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        appConfig = AppPreferencesStore(requireContext())
+        appConfig = OldAppPreferencesStore(requireContext())
 
         ComposeView(requireContext())
 

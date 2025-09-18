@@ -148,7 +148,8 @@ fun DetailedWordView (
                     verticalArrangement = Arrangement.SpaceBetween) {
                     HSKWordView(
                         hanziText = word.simplified,
-                        pinyinText = pinyins
+                        pinyinText = pinyins,
+                        pinyinEditable = ! word.hasWord()
                     )
                     // Definition & Annotation
                     Text(

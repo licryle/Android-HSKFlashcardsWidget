@@ -14,7 +14,7 @@ kotlin {
     androidLibrary {
         namespace = "fr.berliat.hskwidget.crossPlatform"
         compileSdk = 36
-        minSdk = 24
+        minSdk = 26
 
         withJava() // enable java compilation support
         withHostTestBuilder {}.configure {}
@@ -73,6 +73,11 @@ kotlin {
                 implementation(libs.normalize)
                 implementation(libs.kotlinx.datetime)
                 implementation(libs.kotlinx.serialization.json)
+
+                implementation(libs.androidx.datastore)
+                implementation(libs.androidx.datastore.preferences)
+                api(libs.androidx.lifecycle.viewmodel)
+
                 implementation(project(":hsktextviews"))
             }
         }

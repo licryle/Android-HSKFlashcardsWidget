@@ -1,5 +1,8 @@
 package fr.berliat.hskwidget
 
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.core.Preferences
 import androidx.room.Room
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -10,6 +13,8 @@ import platform.Foundation.NSBundle
 import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSUserDomainMask
+
+import okio.Path.Companion.toPath
 
 actual object Utils {
     actual fun openLink(url: String) {
@@ -60,4 +65,22 @@ actual object Utils {
     }
 
     const val DATABASE_FILENAME = "Mandarin_Assistant.db"
+    actual fun logAnalyticsEvent(event: ANALYTICS_EVENTS) {
+    }
+
+    @OptIn(ExperimentalForeignApi::class)
+    actual fun getDataStore(file: String): DataStore<Preferences> {
+        val documentDirectory: NSURL? = NSFileManager.defaultManager.URLForDirectory(
+            directory = NSDocumentDirectory,
+            inDomain = NSUserDomainMask,
+            appropriateForURL = null,
+            create = false,
+            error = null,
+        )
+        val dbPath = requireNotNull(documentDirectory).path + file
+
+        return PreferenceDataStoreFactory.createWithPath(
+            produceFile = { dbPath.toPath() }
+        )
+    }
 }

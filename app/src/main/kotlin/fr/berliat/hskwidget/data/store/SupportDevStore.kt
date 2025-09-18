@@ -19,7 +19,7 @@ import fr.berliat.hskwidget.R
 
 class SupportDevStore private constructor(private val context: Context) : PurchasesUpdatedListener {
     private lateinit var billingClient: BillingClient
-    private val appConfig = AppPreferencesStore(context)
+    private val appConfig = OldAppPreferencesStore(context)
     private val listeners = mutableListOf<SupportDevListener>()
 
     var purchases: MutableMap<SupportProduct, Int> = mutableMapOf()

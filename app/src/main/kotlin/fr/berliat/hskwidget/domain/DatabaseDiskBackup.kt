@@ -8,7 +8,7 @@ import android.provider.DocumentsContract
 import android.util.Log
 import androidx.activity.result.ActivityResultCaller
 import androidx.activity.result.contract.ActivityResultContracts
-import fr.berliat.hskwidget.data.store.AppPreferencesStore
+import fr.berliat.hskwidget.data.store.OldAppPreferencesStore
 import fr.berliat.hskwidget.data.store.DatabaseHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -25,7 +25,7 @@ interface DatabaseBackupCallbacks {
 class DatabaseDiskBackup(comp: ActivityResultCaller,
                          private val context: Context,
                          private val listener: DatabaseBackupCallbacks) {
-    private val prefStore = AppPreferencesStore(context)
+    private val prefStore = OldAppPreferencesStore(context)
 
     private val getFolderAct = comp.registerForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
         if (uri == null || ! DocumentsContract.isTreeUri(uri)) {

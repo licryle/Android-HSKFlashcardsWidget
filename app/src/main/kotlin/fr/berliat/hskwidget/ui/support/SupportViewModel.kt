@@ -12,14 +12,14 @@ import com.google.android.play.core.review.ReviewException
 import com.google.android.play.core.review.ReviewManager
 import com.google.android.play.core.review.model.ReviewErrorCode
 import fr.berliat.hskwidget.R
-import fr.berliat.hskwidget.data.store.AppPreferencesStore
+import fr.berliat.hskwidget.data.store.OldAppPreferencesStore
 import fr.berliat.hskwidget.data.store.SupportDevStore
 import fr.berliat.hskwidget.domain.Utils
 
 class SupportViewModel(application: Application, private val toastMe: (Int) -> Unit)
     : AndroidViewModel(application),
     SupportDevStore.SupportDevListener {
-    private val appConfig = AppPreferencesStore(application.applicationContext)
+    private val appConfig = OldAppPreferencesStore(application.applicationContext)
     private val supportDevStore = SupportDevStore.getInstance(application.applicationContext)
 
     private val _totalSpent = MutableLiveData(appConfig.supportTotalSpent)

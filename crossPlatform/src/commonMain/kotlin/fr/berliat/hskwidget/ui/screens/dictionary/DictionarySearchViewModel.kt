@@ -10,10 +10,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
+import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.domain.SearchQuery
+import fr.berliat.hskwidget.getAppPreferencesStore
 import kotlinx.coroutines.IO
 
-class DictionaryViewModel(val appSearchQueryProvider : () -> SearchQuery) {
+class DictionaryViewModel(val appSearchQueryProvider : () -> SearchQuery,
+                          prefsStore: AppPreferencesStore = getAppPreferencesStore()) {
     private val _searchQuery = MutableStateFlow(appSearchQueryProvider.invoke())
     val searchQuery: StateFlow<SearchQuery> = _searchQuery.asStateFlow()
 
@@ -26,11 +29,11 @@ class DictionaryViewModel(val appSearchQueryProvider : () -> SearchQuery) {
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
-    private val _showHSK3 = MutableStateFlow(false)
-    val showHSK3: StateFlow<Boolean> = _showHSK3.asStateFlow()
+    val showHSK3: StateFlow<Boolean> = prefsStore.dictionaryShowHSK3Definition.asStateFlow()
 
-    private val _hasAnnotationFilter = MutableStateFlow(false)
-    val hasAnnotationFilter: StateFlow<Boolean> = _hasAnnotationFilter.asStateFlow()
+    val hasAnnotationFilter: StateFlow<Boolean> = prefsStore.searchFilterHasAnnotation.asStateFlow()
+
+    val appPreferences = getAppPreferencesStore()
 
     private var currentPage = 0
     private val itemsPerPage = 30
@@ -43,12 +46,12 @@ class DictionaryViewModel(val appSearchQueryProvider : () -> SearchQuery) {
     }
 
     fun toggleHSK3(value: Boolean) {
-        _showHSK3.value = value
+        appPreferences.dictionaryShowHSK3Definition.value = value
         performSearch()
     }
 
     fun toggleHasAnnotation(value: Boolean) {
-        _hasAnnotationFilter.value = value
+        appPreferences.searchFilterHasAnnotation.value = value
         performSearch()
     }
 
@@ -79,7 +82,7 @@ class DictionaryViewModel(val appSearchQueryProvider : () -> SearchQuery) {
     private suspend fun fetchResultsForPage(): List<AnnotatedChineseWord> {
         val searchQuery = _searchQuery.value
         val listName = searchQuery.inListName
-        val annotatedOnly = _hasAnnotationFilter.value
+        val annotatedOnly = appPreferences.searchFilterHasAnnotation.value
 
         val results = if (listName != null) {
             // Search within the specified word list

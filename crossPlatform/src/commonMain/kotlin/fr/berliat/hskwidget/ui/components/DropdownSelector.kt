@@ -22,6 +22,7 @@ fun <T> DropdownSelector(
     options: List<T>,
     selected: T,
     onSelected: (T) -> Unit,
+    labelProvider : (T) -> String = { it.toString() },
     modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -32,7 +33,7 @@ fun <T> DropdownSelector(
         modifier = modifier.fillMaxWidth()
     ) {
         OutlinedTextField(
-            value = selected.toString(),
+            value = labelProvider.invoke(selected),
             onValueChange = {},
             label = { Text(label) },
             readOnly = true,
@@ -47,7 +48,7 @@ fun <T> DropdownSelector(
         ) {
             options.forEach { option ->
                 DropdownMenuItem(
-                    text = { Text(option.toString()) },
+                    text = { Text(labelProvider.invoke(option)) },
                     onClick = {
                         onSelected(option)
                         expanded = false

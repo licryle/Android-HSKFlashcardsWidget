@@ -9,7 +9,7 @@ import androidx.datastore.preferences.core.Preferences
 import kotlinx.coroutines.Deferred
 import java.time.Instant
 
-class AppPreferencesStore(context: Context):
+class OldAppPreferencesStore(context: Context):
     PrefixedPreferenceDataStoreBridge(context.dataStore, "app") {
     var supportTotalSpent: Float
         get() {

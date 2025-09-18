@@ -25,7 +25,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.Purchase
-import fr.berliat.hskwidget.data.store.AppPreferencesStore
+import fr.berliat.hskwidget.data.store.OldAppPreferencesStore
 import fr.berliat.hskwidget.data.store.DatabaseHelper
 import fr.berliat.hskwidget.data.store.SupportDevStore
 import fr.berliat.hskwidget.databinding.ActivityMainBinding
@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
-    private lateinit var appConfig: AppPreferencesStore
+    private lateinit var appConfig: OldAppPreferencesStore
     private lateinit var databaseDiskBackup: DatabaseDiskBackup
     private lateinit var supportDevStore: SupportDevStore
     private var showOCRReminder: Boolean = true
@@ -75,7 +75,7 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
 
         databaseDiskBackup = DatabaseDiskBackup(this, this, this)
 
-        appConfig = AppPreferencesStore(applicationContext)
+        appConfig = OldAppPreferencesStore(applicationContext)
 
         setupSupporter()
         setupActionBar()

@@ -15,7 +15,7 @@ kotlin {
     androidLibrary {
         namespace = "fr.berliat.hsktextviews"
         compileSdk = 36
-        minSdk = 24
+        minSdk = 26
 
         withHostTestBuilder {
         }

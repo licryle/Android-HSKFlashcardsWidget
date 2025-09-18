@@ -1,5 +1,8 @@
 package fr.berliat.hskwidget
 
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 
 expect object Utils {
@@ -14,12 +17,17 @@ expect object Utils {
 
     suspend fun getDatabaseInstance() : ChineseWordsDatabase
 
+    fun getDataStore(file: String): DataStore<Preferences>
+
     fun getDatabasePath(): String
 }
 
 fun String.capitalize() =
     this.toString().lowercase().replaceFirstChar { it.uppercaseChar() }
 
+fun getAppPreferencesStore() : AppPreferencesStore {
+    return AppPreferencesStore.getInstance(Utils.getDataStore("app.preferences_pb"))
+}
 
 enum class ANALYTICS_EVENTS {
     SCREEN_VIEW,

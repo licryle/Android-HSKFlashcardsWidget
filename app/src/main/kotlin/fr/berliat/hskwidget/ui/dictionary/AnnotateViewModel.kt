@@ -7,7 +7,7 @@ import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWordAnnotation
 import fr.berliat.hskwidget.data.repo.WordListRepository
-import fr.berliat.hskwidget.data.store.AppPreferencesStore
+import fr.berliat.hskwidget.data.store.OldAppPreferencesStore
 import fr.berliat.hskwidget.data.store.DatabaseHelper
 import fr.berliat.hskwidget.data.type.ClassLevel
 import fr.berliat.hskwidget.data.type.ClassType
@@ -59,8 +59,8 @@ class OldAnnotateViewModel(val context: Context, val wordListRepo: WordListRepos
         Utils.incrementConsultedWord(context, annotatedWord.simplified)
 
         if (annotatedWord.hasAnnotation()) {
-            AppPreferencesStore(context).lastAnnotatedClassType = updatedAnnotation.classType!!
-            AppPreferencesStore(context).lastAnnotatedClassLevel = updatedAnnotation.level!!
+            OldAppPreferencesStore(context).lastAnnotatedClassType = updatedAnnotation.classType!!
+            OldAppPreferencesStore(context).lastAnnotatedClassLevel = updatedAnnotation.level!!
         }
     }
 
