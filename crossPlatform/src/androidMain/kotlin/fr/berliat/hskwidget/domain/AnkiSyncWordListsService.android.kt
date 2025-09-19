@@ -2,8 +2,9 @@ package fr.berliat.hskwidget.domain
 
 import android.database.sqlite.SQLiteException
 import android.graphics.Bitmap
-import android.util.Log
 import android.graphics.Canvas
+import android.graphics.drawable.Drawable
+import android.util.Log
 import fr.berliat.ankidroidhelper.AnkiSyncService
 import fr.berliat.hskwidget.Utils
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
@@ -19,14 +20,10 @@ import hskflashcardswidget.crossplatform.generated.resources.app_name
 import hskflashcardswidget.crossplatform.generated.resources.cancel
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.runBlocking
-import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import kotlinx.coroutines.yield
-import org.jetbrains.compose.resources.InternalResourceApi
 import org.jetbrains.compose.resources.getString
 import kotlin.collections.chunked
 
-@OptIn(InternalResourceApi::class)
 actual class AnkiSyncWordListsService: AnkiSyncService() {
     private lateinit var syncStartMessage : String
     private lateinit var syncProgressMessage : String
@@ -37,56 +34,29 @@ actual class AnkiSyncWordListsService: AnkiSyncService() {
     private lateinit var notificationLargeIcon : Bitmap
 
     private lateinit var wordListRepository : WordListRepository
-    init {
-        runBlocking { // Todo, optimize that, refactor parent to load at the beginning of service
-            wordListRepository = WordListRepository.getInstance()
-            syncStartMessage = getString(Res.string.anki_sync_start_message)
-            syncProgressMessage = getString(Res.string.anki_sync_progress_message)
-            notificationTitle = getString(Res.string.app_name)
-            notificationCancelText = getString(Res.string.cancel)
-            notificationChannelDescription = getString(Res.string.anki_sync_notification_description)
-            notificationChannelTitle = getString(Res.string.anki_sync_notification_name)
-            notificationLargeIcon = loadVectorXmlAsBitmap("drawable/close_24px.xml")//Res.drawable.close_24px)
-        }
+
+
+    override suspend fun initResources() {
+        wordListRepository = WordListRepository.getInstance()
+        syncStartMessage = getString(Res.string.anki_sync_start_message)
+        syncProgressMessage = getString(Res.string.anki_sync_progress_message)
+        notificationTitle = getString(Res.string.app_name)
+        notificationCancelText = getString(Res.string.cancel)
+        notificationChannelDescription = getString(Res.string.anki_sync_notification_description)
+        notificationChannelTitle = getString(Res.string.anki_sync_notification_name)
+        notificationLargeIcon = drawableToBitmap(resources.getDrawable(resources.getIdentifier("ic_launcher", "mipmap", packageName)))
     }
 
-    suspend fun loadVectorXmlAsBitmap(resourcePath: String): Bitmap {
-        // Parse the XML string into a VectorDrawableCompat
-        // This requires an XML pull parser, which is more complex than a direct string.
-        // A simpler, though less robust way, is to manually draw it.
-        // The most robust way is via `ContextCompat`.
-        try {
-            val resourceId = this.resources.getIdentifier(
-                resourcePath.substringAfterLast("/").substringBeforeLast("."),
-                "drawable",
-                this.packageName
-            )
-
-            val drawable = VectorDrawableCompat.create(this.resources, resourceId, null)
-
-            // Ensure the drawable is not null and has a size
-            if (drawable == null || drawable.intrinsicWidth <= 0 || drawable.intrinsicHeight <= 0) {
-                throw Error()
-            }
-
-            // Use the drawable's intrinsic size for the bitmap.
-            val width = drawable.intrinsicWidth
-            val height = drawable.intrinsicHeight
-
-            // Create a new bitmap.
-            val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-
-            // Create an Android-specific Canvas instance, which takes a Bitmap in its constructor.
-            val canvas = Canvas(bitmap)
-
-            // Set the bounds and draw the drawable onto the canvas.
-            drawable.setBounds(0, 0, width, height)
-            drawable.draw(canvas)
-
-            return bitmap
-        } catch (_: Exception) {
-            return Bitmap.createBitmap(24, 24, Bitmap.Config.ARGB_8888)
-        }
+    private fun drawableToBitmap(drawable: Drawable): Bitmap {
+        val bitmap = Bitmap.createBitmap(
+            drawable.intrinsicWidth.takeIf { it > 0 } ?: 1,
+            drawable.intrinsicHeight.takeIf { it > 0 } ?: 1,
+            Bitmap.Config.ARGB_8888
+        )
+        val canvas = Canvas(bitmap)
+        drawable.setBounds(0, 0, canvas.width, canvas.height)
+        drawable.draw(canvas)
+        return bitmap
     }
 
     override suspend fun syncToAnki() {
