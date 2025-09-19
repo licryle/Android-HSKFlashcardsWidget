@@ -22,13 +22,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import fr.berliat.hskwidget.AnkiDelegator
+import fr.berliat.hskwidget.data.model.ChineseWord
 
 import fr.berliat.hskwidget.ui.components.DetailedWordView
 import fr.berliat.hskwidget.ui.components.LoadingView
+import fr.berliat.hskwidget.ui.screens.wordlist.WordListSelectionDialog
 
 import hskflashcardswidget.crossplatform.generated.resources.Res
 import hskflashcardswidget.crossplatform.generated.resources.bookmark_add_24px
@@ -124,10 +130,10 @@ private fun DictionarySearchNoResult(
 @Composable
 fun DictionarySearchScreen(
     viewModel: DictionaryViewModel,
+    ankiCaller : AnkiDelegator,
     onSpeak: (String) -> Unit,
     onAnnotate: (String) -> Unit,
     onCopy: (String) -> Unit,
-    onListChange: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val searchQuery by viewModel.searchQuery.collectAsState()
@@ -137,10 +143,25 @@ fun DictionarySearchScreen(
     val showHSK3 by viewModel.showHSK3.collectAsState()
     val hasAnnotationFilter by viewModel.hasAnnotationFilter.collectAsState()
 
+    var showWordListDialog by remember { mutableStateOf<ChineseWord?>(null) }
+
     val listState = rememberLazyListState()
 
     // Whenever searchQuery changes, scroll to top
     LaunchedEffect(searchQuery) { listState.scrollToItem(0) }
+
+    showWordListDialog?.let {
+        WordListSelectionDialog(
+            ankiCaller = ankiCaller,
+            word = it,
+            onDismiss = { showWordListDialog = null },
+            onSaved = {
+                viewModel.listsAssociationChanged()
+                showWordListDialog = null
+            }, // we touched lists, let's
+            modifier = modifier
+        )
+    }
 
     Column(modifier = modifier.fillMaxSize()) {
         // Filters row
@@ -173,7 +194,7 @@ fun DictionarySearchScreen(
                             onFavoriteClick = { onAnnotate(word.simplified) },
                             onSpeakClick = { onSpeak(word.simplified) },
                             onCopyClick = { onCopy(word.simplified) },
-                            onListsClick = { onListChange(word.simplified) }
+                            onListsClick = { showWordListDialog = word.word }
                         )
 
                         if (!isLoading && hasMoreResults && index >= results.size - 5) {

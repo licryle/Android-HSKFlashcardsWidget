@@ -63,7 +63,7 @@ class WordListRepository(
     suspend fun getAllLists() = withContext(Dispatchers.IO) { wordListDAO.getAllLists() }
     suspend fun getSystemLists() = withContext(Dispatchers.IO) { wordListDAO.getSystemLists() }
     suspend fun getUserLists() = withContext(Dispatchers.IO) { wordListDAO.getUserLists() }
-    suspend fun getWordListsForWord(wordId: String) = withContext(Dispatchers.IO) { wordListDAO.getWordListsForWord(wordId) }
+    suspend fun getWordListsForWord(simplified: String) = withContext(Dispatchers.IO) { wordListDAO.getWordListsForWord(simplified) }
 
     suspend fun isWordInList(wordList: WordList, simplified: String) : Boolean = withContext(Dispatchers.IO) {
         val existingEntries = wordListDAO.getEntriesForWord(simplified)
@@ -98,7 +98,7 @@ class WordListRepository(
         return AnkiSyncWordListsService::class
     }
 
-    suspend fun updateWordListAssociations(simplified: String, listIds: List<Long>): (suspend () -> Result<Unit>)?
+    suspend fun updateWordListAssociations(simplified: String, listIds: Set<Long>): (suspend () -> Result<Unit>)?
             = withContext(Dispatchers.IO) {
         // First remove all existing associations for this word
         val entries = wordListDAO.getEntriesForWord(simplified)

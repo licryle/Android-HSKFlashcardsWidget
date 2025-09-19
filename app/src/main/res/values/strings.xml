@@ -125,23 +125,12 @@ We recommend to choose the level your at plus the one below, or above depending 
     <string name="nav_host_ocr_reminder_text">Your scanned text is still accessible by clicking here.</string>
     <string name="menu_ocr_display">OCR: Scanned Text</string>
     <string name="ocr_display_word_not_found">Couldn\'t find %1$s, copying to clipboard</string>
-    <string name="wordlist_create_new_list_button">Create New List</string>
-    <string name="wordlist_delete_button">Delete List</string>
-    <string name="wordlist_delete_confirmation">Are you sure you want to delete the list \"%1$s\"?</string>
-    <string name="wordlist_word_count">%1$d words</string>
-    <string name="wordlist_consult_button">Consult</string>
-    <string name="wordlist_create_button">Create list</string>
-    <string name="wordlist_list_name">List name</string>
-    <string name="wordlist_select_lists">Select Lists</string>
-    <string name="wordlist_lists_updated_toast">Lists updated successfully</string>
-    <string name="wordlist_name">Word list</string>
-    <string name="wordlist_createddate">Created: %s</string>
-    <string name="wordlist_editeddate">Modified: %s</string>
-    <string name="wordlist_rename_button">Rename list</string>
-    <string name="wordlist_list_name_dupe">This list name already exist, use another one.</string>
-    <string name="deck_name_global">All words</string>
+
     <string name="dbrestore_start">Database restoration started</string>
     <string name="menu_support">Support the creator!</string>
+
+    <string name="wordlist_word_count">%1$d words</string>
+    <string name="wordlist_name">Word list</string>
 
     <string name="support_devintro_title">🥐 Support the creator 🥐</string>
     <string name="support_devintro">Hello everyone, Cyrille here, I\'m an indie developer originally from France.\n\nAs I learn Chinese, I realized I needed such app and none of the existing ones filled my needs.\n\nSo here we are, I\'m happily sharing for free this creation with you.\n\nIf you also find it useful, please consider participating to my croissant fund, or review it for free!\n\nReviews, feedback, encouragement help tremendously!</string>

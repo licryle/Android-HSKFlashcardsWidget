@@ -36,6 +36,7 @@ import fr.berliat.hskwidget.domain.hanziClickedBackground
 import fr.berliat.hskwidget.domain.hanziStyle
 import fr.berliat.hskwidget.domain.pinyinStyle
 import fr.berliat.hskwidget.ui.components.LoadingView
+import fr.berliat.hskwidget.ui.utils.HSKAnkiDelegate
 import hskflashcardswidget.crossplatform.generated.resources.Res
 import hskflashcardswidget.crossplatform.generated.resources.ocr_display_loading
 
@@ -47,6 +48,7 @@ class DisplayOCRFragment : Fragment(), HSKTextSegmenterListener {
     private lateinit var viewModel: DisplayOCRViewModel
 
     private lateinit var appConfig: OldAppPreferencesStore
+    private lateinit var ankiCaller : HSKAnkiDelegate
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,6 +60,7 @@ class DisplayOCRFragment : Fragment(), HSKTextSegmenterListener {
             { DatabaseHelper.getInstance(requireContext()).chineseWordFrequencyDAO() }
         )
         viewModel = ViewModelProvider(this, factory)[DisplayOCRViewModel::class.java]
+        ankiCaller = HSKAnkiDelegate(this)
 
         if (requireActivity().javaClass.simpleName == "MainActivity") {
             mainApp.setOCRReminderVisible()
@@ -221,7 +224,7 @@ class DisplayOCRFragment : Fragment(), HSKTextSegmenterListener {
             Utils.populateDictionaryEntryView(
                 viewBinding.ocrDisplayDefinition, annotatedWord,
                 findNavController(),
-                { }
+                ankiCaller::delegateToAnki
             )
             viewBinding.ocrDisplayDefinition.root.visibility = View.VISIBLE
             viewModel.selectedWord = simplified

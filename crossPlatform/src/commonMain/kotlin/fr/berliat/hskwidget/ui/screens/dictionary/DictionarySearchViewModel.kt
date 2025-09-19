@@ -95,4 +95,8 @@ class DictionaryViewModel(val appSearchQueryProvider : () -> SearchQuery,
         currentPage++
         return results
     }
+
+    fun listsAssociationChanged() {
+        if (searchQuery.value.inListName != null) performSearch()
+    }
 }

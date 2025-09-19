@@ -20,6 +20,10 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
@@ -50,8 +54,7 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.InputStream
 import java.util.concurrent.TimeUnit
-import androidx.fragment.app.FragmentActivity
-import fr.berliat.hskwidget.ui.wordlist.WordListSelectionDialog
+
 import fr.berliat.hskwidget.HSKHelperApp
 import fr.berliat.hskwidget.data.store.OldAppPreferencesStore
 import fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragmentDirections
@@ -60,9 +63,10 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.UUID
 import androidx.compose.ui.graphics.Color
+import fr.berliat.hskwidget.AnkiDelegator
+import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.ui.components.DetailedWordView
-
-typealias CallbackNoParam = () -> Unit
+import fr.berliat.hskwidget.ui.screens.wordlist.WordListSelectionDialog
 
 val hanziStyle = TextStyle(fontSize = 34.sp, color = Color.Black)
 val pinyinStyle = TextStyle(fontSize = 20.sp, color = Color.Black)
@@ -286,12 +290,23 @@ class Utils {
 
         fun populateDictionaryEntryView(binding: FragmentDictionarySearchItemBinding,
                                         word: AnnotatedChineseWord, navController: NavController,
-                                        wordListChangedCallback: CallbackNoParam
+                                        ankiCaller: AnkiDelegator
         ) {
             val appConfig = OldAppPreferencesStore(navController.context)
             val context = navController.context
 
             binding.dictionaryItemContainer.setContent {
+                var showWordListDialog by remember { mutableStateOf<ChineseWord?>(null) }
+
+                showWordListDialog?.let {
+                    WordListSelectionDialog(
+                        ankiCaller = ankiCaller,
+                        word = it,
+                        onDismiss = { showWordListDialog = null },
+                        onSaved = { showWordListDialog = null }
+                    )
+                }
+
                 DetailedWordView(
                     word,
                     appConfig.dictionaryShowHSK3Definition,
@@ -302,11 +317,7 @@ class Utils {
                     },
                     { playWordInBackground(context, word.simplified) },
                     { copyToClipBoard(context, word.simplified) },
-                    {
-                        val dialog = WordListSelectionDialog.newInstance(word.simplified)
-                        dialog.onSave = wordListChangedCallback
-                        dialog.show((context as FragmentActivity).supportFragmentManager, "WordListSelectionDialog")
-                    }
+                    { showWordListDialog = word.word }
                 )
             }
         }

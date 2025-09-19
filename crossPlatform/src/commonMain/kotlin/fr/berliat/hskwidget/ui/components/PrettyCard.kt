@@ -1,0 +1,50 @@
+package fr.berliat.hskwidget.ui.components
+
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+
+@Composable
+fun PrettyCard(
+    modifier: Modifier = Modifier,
+    elevation: Dp = 4.dp,
+    borderColor: Color = Color.Gray,
+    shape: Shape = RoundedCornerShape(8.dp),
+    onClick : () -> Unit = {},
+    content: @Composable ColumnScope.() -> Unit
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .border(
+                width = 0.5.dp,
+                color = borderColor,
+                shape = shape
+            ),
+        shape = shape,
+        elevation = CardDefaults.cardElevation(defaultElevation = elevation),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+        ),
+        onClick = onClick
+    ) {
+        Column(
+            modifier = Modifier.padding(0.dp),
+            content = content
+        )
+    }
+}

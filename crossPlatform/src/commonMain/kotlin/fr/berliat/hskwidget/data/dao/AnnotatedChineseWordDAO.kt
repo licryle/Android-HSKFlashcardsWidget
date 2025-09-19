@@ -2,6 +2,7 @@ package fr.berliat.hskwidget.data.dao
 
 import androidx.room.Dao
 import androidx.room.Query
+import androidx.room.RewriteQueriesToDropUnusedColumns
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 
 private const val select_left_join =
@@ -29,13 +30,14 @@ private const val select_right_join =
 
 @Dao
 interface AnnotatedChineseWordDAO {
-     @Query("$select_left_join WHERE a.a_searchable_text LIKE '%' || :str || '%'" +
+    @Query("$select_left_join WHERE a.a_searchable_text LIKE '%' || :str || '%'" +
             " AND (0=:hasAnnotation OR (1=:hasAnnotation AND a.first_seen IS NOT NULL))" +
             " UNION " +
             "$select_right_join WHERE w.searchable_text LIKE '%' || :str || '%'" +
             " AND (0=:hasAnnotation OR (1=:hasAnnotation AND a.first_seen IS NOT NULL))" +
             " ORDER BY is_first_seen_null, a.first_seen DESC, w.popularity DESC " +
             " LIMIT :pageSize OFFSET (:page * :pageSize)")
+    @RewriteQueriesToDropUnusedColumns
     suspend fun searchFromStrLike(str: String?, hasAnnotation: Boolean, page: Int = 0, pageSize: Int = 30): List<AnnotatedChineseWord>
 
     @Query("SELECT * FROM (" +
@@ -43,6 +45,7 @@ interface AnnotatedChineseWordDAO {
            " UNION " +
            "$select_right_join WHERE w.simplified IN (SELECT simplified FROM word_list_entry WHERE list_id IN (:listIds) AND simplified NOT IN (:bannedWords))" +
            ") ORDER BY RANDOM() LIMIT 1")
+    @RewriteQueriesToDropUnusedColumns
     suspend fun getRandomWordFromLists(listIds: List<Long>, bannedWords: Array<String>): AnnotatedChineseWord?
 
     @Query("SELECT a.a_simplified, COALESCE(w.simplified, a.a_simplified) simplified, a.a_searchable_text, " +
@@ -71,6 +74,7 @@ interface AnnotatedChineseWordDAO {
             " AND (0=:hasAnnotation OR (1=:hasAnnotation AND a.first_seen IS NOT NULL)) " +
             " ORDER BY is_first_seen_null, a.first_seen DESC, w.popularity DESC " +
             " LIMIT :pageSize OFFSET (:page * :pageSize)")
+    @RewriteQueriesToDropUnusedColumns
     suspend fun searchFromWordList(listName: String, hasAnnotation: Boolean, page: Int = 0, pageSize: Int = 30): List<AnnotatedChineseWord>
 
     suspend fun getAllAnnotated(): List<AnnotatedChineseWord> {
@@ -81,10 +85,12 @@ interface AnnotatedChineseWordDAO {
             " UNION " +
             "$select_right_join WHERE simplified = :simplifiedWord" +
             " LIMIT 1")
+    @RewriteQueriesToDropUnusedColumns
     suspend fun getFromSimplified(simplifiedWord: String?): AnnotatedChineseWord?
 
     @Query("$select_left_join WHERE a_simplified IN (:simplifiedWords)" +
             " UNION " +
             "$select_right_join WHERE simplified IN (:simplifiedWords)")
+    @RewriteQueriesToDropUnusedColumns
     suspend fun getFromSimplified(simplifiedWords: List<String>): List<AnnotatedChineseWord>
 }
