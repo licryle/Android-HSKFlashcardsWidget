@@ -263,6 +263,9 @@ class Utils {
                 inputStream.copyTo(output)
             }
 
+            inputStream.close()
+            outFile.outputStream().close()
+
             return@withContext outFile
         }
 
