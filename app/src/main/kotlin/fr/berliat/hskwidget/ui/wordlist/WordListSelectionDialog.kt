@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import fr.berliat.hskwidget.R
@@ -16,6 +17,9 @@ import fr.berliat.hskwidget.databinding.FragmentWordlistDialogSelectListsBinding
 import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.domain.CallbackNoParam
 import fr.berliat.hskwidget.ui.utils.HSKAnkiDelegate
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class WordListSelectionDialog : DialogFragment() {
     private lateinit var binding: FragmentWordlistDialogSelectListsBinding
@@ -51,11 +55,15 @@ class WordListSelectionDialog : DialogFragment() {
             return
         }
 
-        viewModel = WordListViewModel(WordListRepository(requireContext()), ankiDelegate::delegateToAnki)
+        lifecycleScope.launch(Dispatchers.IO) {
+            viewModel = WordListViewModel(WordListRepository.getInstance(), ankiDelegate::delegateToAnki)
 
-        setupRecyclerView()
-        setupButtons()
-        loadData()
+            withContext(Dispatchers.Main) {
+                setupRecyclerView()
+                setupButtons()
+                loadData()
+            }
+        }
     }
 
     private fun setupRecyclerView() {

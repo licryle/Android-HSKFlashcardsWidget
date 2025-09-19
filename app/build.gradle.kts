@@ -152,8 +152,6 @@ dependencies {
 
     implementation("io.github.yrjyrj123:jieba-analysis:1.0.3")
 
-    // Anki
-    implementation("com.github.ankidroid:Anki-Android:api-v1.1.0")
 
     // Let's allow users to support the dev with money
     implementation("com.android.billingclient:billing:8.0.0")

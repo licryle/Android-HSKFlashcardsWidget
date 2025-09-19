@@ -7,8 +7,11 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.room.Room
+import fr.berliat.hskwidget.data.dao.AnkiDAO
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
 import okio.Path.Companion.toPath
@@ -68,28 +71,39 @@ actual object Utils {
 
 
     private var databasePath = ""
+    private var databaseInstance : ChineseWordsDatabase? = null
+    private var databaseMutex = Mutex()
     actual suspend fun getDatabaseInstance(): ChineseWordsDatabase = withContext(
         Dispatchers.IO) {
-            val dbBuilder = Room.databaseBuilder(
-                context().applicationContext,
-                ChineseWordsDatabase::class.java,
-                DATABASE_FILENAME
-            )
-                .createFromAsset(DATABASE_ASSET_PATH)
+            val instance = databaseInstance
+            instance?.let { return@withContext instance }
 
-            /*if (BuildConfig.DEBUG) {
-                dbBuilder.setQueryCallback(
-                    { sqlQuery, bindArgs ->
-                        Logger.d(tag = TAG, messageString = "SQL Query: $sqlQuery SQL Args: $bindArgs")
-                    }, Executors.newSingleThreadExecutor()
-                )
-            }*/
+            databaseMutex.withLock {
+                databaseInstance ?: run {
 
-            val db = dbBuilder.build()
+                    val dbBuilder = Room.databaseBuilder(
+                        context().applicationContext,
+                        ChineseWordsDatabase::class.java,
+                        DATABASE_FILENAME
+                    )
+                        .createFromAsset(DATABASE_ASSET_PATH)
 
-            databasePath = db.openHelper.writableDatabase.path.toString()
+                    /*if (BuildConfig.DEBUG) {
+                    dbBuilder.setQueryCallback(
+                        { sqlQuery, bindArgs ->
+                            Logger.d(tag = TAG, messageString = "SQL Query: $sqlQuery SQL Args: $bindArgs")
+                        }, Executors.newSingleThreadExecutor()
+                    )
+                }*/
 
-            return@withContext db
+                    val db = dbBuilder.build()
+
+                    databasePath = db.openHelper.writableDatabase.path.toString()
+                    databaseInstance = db
+
+                    return@withContext db
+                }
+            }
         }
 
     actual fun getDatabasePath(): String {
@@ -104,5 +118,9 @@ actual object Utils {
         return PreferenceDataStoreFactory.createWithPath(
             produceFile = { context().filesDir.resolve(file).absolutePath.toPath() }
         )
+    }
+
+    actual fun getAnkiDAO(): AnkiDAO {
+        return AnkiDAO(context())
     }
 }

@@ -93,6 +93,15 @@ kotlin {
                 implementation(libs.compose.ui.tooling)
                 implementation(libs.compose.ui.tooling.preview)
                 implementation(libs.androidx.room.sqlite.wrapper)
+
+                // Anki
+                implementation(libs.anki.android)
+                implementation(project(":AnkiDroidAPIHelper"))
+
+                implementation(libs.androidx.lifecycle.service) // LifecycleService
+                implementation(libs.androidx.lifecycle.runtime.ktx)
+
+                implementation("androidx.vectordrawable:vectordrawable:1.2.0")
             }
             resources.srcDirs("src/commonMain/composeResources")
         }

@@ -3,7 +3,6 @@ package fr.berliat.hskwidget.data.store
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
 import kotlinx.datetime.Instant
 import okio.Path
 import okio.Path.Companion.toPath
@@ -70,7 +69,9 @@ class AppPreferencesStore private constructor(store: DataStore<Preferences>) {
     // --- Int preferences ---
     val appVersionCode = PreferenceState<Int, Int>(store, intPreferencesKey("appVersionCode"), 0)
     val dbBackUpMaxLocalFiles = PreferenceState<Int, Int>(store, intPreferencesKey("database_backup_max_local_files"), 2)
-    val readerTextSize = PreferenceState<Int, Int>(store, intPreferencesKey("reader_text_size"), 30)
+
+    // --- Long preferences ---
+    val ankiModelId = PreferenceState<Long, Long>(store, longPreferencesKey("anki_model_id"), -1)
 
     // --- Float preferences ---
     val supportTotalSpent = PreferenceState<Float, Float>(store, floatPreferencesKey("support_total_spent"), -1f)

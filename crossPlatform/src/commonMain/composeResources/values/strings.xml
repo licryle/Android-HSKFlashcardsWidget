@@ -1,4 +1,5 @@
 <resources>
+    <string name="app_name">Mandarin Assistant</string>
     <string name="delete">Delete</string>
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
@@ -53,4 +54,128 @@
     <string name="annotation_edit_delete_confirm_message">Are you sure you want to *delete* this annotation?</string>
 
     <string name="ocr_display_loading">Processing your image</string>
+
+
+    <string name="anki_sync_start_message">Preparing for a full import of lists to Anki.</string>
+    <string name="anki_sync_progress_message" formatted="false">Syncing word %s to AnkiDroid: %d / %d</string>
+    <string name="anki_sync_notification_name">Anki Sync Progress</string>
+    <string name="anki_sync_notification_description">Provides you with a progress notification for the Anki Sync.</string>
+
+
+    <string name="anki_card_CNEN_front"><![CDATA[
+        <h1 class="mobile">{{Hanzi}}</h1>
+
+        <br />
+
+        {{tts zh:Hanzi}}
+        <div class="metadata">
+            <div>{{HSK}} - {{Level}}</div>
+        </div>
+    ]]></string>
+
+    <string name="anki_card_CNEN_back"><![CDATA[
+        <h1 class="mobile">{{Hanzi}}</h1>
+
+        {{Pinyin}}<br />
+
+        {{tts zh:Hanzi}}
+
+        <hr id="answer" />
+        {{Definition}}
+        {{tts en:Definition}}<br /><br />
+        {{Notes}}
+        <br /><br />
+
+        <hr id="example" />
+
+        <div class="metadata">
+            <div>{{HSK}} - {{Level}}</div>
+        </div>
+    ]]></string>
+
+    <string name="anki_card_ENCN_front"><![CDATA[
+        <h1 class="mobile">&nbsp;</h1>
+
+        <br />
+
+        <hr id="answer" />
+        {{Definition}}
+        {{tts en:Definition}}<br /><br />
+        {{Notes}}
+
+        <div class="metadata">
+            <div>{{HSK}} - {{Level}}</div>
+        </div>
+    ]]></string>
+
+    <string name="anki_card_ENCN_back"><![CDATA[
+        <h1 class="mobile">{{Hanzi}}</h1>
+
+        {{Pinyin}}<br />
+
+        {{tts zh:Hanzi}}
+
+        <hr id="answer" />
+        {{Definition}}
+        {{tts en:Definition}}<br /><br />
+        {{Notes}}
+        <br /><br />
+
+        <hr id="example" />
+
+        <div class="metadata">
+            <div>{{HSK}} - {{Level}}</div>
+        </div>
+    ]]></string>
+
+    <string name="anki_card_css">H1 {
+font-size: 60px;
+}
+
+.card {
+font-family: arial;
+font-size: 20px;
+text-align: center;
+color: black;
+background-color: white;
+}
+
+.example {
+font-size: 20px;
+}
+
+HR {
+margin-top: 35px;
+margin-bottom: 35px;
+}
+
+.metadata > div {
+flex-grow: 1;
+}
+
+.metadata > div:nth-child(2) {
+font-size: 30px;
+}
+
+.metadata > div:nth-child(1) {
+text-align: center;
+font-size: 30px;
+}
+
+.metadata > div:nth-child(3) {
+text-align: right;
+}
+
+.metadata {
+position: fixed;
+display: flex;
+flex-direction: row;
+bottom: 0;
+width: 92%;
+align-items: flex-end;
+margin: 0;
+padding: 0;
+}
+
+.mobile .disabled {display: none;visibility: hidden;}</string>
 </resources>

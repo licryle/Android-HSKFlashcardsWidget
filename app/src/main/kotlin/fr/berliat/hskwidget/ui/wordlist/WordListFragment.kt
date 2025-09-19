@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.DiffUtil
@@ -20,6 +21,8 @@ import fr.berliat.hskwidget.data.model.WordListWithCount
 import fr.berliat.hskwidget.data.repo.WordListRepository
 import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.ui.utils.HSKAnkiDelegate
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -50,23 +53,26 @@ class WordListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel = WordListViewModel(WordListRepository(requireContext()), ankiDelegate::delegateToAnki)
+        lifecycleScope.launch(Dispatchers.IO) {
+            viewModel =
+                WordListViewModel(WordListRepository.getInstance(), ankiDelegate::delegateToAnki)
 
-        val recyclerView = view.findViewById<RecyclerView>(R.id.wordListRecyclerView)
-        adapter = WordListAdapter(
-            requireContext(),
-            onConsultClick = { list -> consultList(list) },
-            onDeleteClick = { list -> showDeleteConfirmation(list) },
-            onRenameClick = { list -> showRenameDialog(list) }
-        )
-        recyclerView.layoutManager = LinearLayoutManager(context)
-        recyclerView.adapter = adapter
+            val recyclerView = view.findViewById<RecyclerView>(R.id.wordListRecyclerView)
+            adapter = WordListAdapter(
+                requireContext(),
+                onConsultClick = { list -> consultList(list) },
+                onDeleteClick = { list -> showDeleteConfirmation(list) },
+                onRenameClick = { list -> showRenameDialog(list) }
+            )
+            recyclerView.layoutManager = LinearLayoutManager(context)
+            recyclerView.adapter = adapter
 
-        view.findViewById<FloatingActionButton>(R.id.addListFab).setOnClickListener {
-            showCreateListDialog()
+            view.findViewById<FloatingActionButton>(R.id.addListFab).setOnClickListener {
+                showCreateListDialog()
+            }
+
+            refreshLists()
         }
-
-        refreshLists()
     }
 
     private fun refreshLists() {

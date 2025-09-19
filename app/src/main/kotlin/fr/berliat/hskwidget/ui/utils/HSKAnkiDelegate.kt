@@ -3,17 +3,27 @@ package fr.berliat.hskwidget.ui.utils
 import android.content.Context
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import fr.berliat.ankidroidhelper.AnkiDelegate
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.store.AnkiStore
 import fr.berliat.hskwidget.data.store.OldAppPreferencesStore
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class HSKAnkiDelegate(val fragment: Fragment, handler: HandlerInterface? = null)  : AnkiDelegate(fragment, handler) {
     private val context = fragment.requireContext()
     private val appConfig = OldAppPreferencesStore(context)
-    private val ankiStore = AnkiStore(context)
+    private lateinit var ankiStore : AnkiStore
+
+    init {
+        fragment.lifecycleScope.launch(Dispatchers.IO) {
+            ankiStore =
+                AnkiStore.getInstance()
+            // Todo make it safer
+        }
+    }
 
     override fun onAnkiRequestPermissionsResult(granted: Boolean) {
         appConfig.ankiSaveNotes = granted

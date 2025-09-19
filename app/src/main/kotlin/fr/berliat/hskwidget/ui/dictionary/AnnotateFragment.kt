@@ -25,6 +25,7 @@ import hskflashcardswidget.crossplatform.generated.resources.annotation_edit_sav
 import hskflashcardswidget.crossplatform.generated.resources.annotation_edit_save_failure
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
 import org.jetbrains.compose.resources.getString
@@ -48,7 +49,9 @@ class AnnotateFragment: Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        annotateViewModel = OldAnnotateViewModel(requireContext(), WordListRepository(requireContext()), ankiDelegate::delegateToAnki)
+        annotateViewModel = runBlocking { // Todo find another solution (really deprecate ViewModel)
+            OldAnnotateViewModel(requireContext(), WordListRepository.getInstance(), ankiDelegate::delegateToAnki)
+        }
 
         val simplifiedWord = arguments?.getString("simplifiedWord") ?: ""
 

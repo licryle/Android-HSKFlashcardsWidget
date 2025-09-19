@@ -5,6 +5,11 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+
+import hskflashcardswidget.crossplatform.generated.resources.Res
+import hskflashcardswidget.crossplatform.generated.resources.app_name
+import org.jetbrains.compose.resources.getString
+
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
@@ -18,6 +23,13 @@ data class WordList @OptIn(ExperimentalTime::class) constructor(
     @ColumnInfo(name = "anki_deck_id") val ankiDeckId: Long = 0,
     @ColumnInfo(name = "list_type") val listType: ListType = ListType.USER
 ) {
+    suspend fun getAnkiDeckName(): String {
+        return getDeckNamePrefix() + name
+    }
+
+    suspend fun getDeckNamePrefix() : String {
+        return getString(Res.string.app_name) + ": "
+    }
 
     enum class ListType (val type: String) {
         USER("USER"),

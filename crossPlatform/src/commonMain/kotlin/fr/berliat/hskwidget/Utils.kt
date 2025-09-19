@@ -2,6 +2,7 @@ package fr.berliat.hskwidget
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import fr.berliat.hskwidget.data.dao.AnkiDAO
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 
@@ -18,6 +19,8 @@ expect object Utils {
     suspend fun getDatabaseInstance() : ChineseWordsDatabase
 
     fun getDataStore(file: String): DataStore<Preferences>
+
+    fun getAnkiDAO(): AnkiDAO
 
     fun getDatabasePath(): String
 }

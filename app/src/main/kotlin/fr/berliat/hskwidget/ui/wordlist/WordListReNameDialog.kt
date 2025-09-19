@@ -6,11 +6,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.lifecycleScope
 import fr.berliat.ankidroidhelper.AnkiDelegator
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.repo.WordListRepository
 import fr.berliat.hskwidget.databinding.FragmentWordlistDialogCreateListBinding
 import fr.berliat.hskwidget.domain.Utils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class WordListReNameDialog(
     private val ankiCaller: AnkiDelegator,
@@ -52,45 +56,50 @@ class WordListReNameDialog(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel = WordListViewModel(WordListRepository(requireContext()), ankiCaller)
+        lifecycleScope.launch(Dispatchers.IO) {
+            viewModel = WordListViewModel(WordListRepository.getInstance(), ankiCaller)
 
-        val listId = arguments?.getLong(ARG_LIST_ID)
-        val existingName = arguments?.getString(ARG_LIST_NAME)
+            withContext(Dispatchers.Main) {
 
-        if (listId != null && existingName != null) {
-            binding.listNameInput.setText(existingName)
-            binding.createButton.text = getString(R.string.wordlist_rename_button)
-        }
+                val listId = arguments?.getLong(ARG_LIST_ID)
+                val existingName = arguments?.getString(ARG_LIST_NAME)
 
-        binding.cancelButton.setOnClickListener {
-            dismiss()
-            onReNameResult(false, null)
-        }
+                if (listId != null && existingName != null) {
+                    binding.listNameInput.setText(existingName)
+                    binding.createButton.text = getString(R.string.wordlist_rename_button)
+                }
 
-        binding.createButton.setOnClickListener {
-            val name = binding.listNameInput.text.toString().trim()
-            if (name.isNotBlank()) {
-                if (listId != null) {
-                    viewModel.renameList(listId, name) { err ->
-                        if (err == null) {
-                            onReNameResult(true, name)
-                            Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.LIST_RENAME)
+                binding.cancelButton.setOnClickListener {
+                    dismiss()
+                    onReNameResult(false, null)
+                }
 
-                            dismiss()
+                binding.createButton.setOnClickListener {
+                    val name = binding.listNameInput.text.toString().trim()
+                    if (name.isNotBlank()) {
+                        if (listId != null) {
+                            viewModel.renameList(listId, name) { err ->
+                                if (err == null) {
+                                    onReNameResult(true, name)
+                                    Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.LIST_RENAME)
+
+                                    dismiss()
+                                } else {
+                                    Toast.makeText(context, getString(R.string.wordlist_list_name_dupe), Toast.LENGTH_LONG).show()
+                                }
+                            }
                         } else {
-                            Toast.makeText(context, getString(R.string.wordlist_list_name_dupe), Toast.LENGTH_LONG).show()
-                        }
-                    }
-                } else {
-                    viewModel.createList(name) { err ->
-                        if (err == null) {
-                            onReNameResult(true, name)
+                            viewModel.createList(name) { err ->
+                                if (err == null) {
+                                    onReNameResult(true, name)
 
-                            Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.LIST_CREATE)
+                                    Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.LIST_CREATE)
 
-                            dismiss()
-                        } else {
-                            Toast.makeText(context, getString(R.string.wordlist_list_name_dupe), Toast.LENGTH_LONG).show()
+                                    dismiss()
+                                } else {
+                                    Toast.makeText(context, getString(R.string.wordlist_list_name_dupe), Toast.LENGTH_LONG).show()
+                                }
+                            }
                         }
                     }
                 }

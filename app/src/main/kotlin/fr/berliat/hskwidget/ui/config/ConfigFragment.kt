@@ -306,7 +306,7 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
         Log.i(TAG, "importsAllNotesToAnkiDroid: starting full import into Anki")
 
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-            ankiDelegate.delegateToAnki(WordListRepository(requireContext()).syncListsToAnki())
+            ankiDelegate.delegateToAnki(WordListRepository.getInstance().syncListsToAnki())
         }
     }
 
