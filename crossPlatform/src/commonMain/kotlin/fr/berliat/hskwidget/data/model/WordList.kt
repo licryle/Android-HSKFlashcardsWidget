@@ -8,18 +8,19 @@ import androidx.room.PrimaryKey
 
 import hskflashcardswidget.crossplatform.generated.resources.Res
 import hskflashcardswidget.crossplatform.generated.resources.app_name
+
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
+
 import org.jetbrains.compose.resources.getString
 
-import kotlin.time.Clock
-import kotlin.time.ExperimentalTime
-
 @Entity(tableName = "word_list")
-data class WordList @OptIn(ExperimentalTime::class) constructor(
+data class WordList constructor(
     val name: String,
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
-    @ColumnInfo(name = "creation_date") val creationDate: Long = Clock.System.now().toEpochMilliseconds(),
-    @ColumnInfo(name = "last_modified") val lastModified: Long = Clock.System.now().toEpochMilliseconds(), // Add this field with current timestamp as default
+    @ColumnInfo(name = "creation_date") val creationDate: Instant = Clock.System.now(),
+    @ColumnInfo(name = "last_modified") val lastModified: Instant = Clock.System.now(), // Add this field with current timestamp as default
     @ColumnInfo(name = "anki_deck_id") val ankiDeckId: Long = 0,
     @ColumnInfo(name = "list_type") val listType: ListType = ListType.USER
 ) {
@@ -69,11 +70,11 @@ data class WordListEntry(
 data class WordListWithCount(
     val name: String,
     val id: Long,
-    @ColumnInfo(name = "creation_date") val creationDate: Long,
-    @ColumnInfo(name = "last_modified") val lastModified: Long,
-    @ColumnInfo(name = "anki_deck_id") val ankiDeckId: Long,
-    @ColumnInfo(name = "list_type") val listType: WordList.ListType,
-    @ColumnInfo(name = "word_count") val wordCount: Int
+    val creationDate: Instant,
+    val lastModified: Instant,
+    val ankiDeckId: Long,
+    val listType: WordList.ListType,
+    val wordCount: Int
 ) {
     val wordList: WordList
         get () {

@@ -5,6 +5,11 @@ import androidx.datastore.preferences.core.Preferences
 import fr.berliat.hskwidget.data.dao.AnkiDAO
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+
+typealias AnkiDelegator = suspend ((suspend () -> Result<Unit>)?) -> Unit
 
 expect object Utils {
     fun openLink(url: String)
@@ -72,4 +77,11 @@ enum class ANALYTICS_EVENTS {
     PURCHASE_CLICK,
     PURCHASE_FAILED,
     PURCHASE_SUCCESS
+}
+
+fun Instant.YYMMDD(timeZone: TimeZone = TimeZone.currentSystemDefault()): String {
+    val local = this.toLocalDateTime(timeZone)
+    val month = local.monthNumber.toString().padStart(2, '0')
+    val day = local.dayOfMonth.toString().padStart(2, '0')
+    return "${local.year}-$month-$day"
 }

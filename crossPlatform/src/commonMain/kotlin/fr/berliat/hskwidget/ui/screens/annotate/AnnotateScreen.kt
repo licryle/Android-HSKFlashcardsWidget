@@ -8,13 +8,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -29,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.type.ClassLevel
 import fr.berliat.hskwidget.data.type.ClassType
+import fr.berliat.hskwidget.ui.components.ConfirmDeletionDialog
 import fr.berliat.hskwidget.ui.components.DetailedWordView
 import fr.berliat.hskwidget.ui.components.DropdownSelector
 import fr.berliat.hskwidget.ui.components.LoadingView
@@ -41,7 +40,6 @@ import hskflashcardswidget.crossplatform.generated.resources.annotation_edit_del
 import hskflashcardswidget.crossplatform.generated.resources.annotation_edit_is_exam_hint
 import hskflashcardswidget.crossplatform.generated.resources.annotation_edit_notes_hint
 import hskflashcardswidget.crossplatform.generated.resources.annotation_edit_themes_hint
-import hskflashcardswidget.crossplatform.generated.resources.cancel
 import hskflashcardswidget.crossplatform.generated.resources.delete
 import hskflashcardswidget.crossplatform.generated.resources.save
 
@@ -92,6 +90,15 @@ fun AnnotateScreen(
     if (annotatedWord == null) {
         LoadingView()
         return
+    }
+
+    if (confirmDeleteDialog) {
+        ConfirmDeletionDialog(
+            title = Res.string.annotation_edit_delete_confirm_title,
+            message = Res.string.annotation_edit_delete_confirm_message,
+            onConfirm = { onDelete(annotatedWord!!.simplified) },
+            onDismiss = { confirmDeleteDialog = false }
+        )
     }
 
     Column(
@@ -183,27 +190,5 @@ fun AnnotateScreen(
                 Text(stringResource(Res.string.save))
             }
         }
-    }
-
-    if (confirmDeleteDialog) {
-        AlertDialog(
-            onDismissRequest = { confirmDeleteDialog = false },
-            title = {
-                Text(text = stringResource(Res.string.annotation_edit_delete_confirm_title))
-            },
-            text = {
-                Text(text = stringResource(Res.string.annotation_edit_delete_confirm_message))
-            },
-            confirmButton = {
-                TextButton(onClick = { onDelete(annotatedWord!!.simplified) }) {
-                    Text(stringResource(Res.string.delete))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick =  { confirmDeleteDialog = false }) {
-                    Text(stringResource(Res.string.cancel))
-                }
-            }
-        )
     }
 }

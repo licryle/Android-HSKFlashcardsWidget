@@ -15,7 +15,6 @@ class AboutFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // Use ComposeView and setContent with a proper @Composable lambda
         return ComposeView(requireContext()).apply {
             setContent {
                 AboutScreen(AboutViewModel()) // Works now
