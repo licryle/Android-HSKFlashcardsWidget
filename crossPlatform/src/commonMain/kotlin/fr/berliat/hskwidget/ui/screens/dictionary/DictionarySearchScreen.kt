@@ -139,6 +139,9 @@ fun DictionarySearchScreen(
 
     val listState = rememberLazyListState()
 
+    // Whenever searchQuery changes, scroll to top
+    LaunchedEffect(searchQuery) { listState.scrollToItem(0) }
+
     Column(modifier = modifier.fillMaxSize()) {
         // Filters row
         DictionarySearchFilters(
