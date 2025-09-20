@@ -7,6 +7,8 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.room.Room
+import fr.berliat.hsktextviews.HSKTextSegmenter
+import fr.berliat.hskwidget.core.JiebaHSKTextSegmenter
 import fr.berliat.hskwidget.data.dao.AnkiDAO
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import kotlinx.coroutines.Dispatchers
@@ -122,5 +124,9 @@ actual object Utils {
 
     actual fun getAnkiDAO(): AnkiDAO {
         return AnkiDAO(context())
+    }
+
+    actual fun getHSKSegmenter() : HSKTextSegmenter {
+        return JiebaHSKTextSegmenter()
     }
 }

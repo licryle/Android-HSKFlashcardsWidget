@@ -150,8 +150,6 @@ dependencies {
     // Text features
     implementation("com.google.mlkit:text-recognition-chinese:16.0.1")
 
-    implementation("io.github.yrjyrj123:jieba-analysis:1.0.3")
-
 
     // Let's allow users to support the dev with money
     implementation("com.android.billingclient:billing:8.0.0")

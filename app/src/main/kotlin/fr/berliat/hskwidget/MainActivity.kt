@@ -33,7 +33,6 @@ import fr.berliat.hskwidget.data.store.SupportDevStore
 import fr.berliat.hskwidget.databinding.ActivityMainBinding
 import fr.berliat.hskwidget.domain.DatabaseDiskBackup
 import fr.berliat.hskwidget.domain.DatabaseBackupCallbacks
-import fr.berliat.hskwidget.domain.SharedViewModel
 import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.domain.getParcelableExtraCompat
 import fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragment
@@ -76,8 +75,6 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
         }
 
         multiplatform.network.cmptoast.AppContext.apply { set(applicationContext) }
-
-        setupSharedViewModel()
 
         // Enable StrictMode in Debug mode
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -348,10 +345,6 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
         binding.navView.post {
             supportMenu.title = getString(tpl).format(getString(supStrId))
         }
-    }
-
-    private fun setupSharedViewModel() {
-        SharedViewModel.getInstance(this)
     }
 
     private fun setupOCRBtn() {

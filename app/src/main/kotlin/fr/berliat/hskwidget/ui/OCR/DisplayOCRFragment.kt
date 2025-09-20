@@ -30,8 +30,8 @@ import fr.berliat.hsktextviews.HSKTextSegmenter
 import fr.berliat.hsktextviews.HSKTextSegmenterListener
 import fr.berliat.hsktextviews.views.ShowPinyins
 import fr.berliat.hskwidget.MainActivity
+import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.store.DatabaseHelper
-import fr.berliat.hskwidget.domain.SharedViewModel
 import fr.berliat.hskwidget.domain.hanziClickedBackground
 import fr.berliat.hskwidget.domain.hanziStyle
 import fr.berliat.hskwidget.domain.pinyinStyle
@@ -52,7 +52,7 @@ class DisplayOCRFragment : Fragment(), HSKTextSegmenterListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        segmenter = SharedViewModel.getInstance(this).segmenter
+        segmenter = HSKAppServices.HSKSegmenter
 
         val mainApp = requireActivity() as MainActivity
         val factory = DisplayOCRViewModelFactory(

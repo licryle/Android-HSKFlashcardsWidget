@@ -2,6 +2,7 @@ package fr.berliat.hskwidget
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import fr.berliat.hsktextviews.HSKTextSegmenter
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.dao.AnkiDAO
 import fr.berliat.hskwidget.data.repo.ChineseWordFrequencyRepo
@@ -29,6 +30,8 @@ expect object Utils {
     fun getDatabasePath(): String
 
     fun getDataStore(file: String): DataStore<Preferences>
+
+    fun getHSKSegmenter() : HSKTextSegmenter
 
     internal fun getAnkiDAO(): AnkiDAO
 }

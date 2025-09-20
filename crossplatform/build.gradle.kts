@@ -101,6 +101,7 @@ kotlin {
                 implementation(libs.androidx.lifecycle.runtime.ktx)
 
                 implementation("androidx.vectordrawable:vectordrawable:1.2.0")
+                implementation(libs.jieba.analysis)
             }
             resources.srcDirs("src/commonMain/composeResources")
         }

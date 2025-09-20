@@ -1,4 +1,4 @@
-package fr.berliat.hskwidget.domain
+package fr.berliat.hskwidget.core
 
 import android.util.Log
 import com.huaban.analysis.jieba.JiebaSegmenter
@@ -12,7 +12,7 @@ class JiebaHSKTextSegmenter: HSKTextSegmenter {
     var segmenter: JiebaSegmenter? = null
         private set
 
-    suspend fun preload() {
+    override suspend fun preload() {
         var seg: JiebaSegmenter?
 
         withContext(Dispatchers.IO) {

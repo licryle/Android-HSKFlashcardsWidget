@@ -1,6 +1,7 @@
 [versions]
 ankiAndroid = "api-v1.1.0"
 datastorePreferences = "1.1.7"
+jiebaAnalysis = "1.0.3"
 kotlin = "2.2.20"
 compose = "1.8.2"
 kotlinxDatetime = "0.7.1-0.6.x-compat"
@@ -24,6 +25,7 @@ androidx-datastore-preferences = { module = "androidx.datastore:datastore-prefer
 androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "androidx-viewmodel" }
 androidx-lifecycle-service = { module = "androidx.lifecycle:lifecycle-service", version.ref = "androidx-viewmodel" }
 anki-android = { module = "com.github.ankidroid:Anki-Android", version.ref = "ankiAndroid" }
+jieba-analysis = { module = "io.github.yrjyrj123:jieba-analysis", version.ref = "jiebaAnalysis" }
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
 compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose" }
 compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "compose" }
