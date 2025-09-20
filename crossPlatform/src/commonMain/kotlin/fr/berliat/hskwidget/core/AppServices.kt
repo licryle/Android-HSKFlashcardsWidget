@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-open class  AppServices {
+open class AppServices {
     private val _status = MutableStateFlow<Status>(Status.NotReady)
     val status: StateFlow<Status> = _status.asStateFlow()
 
@@ -30,24 +30,26 @@ open class  AppServices {
     /**
      * Initialize all services concurrently.
      */
-    fun init(scope: CoroutineScope) {
-        scope.launch {
+    open fun init(scope: CoroutineScope) {
+        scope.launch(Dispatchers.IO) {
             try {
-                coroutineScope {
                     factories.forEach { (name, factory) ->
-                        launch(Dispatchers.IO) {
-                            val instance = factory()
-                            mutex.withLock {
-                                instances[name] = instance
-                            }
+                        val instance = factory()
+                        mutex.withLock {
+                            instances[name] = instance
                         }
                     }
-                }
                 _status.value = Status.Ready
             } catch (t: Throwable) {
                 _status.value = Status.Failed(t)
+                throw t
             }
         }
+    }
+
+    protected fun <T: Any> getAnyway(name: String): T {
+        return instances[name] as? T
+            ?: throw IllegalArgumentException("No service registered with name $name")
     }
 
     /**

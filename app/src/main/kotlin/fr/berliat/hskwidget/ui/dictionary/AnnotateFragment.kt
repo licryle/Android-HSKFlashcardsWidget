@@ -11,12 +11,11 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.coroutineScope
 import androidx.navigation.fragment.findNavController
 import fr.berliat.hskwidget.R
-import fr.berliat.hskwidget.data.repo.WordListRepository
+import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.domain.Utils
 
 import fr.berliat.hskwidget.ui.screens.annotate.AnnotateScreen
 import fr.berliat.hskwidget.ui.utils.HSKAnkiDelegate
-import fr.berliat.hskwidget.getAppPreferencesStore
 
 import hskflashcardswidget.crossplatform.generated.resources.Res
 import hskflashcardswidget.crossplatform.generated.resources.annotation_edit_delete_failure
@@ -50,7 +49,7 @@ class AnnotateFragment: Fragment() {
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         annotateViewModel = runBlocking { // Todo find another solution (really deprecate ViewModel)
-            OldAnnotateViewModel(requireContext(), WordListRepository.getInstance(), ankiDelegate::delegateToAnki)
+            OldAnnotateViewModel(requireContext(), HSKAppServices.wordListRepo, ankiDelegate::delegateToAnki)
         }
 
         val simplifiedWord = arguments?.getString("simplifiedWord") ?: ""
@@ -58,7 +57,7 @@ class AnnotateFragment: Fragment() {
         val baseView = ComposeView(requireContext())
         Utils.hideKeyboard(requireContext(), baseView)
 
-        val appPreferences2 = getAppPreferencesStore()
+        val appPreferences2 = HSKAppServices.appPreferences
 
         // Use ComposeView and setContent with a proper @Composable lambda
         return baseView.apply {

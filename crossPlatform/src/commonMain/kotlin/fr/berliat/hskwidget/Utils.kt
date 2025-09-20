@@ -3,7 +3,6 @@ package fr.berliat.hskwidget
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import fr.berliat.hskwidget.data.dao.AnkiDAO
-import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
@@ -21,21 +20,16 @@ expect object Utils {
     fun logAnalyticsScreenView(screen: String)
     fun logAnalyticsEvent(event: ANALYTICS_EVENTS)
 
-    suspend fun getDatabaseInstance() : ChineseWordsDatabase
+    internal suspend fun getDatabaseInstance() : ChineseWordsDatabase
+    fun getDatabasePath(): String
 
     fun getDataStore(file: String): DataStore<Preferences>
 
-    fun getAnkiDAO(): AnkiDAO
-
-    fun getDatabasePath(): String
+    internal fun getAnkiDAO(): AnkiDAO
 }
 
 fun String.capitalize() =
     this.toString().lowercase().replaceFirstChar { it.uppercaseChar() }
-
-fun getAppPreferencesStore() : AppPreferencesStore {
-    return AppPreferencesStore.getInstance(Utils.getDataStore("app.preferences_pb"))
-}
 
 enum class ANALYTICS_EVENTS {
     SCREEN_VIEW,

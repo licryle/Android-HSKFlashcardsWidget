@@ -25,6 +25,8 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.Purchase
+import fr.berliat.hskwidget.core.AppServices
+import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.store.OldAppPreferencesStore
 import fr.berliat.hskwidget.data.store.DatabaseHelper
 import fr.berliat.hskwidget.data.store.SupportDevStore
@@ -38,7 +40,10 @@ import fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragment
 import fr.berliat.hskwidget.ui.utils.StrictModeManager
 import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.io.FileInputStream
 
@@ -60,8 +65,17 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        multiplatform.network.cmptoast.AppContext.apply { set(applicationContext) }
         fr.berliat.hskwidget.Utils.init { this }
+        HSKAppServices.init(lifecycleScope)
+
+        // TODO: Temporary until moved to compose
+        runBlocking {
+            HSKAppServices.status
+                .filter { it is AppServices.Status.Ready || it is AppServices.Status.Failed}
+                .first()
+        }
+
+        multiplatform.network.cmptoast.AppContext.apply { set(applicationContext) }
 
         setupSharedViewModel()
 

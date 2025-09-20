@@ -1,6 +1,7 @@
 package fr.berliat.hskwidget.ui.screens.dictionary
 
 import fr.berliat.hskwidget.Utils
+import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.dao.AnnotatedChineseWordDAO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,11 +13,11 @@ import kotlinx.coroutines.launch
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.domain.SearchQuery
-import fr.berliat.hskwidget.getAppPreferencesStore
 import kotlinx.coroutines.IO
 
 class DictionaryViewModel(val appSearchQueryProvider : () -> SearchQuery,
-                          prefsStore: AppPreferencesStore = getAppPreferencesStore()) {
+                          prefsStore: AppPreferencesStore = HSKAppServices.appPreferences
+) {
     private val _searchQuery = MutableStateFlow(appSearchQueryProvider.invoke())
     val searchQuery: StateFlow<SearchQuery> = _searchQuery.asStateFlow()
 
@@ -33,7 +34,7 @@ class DictionaryViewModel(val appSearchQueryProvider : () -> SearchQuery,
 
     val hasAnnotationFilter: StateFlow<Boolean> = prefsStore.searchFilterHasAnnotation.asStateFlow()
 
-    val appPreferences = getAppPreferencesStore()
+    val appPreferences = HSKAppServices.appPreferences
 
     private var currentPage = 0
     private val itemsPerPage = 30

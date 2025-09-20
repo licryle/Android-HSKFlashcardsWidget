@@ -24,7 +24,7 @@ import fr.berliat.hskwidget.domain.DatabaseBackupCallbacks
 import fr.berliat.googledrivebackup.GoogleDriveBackup
 import fr.berliat.googledrivebackup.GoogleDriveBackupFile
 import fr.berliat.googledrivebackup.GoogleDriveBackupInterface
-import fr.berliat.hskwidget.data.repo.WordListRepository
+import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.store.DatabaseHelper
 import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.ui.utils.HSKAnkiDelegate
@@ -306,7 +306,7 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
         Log.i(TAG, "importsAllNotesToAnkiDroid: starting full import into Anki")
 
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-            ankiDelegate.delegateToAnki(WordListRepository.getInstance().syncListsToAnki())
+            ankiDelegate.delegateToAnki(HSKAppServices.wordListRepo.syncListsToAnki())
         }
     }
 

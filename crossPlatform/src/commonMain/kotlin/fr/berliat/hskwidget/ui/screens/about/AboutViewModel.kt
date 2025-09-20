@@ -2,6 +2,7 @@ package fr.berliat.hskwidget.ui.screens.about
 
 import co.touchlab.kermit.Logger
 import fr.berliat.hskwidget.Utils
+import fr.berliat.hskwidget.core.HSKAppServices
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -40,7 +41,7 @@ class AboutViewModel {
         Logger.d(tag = TAG, messageString = "fetching stats")
 
         viewModelScope.launch(Dispatchers.IO) {
-            val db = Utils.getDatabaseInstance()
+            val db = HSKAppServices.database
             val words = db.chineseWordDAO()
             val annotations = db.chineseWordAnnotationDAO()
             // Here we executed in the coRoutine Scope

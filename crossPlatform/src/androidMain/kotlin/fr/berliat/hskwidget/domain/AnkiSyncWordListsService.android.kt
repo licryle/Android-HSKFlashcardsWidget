@@ -6,11 +6,10 @@ import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.util.Log
 import fr.berliat.ankidroidhelper.AnkiSyncService
-import fr.berliat.hskwidget.Utils
+import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.WordList
 import fr.berliat.hskwidget.data.repo.WordListRepository
-import fr.berliat.hskwidget.data.store.AnkiStore
 import hskflashcardswidget.crossplatform.generated.resources.Res
 import hskflashcardswidget.crossplatform.generated.resources.anki_sync_notification_description
 import hskflashcardswidget.crossplatform.generated.resources.anki_sync_notification_name
@@ -37,7 +36,7 @@ actual class AnkiSyncWordListsService: AnkiSyncService() {
 
 
     override suspend fun initResources() {
-        wordListRepository = WordListRepository.getInstance()
+        wordListRepository = HSKAppServices.wordListRepo
         syncStartMessage = getString(Res.string.anki_sync_start_message)
         syncProgressMessage = getString(Res.string.anki_sync_progress_message)
         notificationTitle = getString(Res.string.app_name)
@@ -60,9 +59,9 @@ actual class AnkiSyncWordListsService: AnkiSyncService() {
     }
 
     override suspend fun syncToAnki() {
-        val wordListDAO = Utils.getDatabaseInstance().wordListDAO()
-        val annotatedChineseWordDAO = Utils.getDatabaseInstance().annotatedChineseWordDAO()
-        val ankiStore = AnkiStore.getInstance()
+        val wordListDAO = HSKAppServices.database.wordListDAO()
+        val annotatedChineseWordDAO = HSKAppServices.database.annotatedChineseWordDAO()
+        val ankiStore = HSKAppServices.ankiStore
 
         val lists = wordListDAO.getAllLists()
         val entries = wordListDAO.getAllListEntries()

@@ -2,7 +2,6 @@ package fr.berliat.hskwidget.data.store
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
-import kotlinx.coroutines.*
 import kotlinx.datetime.Instant
 import okio.Path
 import okio.Path.Companion.toPath
@@ -47,12 +46,12 @@ class AppPreferencesStore private constructor(store: DataStore<Preferences>) {
         private val mutex = Mutex()
         private var INSTANCE: AppPreferencesStore? = null
 
-        fun getInstance(store: DataStore<Preferences>): AppPreferencesStore {
-            return INSTANCE ?: runBlocking {
-                mutex.withLock {
-                    INSTANCE ?: AppPreferencesStore(store).also { instance ->
-                        INSTANCE = instance
-                    }
+        suspend fun getInstance(store: DataStore<Preferences>): AppPreferencesStore {
+            if (INSTANCE != null) return INSTANCE!!
+
+            return mutex.withLock {
+                INSTANCE ?: AppPreferencesStore(store).also { instance ->
+                    INSTANCE = instance
                 }
             }
         }

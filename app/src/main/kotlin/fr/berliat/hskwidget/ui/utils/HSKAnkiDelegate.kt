@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import fr.berliat.ankidroidhelper.AnkiDelegate
 import fr.berliat.hskwidget.R
+import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.store.AnkiStore
 import fr.berliat.hskwidget.data.store.OldAppPreferencesStore
 import kotlinx.coroutines.Dispatchers
@@ -19,9 +20,7 @@ class HSKAnkiDelegate(val fragment: Fragment, handler: HandlerInterface? = null)
 
     init {
         fragment.lifecycleScope.launch(Dispatchers.IO) {
-            ankiStore =
-                AnkiStore.getInstance()
-            // Todo make it safer
+            ankiStore = HSKAppServices.ankiStore
         }
     }
 

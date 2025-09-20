@@ -2,14 +2,13 @@ package fr.berliat.hskwidget.ui.screens.annotate
 
 import androidx.lifecycle.ViewModel
 
-import fr.berliat.hskwidget.Utils
+import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWordAnnotation
 import fr.berliat.hskwidget.data.type.ClassLevel
 import fr.berliat.hskwidget.data.type.ClassType
-import fr.berliat.hskwidget.getAppPreferencesStore
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -18,7 +17,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.withContext
 
 class AnnotateViewModel(
-    prefsStore: AppPreferencesStore = getAppPreferencesStore()
+    prefsStore: AppPreferencesStore = HSKAppServices.appPreferences
 ) : ViewModel() {
     private val _annotatedWord = MutableStateFlow<AnnotatedChineseWord?>(null)
     val annotatedWord: StateFlow<AnnotatedChineseWord?> get() = _annotatedWord
@@ -38,7 +37,7 @@ class AnnotateViewModel(
     }
     suspend fun getAnnotatedChineseWord(simplifiedWord: String): AnnotatedChineseWord
             = withContext(Dispatchers.IO) {
-        val annot = Utils.getDatabaseInstance().annotatedChineseWordDAO().getFromSimplified(simplifiedWord)
+        val annot = HSKAppServices.database.annotatedChineseWordDAO().getFromSimplified(simplifiedWord)
         return@withContext if (annot == null || !annot.hasAnnotation()) {
             AnnotatedChineseWord(
                 annot?.word ?: ChineseWord.getBlank(simplifiedWord),

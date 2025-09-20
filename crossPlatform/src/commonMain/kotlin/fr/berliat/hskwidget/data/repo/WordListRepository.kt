@@ -1,6 +1,5 @@
 package fr.berliat.hskwidget.data.repo
 
-import fr.berliat.hskwidget.Utils
 import fr.berliat.hskwidget.data.dao.AnnotatedChineseWordDAO
 import fr.berliat.hskwidget.data.dao.WordListDAO
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
@@ -48,14 +47,6 @@ class WordListRepository(
     private val annotatedChineseWordDAO: AnnotatedChineseWordDAO
 ) {
     companion object {
-        suspend fun getInstance(): WordListRepository {
-            return WordListRepository(
-                ankiStore = AnkiStore.getInstance(),
-                wordListDAO = Utils.getDatabaseInstance().wordListDAO(),
-                annotatedChineseWordDAO = Utils.getDatabaseInstance().annotatedChineseWordDAO()
-            )
-        }
-
         const val TAG = "WordListRepository"
     }
 

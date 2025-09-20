@@ -1,7 +1,6 @@
 package fr.berliat.hskwidget.data.store
 
 import co.touchlab.kermit.Logger
-import fr.berliat.hskwidget.Utils
 import fr.berliat.hskwidget.core.Locale
 import fr.berliat.hskwidget.data.dao.AnkiDAO
 import fr.berliat.hskwidget.data.dao.AnkiNoteInfo
@@ -9,7 +8,6 @@ import fr.berliat.hskwidget.data.dao.WordListDAO
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.WordList
 import fr.berliat.hskwidget.data.model.WordListEntry
-import fr.berliat.hskwidget.getAppPreferencesStore
 import hskflashcardswidget.crossplatform.generated.resources.Res
 import hskflashcardswidget.crossplatform.generated.resources.anki_card_CNEN_back
 import hskflashcardswidget.crossplatform.generated.resources.anki_card_CNEN_front
@@ -19,8 +17,6 @@ import hskflashcardswidget.crossplatform.generated.resources.anki_card_css
 import hskflashcardswidget.crossplatform.generated.resources.app_name
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.getString
 
@@ -30,21 +26,6 @@ class AnkiStore(
     val appPreferences : AppPreferencesStore
 ) {
     companion object {
-        private var INSTANCE : AnkiStore? = null
-        private val mutex = Mutex()
-
-        suspend fun getInstance() : AnkiStore {
-            INSTANCE?.let { return it }
-
-            return mutex.withLock {
-                INSTANCE?.let { return it } // check again inside the lock
-                AnkiStore(Utils.getAnkiDAO(),
-                    Utils.getDatabaseInstance().wordListDAO(),
-                    getAppPreferencesStore())
-                    .also { INSTANCE = it }
-            }
-        }
-
         const val TAG = "AnkiDroidHelper"
 
         // List of field names that will be used in AnkiDroid model
