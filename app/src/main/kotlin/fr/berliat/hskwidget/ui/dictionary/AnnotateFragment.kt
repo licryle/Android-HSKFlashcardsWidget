@@ -11,7 +11,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.coroutineScope
 import androidx.navigation.fragment.findNavController
 import fr.berliat.hskwidget.R
-import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.domain.Utils
 
 import fr.berliat.hskwidget.ui.screens.annotate.AnnotateScreen
