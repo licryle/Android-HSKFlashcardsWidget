@@ -54,7 +54,6 @@ import java.io.InputStream
 import java.util.concurrent.TimeUnit
 
 import fr.berliat.hskwidget.HSKHelperApp
-import fr.berliat.hskwidget.data.store.OldAppPreferencesStore
 import fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragmentDirections
 import java.time.Instant
 import java.time.ZoneId
@@ -62,6 +61,7 @@ import java.time.format.DateTimeFormatter
 import java.util.UUID
 import androidx.compose.ui.graphics.Color
 import fr.berliat.hskwidget.AnkiDelegator
+import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.incrementConsultedWord
 import fr.berliat.hskwidget.ui.components.DetailedWordView
@@ -279,7 +279,7 @@ class Utils {
                                         word: AnnotatedChineseWord, navController: NavController,
                                         ankiCaller: AnkiDelegator
         ) {
-            val appConfig = OldAppPreferencesStore(navController.context)
+            val appConfig = HSKAppServices.appPreferences
             val context = navController.context
 
             binding.dictionaryItemContainer.setContent {
@@ -296,7 +296,7 @@ class Utils {
 
                 DetailedWordView(
                     word,
-                    appConfig.dictionaryShowHSK3Definition,
+                    appConfig.dictionaryShowHSK3Definition.value,
                     {
                         val action = DictionarySearchFragmentDirections.annotateWord(word.simplified, false)
 
