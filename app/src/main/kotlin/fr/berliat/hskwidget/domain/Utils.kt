@@ -42,8 +42,6 @@ import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.ktx.Firebase
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
-import fr.berliat.hskwidget.data.repo.ChineseWordFrequencyRepo
-import fr.berliat.hskwidget.data.store.DatabaseHelper
 import fr.berliat.hskwidget.databinding.FragmentDictionarySearchItemBinding
 import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
 import kotlinx.coroutines.Dispatchers
@@ -65,6 +63,7 @@ import java.util.UUID
 import androidx.compose.ui.graphics.Color
 import fr.berliat.hskwidget.AnkiDelegator
 import fr.berliat.hskwidget.data.model.ChineseWord
+import fr.berliat.hskwidget.incrementConsultedWord
 import fr.berliat.hskwidget.ui.components.DetailedWordView
 import fr.berliat.hskwidget.ui.screens.wordlist.WordListSelectionDialog
 
@@ -174,7 +173,7 @@ class Utils {
 
             workMgr.enqueue(speechRequest)
 
-            incrementConsultedWord(context, word)
+            incrementConsultedWord(word)
 
             logAnalyticsEvent(ANALYTICS_EVENTS.WIDGET_PLAY_WORD)
         }
@@ -183,18 +182,6 @@ class Utils {
             s?.toString()?.lowercase()?.replaceFirstChar { it.uppercaseChar() } ?: ""
 
         fun getAppScope(context: Context) = (context.applicationContext as HSKHelperApp).applicationScope
-
-        fun incrementConsultedWord(context: Context, word: String) {
-           getAppScope(context).launch(Dispatchers.IO) {
-                val db = DatabaseHelper.getInstance(context)
-                val frequencyWordsRepo = ChineseWordFrequencyRepo(
-                    db.chineseWordFrequencyDAO(),
-                    db.annotatedChineseWordDAO()
-                )
-
-                frequencyWordsRepo.incrementConsulted(word)
-            }
-        }
 
         fun hasFolderWritePermission(context: Context, uri: Uri): Boolean {
             if (uri.toString() == "") return false
@@ -354,7 +341,7 @@ class Utils {
 
             logAnalyticsEvent(ANALYTICS_EVENTS.WIDGET_COPY_WORD)
 
-            incrementConsultedWord(context, s)
+            incrementConsultedWord(s)
         }
 
         /**

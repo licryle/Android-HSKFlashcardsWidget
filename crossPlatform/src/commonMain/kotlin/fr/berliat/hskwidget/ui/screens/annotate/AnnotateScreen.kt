@@ -23,8 +23,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import fr.berliat.hskwidget.AnkiDelegator
 
-import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.type.ClassLevel
 import fr.berliat.hskwidget.data.type.ClassType
 import fr.berliat.hskwidget.ui.components.ConfirmDeletionDialog
@@ -50,11 +50,12 @@ fun AnnotateScreen(
     word: String,
     onSpeak: (String) -> Unit,
     onCopy: (String) -> Unit,
-    onSave: (word: AnnotatedChineseWord, pinyins: String, notes: String, themes: String, isExam: Boolean, cType: ClassType, cLevel: ClassLevel) -> Unit,
-    onDelete: (String) -> Unit,
+    onSave: (String, Exception?) -> Unit,
+    onDelete: (String, Exception?) -> Unit,
+    ankiCaller : AnkiDelegator,
     modifier: Modifier = Modifier
 ) {
-    val viewModel = remember { AnnotateViewModel() }
+    val viewModel = remember { AnnotateViewModel(ankiCaller = ankiCaller) }
 
     val annotatedWord by viewModel.annotatedWord.collectAsState()
 
@@ -96,7 +97,10 @@ fun AnnotateScreen(
         ConfirmDeletionDialog(
             title = Res.string.annotation_edit_delete_confirm_title,
             message = Res.string.annotation_edit_delete_confirm_message,
-            onConfirm = { onDelete(annotatedWord!!.simplified) },
+            onConfirm = {
+                viewModel.deleteAnnotation(word) { word, e -> onDelete(word, e) }
+                confirmDeleteDialog = false
+            },
             onDismiss = { confirmDeleteDialog = false }
         )
     }
@@ -184,7 +188,16 @@ fun AnnotateScreen(
             }
 
             Button(
-                onClick = { onSave(viewModel.annotatedWord.value!!, pinyins, notes, themes, isExam, selectedClassType, selectedClassLevel) },
+                onClick = { viewModel.saveWord(
+                        viewModel.annotatedWord.value!!,
+                        pinyins,
+                        notes, themes,
+                        isExam,
+                        selectedClassType,
+                        selectedClassLevel) { word, e ->
+                        onSave(word.simplified, e)
+                    }
+                },
                 modifier = Modifier.weight(1f)
             ) {
                 Text(stringResource(Res.string.save))

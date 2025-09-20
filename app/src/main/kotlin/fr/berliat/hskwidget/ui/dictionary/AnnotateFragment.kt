@@ -24,13 +24,11 @@ import hskflashcardswidget.crossplatform.generated.resources.annotation_edit_sav
 import hskflashcardswidget.crossplatform.generated.resources.annotation_edit_save_failure
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
 import org.jetbrains.compose.resources.getString
 
 class AnnotateFragment: Fragment() {
-    private lateinit var annotateViewModel: OldAnnotateViewModel
     private lateinit var ankiDelegate: HSKAnkiDelegate
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,35 +46,21 @@ class AnnotateFragment: Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        annotateViewModel = runBlocking { // Todo find another solution (really deprecate ViewModel)
-            OldAnnotateViewModel(requireContext(), HSKAppServices.wordListRepo, ankiDelegate::delegateToAnki)
-        }
-
         val simplifiedWord = arguments?.getString("simplifiedWord") ?: ""
 
         val baseView = ComposeView(requireContext())
         Utils.hideKeyboard(requireContext(), baseView)
-
-        val appPreferences2 = HSKAppServices.appPreferences
 
         // Use ComposeView and setContent with a proper @Composable lambda
         return baseView.apply {
             setContent {
                 AnnotateScreen(
                     simplifiedWord,
+                    ankiCaller = ankiDelegate::delegateToAnki,
                     onSpeak = { Utils.playWordInBackground(requireContext(), it) },
                     onCopy = { Utils.copyToClipBoard(requireContext(), it) },
-                    onSave = {
-                        word, pinyins, notes, themes, isExam, cType, cLevel ->
-                            annotateViewModel.saveWord(word, pinyins, notes, themes, isExam, cType, cLevel) {
-                                    word, e -> handleSaveResult(word.simplified, ACTION.UPDATE, e)
-                            }
-                            appPreferences2.lastAnnotatedClassType.value = cType
-                            appPreferences2.lastAnnotatedClassLevel.value = cLevel
-                    },
-                    onDelete = { word ->
-                        annotateViewModel.deleteAnnotation(word) { word, e -> handleSaveResult(word, ACTION.DELETE, e) }
-                    }
+                    onSave = { word, e -> handleSaveResult(word, ACTION.UPDATE, e)},
+                    onDelete = { word, e -> handleSaveResult(word, ACTION.DELETE, e)}
                 )
             }
         }

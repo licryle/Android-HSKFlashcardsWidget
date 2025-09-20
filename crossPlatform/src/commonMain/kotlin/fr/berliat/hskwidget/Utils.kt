@@ -2,8 +2,13 @@ package fr.berliat.hskwidget
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.dao.AnkiDAO
+import fr.berliat.hskwidget.data.repo.ChineseWordFrequencyRepo
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -30,6 +35,19 @@ expect object Utils {
 
 fun String.capitalize() =
     this.toString().lowercase().replaceFirstChar { it.uppercaseChar() }
+
+
+fun incrementConsultedWord(word: String) {
+    HSKAppServices.appScope.launch(Dispatchers.IO) {
+        val db = Utils.getDatabaseInstance()
+        val frequencyWordsRepo = ChineseWordFrequencyRepo(
+            db.chineseWordFrequencyDAO(),
+            db.annotatedChineseWordDAO()
+        )
+
+        frequencyWordsRepo.incrementConsulted(word)
+    }
+}
 
 enum class ANALYTICS_EVENTS {
     SCREEN_VIEW,
