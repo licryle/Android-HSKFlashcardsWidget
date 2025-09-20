@@ -72,6 +72,8 @@ class DictionaryViewModel(val appSearchQueryProvider : () -> SearchQuery,
             _searchResults.value = results
             _isLoading.value = false
         }
+
+        Utils.logAnalyticsEvent(ANALYTICS_EVENTS.DICT_SEARCH)
     }
 
     fun loadMore() {
