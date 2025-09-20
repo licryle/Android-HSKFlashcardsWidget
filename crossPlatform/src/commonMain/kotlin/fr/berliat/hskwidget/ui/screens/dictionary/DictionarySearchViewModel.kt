@@ -1,5 +1,6 @@
 package fr.berliat.hskwidget.ui.screens.dictionary
 
+import fr.berliat.hskwidget.ANALYTICS_EVENTS
 import fr.berliat.hskwidget.Utils
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.dao.AnnotatedChineseWordDAO
@@ -49,11 +50,15 @@ class DictionaryViewModel(val appSearchQueryProvider : () -> SearchQuery,
     fun toggleHSK3(value: Boolean) {
         appPreferences.dictionaryShowHSK3Definition.value = value
         performSearch()
+
+        Utils.logAnalyticsEvent(if (value) ANALYTICS_EVENTS.DICT_HSK3_ON else ANALYTICS_EVENTS.DICT_HSK3_OFF)
     }
 
     fun toggleHasAnnotation(value: Boolean) {
         appPreferences.searchFilterHasAnnotation.value = value
         performSearch()
+
+        Utils.logAnalyticsEvent(if (value) ANALYTICS_EVENTS.DICT_ANNOTATION_ON else ANALYTICS_EVENTS.DICT_ANNOTATION_OFF)
     }
 
     fun performSearch() {
