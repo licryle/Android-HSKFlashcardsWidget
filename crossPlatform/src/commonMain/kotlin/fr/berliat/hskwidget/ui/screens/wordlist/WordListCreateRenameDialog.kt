@@ -41,7 +41,6 @@ fun WordListCreateRenameDialog(
 ) {
     var listName by remember { mutableStateOf(defaultName) }
     val error = remember { mutableStateOf<String?>(null) }
-
     val errorStr = stringResource(Res.string.wordlist_list_name_dupe)
 
     LaunchedEffect(viewModel) {
