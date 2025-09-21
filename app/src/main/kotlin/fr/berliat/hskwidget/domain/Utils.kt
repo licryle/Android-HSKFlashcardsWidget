@@ -142,7 +142,6 @@ class Utils {
             }
 
             inputStream.close()
-            outFile.outputStream().close()
 
             return@withContext outFile
         }
