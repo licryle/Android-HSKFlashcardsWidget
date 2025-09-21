@@ -41,7 +41,8 @@ fun HSKWordView(
     onPinyinChange: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    val pinyinList = remember(pinyinText) { pinyinText.split(" ").map { mutableStateOf(it) } }
+    val pinyinList = pinyinText.split(" ")
+    val extPinyinList = mutableListOf<String>()
 
     Row(
         modifier = modifier.clickable { onWordClick?.invoke(hanziText) },
@@ -49,30 +50,34 @@ fun HSKWordView(
     ) {
         var pinyinIndex = -1
         hanziText.forEachIndexed { index, hanzi ->
-            var pinyin = ""
-            var onCharPinyinChange: ((String) -> Unit) = { }
-            if (hanzi.isHanzi()) {
-                pinyinIndex++
+            extPinyinList.add(
+                if (hanzi.isHanzi()) {
+                    pinyinIndex++
 
-                if (pinyinIndex < pinyinList.size) {
-                    // Did not "getOrElse" because it could create an element and cause a refresh
-                    val pinyinEntry = pinyinList[pinyinIndex]
-                    pinyin = pinyinEntry.value
-                    onCharPinyinChange = { newPinyin ->
-                        pinyinEntry.value = newPinyin
-                        onPinyinChange(pinyinList.map {it.value}.joinToString(" "))
+                    if (pinyinIndex < pinyinList.size) {
+                        pinyinList[pinyinIndex]
+                    } else {
+                        ""
                     }
+                } else {
+                    ""
                 }
-            }
+            )
 
             HSKCharView(
                 hanzi,
-                pinyin,
+                initialPinyin = extPinyinList[index],
                 pinyinEditable,
-                index == hanziText.length - 1,
-                onCharPinyinChange,
-                if (isClicked) clickedPinyinStyle else pinyinStyle,
-                if (isClicked) clickedHanziStyle else hanziStyle,
+                autoAddFlatTones = index == hanziText.length - 1,
+                onPinyinChange = { newPinyin ->
+                    if (extPinyinList[index] != newPinyin) {
+                        extPinyinList[index] = newPinyin
+                        onPinyinChange(extPinyinList.map { it.trim() }.filter { it.isNotEmpty() }
+                            .joinToString(" "))
+                    }
+                },
+                pinyinStyle = if (isClicked) clickedPinyinStyle else pinyinStyle,
+                hanziStyle = if (isClicked) clickedHanziStyle else hanziStyle,
                 modifier = Modifier.background(if (isClicked) clickedBackgroundColor else Color.Transparent)
             )
         }

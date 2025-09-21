@@ -32,8 +32,10 @@ fun HSKCharView(
                 pinyin,
                 autoAddFlatTones,
                 { p ->
-                    pinyin = p
-                    onPinyinChange(p)
+                    if (pinyin != p) {
+                        pinyin = p
+                        onPinyinChange(p)
+                    }
                 },
                 pinyinStyle
             )

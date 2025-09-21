@@ -117,7 +117,8 @@ fun AnnotateScreen(
             onCopyClick = { onCopy(annotatedWord!!.simplified) },
             showHSK3Definition = false,
             onFavoriteClick = null,
-            onListsClick = null
+            onListsClick = null,
+            onPinyinChange = { pinyins = it }
         )
 
         OutlinedTextField(

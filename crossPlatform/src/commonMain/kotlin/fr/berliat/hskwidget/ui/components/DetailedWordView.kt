@@ -64,6 +64,7 @@ fun DetailedWordView (
     onSpeakClick: ((AnnotatedChineseWord) -> Unit)? = null,
     onCopyClick: ((AnnotatedChineseWord) -> Unit)? = null,
     onListsClick: ((AnnotatedChineseWord) -> Unit)? = null,
+    onPinyinChange: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     // Compute definition / annotation / alt definition
@@ -82,7 +83,7 @@ fun DetailedWordView (
     }
 
     // Pinyins
-    val pinyins = word.word?.pinyins.toString().ifEmpty { word.annotation?.pinyins?.toString() ?: "" }
+    var pinyins = word.word?.pinyins.toString().ifEmpty { word.annotation?.pinyins?.toString() ?: "" }
 
     // Show/Hide "more" section
     var isMoreVisible by remember { mutableStateOf(false) }
@@ -133,7 +134,13 @@ fun DetailedWordView (
                     HSKWordView(
                         hanziText = word.simplified,
                         pinyinText = pinyins,
-                        pinyinEditable = ! word.hasWord()
+                        pinyinEditable = ! word.hasWord(),
+                        onPinyinChange = {
+                            if (pinyins != it) {
+                                pinyins = it
+                                onPinyinChange(it)
+                            }
+                        }
                     )
                     // Definition & Annotation
                     Text(

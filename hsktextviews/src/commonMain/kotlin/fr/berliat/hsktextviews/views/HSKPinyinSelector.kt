@@ -45,7 +45,7 @@ fun HSKPinyinSelector(
         //Log.e("HSKPinyinSelector", "Got asked for a seldom used HanZi")
     }
 
-    if (! pinyinOptions.contains(selectedPinyin)) {
+    if (! pinyinOptions.contains(selectedPinyin) && pinyinOptions.isNotEmpty()) {
         selectedPinyin = pinyinOptions.elementAtOrElse(0) { "" }
         onSelectPinyin(selectedPinyin)
     }
