@@ -43,7 +43,7 @@ actual class AnkiSyncWordListsService: AnkiSyncService() {
         notificationCancelText = getString(Res.string.cancel)
         notificationChannelDescription = getString(Res.string.anki_sync_notification_description)
         notificationChannelTitle = getString(Res.string.anki_sync_notification_name)
-        notificationLargeIcon = drawableToBitmap(resources.getDrawable(resources.getIdentifier("ic_launcher", "mipmap", packageName)))
+        notificationLargeIcon = drawableToBitmap(resources.getDrawable(resources.getIdentifier("anki_icon", "drawable", packageName)))
     }
 
     private fun drawableToBitmap(drawable: Drawable): Bitmap {
@@ -175,7 +175,7 @@ actual class AnkiSyncWordListsService: AnkiSyncService() {
 
     override fun getNotificationLargeIcon(): Bitmap? = notificationLargeIcon
 
-    override fun getNotificationSmallIcon() = this.resources.getIdentifier("ic_launcher_monochrome_mini", "mipmap", this.packageName)
+    override fun getNotificationSmallIcon() = this.resources.getIdentifier("ic_launcher", "mipmap", this.packageName)
 
     override fun getNotificationCancelIcon() = this.resources.getIdentifier("close_24px", "drawable", this.packageName)
 
