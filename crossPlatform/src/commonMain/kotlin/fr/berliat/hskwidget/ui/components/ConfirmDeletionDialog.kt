@@ -4,6 +4,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 
 import hskflashcardswidget.crossplatform.generated.resources.Res
 import hskflashcardswidget.crossplatform.generated.resources.cancel
@@ -14,12 +15,14 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun ConfirmDeletionDialog(
-    title : StringResource,
-    message : StringResource,
-    onDismiss : () -> Unit,
-    onConfirm : () -> Unit
+    title: StringResource,
+    message: StringResource,
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     AlertDialog(
+        modifier = modifier,
         onDismissRequest = { onDismiss() },
         title = {
             Text(text = stringResource(title))

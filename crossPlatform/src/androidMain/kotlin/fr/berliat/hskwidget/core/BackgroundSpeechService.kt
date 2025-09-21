@@ -1,8 +1,7 @@
-package fr.berliat.hskwidget.domain
+package fr.berliat.hskwidget.core
 
 import android.content.Context
 import android.content.Intent
-import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.media.AudioManager
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
@@ -60,7 +59,7 @@ class BackgroundSpeechService(val context: Context, workerParams: WorkerParamete
 
                 val installIntent = Intent()
                 installIntent.action = TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA
-                installIntent.flags = FLAG_ACTIVITY_NEW_TASK
+                installIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 context.startActivity(installIntent)
 
                 return buildErrorResult(FAILURE_LANG_UNSUPPORTED)

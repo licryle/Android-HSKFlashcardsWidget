@@ -1,9 +1,9 @@
 package fr.berliat.hskwidget.data.store
 
+import androidx.compose.ui.unit.sp
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
 import kotlinx.datetime.Instant
-import okio.Path
 import okio.Path.Companion.toPath
 import fr.berliat.hskwidget.data.type.ClassLevel
 import fr.berliat.hskwidget.data.type.ClassType
@@ -76,12 +76,14 @@ class AppPreferencesStore private constructor(store: DataStore<Preferences>) {
     val supportTotalSpent = PreferenceState<Float, Float>(store, floatPreferencesKey("support_total_spent"), -1f)
 
     // --- Derived complex types ---
-    val dbBackupCloudLastSuccess = PreferenceState<Long, Instant>(store, longPreferencesKey("database_backupcloud_lastsuccess"), 0L,
-        PreferenceConverter<Long, Instant>({ Instant.fromEpochMilliseconds(it) }, { it.toEpochMilliseconds() }))
-    val dbBackUpDirectory = PreferenceState<String, Path>(store, stringPreferencesKey("database_backup_directory"), "",
-        PreferenceConverter<String, Path>({ it.toPath() }, { it.toString() }))
-    val lastAnnotatedClassLevel = PreferenceState<String, ClassLevel>(store, stringPreferencesKey("class_level"), "NotFromClass",
-        PreferenceConverter<String, ClassLevel>({ ClassLevel.from(it) }, { it.name }))
-    val lastAnnotatedClassType = PreferenceState<String, ClassType>(store, stringPreferencesKey("class_type"), "NotFromClass",
-        PreferenceConverter<String, ClassType>({ ClassType.from(it) }, { it.name }))
+    val dbBackupCloudLastSuccess = PreferenceState(store, longPreferencesKey("database_backupcloud_lastsuccess"), 0L,
+        PreferenceConverter({ Instant.fromEpochMilliseconds(it) }, { it.toEpochMilliseconds() }))
+    val dbBackUpDirectory = PreferenceState(store, stringPreferencesKey("database_backup_directory"), "",
+        PreferenceConverter({ it.toPath() }, { it.toString() }))
+    val lastAnnotatedClassLevel = PreferenceState(store, stringPreferencesKey("class_level"), "NotFromClass",
+        PreferenceConverter({ ClassLevel.from(it) }, { it.name }))
+    val lastAnnotatedClassType = PreferenceState(store, stringPreferencesKey("class_type"), "NotFromClass",
+        PreferenceConverter({ ClassType.from(it) }, { it.name }))
+    val readerTextSize = PreferenceState(store, floatPreferencesKey("reader_text_size"), 30f,
+        PreferenceConverter({ it.sp }, { it.value }))
 }

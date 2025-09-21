@@ -3,8 +3,6 @@ package fr.berliat.hskwidget.domain
 import android.Manifest
 import android.app.Activity
 import android.appwidget.AppWidgetManager
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -14,35 +12,18 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
 import android.provider.DocumentsContract
-import android.provider.Settings
-import android.speech.tts.TextToSpeech
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.documentfile.provider.DocumentFile
-import androidx.lifecycle.Observer
-import androidx.navigation.NavController
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import androidx.work.workDataOf
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.ktx.Firebase
-import fr.berliat.hskwidget.R
-import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
-import fr.berliat.hskwidget.databinding.FragmentDictionarySearchItemBinding
 import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -52,24 +33,11 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.InputStream
 import java.util.concurrent.TimeUnit
-
 import fr.berliat.hskwidget.HSKHelperApp
-import fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragmentDirections
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.UUID
-import androidx.compose.ui.graphics.Color
-import fr.berliat.hskwidget.AnkiDelegator
-import fr.berliat.hskwidget.core.HSKAppServices
-import fr.berliat.hskwidget.data.model.ChineseWord
-import fr.berliat.hskwidget.incrementConsultedWord
-import fr.berliat.hskwidget.ui.components.DetailedWordView
-import fr.berliat.hskwidget.ui.screens.wordlist.WordListSelectionDialog
-
-val hanziStyle = TextStyle(fontSize = 34.sp, color = Color.Black)
-val pinyinStyle = TextStyle(fontSize = 20.sp, color = Color.Black)
-val hanziClickedBackground = Color.Yellow
 
 fun <T : Parcelable> Intent.getParcelableExtraCompat(key: String, clazz: Class<T>): T? {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -99,87 +67,6 @@ class Utils {
 
             return formatter.format(time)
         }
-
-        fun playWordInBackground(context: Context, word: String) {
-            val speechRequest = OneTimeWorkRequestBuilder<BackgroundSpeechService>()
-                .setInputData(workDataOf(Pair("word", word)))
-                .build()
-
-            val workMgr = WorkManager.getInstance(context)
-            val observer = object : Observer<WorkInfo?> {
-                override fun onChanged(value: WorkInfo?) {
-                    if (value == null) {
-                        // Handle the case where workInfo is null
-                        return
-                    }
-
-                    if (value.state == WorkInfo.State.SUCCEEDED
-                        || value.state == WorkInfo.State.FAILED
-                    ) {
-
-                        val errStringId: Int
-                        var errRemedyIntent: String? = null
-                        if (value.state == WorkInfo.State.FAILED) {
-                            var errId =
-                                value.outputData.getString(BackgroundSpeechService.FAILURE_REASON)
-                            when (errId) {
-                                BackgroundSpeechService.FAILURE_MUTED
-                                    -> errStringId = R.string.speech_failure_toast_muted
-
-                                BackgroundSpeechService.FAILURE_INIT_FAILED -> {
-                                    errStringId = R.string.speech_failure_toast_init
-                                    errRemedyIntent = Settings.ACTION_ACCESSIBILITY_SETTINGS
-                                }
-
-                                BackgroundSpeechService.FAILURE_LANG_UNSUPPORTED -> {
-                                    errStringId = R.string.speech_failure_toast_chinese_unsupported
-                                    errRemedyIntent = TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA
-                                }
-
-                                else -> {
-                                    errStringId = R.string.speech_failure_toast_unknown
-                                    errId = BackgroundSpeechService.FAILURE_UNKNOWN
-                                }
-                            }
-
-                            logAnalyticsError("SPEECH", errId, "")
-
-                            if (errRemedyIntent == null) {
-                                Toast.makeText(
-                                    context, context.getString(errStringId),
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            } else {
-                                AlertDialog.Builder(context)
-                                    .setTitle(R.string.dialog_tts_error)
-                                    .setMessage(errStringId)
-                                    .setPositiveButton(R.string.fix_it) { _, _ ->
-                                        val intent = Intent(errRemedyIntent)
-                                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                                        context.startActivity(intent)
-                                }
-                                    .setNegativeButton(R.string.cancel, null)
-                                    .show()
-                            }
-                        }
-
-                        workMgr.getWorkInfoByIdLiveData(speechRequest.id)
-                            .removeObserver(this)
-                    }
-                }
-            }
-
-            workMgr.getWorkInfoByIdLiveData(speechRequest.id).observeForever(observer)
-
-            workMgr.enqueue(speechRequest)
-
-            incrementConsultedWord(word)
-
-            logAnalyticsEvent(ANALYTICS_EVENTS.WIDGET_PLAY_WORD)
-        }
-
-        fun capitalizeStr(s: Any?) =
-            s?.toString()?.lowercase()?.replaceFirstChar { it.uppercaseChar() } ?: ""
 
         fun getAppScope(context: Context) = (context.applicationContext as HSKHelperApp).applicationScope
 
@@ -275,40 +162,6 @@ class Utils {
             }
         }
 
-        fun populateDictionaryEntryView(binding: FragmentDictionarySearchItemBinding,
-                                        word: AnnotatedChineseWord, navController: NavController,
-                                        ankiCaller: AnkiDelegator
-        ) {
-            val appConfig = HSKAppServices.appPreferences
-            val context = navController.context
-
-            binding.dictionaryItemContainer.setContent {
-                var showWordListDialog by remember { mutableStateOf<ChineseWord?>(null) }
-
-                showWordListDialog?.let {
-                    WordListSelectionDialog(
-                        ankiCaller = ankiCaller,
-                        word = it,
-                        onDismiss = { showWordListDialog = null },
-                        onSaved = { showWordListDialog = null }
-                    )
-                }
-
-                DetailedWordView(
-                    word,
-                    appConfig.dictionaryShowHSK3Definition.value,
-                    {
-                        val action = DictionarySearchFragmentDirections.annotateWord(word.simplified, false)
-
-                        navController.navigate(action)
-                    },
-                    { playWordInBackground(context, word.simplified) },
-                    { copyToClipBoard(context, word.simplified) },
-                    { showWordListDialog = word.word }
-                )
-            }
-        }
-
         fun requestPermissionNotification(activity: Activity) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 if (ContextCompat.checkSelfPermission(
@@ -324,24 +177,6 @@ class Utils {
                     )
                 }
             }
-        }
-
-        fun copyToClipBoard(context: Context, s: String) {
-            // https://stackoverflow.com/a/28780585/3059536
-            val clipboard =
-                context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-            val clip = ClipData.newPlainText("Copied Text", s)
-            clipboard.setPrimaryClip(clip)
-
-            Toast.makeText(
-                context,
-                String.format(context.getString(R.string.copied_to_clipboard), s),
-                Toast.LENGTH_SHORT
-            ).show()
-
-            logAnalyticsEvent(ANALYTICS_EVENTS.WIDGET_COPY_WORD)
-
-            incrementConsultedWord(s)
         }
 
         /**

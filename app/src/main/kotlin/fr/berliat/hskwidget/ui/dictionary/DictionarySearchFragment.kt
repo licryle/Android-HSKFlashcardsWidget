@@ -10,7 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 
 import fr.berliat.hskwidget.R
-import fr.berliat.hskwidget.domain.Utils
+import fr.berliat.hskwidget.Utils
 
 import fr.berliat.hskwidget.domain.SearchQuery
 import fr.berliat.hskwidget.ui.screens.dictionary.DictionarySearchScreen
@@ -38,13 +38,13 @@ class DictionarySearchFragment : Fragment() {
                 DictionarySearchScreen(
                     viewModel = viewModel,
                     ankiCaller = ankiDelegate::delegateToAnki,
-                    onSpeak = { Utils.playWordInBackground(requireContext(), it) },
+                    onSpeak = Utils::playWordInBackground,
                     onAnnotate = {
                         val action = DictionarySearchFragmentDirections.annotateWord(it, false)
 
                         findNavController().navigate(action)
                     },
-                    onCopy = { Utils.copyToClipBoard(requireContext(), it) }
+                    onCopy = Utils::copyToClipBoard
                 )
             }
         }

@@ -24,7 +24,9 @@ expect object Utils {
     fun getAppVersion(): String
 
     fun logAnalyticsScreenView(screen: String)
-    fun logAnalyticsEvent(event: ANALYTICS_EVENTS)
+    fun logAnalyticsEvent(event: ANALYTICS_EVENTS,
+                          params: Map<String, String> = mapOf())
+    fun logAnalyticsError(module: String, error: String, details: String)
 
     internal suspend fun getDatabaseInstance() : ChineseWordsDatabase
     fun getDatabasePath(): String
@@ -34,6 +36,10 @@ expect object Utils {
     fun getHSKSegmenter() : HSKTextSegmenter
 
     internal fun getAnkiDAO(): AnkiDAO
+
+
+    fun copyToClipBoard(s: String)
+    fun playWordInBackground(word: String)
 }
 
 fun String.capitalize() =

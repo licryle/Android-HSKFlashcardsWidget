@@ -100,8 +100,11 @@ kotlin {
                 implementation(libs.androidx.lifecycle.service) // LifecycleService
                 implementation(libs.androidx.lifecycle.runtime.ktx)
 
-                implementation("androidx.vectordrawable:vectordrawable:1.2.0")
                 implementation(libs.jieba.analysis)
+
+                implementation("androidx.work:work-runtime-ktx:2.9.0")
+                implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.6")
+                implementation("com.google.mlkit:text-recognition-chinese:16.0.1")
             }
             resources.srcDirs("src/commonMain/composeResources")
         }

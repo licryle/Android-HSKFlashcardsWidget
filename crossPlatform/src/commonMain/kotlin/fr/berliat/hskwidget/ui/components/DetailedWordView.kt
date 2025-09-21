@@ -60,10 +60,10 @@ import org.jetbrains.compose.resources.stringResource
 fun DetailedWordView (
     word: AnnotatedChineseWord,
     showHSK3Definition: Boolean,
-    onFavoriteClick: (() -> Unit)? = null,
-    onSpeakClick: (() -> Unit)? = null,
-    onCopyClick: (() -> Unit)? = null,
-    onListsClick: (() -> Unit)? = null,
+    onFavoriteClick: ((AnnotatedChineseWord) -> Unit)? = null,
+    onSpeakClick: ((AnnotatedChineseWord) -> Unit)? = null,
+    onCopyClick: ((AnnotatedChineseWord) -> Unit)? = null,
+    onListsClick: ((AnnotatedChineseWord) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     // Compute definition / annotation / alt definition
@@ -115,7 +115,7 @@ fun DetailedWordView (
                         RoundIconButton(
                             Res.drawable.baseline_volume_up_24,
                             Res.string.widget_btn_speak,
-                            onSpeakClick
+                            { onSpeakClick(word) }
                         )
                     }
 
@@ -123,7 +123,7 @@ fun DetailedWordView (
                         RoundIconButton(
                             Res.drawable.content_copy_24px,
                             Res.string.widget_btn_copy,
-                            onCopyClick
+                            { onCopyClick(word) }
                         )
                     }
                 }
@@ -169,7 +169,7 @@ fun DetailedWordView (
                     horizontalAlignment = Alignment.End
                 ) {
                     onFavoriteClick?.let {
-                        IconButton(onClick = onFavoriteClick) {
+                        IconButton(onClick = { onFavoriteClick(word) }) {
                             val resId =
                                 if (word.hasAnnotation()) Res.drawable.bookmark_heart_24px else Res.drawable.bookmark_24px
                             Icon(
@@ -194,7 +194,7 @@ fun DetailedWordView (
                         RoundIconButton(
                             Res.drawable.format_list_bulleted_add_24px,
                             Res.string.dictionary_item_lists,
-                            onListsClick
+                            { onListsClick(word) }
                         )
                     }
                 }

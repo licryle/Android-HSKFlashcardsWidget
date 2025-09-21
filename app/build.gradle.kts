@@ -147,9 +147,6 @@ dependencies {
     implementation("androidx.camera:camera-view:${cameraxVersion}")
     implementation("androidx.camera:camera-extensions:${cameraxVersion}")
 
-    // Text features
-    implementation("com.google.mlkit:text-recognition-chinese:16.0.1")
-
 
     // Let's allow users to support the dev with money
     implementation("com.android.billingclient:billing:8.0.0")

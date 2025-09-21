@@ -7,59 +7,38 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.compose.ui.unit.sp
-import androidx.core.net.toUri
+import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import fr.berliat.hsktextviews.views.HSKTextView
-import fr.berliat.hskwidget.R
-import androidx.compose.runtime.livedata.observeAsState
 
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
-import fr.berliat.hskwidget.data.store.OldAppPreferencesStore
-import fr.berliat.hskwidget.databinding.FragmentOcrDisplayBinding
 import fr.berliat.hskwidget.domain.Utils
 
-import com.google.mlkit.vision.common.InputImage
-import fr.berliat.hsktextviews.HSKTextSegmenter
 import fr.berliat.hsktextviews.HSKTextSegmenterListener
-import fr.berliat.hsktextviews.views.ShowPinyins
 import fr.berliat.hskwidget.MainActivity
 import fr.berliat.hskwidget.core.HSKAppServices
-import fr.berliat.hskwidget.data.store.DatabaseHelper
-import fr.berliat.hskwidget.domain.hanziClickedBackground
-import fr.berliat.hskwidget.domain.hanziStyle
-import fr.berliat.hskwidget.domain.pinyinStyle
-import fr.berliat.hskwidget.ui.components.LoadingView
+import fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragmentDirections
+import fr.berliat.hskwidget.ui.screens.OCR.DisplayOCRScreen
+import fr.berliat.hskwidget.ui.screens.OCR.DisplayOCRViewModel
 import fr.berliat.hskwidget.ui.utils.HSKAnkiDelegate
-import hskflashcardswidget.crossplatform.generated.resources.Res
-import hskflashcardswidget.crossplatform.generated.resources.ocr_display_loading
-
-import kotlin.collections.emptyMap
+import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.getString
 
 class DisplayOCRFragment : Fragment(), HSKTextSegmenterListener {
-    private lateinit var viewBinding: FragmentOcrDisplayBinding
-    private lateinit var segmenter: HSKTextSegmenter
-    private lateinit var viewModel: DisplayOCRViewModel
-
-    private lateinit var appConfig: OldAppPreferencesStore
     private lateinit var ankiCaller : HSKAnkiDelegate
+    private val viewModel = DisplayOCRViewModel(
+        appPreferences = HSKAppServices.appPreferences,
+        annotatedChineseWordDAO = HSKAppServices.database.annotatedChineseWordDAO(),
+        chineseWordFrequencyDAO = HSKAppServices.database.chineseWordFrequencyDAO()
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        segmenter = HSKAppServices.HSKSegmenter
 
         val mainApp = requireActivity() as MainActivity
-        val factory = DisplayOCRViewModelFactory(
-            { DatabaseHelper.getInstance(requireContext()).annotatedChineseWordDAO() },
-            { DatabaseHelper.getInstance(requireContext()).chineseWordFrequencyDAO() }
-        )
-        viewModel = ViewModelProvider(this, factory)[DisplayOCRViewModel::class.java]
         ankiCaller = HSKAnkiDelegate(this)
 
         if (requireActivity().javaClass.simpleName == "MainActivity") {
@@ -67,109 +46,55 @@ class DisplayOCRFragment : Fragment(), HSKTextSegmenterListener {
         }
     }
 
-    @Composable
-    fun OCRDisplayEmpty() {
-        Text("No text returned")
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        viewBinding =
-            FragmentOcrDisplayBinding.inflate(inflater, container, false) // Inflate here
-        appConfig = OldAppPreferencesStore(requireContext())
-
-        viewBinding.ocrDisplayAdd.setOnClickListener {
-            val action =
-                DisplayOCRFragmentDirections.appendOCR(viewModel.text.value ?: "")
-            findNavController().navigate(action)
+        lifecycleScope.launch {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.toastEvent.collect { stringRes ->
+                    val s = getString(stringRes)
+                    Toast.makeText(requireContext(), s, Toast.LENGTH_LONG).show()
+                }
+            }
         }
 
-        val composeView = viewBinding.ocrDisplayText
-        composeView.apply {
-            // Make sure composition lifecycle follows the View lifecycle
-            setViewCompositionStrategy(
-                ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
-            )
+        viewModel.selectedWord.value?.let {
+            viewModel.fetchWordForDisplay(it.simplified)
+        }
 
+        return ComposeView(requireContext()).apply {
             setContent {
-                val text by viewModel.text.observeAsState("")
-                val clickedWords by viewModel.clickedWords.observeAsState(emptyMap())
-
-                // Call your composable here
-                HSKTextView(
-                    text = text,
-                    segmenter = segmenter,
-                    hanziStyle = hanziStyle.copy(fontSize = appConfig.readerTextSize.sp),
-                    pinyinStyle = pinyinStyle,
-                    clickedHanziStyle = hanziStyle.copy(fontSize = appConfig.readerTextSize.sp),
-                    clickedPinyinStyle = pinyinStyle,
-                    clickedBackgroundColor = hanziClickedBackground,
-                    loadingComposable = { LoadingView(loadingText = Res.string.ocr_display_loading) },
-                    emptyComposable = { OCRDisplayEmpty() },
-                    onWordClick = { word -> this@DisplayOCRFragment.onWordClick(word) },
-                    showPinyins = if (appConfig.readerShowAllPinyins) ShowPinyins.ALL else ShowPinyins.CLICKED,
-                    endSeparator = if (appConfig.readerSeparateWords) WORD_SEPARATOR else "",
-                    clickedWords = clickedWords,
-                    onTextAnalysisFailure = { e -> this@DisplayOCRFragment.onTextAnalysisFailure(e) }
+                DisplayOCRScreen(
+                    ankiCaller = ankiCaller::delegateToAnki,
+                    viewModel = viewModel,
+                    onFavoriteClick = { word -> onFavoriteClick(word) },
+                    onClickOCRAdd = {
+                        val action =
+                            DisplayOCRFragmentDirections.appendOCR(viewModel.text.value)
+                        findNavController().navigate(action)
+                    }
                 )
             }
         }
-
-        viewBinding.ocrDisplayConfBigger.setOnClickListener { updateTextSize(2) }
-        viewBinding.ocrDisplayConfSmaller.setOnClickListener { updateTextSize(-2) }
-
-        viewBinding.ocrDisplaySeparator.isChecked = appConfig.readerSeparateWords
-        viewBinding.ocrDisplaySeparator.setOnClickListener {
-            appConfig.readerSeparateWords = viewBinding.ocrDisplaySeparator.isChecked
-        }
-
-        viewBinding.ocrDisplayPinyins.isChecked = appConfig.readerShowAllPinyins
-        viewBinding.ocrDisplayPinyins.setOnClickListener {
-            appConfig.readerShowAllPinyins = viewBinding.ocrDisplayPinyins.isChecked
-        }
-
-        viewModel.toastEvent.observe(viewLifecycleOwner) { value ->
-            if (value.first.isNotEmpty()) {
-                Toast.makeText(requireContext(), value.first, value.second).show()
-            }
-        }
-
-        setupSegmenter()
-
-        return viewBinding.root // Return the root view of the binding
     }
 
     override fun onResume() {
         super.onResume()
 
-        if (viewModel.selectedWord != null) {
-            viewModel.fetchWordForDisplay(viewModel.selectedWord!!, ::showSelectedWord)
-        }
+        setupSegmenter()
 
         Utils.logAnalyticsScreenView("DisplayOCR")
     }
 
     private fun setupSegmenter() {
-        if (! segmenter.isReady()) {
+        if (!HSKAppServices.HSKSegmenter.isReady()) {
             Log.d(TAG, "Segmenter not ready, setting up listener")
-            segmenter.listener = this
+            HSKAppServices.HSKSegmenter.listener = this
         } else {
             Log.d(TAG, "Segmenter ready: let's process arguments")
             processFromArguments()
         }
-    }
-
-    private fun updateTextSize(increment: Int) {
-        Log.d(TAG, "updateTextSize to $increment")
-        val textSize = (appConfig.readerTextSize + increment).coerceAtLeast(10)
-
-        if (textSize <= 10) {
-            Toast.makeText(context, "Smaller text available", Toast.LENGTH_LONG).show()
-        }
-
-        appConfig.readerTextSize = textSize
     }
 
     private fun processFromArguments() {
@@ -182,67 +107,26 @@ class DisplayOCRFragment : Fragment(), HSKTextSegmenterListener {
         if (imageUri != "") {
             Log.d(TAG, "processFromArguments: image was provided")
 
-            viewModel.text.value = text
+            viewModel.setText(text)
 
             if (text == "")
                 viewModel.resetText()
 
-            viewModel.recognizeText{ InputImage.fromFilePath(requireContext(), imageUri.toUri()) }
+            viewModel.recognizeText(imageUri)
             requireArguments().putString("imageUri", "") // Consume condition
         } else if (text != "") {
             Log.d(TAG, "processFromArguments: text was provided")
 
-            viewModel.text.value = text
-        } else if (viewModel.text.value?.isEmpty() == true) { // text is empty
+            viewModel.setText(text)
+        } else if (viewModel.text.value.isEmpty()) { // text is empty
             Toast.makeText(requireContext(), "Oops - nothing to display", Toast.LENGTH_LONG).show()
         }
     }
 
-    fun onWordClick(hanzi: String) {
-        Log.d(TAG, "onWordClick $hanzi")
+    fun onFavoriteClick(word: AnnotatedChineseWord) {
+        val action = DictionarySearchFragmentDirections.annotateWord(word.simplified, false)
 
-        viewModel.fetchWordForDisplay(hanzi, ::showSelectedWord)
-
-        Log.d(TAG, "Augmenting Consulted Count for $hanzi by 1, if word exists")
-        viewModel.augmentWordFrequencyConsulted(hanzi)
-    }
-
-    private fun showSelectedWord(simplified: String, annotatedWord: AnnotatedChineseWord?) {
-        // Update the UI with the result
-        if (annotatedWord == null) {
-            Utils.copyToClipBoard(requireContext(), simplified)
-
-            val message = requireContext().getString(R.string.ocr_display_word_not_found, simplified)
-            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
-
-            Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.OCR_WORD_NOTFOUND)
-        } else {
-            viewModel.clickedWords.postValue(
-                viewModel.clickedWords.value.orEmpty()
-                        + (simplified to annotatedWord.word?.pinyins.toString()))
-
-            Utils.populateDictionaryEntryView(
-                viewBinding.ocrDisplayDefinition, annotatedWord,
-                findNavController(),
-                ankiCaller::delegateToAnki
-            )
-            viewBinding.ocrDisplayDefinition.root.visibility = View.VISIBLE
-            viewModel.selectedWord = simplified
-
-            Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.OCR_WORD_FOUND)
-        }
-    }
-
-    fun onTextAnalysisFailure(e: Error) {
-        Log.d(TAG, "onTextAnalysisFailure: $e")
-
-        Toast.makeText(context, getString(R.string.ocr_display_analysis_failure), Toast.LENGTH_LONG).show()
-
-        Utils.logAnalyticsError(
-            "OCR_DISPLAY",
-            "TextAnalysisFailed",
-            e.message ?: ""
-        )
+        findNavController().navigate(action)
     }
 
     override fun onIsSegmenterReady() {
@@ -253,6 +137,5 @@ class DisplayOCRFragment : Fragment(), HSKTextSegmenterListener {
     companion object {
         private const val TAG = "DisplayOCRFragment"
 
-        private const val WORD_SEPARATOR = "·"
     }
 }

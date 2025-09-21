@@ -90,7 +90,7 @@ class FlashcardManager private constructor(private val context: Context,
     fun playWidgetWord() : Boolean {
         val word = flashCardPrefs.currentSimplified ?: return false
 
-        Utils.playWordInBackground(context, word)
+        fr.berliat.hskwidget.Utils.playWordInBackground(word)
 
         return true
     }

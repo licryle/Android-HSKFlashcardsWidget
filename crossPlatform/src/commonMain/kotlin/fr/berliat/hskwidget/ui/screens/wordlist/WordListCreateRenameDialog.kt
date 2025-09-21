@@ -33,11 +33,12 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun WordListCreateRenameDialog(
     viewModel: WordListViewModel,
-    list : WordList? = null,
+    list: WordList? = null,
     onSuccess: () -> Unit,
     onCancel: () -> Unit,
     onError: () -> Unit = {},
-    defaultName: String = ""
+    defaultName: String = "",
+    modifier: Modifier = Modifier
 ) {
     var listName by remember { mutableStateOf(defaultName) }
     val error = remember { mutableStateOf<String?>(null) }
@@ -64,6 +65,7 @@ fun WordListCreateRenameDialog(
     }
 
     AlertDialog(
+        modifier = modifier,
         onDismissRequest = onCancel,
         title = { Text(text = stringResource(titleRes)) },
         text = {

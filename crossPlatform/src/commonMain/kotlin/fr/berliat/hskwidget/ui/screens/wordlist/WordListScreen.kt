@@ -30,7 +30,7 @@ import fr.berliat.hskwidget.data.model.WordList
 import fr.berliat.hskwidget.data.model.WordListWithCount
 import fr.berliat.hskwidget.ui.components.ConfirmDeletionDialog
 import fr.berliat.hskwidget.YYMMDD
-import fr.berliat.hskwidget.ui.components.LoadingView
+import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.ui.components.PrettyCard
 import fr.berliat.hskwidget.ui.components.RoundIconButton
 
@@ -52,14 +52,12 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun WordListScreen(
-    ankiCaller : AnkiDelegator,
-    onClickList: (WordList) -> Unit
+    ankiCaller: AnkiDelegator,
+    onClickList: (WordList) -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: WordListViewModel = WordListViewModel(HSKAppServices.wordListRepo, ankiCaller)
 ) {
-    val viewModel = rememberSuspendWordListViewModel(ankiCaller)
-    if (viewModel == null) {
-        LoadingView()
-        return
-    }
+
 
     val wordLists by viewModel.allLists.collectAsState()
 
@@ -72,7 +70,8 @@ fun WordListScreen(
             viewModel = viewModel,
             list = null,
             onSuccess = { showCreateDialog = false },
-            onCancel = { showCreateDialog = false }
+            onCancel = { showCreateDialog = false },
+            modifier = modifier
         )
     }
 
@@ -85,7 +84,8 @@ fun WordListScreen(
                 viewModel.deleteList(cDL)
                 confirmDeleteList = null
             },
-            onDismiss = { confirmDeleteList = null }
+            onDismiss = { confirmDeleteList = null },
+            modifier = modifier
         )
     }
 
@@ -96,7 +96,8 @@ fun WordListScreen(
             list = wordListToRename,
             onSuccess = { wordListToRename = null },
             onCancel = { wordListToRename = null },
-            defaultName = wLTR.name
+            defaultName = wLTR.name,
+            modifier = modifier
         )
     }
 
@@ -107,7 +108,8 @@ fun WordListScreen(
                     wordList = wordList,
                     onClick = { onClickList(wordList.wordList) },
                     onRename = { wordListToRename = wordList.wordList },
-                    onDelete = { confirmDeleteList = wordList.wordList }
+                    onDelete = { confirmDeleteList = wordList.wordList },
+                    modifier = modifier
                 )
             }
         }
@@ -132,7 +134,8 @@ private fun WordListRow(
     wordList: WordListWithCount,
     onClick: () -> Unit,
     onRename: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    modifier: Modifier
 ) {
     PrettyCard(
         onClick = onClick
@@ -145,7 +148,7 @@ private fun WordListRow(
                 iconRes = Res.drawable.edit_24px,
                 contentDescriptionRes = Res.string.wordlist_rename_button,
                 onClick = { if (!hideBtn) onRename() },
-                modifier = Modifier.alpha(if (hideBtn) 0f else 1f)
+                modifier = modifier.alpha(if (hideBtn) 0f else 1f)
             )
 
             Column(modifier = Modifier
@@ -157,7 +160,7 @@ private fun WordListRow(
                 )
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Column(
-                        modifier = Modifier.weight(1f)
+                        modifier = modifier.weight(1f)
                     ) {
                         Text(
                             text = stringResource(Res.string.wordlist_word_count, wordList.wordCount),
@@ -181,7 +184,7 @@ private fun WordListRow(
                 iconRes = Res.drawable.delete_24px,
                 contentDescriptionRes = Res.string.wordlist_delete_button,
                 onClick = { if (!hideBtn) onDelete() },
-                modifier = Modifier.alpha(if (hideBtn) 0f else 1f)
+                modifier = modifier.alpha(if (hideBtn) 0f else 1f)
             )
         }
     }

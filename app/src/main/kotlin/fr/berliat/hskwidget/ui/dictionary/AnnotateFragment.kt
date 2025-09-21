@@ -11,7 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.coroutineScope
 import androidx.navigation.fragment.findNavController
 import fr.berliat.hskwidget.R
-import fr.berliat.hskwidget.domain.Utils
+import fr.berliat.hskwidget.Utils
 
 import fr.berliat.hskwidget.ui.screens.annotate.AnnotateScreen
 import fr.berliat.hskwidget.ui.utils.HSKAnkiDelegate
@@ -48,7 +48,7 @@ class AnnotateFragment: Fragment() {
         val simplifiedWord = arguments?.getString("simplifiedWord") ?: ""
 
         val baseView = ComposeView(requireContext())
-        Utils.hideKeyboard(requireContext(), baseView)
+        fr.berliat.hskwidget.domain.Utils.hideKeyboard(requireContext(), baseView)
 
         // Use ComposeView and setContent with a proper @Composable lambda
         return baseView.apply {
@@ -56,8 +56,8 @@ class AnnotateFragment: Fragment() {
                 AnnotateScreen(
                     simplifiedWord,
                     ankiCaller = ankiDelegate::delegateToAnki,
-                    onSpeak = { Utils.playWordInBackground(requireContext(), it) },
-                    onCopy = { Utils.copyToClipBoard(requireContext(), it) },
+                    onSpeak = Utils::playWordInBackground,
+                    onCopy = Utils::copyToClipBoard,
                     onSave = { word, e -> handleSaveResult(word, ACTION.UPDATE, e)},
                     onDelete = { word, e -> handleSaveResult(word, ACTION.DELETE, e)}
                 )

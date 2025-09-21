@@ -97,11 +97,11 @@ fun AnnotateScreen(
         ConfirmDeletionDialog(
             title = Res.string.annotation_edit_delete_confirm_title,
             message = Res.string.annotation_edit_delete_confirm_message,
+            onDismiss = { confirmDeleteDialog = false },
             onConfirm = {
                 viewModel.deleteAnnotation(word) { word, e -> onDelete(word, e) }
                 confirmDeleteDialog = false
-            },
-            onDismiss = { confirmDeleteDialog = false }
+            }
         )
     }
 

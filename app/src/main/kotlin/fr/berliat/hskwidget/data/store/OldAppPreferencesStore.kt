@@ -67,28 +67,4 @@ class OldAppPreferencesStore(context: Context):
         set(nb) {
             putInt("database_backup_max_local_files", nb)
         }
-
-    var readerTextSize : Int
-        get() {
-            return getInt("reader_text_size", 30)
-        }
-        set(textSize) {
-            putInt("reader_text_size", textSize)
-        }
-
-    var readerSeparateWords: Boolean
-        get() {
-            return getBoolean("reader_separate_word", false)
-        }
-        set(enabled) {
-            putBoolean("reader_separate_word", enabled)
-        }
-
-    var readerShowAllPinyins: Boolean
-        get() {
-            return getBoolean("reader_show_pinyins", false)
-        }
-        set(enabled) {
-            putBoolean("reader_show_pinyins", enabled)
-        }
 }

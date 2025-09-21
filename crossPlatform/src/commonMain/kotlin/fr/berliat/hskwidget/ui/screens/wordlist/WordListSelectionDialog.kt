@@ -80,7 +80,6 @@ fun WordListSelectionDialog(
     if (showCreateDialog) {
         WordListCreateRenameDialog(
             viewModel = viewModel,
-            list = null,
             onSuccess = { showCreateDialog = false },
             onCancel = { showCreateDialog = false }
         )

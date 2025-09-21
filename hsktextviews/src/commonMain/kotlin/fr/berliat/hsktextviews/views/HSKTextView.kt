@@ -45,7 +45,7 @@ fun HSKTextView(
     loadingComposable: @Composable () -> Unit,
     emptyComposable: @Composable () -> Unit,
     onWordClick: ((String) -> Unit)? = null,
-    onTextAnalysisFailure: ((e: Error) -> Unit)? = null,
+    onTextAnalysisFailure: ((e: Exception) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     var words by remember { mutableStateOf(listOf<Pair<String, String>>()) }
@@ -72,7 +72,7 @@ fun HSKTextView(
             isLoading = false
 
             if (words.isEmpty()) {
-                onTextAnalysisFailure?.invoke(Error("Segmenter returned no words"))
+                onTextAnalysisFailure?.invoke(Exception("Segmenter returned no words"))
             }
         }
     }
@@ -82,7 +82,7 @@ fun HSKTextView(
         trimText.isBlank() || words.isEmpty() -> emptyComposable()
         else ->
             FlowRow(
-                modifier = modifier.wrapContentWidth().verticalScroll(scrollState),
+                modifier = modifier.fillMaxWidth().verticalScroll(scrollState),
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
@@ -103,6 +103,7 @@ fun HSKTextView(
                         }
 
                         HSKWordView(
+                            modifier = modifier,
                             hanziText = word,
                             pinyinText = showedPinyin,
                             pinyinEditable = false,
