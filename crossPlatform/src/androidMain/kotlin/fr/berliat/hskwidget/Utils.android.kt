@@ -274,4 +274,11 @@ actual object Utils {
 
         logAnalyticsEvent(ANALYTICS_EVENTS.WIDGET_PLAY_WORD)
     }
+
+    actual fun toast(stringRes: StringResource, args: List<String>) {
+        val s = runBlocking { getString(stringRes) } // Todo change to coroutine
+        s.format(args)
+
+        Toast.makeText(context(), s.format(args), Toast.LENGTH_LONG).show()
+    }
 }

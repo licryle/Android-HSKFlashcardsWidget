@@ -38,12 +38,16 @@ import fr.berliat.hskwidget.domain.getParcelableExtraCompat
 import fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragment
 import fr.berliat.hskwidget.ui.utils.StrictModeManager
 import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
+import hskflashcardswidget.crossplatform.generated.resources.Res
+import hskflashcardswidget.crossplatform.generated.resources.support_status_tpl
+import hskflashcardswidget.crossplatform.generated.resources.support_total_error
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import org.jetbrains.compose.resources.getString
 import java.io.FileInputStream
 
 class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
@@ -316,7 +320,9 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
             }
 
             override fun onQueryFailure(result: BillingResult) {
-                Toast.makeText(applicationContext, R.string.support_total_error, Toast.LENGTH_LONG).show()
+                // TODO remove runBLocking
+                val txt = runBlocking { getString(Res.string.support_total_error) }
+                Toast.makeText(applicationContext, txt, Toast.LENGTH_LONG).show()
             }
 
             override fun onPurchaseSuccess(purchase: Purchase) { }
@@ -334,16 +340,17 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
     private fun updateSupportMenuTitle(totalSpent: Float) {
         val tier = supportDevStore.getSupportTier(totalSpent)
 
-        var tpl = R.string.menu_support
+        var tpl = getString(R.string.menu_support)
         if (totalSpent > 0) {
-            tpl = R.string.support_status_tpl
+            // TODO remove runBLocking
+            tpl = runBlocking { getString(Res.string.support_status_tpl) }
         }
 
-        val supStrId = supportDevStore.getSupportTierString(tier)
         val supportMenu = binding.navView.menu.findItem(R.id.nav_support)
 
         binding.navView.post {
-            supportMenu.title = getString(tpl).format(getString(supStrId))
+            // TODO properly pull string
+            supportMenu.title = tpl.format(tier.toString())
         }
     }
 

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.util.Log
+
 import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClientStateListener
@@ -14,12 +15,14 @@ import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchasesUpdatedListener
 import com.android.billingclient.api.QueryProductDetailsParams
 import com.android.billingclient.api.QueryPurchasesParams
-import fr.berliat.hskwidget.R
 
+import fr.berliat.hskwidget.core.HSKAppServices
+
+import kotlin.collections.forEach
 
 class SupportDevStore private constructor(private val context: Context) : PurchasesUpdatedListener {
     private lateinit var billingClient: BillingClient
-    private val appConfig = OldAppPreferencesStore(context)
+    private val appConfig = HSKAppServices.appPreferences
     private val listeners = mutableListOf<SupportDevListener>()
 
     var purchases: MutableMap<SupportProduct, Int> = mutableMapOf()
@@ -62,15 +65,6 @@ class SupportDevStore private constructor(private val context: Context) : Purcha
         PLATINUM(10.0f);
     }
 
-    private val SupportTierStrings = mapOf<SupportTier, Int>(
-        SupportTier.ERROR to R.string.support_status_error,
-        SupportTier.NONE to R.string.support_status_nosupport,
-        SupportTier.BRONZE to R.string.support_status_tier1,
-        SupportTier.SILVER to R.string.support_status_tier2,
-        SupportTier.GOLDEN to R.string.support_status_tier3,
-        SupportTier.PLATINUM to R.string.support_status_tier4
-    )
-
     enum class SupportProduct(val productId: String) {
         TIER1("support_tier1"),
         TIER2("support_tier2"),
@@ -102,10 +96,6 @@ class SupportDevStore private constructor(private val context: Context) : Purcha
         return SupportTier.ERROR
     }
 
-    fun getSupportTierString(tier : SupportTier): Int {
-        return SupportTierStrings[tier]!!
-    }
-
     fun queryPurchaseHistory() {
         val params = QueryPurchasesParams.newBuilder()
             .setProductType(BillingClient.ProductType.INAPP)
@@ -117,7 +107,7 @@ class SupportDevStore private constructor(private val context: Context) : Purcha
 
                 val totSpent = getTotalSpent()
                 if (totSpent >= 0) {
-                    appConfig.supportTotalSpent = totSpent
+                    appConfig.supportTotalSpent.value = totSpent
                 }
 
                 triggerOnTotalSpentChange(totSpent)

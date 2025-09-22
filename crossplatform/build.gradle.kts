@@ -102,9 +102,15 @@ kotlin {
 
                 implementation(libs.jieba.analysis)
 
-                implementation("androidx.work:work-runtime-ktx:2.9.0")
-                implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.6")
-                implementation("com.google.mlkit:text-recognition-chinese:16.0.1")
+                // Background TTS - maybe review and simplify
+                implementation(libs.androidx.work.runtime.ktx)
+                implementation(libs.androidx.lifecycle.livedata.ktx)
+
+                // OCR
+                implementation(libs.text.recognition.chinese)
+
+                implementation(libs.billing.ktx)
+                implementation(libs.review.ktx)
             }
             resources.srcDirs("src/commonMain/composeResources")
         }

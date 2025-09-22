@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import org.jetbrains.compose.resources.StringResource
 
 typealias AnkiDelegator = suspend ((suspend () -> Result<Unit>)?) -> Unit
 
@@ -40,6 +41,8 @@ expect object Utils {
 
     fun copyToClipBoard(s: String)
     fun playWordInBackground(word: String)
+
+    fun toast(stringRes: StringResource, args: List<String> = emptyList<String>())
 }
 
 fun String.capitalize() =

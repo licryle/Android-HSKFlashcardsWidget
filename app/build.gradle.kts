@@ -171,6 +171,26 @@ dependencies {
 }
 
 // TODO: Remove these unhappy hacks. I've search for a while and couldn't find why my resources aren't exported despite export configuration.
+val copyCrossPlatformAndroidResources = tasks.register<Copy>("copyCrossPlatformAndroidResources") {
+    group = "build"
+    description = "Copies my resources from CrossPlatform output to App input"
+
+    val sourceDir = file("$rootDir/crossPlatform/build/generated/compose/resourceGenerator/preparedResources/androidMain/composeResources")
+    from(sourceDir)
+    into("$rootDir/app/build/intermediates/assets/debug/mergeDebugAssets/composeResources/hskflashcardswidget.crossplatform.generated.resources")
+
+    inputs.dir(sourceDir)
+    dependsOn(project(":crossPlatform").tasks.named("prepareComposeResourcesTaskForAndroidMain"))
+    dependsOn(project(":crossPlatform").tasks.named("copyNonXmlValueResourcesForAndroidMain"))
+    dependsOn(project(":crossPlatform").tasks.named("convertXmlValueResourcesForAndroidMain"))
+}
+
+tasks.named("preBuild").configure {
+    dependsOn(":crossPlatform:convertXmlValueResourcesForCommonMain")
+    dependsOn(copyCrossPlatformAndroidResources)
+}
+
+// TODO: Remove these unhappy hacks. I've search for a while and couldn't find why my resources aren't exported despite export configuration.
 tasks.register<Delete>("cleanCopyCrossPlatformResources") {
     description = "Deletes the old cross-platform resources."
     delete("$rootDir/app/build/intermediates/assets/debug/mergeDebugAssets/composeResources/hskflashcardswidget.crossplatform.generated.resources")
