@@ -9,9 +9,6 @@ import android.widget.Toast
 
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
@@ -24,8 +21,6 @@ import fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragmentDirections
 import fr.berliat.hskwidget.ui.screens.OCR.DisplayOCRScreen
 import fr.berliat.hskwidget.ui.screens.OCR.DisplayOCRViewModel
 import fr.berliat.hskwidget.ui.utils.HSKAnkiDelegate
-import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.getString
 
 class DisplayOCRFragment : Fragment(), HSKTextSegmenterListener {
     private lateinit var ankiCaller : HSKAnkiDelegate
@@ -50,15 +45,6 @@ class DisplayOCRFragment : Fragment(), HSKTextSegmenterListener {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        lifecycleScope.launch {
-            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.toastEvent.collect { stringRes ->
-                    val s = getString(stringRes)
-                    Toast.makeText(requireContext(), s, Toast.LENGTH_LONG).show()
-                }
-            }
-        }
-
         viewModel.selectedWord.value?.let {
             viewModel.fetchWordForDisplay(it.simplified)
         }

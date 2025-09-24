@@ -24,9 +24,7 @@ import hskflashcardswidget.crossplatform.generated.resources.ocr_display_word_no
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -46,9 +44,6 @@ class DisplayOCRViewModel(
     val showPinyins = appPreferences.readerShowAllPinyins.asStateFlow()
     val separatorEnabled = appPreferences.readerSeparateWords.asStateFlow()
     val textSize = appPreferences.readerTextSize.asStateFlow()
-
-    private val _toastEvent = MutableSharedFlow<StringResource>()
-    val toastEvent: SharedFlow<StringResource> = _toastEvent
 
     private val _text = MutableStateFlow("")
     val text: StateFlow<String> = _text
@@ -109,7 +104,7 @@ class DisplayOCRViewModel(
             val annotatedWord = fetchWord(simplified)
 
             if (annotatedWord == null) {
-                _toastEvent.emit(Res.string.ocr_display_word_not_found)
+                Utils.toast(Res.string.ocr_display_word_not_found)
 
                 withContext(Dispatchers.Main) {
                     Utils.copyToClipBoard(simplified)
@@ -132,7 +127,7 @@ class DisplayOCRViewModel(
 
         if (textSize == smallestHanziFontSize.value) {
             viewModelScope.launch {
-                _toastEvent.emit(Res.string.ocr_display_smallest_text)
+                Utils.toast(Res.string.ocr_display_smallest_text)
             }
         }
 
