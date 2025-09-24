@@ -35,6 +35,7 @@ import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.ui.components.DetailedWordView
+import fr.berliat.hskwidget.ui.components.Error
 import fr.berliat.hskwidget.ui.components.ErrorView
 import fr.berliat.hskwidget.ui.components.LoadingView
 import fr.berliat.hskwidget.ui.components.hanziClickedBackground
@@ -89,7 +90,7 @@ fun DisplayOCRScreen(
                 if (err != null) {
                     ErrorView(
                         modifier = modifier,
-                        errorText = err
+                        error = Error(err)
                     )
                 } else {
                     val text by viewModel.text.collectAsState("")

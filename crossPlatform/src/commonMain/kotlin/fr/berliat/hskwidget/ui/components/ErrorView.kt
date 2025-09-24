@@ -3,7 +3,6 @@ package fr.berliat.hskwidget.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,13 +26,17 @@ import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
+class Error(
+    val errorText: StringResource = Res.string.loading,
+    val retryText: StringResource = Res.string.fix_it,
+    val onRetryClick: (() -> Unit)? = null
+)
+
 @Composable
 fun ErrorView(
     backgroundColor: Color = Color(0xFFFFFFFF), // replace with theme color if needed
     modifier: Modifier = Modifier,
-    errorText: StringResource = Res.string.loading,
-    retryText: StringResource = Res.string.fix_it,
-    onRetryClick: (() -> Unit)? = null
+    error : Error = Error()
 ) {
     Column(
         modifier = modifier
@@ -51,22 +54,16 @@ fun ErrorView(
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = stringResource(errorText),
+            text = stringResource(error.errorText),
             textAlign = TextAlign.Center
         )
-        onRetryClick?.let {
-            Row() {
-                Icon(
-                    painter = painterResource(Res.drawable.refresh_24px),
-                    contentDescription = null,
-                    modifier = Modifier.size(50.dp)
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = stringResource(retryText),
-                    textAlign = TextAlign.Center
-                )
-            }
+        Spacer(modifier = Modifier.height(16.dp))
+        error.onRetryClick?.let {
+            IconButton(
+                onClick = error.onRetryClick,
+                text = stringResource(error.retryText),
+                drawable = Res.drawable.refresh_24px
+            )
         }
     }
 }
