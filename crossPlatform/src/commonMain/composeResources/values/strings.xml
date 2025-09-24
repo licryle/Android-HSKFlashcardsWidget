@@ -36,6 +36,15 @@
     <string name="dictionary_item_altdefinition">Definition</string>
     <string name="dictionary_item_lists">Manage lists for this word</string>
     <string name="dictionary_item_annotate">Annotate a word</string>
+    <string name="dictionary_item_reload">New word</string>
+
+    <string name="widget_configure">Configure Widget</string>
+    <string name="widget_configure_close">Configure Widget &amp; close app</string>
+    <string name="widget_configure_new_back">Add new Widget &amp; go back</string>
+    <string name="widget_configure_error_no_list">Select at least 1 list</string>
+    <string name="widget_configure_wordlist_title">Vocabulary list to include</string>
+    <string name="widget_configure_wordlist_word_count">%1$d words</string>
+    <string name="widget_configure_no_change">No change to save</string>
 
     <string name="widget_btn_speak">Listen to this word</string>
     <string name="widget_btn_copy">Copy to clipboard</string>

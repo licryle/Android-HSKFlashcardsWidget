@@ -18,10 +18,6 @@
 
     <string name="search_hint">Search pinyin, definition, hanzi</string>
 
-    <string name="conf_widget_btn">Configure Widget</string>
-    <string name="conf_close_widget_btn">Configure Widget &amp; close app</string>
-    <string name="add_close_widget_btn">Add new Widget &amp; go back</string>
-
     <string name="widget_btn_speak">Listen to this word</string>
     <string name="widget_btn_reload">New word</string>
     <string name="app_widget_description"><![CDATA[Display a flashcard of random HSK characters & words.]]></string>

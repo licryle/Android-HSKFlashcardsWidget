@@ -62,11 +62,11 @@ import org.jetbrains.compose.resources.stringResource
 fun DisplayOCRScreen(
     ankiCaller : AnkiDelegator,
     modifier: Modifier = Modifier,
-    viewModel: DisplayOCRViewModel = DisplayOCRViewModel(
+    viewModel: DisplayOCRViewModel = remember { DisplayOCRViewModel(
         appPreferences = HSKAppServices.appPreferences,
         annotatedChineseWordDAO = HSKAppServices.database.annotatedChineseWordDAO(),
         chineseWordFrequencyDAO = HSKAppServices.database.chineseWordFrequencyDAO()
-    ),
+    ) },
     segmenter : HSKTextSegmenter = HSKAppServices.HSKSegmenter,
     appConfig : AppPreferencesStore = HSKAppServices.appPreferences,
     onClickOCRAdd : () -> Unit = {},

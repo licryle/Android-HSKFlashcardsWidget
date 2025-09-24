@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import fr.berliat.hskwidget.AnkiDelegator
+import fr.berliat.hskwidget.core.HSKAppServices
 
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.model.WordListWithCount
@@ -49,11 +50,7 @@ fun WordListSelectionDialog(
     onSaved: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val viewModel = rememberSuspendWordListViewModel(ankiCaller)
-    if (viewModel == null) {
-        LoadingView()
-        return
-    }
+    val viewModel = remember(ankiCaller) { WordListViewModel(HSKAppServices.wordListRepo, ankiCaller) }
 
     val allLists by viewModel.userLists.collectAsState()
     val shouldDismiss by viewModel.dismiss.collectAsState()

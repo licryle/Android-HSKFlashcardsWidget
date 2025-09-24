@@ -55,10 +55,10 @@ fun WordListScreen(
     ankiCaller: AnkiDelegator,
     onClickList: (WordList) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: WordListViewModel = WordListViewModel(HSKAppServices.wordListRepo, ankiCaller)
+    viewModel: WordListViewModel = remember {
+        WordListViewModel(HSKAppServices.wordListRepo, ankiCaller)
+    }
 ) {
-
-
     val wordLists by viewModel.allLists.collectAsState()
 
     var showCreateDialog by remember { mutableStateOf(false) }

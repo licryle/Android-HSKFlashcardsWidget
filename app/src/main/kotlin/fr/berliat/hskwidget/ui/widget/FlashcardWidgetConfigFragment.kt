@@ -4,105 +4,28 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
-import com.google.android.material.materialswitch.MaterialSwitch
-import fr.berliat.hskwidget.R
-import fr.berliat.hskwidget.data.model.WidgetListEntry
-import fr.berliat.hskwidget.data.store.DatabaseHelper
-import fr.berliat.hskwidget.databinding.FlashcardWidgetConfigureBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import fr.berliat.hskwidget.ui.screens.widgetConfigure.WidgetConfigScreen
 
 class FlashcardWidgetConfigFragment(val expectsActivityResult: Boolean = false) : Fragment() {
-    private lateinit var viewBinding: FlashcardWidgetConfigureBinding
-    private var _widgetId: Int? = null
+    private var widgetId = 0
     private val prefListeners = mutableListOf<WidgetPreferenceListener>()
-    private suspend fun widgetListsDAO() = withContext(Dispatchers.IO) {
-        DatabaseHelper.getInstance(requireContext()).widgetListDAO()
-    }
-    private suspend fun wordListDAO() = withContext(Dispatchers.IO) {
-        DatabaseHelper.getInstance(requireContext()).wordListDAO()
-    }
-
-    private val switchList = mutableMapOf<Long, MaterialSwitch>()
-
-    // Properties only valid between onCreateView and onDestroyView.
-    private val widgetId get() = _widgetId!!
-    override fun onCreate(savedInstanceState: Bundle?) {
-        arguments?.let {
-            _widgetId = it.getInt(ARG_WIDGETID)
-        }
-
-        super.onCreate(savedInstanceState)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        viewBinding =
-            FlashcardWidgetConfigureBinding.inflate(inflater, container, false) // Inflate here
+        widgetId = arguments?.getInt(ARG_WIDGETID) ?: 0
 
-        lifecycleScope.launch(Dispatchers.IO) {
-            val widgetList = widgetListsDAO().getListsForWidget(widgetId)
-            val allLists = wordListDAO().getAllLists()
-
-            withContext(Dispatchers.Main) {
-                for (list in allLists) {
-                    val newView = inflater.inflate(R.layout.flashcard_widget_configure_list, container, false)
-                    newView.findViewById<TextView>(R.id.flashcard_widget_configure_list_label).text = list.name
-
-                    newView.findViewById<TextView>(R.id.flashcard_widget_configure_list_wordcount)
-                        .text = requireContext().getString(R.string.wordlist_word_count).format(list.wordCount)
-
-                    val switch = newView.findViewById<MaterialSwitch>(R.id.flashcard_widget_configure_list_switch)
-                    switch.isChecked = list.id in widgetList
-                    switch.setOnClickListener { fireWidgetPreferenceChange(list.id, switch.isChecked) }
-
-                    switchList[list.id] = switch
-
-                    viewBinding.flashcardConfigureContainer.addView(newView)
-                }
-
-                var btnTextRes = R.string.conf_widget_btn
-                when {
-                    // Brand new widget (in theory)
-                    expectsActivityResult && widgetList.isEmpty() -> btnTextRes = R.string.add_close_widget_btn
-                    expectsActivityResult -> btnTextRes = R.string.conf_close_widget_btn
-                }
-
-                viewBinding.flashcardWidgetConfigureConfwidget.text = getString(btnTextRes)
+        return ComposeView(requireContext()).apply {
+            setContent {
+                WidgetConfigScreen(widgetId,
+                    expectsActivityResult,
+                    { fireWidgetPreferenceSaved() })
             }
         }
-
-        viewBinding.flashcardWidgetConfigureConfwidget.setOnClickListener {
-            val entriesToAdd = mutableListOf<WidgetListEntry>()
-            for ((listId, switch) in switchList) {
-                if (switch.isChecked) {
-                    entriesToAdd.add(WidgetListEntry(widgetId, listId))
-                }
-            }
-
-            if (entriesToAdd.isEmpty()) {
-                fireWidgetPreferenceEmpty()
-            } else {
-                lifecycleScope.launch(Dispatchers.IO) {
-                    widgetListsDAO().deleteWidget(widgetId)
-                    widgetListsDAO().insertListsToWidget(entriesToAdd)
-
-                    withContext(Dispatchers.Main) {
-                        fireWidgetPreferenceSaved()
-                    }
-                }
-            }
-        }
-
-
-        return viewBinding.root // Return the root v
     }
 
     fun addWidgetPreferenceListener(listener: WidgetPreferenceListener) {
