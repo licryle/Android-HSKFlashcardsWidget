@@ -12,7 +12,7 @@ import androidx.fragment.app.Fragment
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.domain.FlashcardManager
 import fr.berliat.hskwidget.domain.Utils
-import fr.berliat.hskwidget.ui.widget.FlashcardWidgetConfigFragment
+import fr.berliat.hskwidget.ui.widget.WidgetConfigFragment
 import fr.berliat.hskwidget.ui.widget.FlashcardFragment
 
 
@@ -24,10 +24,10 @@ private const val ARG_WIDGETID = "WIDGETID"
  * create an instance of this fragment.
  */
 class WidgetsWidgetConfPreviewFragment(val expectsActivityResult: Boolean = false)
-    : Fragment(), FlashcardWidgetConfigFragment.WidgetPreferenceListener  {
+    : Fragment(), WidgetConfigFragment.WidgetPreferenceListener  {
     private var _widgetId: Int? = null
     private var _root: View ? = null
-    private var _confFragment: FlashcardWidgetConfigFragment? = null
+    private var _confFragment: WidgetConfigFragment? = null
     private var _previewFragment: FlashcardFragment? = null
 
     // Properties only valid between onCreateView and onDestroyView.
@@ -43,7 +43,7 @@ class WidgetsWidgetConfPreviewFragment(val expectsActivityResult: Boolean = fals
             _widgetId = it.getInt(ARG_WIDGETID)
         }
 
-        _confFragment = FlashcardWidgetConfigFragment.newInstance(widgetId, expectsActivityResult)
+        _confFragment = WidgetConfigFragment.newInstance(widgetId, expectsActivityResult)
         confFragment.addWidgetPreferenceListener(this)
         _previewFragment = FlashcardFragment.newInstance(widgetId)
 

@@ -27,7 +27,7 @@ internal const val ACTION_DICTIONARY = "fr.berliat.hskwidget.ACTION_DICTIONARY"
 
 /**
  * Implementation of App Widget functionality.
- * App Widget Configuration implemented in [FlashcardWidgetConfigFragment]
+ * App Widget Configuration implemented in [WidgetConfigFragment]
  */
 class FlashcardWidgetProvider : AppWidgetProvider() {
 

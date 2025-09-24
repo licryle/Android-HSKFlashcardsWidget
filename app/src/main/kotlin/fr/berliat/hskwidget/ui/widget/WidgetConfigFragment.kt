@@ -8,7 +8,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import fr.berliat.hskwidget.ui.screens.widgetConfigure.WidgetConfigScreen
 
-class FlashcardWidgetConfigFragment(val expectsActivityResult: Boolean = false) : Fragment() {
+class WidgetConfigFragment(val expectsActivityResult: Boolean = false) : Fragment() {
     private var widgetId = 0
     private val prefListeners = mutableListOf<WidgetPreferenceListener>()
 
@@ -66,7 +66,7 @@ class FlashcardWidgetConfigFragment(val expectsActivityResult: Boolean = false) 
          */
         @JvmStatic
         fun newInstance(widgetId: Int, expectsActivityResult: Boolean) =
-            FlashcardWidgetConfigFragment(expectsActivityResult).apply {
+            WidgetConfigFragment(expectsActivityResult).apply {
                 arguments = Bundle().apply {
                     putInt(ARG_WIDGETID, widgetId)
                 }
