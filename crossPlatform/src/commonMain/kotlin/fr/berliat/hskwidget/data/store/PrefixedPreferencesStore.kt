@@ -1,0 +1,66 @@
+package fr.berliat.hskwidget.data.store
+
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.floatPreferencesKey
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
+
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+
+open class PrefixedPreferencesStore protected constructor(
+    private val store: DataStore<Preferences>,
+    private val prefix: String
+) {
+    companion object {
+        private val mutex = Mutex()
+        private val instances = mutableMapOf<Pair<DataStore<Preferences>, String>, PrefixedPreferencesStore>()
+
+        suspend fun getInstance(store: DataStore<Preferences>, prefix: String): PrefixedPreferencesStore {
+            val key = Pair(store, prefix)
+            instances[key]?.let { return it }
+
+            return mutex.withLock {
+                instances[key] ?: PrefixedPreferencesStore(store, prefix).also { instance ->
+                    instances[key] = instance
+                }
+            }
+        }
+    }
+
+    fun prefixKey(key: String): String {
+        return if (prefix.isEmpty()) key else "${prefix}_$key"
+    }
+
+    fun <S, T> registerPreference(
+        factory: (String) -> Preferences.Key<S>,
+        name: String,
+        default: T,
+        converter: PreferenceConverter<S, T>? = null
+    ): PreferenceState<S, T> {
+        val key = prefixKey(name)
+        return PreferenceState(store, factory(key), default, converter)
+    }
+
+    fun <T> registerBooleanPref(name: String, default: T, converter: PreferenceConverter<Boolean, T>? = null) =
+        registerPreference(::booleanPreferencesKey, name, default, converter)
+
+    fun <T> registerIntPref(name: String, default: T, converter: PreferenceConverter<Int, T>? = null) =
+        registerPreference(::intPreferencesKey, name, default, converter)
+
+    fun <T> registerLongPref(name: String, default: T, converter: PreferenceConverter<Long, T>? = null) =
+        registerPreference(::longPreferencesKey, name, default, converter)
+
+    fun <T> registerFloatPref(name: String, default: T, converter: PreferenceConverter<Float, T>? = null) =
+        registerPreference(::floatPreferencesKey, name, default, converter)
+
+    fun <T> registerStringPref(name: String, default: T, converter: PreferenceConverter<String, T>? = null) =
+        registerPreference(::stringPreferencesKey, name, default, converter)
+
+    fun <T> registerStringSetPref(name: String, default: T, converter: PreferenceConverter<Set<String>, T>? = null) =
+        registerPreference(::stringSetPreferencesKey, name, default, converter)
+}

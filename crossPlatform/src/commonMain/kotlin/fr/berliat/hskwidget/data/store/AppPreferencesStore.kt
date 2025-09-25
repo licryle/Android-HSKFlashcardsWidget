@@ -40,50 +40,59 @@ import kotlinx.coroutines.sync.withLock
  * ```
  */
 
-class AppPreferencesStore private constructor(store: DataStore<Preferences>) {
-
+class AppPreferencesStore private constructor(store: DataStore<Preferences>):
+      PrefixedPreferencesStore(store, "")  {
     companion object {
         private val mutex = Mutex()
-        private var INSTANCE: AppPreferencesStore? = null
+        private val instances = mutableMapOf<DataStore<Preferences>, AppPreferencesStore>()
 
         suspend fun getInstance(store: DataStore<Preferences>): AppPreferencesStore {
-            if (INSTANCE != null) return INSTANCE!!
+            instances[store]?.let { return it }
 
             return mutex.withLock {
-                INSTANCE ?: AppPreferencesStore(store).also { instance ->
-                    INSTANCE = instance
+                instances[store] ?: AppPreferencesStore(store).also { instance ->
+                    instances[store] = instance
                 }
             }
         }
     }
 
     // --- Boolean preferences ---
-    val dbBackUpActive = PreferenceState<Boolean, Boolean>(store, booleanPreferencesKey("database_backup_active"), false)
-    val ankiSaveNotes = PreferenceState<Boolean, Boolean>(store, booleanPreferencesKey("anki_save_notes"), false)
-    val searchFilterHasAnnotation = PreferenceState<Boolean, Boolean>(store, booleanPreferencesKey("search_filter_hasAnnotation"), false)
-    val dictionaryShowHSK3Definition = PreferenceState<Boolean, Boolean>(store, booleanPreferencesKey("dictionary_show_hsk3_definition"), false)
-    val readerSeparateWords = PreferenceState<Boolean, Boolean>(store, booleanPreferencesKey("reader_separate_word"), false)
-    val readerShowAllPinyins = PreferenceState<Boolean, Boolean>(store, booleanPreferencesKey("reader_show_pinyins"), false)
+    val dbBackUpActive = registerBooleanPref("database_backup_active", false)
+    val ankiSaveNotes = registerBooleanPref("anki_save_notes", false)
+    val searchFilterHasAnnotation = registerBooleanPref("search_filter_hasAnnotation", false)
+    val dictionaryShowHSK3Definition = registerBooleanPref("dictionary_show_hsk3_definition", false
+    )
+    val readerSeparateWords = registerBooleanPref("reader_separate_word", false)
+    val readerShowAllPinyins = registerBooleanPref("reader_show_pinyins", false)
 
     // --- Int preferences ---
-    val appVersionCode = PreferenceState<Int, Int>(store, intPreferencesKey("appVersionCode"), 0)
-    val dbBackUpMaxLocalFiles = PreferenceState<Int, Int>(store, intPreferencesKey("database_backup_max_local_files"), 2)
+    val appVersionCode = registerIntPref("appVersionCode", 0)
+    val dbBackUpMaxLocalFiles = registerIntPref("database_backup_max_local_files", 2)
 
     // --- Long preferences ---
-    val ankiModelId = PreferenceState<Long, Long>(store, longPreferencesKey("anki_model_id"), -1)
+    val ankiModelId = registerLongPref("anki_model_id", -1L)
 
     // --- Float preferences ---
-    val supportTotalSpent = PreferenceState<Float, Float>(store, floatPreferencesKey("support_total_spent"), -1f)
+    val supportTotalSpent = registerFloatPref("support_total_spent", -1f)
 
     // --- Derived complex types ---
-    val dbBackupCloudLastSuccess = PreferenceState(store, longPreferencesKey("database_backupcloud_lastsuccess"), 0L,
-        PreferenceConverter({ Instant.fromEpochMilliseconds(it) }, { it.toEpochMilliseconds() }))
-    val dbBackUpDirectory = PreferenceState(store, stringPreferencesKey("database_backup_directory"), "",
-        PreferenceConverter({ it.toPath() }, { it.toString() }))
-    val lastAnnotatedClassLevel = PreferenceState(store, stringPreferencesKey("class_level"), "NotFromClass",
-        PreferenceConverter({ ClassLevel.from(it) }, { it.name }))
-    val lastAnnotatedClassType = PreferenceState(store, stringPreferencesKey("class_type"), "NotFromClass",
-        PreferenceConverter({ ClassType.from(it) }, { it.name }))
-    val readerTextSize = PreferenceState(store, floatPreferencesKey("reader_text_size"), 30f,
-        PreferenceConverter({ it.sp }, { it.value }))
+    val dbBackupCloudLastSuccess = registerLongPref(
+        "database_backupcloud_lastsuccess",
+        Instant.fromEpochMilliseconds(0L),
+        PreferenceConverter({ Instant.fromEpochMilliseconds(it) }, { it.toEpochMilliseconds() })
+    )
+    val dbBackUpDirectory = registerStringPref(
+        "database_backup_directory", ClassType.NotFromClass,
+        PreferenceConverter({ it.toPath() }, { it.toString() })
+    )
+    val lastAnnotatedClassLevel = registerStringPref("class_level", ClassLevel.NotFromClass,
+        PreferenceConverter({ ClassLevel.from(it) }, { it.name })
+    )
+    val lastAnnotatedClassType = registerStringPref("class_type", ClassType.NotFromClass,
+        PreferenceConverter({ ClassType.from(it) }, { it.name })
+    )
+    val readerTextSize = registerFloatPref("reader_text_size", 30f.sp,
+        PreferenceConverter({ it.sp }, { it.value })
+    )
 }

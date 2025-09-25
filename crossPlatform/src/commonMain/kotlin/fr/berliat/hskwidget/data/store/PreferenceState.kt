@@ -24,17 +24,17 @@ class PreferenceConverter<S, T>(
 class PreferenceState<S, T>(
     private val store: DataStore<Preferences>,
     private val key: Preferences.Key<S>,
-    initialValue: S,
+    initialValue: T,
     converter: PreferenceConverter<S, T>? = null
 ) {
     private val conv = converter ?: PreferenceConverter({ it as T }, { it as S })
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-    private val _flow : MutableStateFlow<T> = MutableStateFlow(conv.fromStore(initialValue))
+    private val _flow : MutableStateFlow<T> = MutableStateFlow(initialValue)
     fun asStateFlow(): StateFlow<T> = _flow
 
     init {
         scope.launch {
-            val stored = store.data.map { it[key] ?: initialValue }.first()
+            val stored = store.data.map { it[key] ?: conv.toStore(initialValue) }.first()
             _flow.value = conv.fromStore(stored)
         }
     }
