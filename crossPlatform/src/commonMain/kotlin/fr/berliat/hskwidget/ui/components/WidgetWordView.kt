@@ -29,7 +29,6 @@ fun WidgetWordView(
     onClickSpeak: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-
     Column(
         modifier = modifier
             .fillMaxSize()

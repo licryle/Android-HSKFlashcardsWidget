@@ -1,7 +1,11 @@
 package fr.berliat.hskwidget.ui.components
 
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 val hanziStyle = TextStyle(fontSize = 34.sp, color = Color.Black)
@@ -15,3 +19,5 @@ object Colors {
     val silver = Color(192, 192, 192) // #C0C0C0
     val gold = Color(255, 215, 0) // #FFD700
 }
+
+val widgetDefaultBox = Modifier.size(185.dp).padding(5.dp)

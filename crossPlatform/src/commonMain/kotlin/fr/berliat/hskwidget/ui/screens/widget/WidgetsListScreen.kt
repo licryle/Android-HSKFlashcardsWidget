@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Tab
@@ -24,7 +23,8 @@ import fr.berliat.hskwidget.data.type.HSK_Level
 import fr.berliat.hskwidget.data.type.Pinyins
 import fr.berliat.hskwidget.ui.components.IconButton
 import fr.berliat.hskwidget.ui.components.WidgetWordView
-import fr.berliat.hskwidget.ui.screens.widgetConfigure.WidgetConfigScreen
+import fr.berliat.hskwidget.ui.components.widgetDefaultBox
+import fr.berliat.hskwidget.ui.screens.widgetConfigure.WidgetConfigWithPreviewScreen
 
 import hskflashcardswidget.crossplatform.generated.resources.Res
 import hskflashcardswidget.crossplatform.generated.resources.ic_add_24dp
@@ -69,10 +69,7 @@ fun WidgetsListScreen(
             )
 
             Box(
-                modifier = Modifier
-                    .size(150.dp)
-                    .align(Alignment.CenterHorizontally)
-                    .padding(10.dp)
+                modifier = widgetDefaultBox.align(Alignment.CenterHorizontally)
             ) {
                 WidgetWordView(
                     ChineseWord(
@@ -112,7 +109,7 @@ fun WidgetsListScreen(
                 state = pagerState,
                 modifier = Modifier.weight(1f)
             ) { page ->
-                WidgetConfigScreen(
+                WidgetConfigWithPreviewScreen(
                     widgetId = widgetIds[page],
                     expectsActivityResult = expectsActivityResult,
                     onSuccessfulSave = { onWidgetPreferenceSaved(widgetIds[page]) },

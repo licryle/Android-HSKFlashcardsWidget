@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.sp
 
 import fr.berliat.hskwidget.data.model.WordListWithCount
 import fr.berliat.hskwidget.ui.components.LoadingView
+import fr.berliat.hskwidget.ui.components.widgetDefaultBox
 import fr.berliat.hskwidget.ui.screens.widget.WidgetView
 
 import hskflashcardswidget.crossplatform.generated.resources.Res
@@ -58,7 +59,7 @@ fun WidgetConfigWithPreviewScreen(
             .fillMaxSize()
             .padding(top = 15.dp)
     ) {
-        Box(modifier = modifier.height(150.dp).width(150.dp).align(Alignment.CenterHorizontally)) {
+        Box(widgetDefaultBox.align(Alignment.CenterHorizontally)) {
             WidgetView(widgetId = widgetId, modifier = modifier)
         }
 
