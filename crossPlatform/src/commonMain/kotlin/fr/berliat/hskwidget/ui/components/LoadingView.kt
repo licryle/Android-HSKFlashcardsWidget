@@ -29,7 +29,7 @@ fun LoadingView(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .fillMaxHeight(0.5f) // adjust if needed
+            .fillMaxHeight(1f) // adjust if needed
             .background(backgroundColor)
             .padding(16.dp),
         verticalArrangement = Arrangement.Center,
