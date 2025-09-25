@@ -1,10 +1,12 @@
 package fr.berliat.hskwidget.ui.screens.widgetConfigure
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -28,6 +30,7 @@ import androidx.compose.ui.unit.sp
 
 import fr.berliat.hskwidget.data.model.WordListWithCount
 import fr.berliat.hskwidget.ui.components.LoadingView
+import fr.berliat.hskwidget.ui.screens.widget.WidgetView
 
 import hskflashcardswidget.crossplatform.generated.resources.Res
 import hskflashcardswidget.crossplatform.generated.resources.ic_dictionary_24dp
@@ -41,6 +44,35 @@ import hskflashcardswidget.crossplatform.generated.resources.widget_configure_wo
 
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+
+@Composable
+fun WidgetConfigWithPreviewScreen(
+    widgetId: Int,
+    expectsActivityResult: Boolean = false,
+    onSuccessfulSave : () -> Unit,
+    viewModel: WidgetConfigViewModel = remember(widgetId) { WidgetConfigViewModel(widgetId, onSuccessfulSave = onSuccessfulSave) },
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(top = 15.dp)
+    ) {
+        Box(modifier = modifier.height(150.dp).width(150.dp).align(Alignment.CenterHorizontally)) {
+            WidgetView(widgetId = widgetId, modifier = modifier)
+        }
+
+        Spacer(modifier = modifier.height(10.dp))
+
+        WidgetConfigScreen(
+            widgetId = widgetId,
+            expectsActivityResult = expectsActivityResult,
+            onSuccessfulSave = onSuccessfulSave,
+            viewModel = viewModel,
+            modifier = modifier
+        )
+    }
+}
 
 @Composable
 fun WidgetConfigScreen(
@@ -98,7 +130,9 @@ fun WidgetConfigScreen(
                         list = list,
                         isSelected = localSelectedIds.contains(list.id),
                         onToggle = { included ->
-                            if (included) localSelectedIds.add(list.id) else localSelectedIds.remove(list.id)
+                            if (included) localSelectedIds.add(list.id) else localSelectedIds.remove(
+                                list.id
+                            )
                         }
                     )
                 }
@@ -118,7 +152,7 @@ fun WidgetConfigScreen(
                     .fillMaxWidth()
                     .padding(8.dp),
                 onClick = { viewModel.savePreferences(localSelectedIds) },
-                enabled = ! localSelectedIds.isEmpty() && localSelectedIds.toSet() != selectedIds.value.toSet()
+                enabled = !localSelectedIds.isEmpty() && localSelectedIds.toSet() != selectedIds.value.toSet()
             ) {
                 Text(text = stringResource(configureButtonLabel))
             }

@@ -7,6 +7,8 @@ import fr.berliat.hskwidget.data.repo.WordListRepository
 import fr.berliat.hskwidget.data.store.AnkiStore
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
+import fr.berliat.hskwidget.data.store.WidgetPreferencesStore
+import fr.berliat.hskwidget.data.store.WidgetPreferencesStoreProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -18,6 +20,15 @@ object HSKAppServices : AppServices() {
         register("database") { Utils.getDatabaseInstance() }
         register("appPreferences") {
             AppPreferencesStore.getInstance(Utils.getDataStore("app.preferences_pb"))
+        }
+
+        register("widgetsPreferencesProvider") {
+            val provider : WidgetPreferencesStoreProvider = { widgetId: Int ->
+                WidgetPreferencesStore.getInstance(
+                    Utils.getDataStore("widgets.preferences_pb"), widgetId
+                )
+            }
+            provider
         }
         register("ankiDAO") { Utils.getAnkiDAO() }
         register("ankiStore") {
@@ -50,6 +61,7 @@ object HSKAppServices : AppServices() {
 
     val database: ChineseWordsDatabase get() = get("database")
     val appPreferences: AppPreferencesStore get() = get("appPreferences")
+    val widgetsPreferencesProvider: WidgetPreferencesStoreProvider get() = get("widgetsPreferencesProvider")
     val ankiDAO: AnkiDAO get() = get("ankiDAO")
     val ankiStore: AnkiStore get() = get("ankiStore")
     val wordListRepo: WordListRepository get() = get("wordListRepo")
