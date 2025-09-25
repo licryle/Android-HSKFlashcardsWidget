@@ -1,5 +1,6 @@
 package fr.berliat.hskwidget.ui.widgets
 
+import android.app.Activity
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
@@ -8,125 +9,78 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModelProvider
-import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayoutMediator
+import androidx.lifecycle.lifecycleScope
+
 import fr.berliat.hskwidget.R
-import fr.berliat.hskwidget.databinding.FragmentWidgetsBinding
+import fr.berliat.hskwidget.core.HSKAppServices
+import fr.berliat.hskwidget.domain.FlashcardManager
 import fr.berliat.hskwidget.domain.Utils
-import fr.berliat.hskwidget.ui.widget.FlashcardFragment
+import fr.berliat.hskwidget.ui.screens.widget.WidgetViewModel
+import fr.berliat.hskwidget.ui.screens.widget.WidgetsListScreen
 import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class WidgetsListFragment : Fragment() {
-    private var _binding: FragmentWidgetsBinding? = null
-    private var _viewModel: WidgetsListViewModel? = null
+    var selectedWidgetId : Int = AppWidgetManager.INVALID_APPWIDGET_ID
+    var expectsActivityResult : Boolean = false
 
-    // This property is only valid between onCreateView and
-    // onDestroyView.
-    private val binding get() = _binding!!
-    private val viewModel get() = _viewModel!!
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        val previewWidget = FlashcardFragment.newInstance(0)
-        with(childFragmentManager.beginTransaction()) {
-            add(
-                R.id.widgets_demoflashcard_fragment,
-                previewWidget)
-            commit()
+    val widgetIds : IntArray
+        get() {
+            val context = requireActivity().applicationContext
+            return FlashcardWidgetProvider().getWidgetIds(context)
         }
-        childFragmentManager.executePendingTransactions()
-        previewWidget.updateWord()
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentWidgetsBinding.inflate(inflater, container, false)
-        _viewModel = ViewModelProvider(this)[WidgetsListViewModel::class.java]
+        handleIntent(arguments)
 
-        binding.widgetsTabs.addOnTabSelectedListener(TabChangeListener(viewModel))
-        binding.widgetsAddNewWidget.setOnClickListener { addNewWidget() }
-
-        return binding.root
+        return ComposeView(requireContext()).apply {
+            setContent {
+                WidgetsListScreen(
+                    widgetIds,
+                    selectedWidgetId = selectedWidgetId,
+                    onAddNewWidget = ::addNewWidget,
+                    onWidgetPreferenceSaved = ::onWidgetPreferenceSaved,
+                    expectsActivityResult = expectsActivityResult
+                )
+            }
+        }
     }
 
     override fun onResume() {
         super.onResume()
 
-        val widgetsIntro = binding.widgetsIntro
-        val tabsLayout = binding.widgetsTabs
-        val widgetPager = binding.widgetsTabsConfigure
-        val demoFlashcard = binding.widgetsDemoflashcardFragment
-
-        val context = requireActivity().applicationContext
-        val widgetIds = FlashcardWidgetProvider().getWidgetIds(context)
-
-        if (widgetIds.isEmpty()) {
-            tabsLayout.visibility = View.GONE
-            widgetPager.visibility = View.GONE
-            demoFlashcard.visibility = View.VISIBLE
-            widgetsIntro.visibility = View.VISIBLE
-        } else {
-            tabsLayout.visibility = View.VISIBLE
-            widgetPager.visibility = View.VISIBLE
-            demoFlashcard.visibility = View.GONE
-            widgetsIntro.visibility = View.GONE
-
-            // Handle intent asking to configure, in particular sets expectsActivityResult
-            handleIntent(arguments)
-            val intentPosition = viewModel.getLastTabPosition()
-
-            widgetPager.adapter = WidgetPagerAdapter(childFragmentManager,
-                viewLifecycleOwner.lifecycle, widgetIds, viewModel.expectsActivityResult)
-            TabLayoutMediator(tabsLayout, widgetPager) { tab, position ->
-                tab.text = "Widget $position"
-            }.attach()
-
-            if (intentPosition < widgetIds.size) {
-                tabsLayout.selectTab(binding.widgetsTabs.getTabAt(intentPosition))
-            }
-        }
-
         Utils.logAnalyticsScreenView("WidgetsList")
     }
 
     private fun handleIntent(arguments: Bundle?) {
-        val intentWidgetId = arguments?.getInt("widgetId", AppWidgetManager.INVALID_APPWIDGET_ID) ?: AppWidgetManager.INVALID_APPWIDGET_ID
-        if (intentWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
-            setSingleWidgetConfigMode(intentWidgetId)
+        selectedWidgetId = arguments?.getInt("widgetId", AppWidgetManager.INVALID_APPWIDGET_ID) ?: AppWidgetManager.INVALID_APPWIDGET_ID
+        if (selectedWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
+            setSingleWidgetConfigMode(selectedWidgetId)
         } else {
             setSingleWidgetConfigMode(AppWidgetManager.INVALID_APPWIDGET_ID)
         }
+
+        // ToDo Notify widget manager a new widget may be here
     }
 
     fun setSingleWidgetConfigMode(intentWidgetId: Int) {
-        viewModel.expectsActivityResult = intentWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID
-        if (!viewModel.expectsActivityResult) return
+        expectsActivityResult = intentWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID
+        if (!expectsActivityResult) return
 
-        val context = requireActivity().applicationContext
-        val widgetIds = FlashcardWidgetProvider().getWidgetIds(context)
-
-        val position = widgetIds.indexOf(intentWidgetId)
-        viewModel.onToggleTab(position)
         Utils.logAnalyticsWidgetAction(Utils.ANALYTICS_EVENTS.WIDGET_RECONFIGURE, intentWidgetId)
         // Consume condition so we don't come back here until next intent
         arguments?.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-
-        _binding = null
     }
 
     fun addNewWidget() {
@@ -153,46 +107,29 @@ class WidgetsListFragment : Fragment() {
         }
     }
 
-    class WidgetPagerAdapter(
-        fragMgr: FragmentManager, lifecycle: Lifecycle,
-        private val widgetIds: IntArray,
-        private val expectsActivityResult: Boolean
-    ) :
-                             FragmentStateAdapter(fragMgr, lifecycle) {
-        // TODO: Someday, is the API evolves, find a better way to access the fragment that cache
-        // it here. I don't know when items are removed.
-        private val fragMap = mutableMapOf<Int, WidgetsWidgetConfPreviewFragment>()
-        private val fragToFireIntent = mutableListOf<Int>()
+    private fun onWidgetPreferenceSaved(widgetId: Int) {
+        val activity = requireActivity()
+        FlashcardManager.getInstance(activity, widgetId).updateWord()
 
-        override fun getItemCount(): Int {
-            return widgetIds.count()
+        lifecycleScope.launch(Dispatchers.IO) {
+            WidgetViewModel.getInstance(
+                HSKAppServices.widgetsPreferencesProvider.invoke(widgetId)
+            ).updateWord()
         }
 
-        override fun createFragment(position: Int): WidgetsWidgetConfPreviewFragment {
-            val widgetId = widgetIds[position]
-            val newFragment = WidgetsWidgetConfPreviewFragment.newInstance(widgetId, expectsActivityResult)
-            fragMap[widgetId] = newFragment
+        Utils.logAnalyticsWidgetAction(Utils.ANALYTICS_EVENTS.WIDGET_RECONFIGURE, widgetId)
 
-            if (fragToFireIntent.contains(widgetId)) {
-                fragToFireIntent.remove(widgetId)
-            }
+        Toast.makeText(
+            activity,
+            getString(R.string.flashcard_widget_configure_saved),
+            Toast.LENGTH_SHORT
+        ).show()
 
-            return newFragment
-        }
-    }
-
-    class TabChangeListener(private val viewModel :WidgetsListViewModel)
-        : TabLayout.OnTabSelectedListener{
-        override fun onTabSelected(tab: TabLayout.Tab?) {
-            if (tab != null) viewModel.onToggleTab(tab.position)
-        }
-
-        override fun onTabUnselected(tab: TabLayout.Tab?) {
-
-        }
-
-        override fun onTabReselected(tab: TabLayout.Tab?) {
-            if (tab != null) viewModel.onToggleTab(tab.position)
+        if (expectsActivityResult) {
+            val resultIntent = Intent()
+            resultIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
+            activity.setResult(Activity.RESULT_OK, activity.intent)
+            activity.finish()
         }
     }
 }
