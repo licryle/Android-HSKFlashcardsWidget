@@ -14,18 +14,12 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 
 import fr.berliat.hskwidget.R
-import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.domain.FlashcardManager
 import fr.berliat.hskwidget.domain.Utils
-import fr.berliat.hskwidget.ui.screens.widget.WidgetViewModel
 import fr.berliat.hskwidget.ui.screens.widget.WidgetsListScreen
 import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
-
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class WidgetsListFragment : Fragment() {
     var selectedWidgetId : Int = AppWidgetManager.INVALID_APPWIDGET_ID
@@ -110,12 +104,6 @@ class WidgetsListFragment : Fragment() {
     private fun onWidgetPreferenceSaved(widgetId: Int) {
         val activity = requireActivity()
         FlashcardManager.getInstance(activity, widgetId).updateWord()
-
-        lifecycleScope.launch(Dispatchers.IO) {
-            WidgetViewModel.getInstance(
-                HSKAppServices.widgetsPreferencesProvider.invoke(widgetId)
-            ).updateWord()
-        }
 
         Utils.logAnalyticsWidgetAction(Utils.ANALYTICS_EVENTS.WIDGET_RECONFIGURE, widgetId)
 
