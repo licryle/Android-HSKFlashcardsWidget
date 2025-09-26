@@ -2,9 +2,9 @@ package fr.berliat.hskwidget.ui.screens.annotate
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import fr.berliat.hskwidget.ANALYTICS_EVENTS
 import fr.berliat.hskwidget.AnkiDelegator
 import fr.berliat.hskwidget.Utils
+import fr.berliat.hskwidget.Utils.incrementConsultedWord
 
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
@@ -16,7 +16,6 @@ import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.data.type.ClassLevel
 import fr.berliat.hskwidget.data.type.ClassType
 import fr.berliat.hskwidget.data.type.Pinyins
-import fr.berliat.hskwidget.incrementConsultedWord
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -90,7 +89,7 @@ class AnnotateViewModel(
             try {
                 database.chineseWordAnnotationDAO().insertOrUpdate(annotatedWord.annotation!!)
 
-                Utils.logAnalyticsEvent(ANALYTICS_EVENTS.ANNOTATION_SAVE)
+                Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.ANNOTATION_SAVE)
 
                 ankiCaller(wordListRepo.addWordToSysAnnotatedList(annotatedWord))
                 ankiCaller(wordListRepo.updateInAllLists(annotatedWord.simplified))
@@ -111,7 +110,7 @@ class AnnotateViewModel(
                 val nbRowAffected = database.chineseWordAnnotationDAO().deleteBySimplified(simplified)
                 if (nbRowAffected == 0) throw Exception("No records deleted")
 
-                Utils.logAnalyticsEvent(ANALYTICS_EVENTS.ANNOTATION_DELETE)
+                Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.ANNOTATION_DELETE)
 
                 wordListRepo.touchAnnotatedList()
                 ankiCaller(wordListRepo.removeWordFromAllLists(simplified))

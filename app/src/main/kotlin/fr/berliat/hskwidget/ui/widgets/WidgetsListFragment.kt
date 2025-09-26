@@ -18,17 +18,13 @@ import androidx.fragment.app.Fragment
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.ui.screens.widget.WidgetsListScreen
-import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
+import fr.berliat.hskwidget.ui.widget.WidgetProvider
 
 class WidgetsListFragment : Fragment() {
     var selectedWidgetId : Int = AppWidgetManager.INVALID_APPWIDGET_ID
     var expectsActivityResult : Boolean = false
 
-    val widgetIds : IntArray
-        get() {
-            val context = requireActivity().applicationContext
-            return FlashcardWidgetProvider().getWidgetIds(context)
-        }
+    val widgetIds = WidgetProvider.getWidgetIds()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -78,11 +74,11 @@ class WidgetsListFragment : Fragment() {
 
     fun addNewWidget() {
         val appWidgetManager = AppWidgetManager.getInstance(context)
-        val myProvider = ComponentName(requireContext(), FlashcardWidgetProvider::class.java)
+        val myProvider = ComponentName(requireContext(), WidgetProvider::class.java)
 
         if (appWidgetManager.isRequestPinAppWidgetSupported) {
-            val confIntent = Intent(context, FlashcardWidgetProvider::class.java)
-            confIntent.action = FlashcardWidgetProvider.ACTION_CONFIGURE_LATEST
+            val confIntent = Intent(context, WidgetProvider::class.java)
+            confIntent.action = WidgetProvider.ACTION_CONFIGURE_LATEST
 
             val callbackIntent = PendingIntent.getBroadcast(
                 /* context = */ context,

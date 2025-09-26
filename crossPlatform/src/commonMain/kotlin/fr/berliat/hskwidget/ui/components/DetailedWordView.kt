@@ -30,7 +30,6 @@ import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.type.Modality
 import fr.berliat.hskwidget.data.type.WordType
 import fr.berliat.hskwidget.capitalize
-import fr.berliat.hskwidget.ANALYTICS_EVENTS
 import fr.berliat.hskwidget.Utils
 import fr.berliat.hskwidget.data.type.HSK_Level
 
@@ -98,9 +97,9 @@ fun DetailedWordView (
 
             isMoreVisible = !isMoreVisible
             if (isMoreVisible)
-                Utils.logAnalyticsEvent(ANALYTICS_EVENTS.WIDGET_EXPAND)
+                Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.WIDGET_EXPAND)
             else
-                Utils.logAnalyticsEvent(ANALYTICS_EVENTS.WIDGET_COLLAPSE)
+                Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.WIDGET_COLLAPSE)
         }
     ) {
         Column {

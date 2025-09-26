@@ -10,7 +10,7 @@ import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.TextRecognizer
 import com.google.mlkit.vision.text.chinese.ChineseTextRecognizerOptions
 
-import fr.berliat.hskwidget.Utils
+import fr.berliat.hskwidget.ExpectedUtils
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -24,7 +24,7 @@ actual class HSKOCR actual constructor() {
                                successCallback: (String?) -> Unit,
                                failureCallBack: (Exception) -> Unit) {
         withContext(Dispatchers.Default) {
-            val image = InputImage.fromFilePath(Utils.context(), imagePath.toUri())
+            val image = InputImage.fromFilePath(ExpectedUtils.context(), imagePath.toUri())
             Logger.d(tag = TAG, messageString = "recognizeText starting")
 
             val options = ChineseTextRecognizerOptions.Builder()

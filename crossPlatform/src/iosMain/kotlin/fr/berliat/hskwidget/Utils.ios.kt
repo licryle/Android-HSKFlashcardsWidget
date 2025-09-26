@@ -4,6 +4,8 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.room.Room
+import fr.berliat.hsktextviews.HSKTextSegmenter
+import fr.berliat.hskwidget.data.dao.AnkiDAO
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.UIKit.UIDevice
@@ -15,8 +17,9 @@ import platform.Foundation.NSFileManager
 import platform.Foundation.NSUserDomainMask
 
 import okio.Path.Companion.toPath
+import org.jetbrains.compose.resources.StringResource
 
-actual object Utils {
+actual private object ExpectedUtils {
     actual fun openLink(url: String) {
         val nsUrl = NSURL.URLWithString(url) ?: return
         UIApplication.sharedApplication.openURL(nsUrl)
@@ -82,5 +85,28 @@ actual object Utils {
         return PreferenceDataStoreFactory.createWithPath(
             produceFile = { dbPath.toPath() }
         )
+    }
+
+    actual fun logAnalyticsEvent(event: ANALYTICS_EVENTS, params: Map<String, String>) {
+    }
+
+    actual fun logAnalyticsError(module: String, error: String, details: String) {
+    }
+
+    actual fun getHSKSegmenter(): HSKTextSegmenter {
+        TODO("Not yet implemented")
+    }
+
+    internal actual fun getAnkiDAO(): AnkiDAO {
+        TODO("Not yet implemented")
+    }
+
+    actual fun copyToClipBoard(s: String) {
+    }
+
+    actual fun playWordInBackground(word: String) {
+    }
+
+    actual fun toast(stringRes: StringResource, args: List<String>) {
     }
 }

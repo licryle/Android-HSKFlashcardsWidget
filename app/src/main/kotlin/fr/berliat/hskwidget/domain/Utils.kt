@@ -7,16 +7,13 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
-import android.provider.DocumentsContract
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.documentfile.provider.DocumentFile
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
@@ -24,20 +21,14 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.ktx.Firebase
-import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
+import fr.berliat.hskwidget.ui.widget.WidgetProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
-import java.io.InputStream
 import java.util.concurrent.TimeUnit
 import fr.berliat.hskwidget.HSKHelperApp
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.util.UUID
 
 fun <T : Parcelable> Intent.getParcelableExtraCompat(key: String, clazz: Class<T>): T? {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -69,82 +60,6 @@ class Utils {
         }
 
         fun getAppScope(context: Context) = (context.applicationContext as HSKHelperApp).applicationScope
-
-        fun hasFolderWritePermission(context: Context, uri: Uri): Boolean {
-            if (uri.toString() == "") return false
-            if (!DocumentsContract.isTreeUri(uri)) return false
-
-            val resolver = context.contentResolver
-            val persistedUris = resolver.persistedUriPermissions
-
-            for (permission in persistedUris) {
-                if (permission.uri == uri && permission.isWritePermission) {
-                    return true
-                }
-            }
-            return false
-        }
-
-        suspend fun listFilesInSAFDirectory(context: Context, directoryUri: Uri): List<DocumentFile>
-            = withContext(Dispatchers.IO) {
-            val dir = DocumentFile.fromTreeUri(context, directoryUri)
-            dir?.listFiles()?.toList() ?: emptyList()
-        }
-
-        suspend fun copyFileUsingSAF(context: Context, sourceFile: File, destinationDir: Uri, fileName: String): Boolean
-            = withContext(Dispatchers.IO) {
-            try {
-                // Open input stream for the source database file
-                val inputStream: InputStream = FileInputStream(sourceFile)
-
-                val dir = DocumentFile.fromTreeUri(context, destinationDir)
-                val destinationFile = dir?.createFile("application/octet-stream", fileName)
-
-                // Open OutputStream to the destination file
-                context.contentResolver.openFileDescriptor(destinationFile!!.uri, "w")
-                    ?.use { parcelFileDescriptor ->
-                        FileOutputStream(parcelFileDescriptor.fileDescriptor).use { output ->
-                            // Copy data from source to destination
-                            inputStream.use { input ->
-                                val buffer = ByteArray(1024)
-                                var length: Int
-                                while (input.read(buffer).also { length = it } > 0) {
-                                    output.write(buffer, 0, length)
-                                }
-                            }
-                        }
-                    }
-
-                true
-            } catch (e: Exception) {
-                e.printStackTrace()
-                false
-            }
-        }
-
-        suspend fun copyUriToCacheDir(context: Context, uri: Uri): File = withContext(Dispatchers.IO) {
-            if (uri.scheme == "file") {
-                val file = File(uri.path!!)
-                if (file.absolutePath.startsWith(context.cacheDir.absolutePath)) {
-                    return@withContext file // already in cacheDir, no need to copy
-                }
-            }
-
-            val inputStream = when (uri.scheme) {
-                "content" -> context.contentResolver.openInputStream(uri)
-                "file" -> File(uri.path!!).inputStream()
-                else -> throw IllegalArgumentException("Unsupported URI scheme: ${uri.scheme}")
-            } ?: throw IllegalArgumentException("Cannot open input stream from URI")
-
-            val outFile = File(context.cacheDir, UUID.randomUUID().toString())
-            outFile.outputStream().use { output ->
-                inputStream.copyTo(output)
-            }
-
-            inputStream.close()
-
-            return@withContext outFile
-        }
 
         fun hideKeyboard(context: Context, view: View) {
             val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -211,8 +126,7 @@ class Utils {
                 bundle.putString(it.key, it.value)
             }
 
-            val appMgr = FlashcardWidgetProvider()
-            val widgets = appMgr.getWidgetIds(appContext)
+            val widgets = WidgetProvider.getWidgetIds()
             bundle.putString("WIDGET_TOTAL_NUMBER", widgets.size.toString())
 
             if (widgets.isEmpty()) {
@@ -239,7 +153,7 @@ class Utils {
 
         fun logAnalyticsWidgetAction(event: ANALYTICS_EVENTS, widgetId: Int) {
             val appContext = getAppContext()
-            val widgets = FlashcardWidgetProvider().getWidgetIds(appContext)
+            val widgets = WidgetProvider.getWidgetIds()
             val size = WidgetSizeProvider(appContext).getWidgetsSize(widgetId)
 
             logAnalyticsEvent(

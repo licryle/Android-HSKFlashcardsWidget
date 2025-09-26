@@ -25,9 +25,10 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.Purchase
+import fr.berliat.hskwidget.ExpectedUtils.INTENT_SEARCH_WORD
 import fr.berliat.hskwidget.core.AppServices
 import fr.berliat.hskwidget.core.HSKAppServices
-import fr.berliat.hskwidget.data.store.OldAppPreferencesStore
+import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.data.store.DatabaseHelper
 import fr.berliat.hskwidget.data.store.SupportDevStore
 import fr.berliat.hskwidget.databinding.ActivityMainBinding
@@ -37,7 +38,7 @@ import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.domain.getParcelableExtraCompat
 import fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragment
 import fr.berliat.hskwidget.ui.utils.StrictModeManager
-import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
+import fr.berliat.hskwidget.ui.widget.WidgetProvider
 import hskflashcardswidget.crossplatform.generated.resources.Res
 import hskflashcardswidget.crossplatform.generated.resources.support_status_tpl
 import hskflashcardswidget.crossplatform.generated.resources.support_total_error
@@ -47,19 +48,20 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import multiplatform.network.cmptoast.AppContext
+import okio.Path
 import org.jetbrains.compose.resources.getString
 import java.io.FileInputStream
 
 class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
     companion object {
-        const val INTENT_SEARCH_WORD: String = "search_word"
         private const val TAG = "MainActivity"
     }
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
-    private lateinit var appConfig: OldAppPreferencesStore
+    private lateinit var appConfig: AppPreferencesStore
     private lateinit var databaseDiskBackup: DatabaseDiskBackup
     private lateinit var supportDevStore: SupportDevStore
     private var showOCRReminder: Boolean = true
@@ -68,7 +70,7 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        fr.berliat.hskwidget.Utils.init { this }
+        ExpectedUtils.init { this }
         HSKAppServices.init(lifecycleScope)
 
         // TODO: Temporary until moved to compose
@@ -77,8 +79,10 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
                 .filter { it is AppServices.Status.Ready || it is AppServices.Status.Failed}
                 .first()
         }
+        appConfig = HSKAppServices.appPreferences
 
-        multiplatform.network.cmptoast.AppContext.apply { set(applicationContext) }
+        WidgetProvider.init({ applicationContext })
+        AppContext.apply { set(applicationContext) }
 
         // Enable StrictMode in Debug mode
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -89,8 +93,6 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
         setContentView(binding.root)
 
         databaseDiskBackup = DatabaseDiskBackup(this, this, this)
-
-        appConfig = OldAppPreferencesStore(applicationContext)
 
         setupSupporter()
         setupActionBar()
@@ -139,21 +141,21 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
     }
 
     private fun handleAppUpdate() {
-        if (appConfig.appVersionCode != BuildConfig.VERSION_CODE) {
-            appConfig.appVersionCode = BuildConfig.VERSION_CODE
+        if (appConfig.appVersionCode.value != BuildConfig.VERSION_CODE) {
+            appConfig.appVersionCode.value = BuildConfig.VERSION_CODE
 
             // Now we can upgrade stuff
-            FlashcardWidgetProvider().updateAllFlashCardWidgets(applicationContext)
+            WidgetProvider().updateAllFlashCardWidgets()
         }
     }
 
     fun shouldUpdateDatabaseFromAsset(): Boolean {
-        if (appConfig.appVersionCode == 0) return false // first launch, nothing to update
+        if (appConfig.appVersionCode.value == 0) return false // first launch, nothing to update
 
         val updateDbVersions = listOf(32, 37)
 
         return updateDbVersions.any { updateVersion ->
-            appConfig.appVersionCode < updateVersion && BuildConfig.VERSION_CODE >= updateVersion
+            appConfig.appVersionCode.value < updateVersion && BuildConfig.VERSION_CODE >= updateVersion
         }
     }
 
@@ -225,12 +227,12 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
         handleImageOCRIntent(intent)
     }
 
-    override fun onBackupFolderSet(uri: Uri) {
+    override fun onBackupFolderSet(path: Path) {
         Utils.getAppScope(applicationContext).launch(Dispatchers.IO) {
-            val success = databaseDiskBackup.backUp(uri)
+            val success = databaseDiskBackup.backUp(path)
 
             if (success) {
-                databaseDiskBackup.cleanOldBackups(uri, appConfig.dbBackUpMaxLocalFiles)
+                databaseDiskBackup.cleanOldBackups(path, appConfig.dbBackUpDiskMaxFiles.value)
             }
 
             withContext(Dispatchers.Main) {
@@ -246,7 +248,7 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
         Toast.makeText(applicationContext, getString(R.string.dbbackup_failure_folderpermission), Toast.LENGTH_LONG).show()
     }
 
-    override fun onBackupFileSelected(uri: Uri) {
+    override fun onBackupFileSelected(path: Path) {
         throw Error("This should never be hit")
     }
 
@@ -259,7 +261,7 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
     }
 
     private fun handleBackUp() {
-        if (appConfig.dbBackUpActive)
+        if (appConfig.dbBackUpDiskActive.value)
             databaseDiskBackup.getFolder()
     }
 
@@ -312,7 +314,7 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
     private fun setupSupporter() {
         supportDevStore = SupportDevStore.getInstance(applicationContext)
 
-        updateSupportMenuTitle(appConfig.supportTotalSpent)
+        updateSupportMenuTitle(appConfig.supportTotalSpent.value)
 
         supportDevStore.addListener(object : SupportDevStore.SupportDevListener {
             override fun onTotalSpentChange(totalSpent: Float) {

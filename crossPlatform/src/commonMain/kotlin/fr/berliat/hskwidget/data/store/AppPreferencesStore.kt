@@ -58,7 +58,7 @@ class AppPreferencesStore private constructor(store: DataStore<Preferences>):
     }
 
     // --- Boolean preferences ---
-    val dbBackUpActive = registerBooleanPref("database_backup_active", false)
+    val dbBackUpDiskActive = registerBooleanPref("database_backup_disk_active", false)
     val ankiSaveNotes = registerBooleanPref("anki_save_notes", false)
     val searchFilterHasAnnotation = registerBooleanPref("search_filter_hasAnnotation", false)
     val dictionaryShowHSK3Definition = registerBooleanPref("dictionary_show_hsk3_definition", false
@@ -68,7 +68,7 @@ class AppPreferencesStore private constructor(store: DataStore<Preferences>):
 
     // --- Int preferences ---
     val appVersionCode = registerIntPref("appVersionCode", 0)
-    val dbBackUpMaxLocalFiles = registerIntPref("database_backup_max_local_files", 2)
+    val dbBackUpDiskMaxFiles = registerIntPref("database_backup_disk_max_files", 2)
 
     // --- Long preferences ---
     val ankiModelId = registerLongPref("anki_model_id", -1L)
@@ -78,12 +78,12 @@ class AppPreferencesStore private constructor(store: DataStore<Preferences>):
 
     // --- Derived complex types ---
     val dbBackupCloudLastSuccess = registerLongPref(
-        "database_backupcloud_lastsuccess",
+        "database_backup_cloud_lastsuccess",
         Instant.fromEpochMilliseconds(0L),
         PreferenceConverter({ Instant.fromEpochMilliseconds(it) }, { it.toEpochMilliseconds() })
     )
-    val dbBackUpDirectory = registerStringPref(
-        "database_backup_directory", ClassType.NotFromClass,
+    val dbBackUpDiskDirectory = registerStringPref(
+        "database_backup_disk_directory", "".toPath(),
         PreferenceConverter({ it.toPath() }, { it.toString() })
     )
     val lastAnnotatedClassLevel = registerStringPref("class_level", ClassLevel.NotFromClass,

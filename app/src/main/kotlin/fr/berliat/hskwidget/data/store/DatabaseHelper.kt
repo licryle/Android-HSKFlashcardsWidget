@@ -5,7 +5,7 @@ import android.content.Context
 import android.util.Log
 import androidx.core.net.toUri
 import androidx.room.Room
-import fr.berliat.hskwidget.domain.Utils
+import fr.berliat.hskwidget.core.FileUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -15,12 +15,6 @@ import java.util.UUID
 import java.util.concurrent.Callable
 
 class DatabaseHelper private constructor(val context: Context) {
-    fun annotatedChineseWordDAO() = liveDatabase.annotatedChineseWordDAO()
-    fun chineseWordAnnotationDAO() = liveDatabase.chineseWordAnnotationDAO()
-    fun chineseWordDAO() = liveDatabase.chineseWordDAO()
-    fun chineseWordFrequencyDAO() = liveDatabase.chineseWordFrequencyDAO()
-    fun wordListDAO() = liveDatabase.wordListDAO()
-    fun widgetListDAO() = liveDatabase.widgetListDAO()
     suspend fun flushToDisk() = liveDatabase.flushToDisk()
     val liveDatabase
         get() = _db!!
@@ -179,6 +173,6 @@ class DatabaseHelper private constructor(val context: Context) {
     suspend fun snapshotDatabase(): File = withContext(Dispatchers.IO) {
         flushToDisk()
 
-        return@withContext Utils.copyUriToCacheDir(context, File(DATABASE_LIVE_PATH).toUri())
+        return@withContext FileUtils.copyUriToCacheDir(context, File(DATABASE_LIVE_PATH).toUri())
     }
 }

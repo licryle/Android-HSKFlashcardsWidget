@@ -11,7 +11,7 @@ import com.android.billingclient.api.Purchase
 import com.google.android.play.core.review.ReviewException
 import com.google.android.play.core.review.ReviewManager
 import com.google.android.play.core.review.model.ReviewErrorCode
-import fr.berliat.hskwidget.ANALYTICS_EVENTS
+
 import fr.berliat.hskwidget.Utils
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
@@ -55,7 +55,7 @@ class SupportViewModel(
     fun makePurchase(productId: String) {
         supportDevStore.makePurchase(activityProvider.invoke(), productId)
         Utils.logAnalyticsEvent(
-            ANALYTICS_EVENTS.PURCHASE_CLICK,
+            Utils.ANALYTICS_EVENTS.PURCHASE_CLICK,
             mapOf("product_id" to productId)
         )
     }
@@ -71,7 +71,7 @@ class SupportViewModel(
     override fun onPurchaseSuccess(purchase: Purchase) {
         Utils.toast(Res.string.support_payment_success)
         Utils.logAnalyticsEvent(
-            ANALYTICS_EVENTS.PURCHASE_SUCCESS,
+            Utils.ANALYTICS_EVENTS.PURCHASE_SUCCESS,
             mapOf("product_id" to getFirstProductId(purchase))
         )
     }
@@ -87,7 +87,7 @@ class SupportViewModel(
     override fun onPurchaseFailure(purchase: Purchase?, billingResponseCode: Int) {
         Utils.toast(Res.string.support_payment_failed)
         Utils.logAnalyticsEvent(
-            ANALYTICS_EVENTS.PURCHASE_FAILED,
+            Utils.ANALYTICS_EVENTS.PURCHASE_FAILED,
             mapOf("product_id" to getFirstProductId(purchase))
         )
     }

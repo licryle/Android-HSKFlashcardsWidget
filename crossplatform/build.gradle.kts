@@ -111,6 +111,9 @@ kotlin {
 
                 implementation(libs.billing.ktx)
                 implementation(libs.review.ktx)
+
+                implementation(libs.androidx.documentfile)
+               // implementation("org.jetbrains.kotlinx:kotlinx-io-core:0.8.0")
             }
             resources.srcDirs("src/commonMain/composeResources")
         }

@@ -8,14 +8,13 @@ import fr.berliat.ankidroidhelper.AnkiDelegate
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.store.AnkiStore
-import fr.berliat.hskwidget.data.store.OldAppPreferencesStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class HSKAnkiDelegate(val fragment: Fragment, handler: HandlerInterface? = null)  : AnkiDelegate(fragment, handler) {
     private val context = fragment.requireContext()
-    private val appConfig = OldAppPreferencesStore(context)
+    private val appConfig = HSKAppServices.appPreferences
     private lateinit var ankiStore : AnkiStore
 
     init {
@@ -25,7 +24,7 @@ class HSKAnkiDelegate(val fragment: Fragment, handler: HandlerInterface? = null)
     }
 
     override fun onAnkiRequestPermissionsResult(granted: Boolean) {
-        appConfig.ankiSaveNotes = granted
+        appConfig.ankiSaveNotes.value = granted
         super.onAnkiRequestPermissionsResult(granted)
         if (!granted) {
             Toast.makeText(context, R.string.anki_permission_denied, Toast.LENGTH_LONG).show()
@@ -45,7 +44,7 @@ class HSKAnkiDelegate(val fragment: Fragment, handler: HandlerInterface? = null)
 
     override suspend fun safelyModifyAnkiDbIfAllowed(ankiDbAction: suspend () -> Result<Unit>): Result<Unit>
             = withContext(Dispatchers.IO) {
-        if (!appConfig.ankiSaveNotes)
+        if (!appConfig.ankiSaveNotes.value)
             return@withContext Result.failure(AnkiOperationsFailures.AnkiFailure_Off)
 
         return@withContext super.safelyModifyAnkiDbIfAllowed(ankiDbAction)
@@ -89,7 +88,7 @@ class HSKAnkiDelegate(val fragment: Fragment, handler: HandlerInterface? = null)
 
     override fun onAnkiNotInstalled() {
         appContextToast(context, context.getString(R.string.anki_not_installed))
-        appConfig.ankiSaveNotes = false
+        appConfig.ankiSaveNotes.value = false
 
         super.onAnkiNotInstalled()
     }

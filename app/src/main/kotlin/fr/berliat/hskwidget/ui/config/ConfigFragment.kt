@@ -24,16 +24,19 @@ import fr.berliat.hskwidget.domain.DatabaseBackupCallbacks
 import fr.berliat.googledrivebackup.GoogleDriveBackup
 import fr.berliat.googledrivebackup.GoogleDriveBackupFile
 import fr.berliat.googledrivebackup.GoogleDriveBackupInterface
+import fr.berliat.hskwidget.core.FileUtils
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.store.DatabaseHelper
 import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.ui.utils.HSKAnkiDelegate
-import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
+import fr.berliat.hskwidget.ui.widget.WidgetProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import okio.Path
+import okio.Path.Companion.toPath
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -310,13 +313,13 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
         }
     }
 
-    override fun onBackupFolderSet(uri: Uri) {
+    override fun onBackupFolderSet(backupPath: Path) {
         appConfig.dbBackUpActive = true
         binding.configBackupActivateBtn.isChecked = true
         Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.CONFIG_BACKUP_ON)
 
-        appConfig.dbBackUpDirectory = uri
-        setBackUpFolderButtonText(uri)
+        appConfig.dbBackUpDirectory = backupPath.toString().toUri()
+        setBackUpFolderButtonText(backupPath.toString().toUri())
     }
 
     override fun onBackupFolderError() {
@@ -325,7 +328,7 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
         Toast.makeText(requireContext(), getString(R.string.dbbackup_failure_folderpermission), Toast.LENGTH_LONG).show()
     }
 
-    override fun onBackupFileSelected(uri: Uri) {
+    override fun onBackupFileSelected(restoreFilePath: Path) {
         Toast.makeText(
             requireContext(),
             getString(R.string.dbrestore_start),
@@ -338,7 +341,7 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
             val dbHelper = DatabaseHelper.getInstance(requireContext())
 
             try {
-                val file = Utils.copyUriToCacheDir(requireContext(), uri)
+                val file = FileUtils.copyUriToCacheDir(requireContext(), restoreFilePath.toString().toUri())
                 val sourceDb = dbHelper.loadExternalDatabase(file)
                 dbHelper.replaceUserDataInDB(dbHelper.liveDatabase, sourceDb)
 
@@ -354,7 +357,7 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
                 }
 
                 // Backup was successful, let's trigger widget updates, hoping any matches
-                FlashcardWidgetProvider().updateAllFlashCardWidgets(requireContext())
+                WidgetProvider().updateAllFlashCardWidgets()
 
                 file.delete()
             } catch (e: IllegalStateException) {
@@ -571,7 +574,7 @@ class ConfigFragment : Fragment(), DatabaseBackupCallbacks,
 
         AlertDialog.Builder(requireContext())
             .setMessage(getString(R.string.googledrive_restore_confirm_overwrite, Utils.formatDate(files[0].modifiedTime ?: Instant.ofEpochMilli(0))))
-            .setPositiveButton(R.string.proceed) { _, _ -> onBackupFileSelected(cloudRestoreFilePath.toUri()) }   // user confirms
+            .setPositiveButton(R.string.proceed) { _, _ -> onBackupFileSelected(cloudRestoreFilePath.toString().toPath()) }   // user confirms
             .setNegativeButton(R.string.cancel) { _, _ -> onRestoreCancelled() }
             .setCancelable(true)                                 // allow dismiss by tapping outside
             .show()

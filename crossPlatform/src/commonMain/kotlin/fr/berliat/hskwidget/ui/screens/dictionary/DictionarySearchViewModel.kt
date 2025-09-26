@@ -1,20 +1,21 @@
 package fr.berliat.hskwidget.ui.screens.dictionary
 
-import fr.berliat.hskwidget.ANALYTICS_EVENTS
 import fr.berliat.hskwidget.Utils
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.dao.AnnotatedChineseWordDAO
+
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.IO
 
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.domain.SearchQuery
-import kotlinx.coroutines.IO
+
 
 class DictionaryViewModel(val appSearchQueryProvider : () -> SearchQuery,
                           prefsStore: AppPreferencesStore = HSKAppServices.appPreferences
@@ -51,14 +52,14 @@ class DictionaryViewModel(val appSearchQueryProvider : () -> SearchQuery,
         appPreferences.dictionaryShowHSK3Definition.value = value
         performSearch()
 
-        Utils.logAnalyticsEvent(if (value) ANALYTICS_EVENTS.DICT_HSK3_ON else ANALYTICS_EVENTS.DICT_HSK3_OFF)
+        Utils.logAnalyticsEvent(if (value) Utils.ANALYTICS_EVENTS.DICT_HSK3_ON else Utils.ANALYTICS_EVENTS.DICT_HSK3_OFF)
     }
 
     fun toggleHasAnnotation(value: Boolean) {
         appPreferences.searchFilterHasAnnotation.value = value
         performSearch()
 
-        Utils.logAnalyticsEvent(if (value) ANALYTICS_EVENTS.DICT_ANNOTATION_ON else ANALYTICS_EVENTS.DICT_ANNOTATION_OFF)
+        Utils.logAnalyticsEvent(if (value) Utils.ANALYTICS_EVENTS.DICT_ANNOTATION_ON else Utils.ANALYTICS_EVENTS.DICT_ANNOTATION_OFF)
     }
 
     fun performSearch() {
@@ -73,7 +74,7 @@ class DictionaryViewModel(val appSearchQueryProvider : () -> SearchQuery,
             _isLoading.value = false
         }
 
-        Utils.logAnalyticsEvent(ANALYTICS_EVENTS.DICT_SEARCH)
+        Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.DICT_SEARCH)
     }
 
     fun loadMore() {

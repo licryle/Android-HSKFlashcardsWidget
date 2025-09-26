@@ -7,6 +7,9 @@ import fr.berliat.hskwidget.data.dao.WidgetListDAO
 import fr.berliat.hskwidget.data.dao.WordListDAO
 import fr.berliat.hskwidget.data.model.WidgetListEntry
 import fr.berliat.hskwidget.data.model.WordListWithCount
+import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
+import fr.berliat.hskwidget.data.store.WidgetPreferencesStoreProvider
+import fr.berliat.hskwidget.domain.WidgetController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,6 +20,8 @@ import kotlinx.coroutines.withContext
 
 class WidgetConfigViewModel(
     private val widgetId: Int,
+    private val widgetPrefProvider: WidgetPreferencesStoreProvider = HSKAppServices.widgetsPreferencesProvider,
+    private val database: ChineseWordsDatabase = HSKAppServices.database,
     private val widgetListDAO: WidgetListDAO = HSKAppServices.database.widgetListDAO(),
     private val wordListDAO: WordListDAO = HSKAppServices.database.wordListDAO(),
     private val onSuccessfulSave: (() -> Unit)? = null
@@ -48,6 +53,9 @@ class WidgetConfigViewModel(
             widgetListDAO.deleteWidget(widgetId)
             widgetListDAO.insertListsToWidget(entriesToAdd)
             loadLists()
+
+            WidgetController.getInstance(widgetPrefProvider.invoke(widgetId), database)
+                .updateWord()
 
             onSuccessfulSave?.let {
                 withContext(Dispatchers.Main) {

@@ -3,28 +3,16 @@ package fr.berliat.hskwidget.data.store
 import android.content.Context
 import android.net.Uri
 import androidx.core.net.toUri
+import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.Deferred
 import java.time.Instant
 
+internal val Context.dataStore: DataStore<Preferences> by preferencesDataStore("WidgetPreferenceStore")
+
 class OldAppPreferencesStore(context: Context):
     PrefixedPreferenceDataStoreBridge(context.dataStore, "app") {
-    var supportTotalSpent: Float
-        get() {
-            return getFloat("support_total_spent", -1f)
-        }
-        set(total) {
-            putFloat("support_total_spent", total)
-        }
-
-    var appVersionCode: Int
-        get() {
-            return getInt("appVersionCode", 0)
-        }
-        set(version) {
-            putInt("appVersionCode", version)
-        }
-
     var ankiSaveNotes: Boolean
         get() {
             return getBoolean("anki_save_notes", false)

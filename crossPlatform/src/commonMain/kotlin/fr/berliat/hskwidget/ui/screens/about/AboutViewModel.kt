@@ -30,7 +30,7 @@ class AboutViewModel {
 
     fun onClickEmail() : Boolean {
         Utils.logAnalyticsScreenView("Email")
-        return Utils.sendEmail("cyrille.berliat+hsk@gmail.com")
+        return Utils.sendEmail("cyrille.berliat+hsk@gmail.com", "About Mandarin Assistant App", "")
     }
 
     fun registerVisit() {

@@ -18,7 +18,7 @@ fun WidgetView(
     // Initialize store + suspend singleton ViewModel
     val _viewModel by produceState<WidgetViewModel?>(initialValue = null, widgetId) {
         val store = HSKAppServices.widgetsPreferencesProvider(widgetId) // suspend
-        value = WidgetViewModel.getInstance(store, HSKAppServices.database) // suspend
+        value = WidgetViewModel(store, HSKAppServices.database) // suspend
     }
 
     val viewModel = _viewModel

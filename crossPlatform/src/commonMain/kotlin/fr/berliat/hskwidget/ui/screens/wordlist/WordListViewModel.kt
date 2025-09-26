@@ -2,7 +2,6 @@ package fr.berliat.hskwidget.ui.screens.wordlist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import fr.berliat.hskwidget.ANALYTICS_EVENTS
 
 import fr.berliat.hskwidget.AnkiDelegator
 import fr.berliat.hskwidget.Utils
@@ -89,14 +88,14 @@ class WordListViewModel(
             loadAllLists() // refresh lists after creating
         }
 
-        Utils.logAnalyticsEvent(ANALYTICS_EVENTS.LIST_CREATE)
+        Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.LIST_CREATE)
     }
 
     fun deleteList(list: WordList) {
         launchSafe {
             ankiCaller(repo.deleteList(list))
             loadAllLists() // refresh lists
-            Utils.logAnalyticsEvent(ANALYTICS_EVENTS.LIST_DELETE)
+            Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.LIST_DELETE)
         }
     }
 
@@ -104,7 +103,7 @@ class WordListViewModel(
         launchSafe {
             repo.renameList(wordList.id, newName)
             loadAllLists() // refresh lists
-            Utils.logAnalyticsEvent(ANALYTICS_EVENTS.LIST_RENAME)
+            Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.LIST_RENAME)
         }
     }
 
@@ -118,7 +117,7 @@ class WordListViewModel(
                     )
                 }
 
-                Utils.logAnalyticsEvent(ANALYTICS_EVENTS.LIST_MODIFY_WORD)
+                Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.LIST_MODIFY_WORD)
 
                 _dismiss.value = true
                 _status.emit(Status.SUCCESS)

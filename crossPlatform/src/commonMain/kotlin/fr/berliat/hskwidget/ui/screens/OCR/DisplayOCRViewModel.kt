@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 
 import co.touchlab.kermit.Logger
 
-import fr.berliat.hskwidget.ANALYTICS_EVENTS
 import fr.berliat.hskwidget.Utils
 import fr.berliat.hskwidget.core.HSKOCR
 import fr.berliat.hskwidget.data.dao.AnnotatedChineseWordDAO
@@ -110,14 +109,14 @@ class DisplayOCRViewModel(
                     Utils.copyToClipBoard(simplified)
                 }
 
-                Utils.logAnalyticsEvent(ANALYTICS_EVENTS.OCR_WORD_NOTFOUND)
+                Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.OCR_WORD_NOTFOUND)
             } else {
                 _selectedWord.value = annotatedWord
                 val pinyin = ((annotatedWord.word?.pinyins ?: annotatedWord.annotation?.pinyins) ?: "").toString()
                 _clickedWords.update { old -> old + (annotatedWord.simplified to pinyin) }
 
                 augmentWordFrequencyConsulted(annotatedWord.simplified)
-                Utils.logAnalyticsEvent(ANALYTICS_EVENTS.OCR_WORD_FOUND)
+                Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.OCR_WORD_FOUND)
             }
         }
     }

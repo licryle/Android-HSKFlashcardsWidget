@@ -9,6 +9,7 @@ import android.net.Uri
 import android.provider.Settings
 import android.speech.tts.TextToSpeech
 import android.widget.Toast
+
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
@@ -18,11 +19,16 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.workDataOf
+import co.touchlab.kermit.Logger
+
 import fr.berliat.hsktextviews.HSKTextSegmenter
+import fr.berliat.hskwidget.Utils.incrementConsultedWord
 import fr.berliat.hskwidget.core.BackgroundSpeechService
 import fr.berliat.hskwidget.core.JiebaHSKTextSegmenter
 import fr.berliat.hskwidget.data.dao.AnkiDAO
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
+import fr.berliat.hskwidget.domain.SearchQuery
+
 import hskflashcardswidget.crossplatform.generated.resources.Res
 import hskflashcardswidget.crossplatform.generated.resources.cancel
 import hskflashcardswidget.crossplatform.generated.resources.copied_to_clipboard
@@ -32,6 +38,7 @@ import hskflashcardswidget.crossplatform.generated.resources.speech_failure_toas
 import hskflashcardswidget.crossplatform.generated.resources.speech_failure_toast_init
 import hskflashcardswidget.crossplatform.generated.resources.speech_failure_toast_muted
 import hskflashcardswidget.crossplatform.generated.resources.speech_failure_toast_unknown
+
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
@@ -39,10 +46,11 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
 import okio.Path.Companion.toPath
+
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.getString
 
-actual object Utils {
+actual object ExpectedUtils {
     private var _contextProvider: (() -> Context)? = null
     fun context() = _contextProvider!!.invoke()
 
@@ -92,13 +100,13 @@ actual object Utils {
     actual fun logAnalyticsScreenView(screen: String) {
     }
 
-    actual fun logAnalyticsEvent(event: ANALYTICS_EVENTS,
+    actual fun logAnalyticsEvent(event: Utils.ANALYTICS_EVENTS,
                                  params: Map<String, String>) {
     }
 
     actual fun logAnalyticsError(module: String, error: String, details: String) {
         logAnalyticsEvent(
-            ANALYTICS_EVENTS.ERROR,
+            Utils.ANALYTICS_EVENTS.ERROR,
             mapOf(
                 "MODULE" to module,
                 "ERROR_ID" to error,
@@ -185,7 +193,7 @@ actual object Utils {
             Toast.LENGTH_SHORT
         ).show()
 
-        logAnalyticsEvent(ANALYTICS_EVENTS.WIDGET_COPY_WORD)
+        logAnalyticsEvent(Utils.ANALYTICS_EVENTS.WIDGET_COPY_WORD)
 
         incrementConsultedWord(s)
     }
@@ -272,7 +280,7 @@ actual object Utils {
 
         incrementConsultedWord(word)
 
-        logAnalyticsEvent(ANALYTICS_EVENTS.WIDGET_PLAY_WORD)
+        logAnalyticsEvent(Utils.ANALYTICS_EVENTS.WIDGET_PLAY_WORD)
     }
 
     actual fun toast(stringRes: StringResource, args: List<String>) {
@@ -281,4 +289,24 @@ actual object Utils {
 
         Toast.makeText(context(), s.format(args), Toast.LENGTH_LONG).show()
     }
+
+    actual fun openAppForSearchQuery(query: SearchQuery) {
+        val context = context()
+        val pm = context.packageManager
+        val launchIntent = pm.getLaunchIntentForPackage(context.packageName)?.apply {
+            putExtra(INTENT_SEARCH_WORD, query.toString())
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        }
+
+        if (launchIntent != null) {
+            Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.WIDGET_OPEN_DICTIONARY)
+            context.startActivity(launchIntent)
+        } else {
+            // fallback: app has no launch intent?
+            Logger.e(tag = TAG, messageString = "No launch intent found for ${context.packageName}")
+        }
+    }
+
+    const val TAG = "Utils"
+    const val INTENT_SEARCH_WORD = "INTENT_SEARCH_WORD"
 }
