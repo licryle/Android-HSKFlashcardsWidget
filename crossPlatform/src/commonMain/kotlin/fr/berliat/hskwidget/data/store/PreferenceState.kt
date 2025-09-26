@@ -9,7 +9,7 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -34,18 +34,22 @@ class PreferenceState<S, T>(
 
     init {
         scope.launch {
-            val stored = store.data.map { it[key] ?: conv.toStore(initialValue) }.first()
-            _flow.value = conv.fromStore(stored)
+            store.data
+                .map { prefs -> prefs[key] ?: conv.toStore(initialValue) }
+                .map { conv.fromStore(it) }
+                .distinctUntilChanged() // only emit when actually changed
+                .collect { _flow.value = it }
         }
     }
 
     var value: T
         get() = _flow.value
         set(v) {
-            _flow.value = v
-            // Save asynchronously
-            scope.launch {
-                store.edit { it[key] = conv.toStore(v) }
+            if (_flow.value != v) {         // prevent unnecessary writes
+                // Save asynchronously
+                scope.launch {
+                    store.edit { it[key] = conv.toStore(v) }
+                }
             }
         }
 }

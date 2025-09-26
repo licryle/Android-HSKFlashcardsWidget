@@ -3,6 +3,7 @@ package fr.berliat.hskwidget.data.store
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
@@ -29,6 +30,16 @@ open class PrefixedPreferencesStore protected constructor(
                     instances[key] = instance
                 }
             }
+        }
+    }
+
+    suspend fun clear() {
+        store.edit { prefs ->
+            val keysToRemove = prefs.asMap()
+                .keys
+                .filter { it.name.startsWith(prefix) }
+
+            keysToRemove.forEach { prefs.remove(it) }
         }
     }
 

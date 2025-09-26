@@ -22,11 +22,11 @@ object HSKAppServices : AppServices() {
             AppPreferencesStore.getInstance(Utils.getDataStore("app.preferences_pb"))
         }
 
+        // A unique datastore is needed, otherwise it fails silently (!) to write anything.
+        val widgetDataStore = Utils.getDataStore("widgets.preferences_pb")
         register("widgetsPreferencesProvider") {
             val provider : WidgetPreferencesStoreProvider = { widgetId: Int ->
-                WidgetPreferencesStore.getInstance(
-                    Utils.getDataStore("widgets.preferences_pb"), widgetId
-                )
+                WidgetPreferencesStore.getInstance(widgetDataStore, widgetId)
             }
             provider
         }
