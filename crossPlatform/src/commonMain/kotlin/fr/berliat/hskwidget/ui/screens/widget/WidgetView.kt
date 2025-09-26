@@ -35,7 +35,8 @@ fun WidgetView(
                 word = word,
                 onClickUpdate = viewModel::updateWord,
                 onClickSpeak = viewModel::speakWord,
-                modifier
+                onClickWord = viewModel::openDictionary,
+                modifier = modifier
             )
         }
     }
