@@ -9,6 +9,7 @@ import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.model.WordListWithCount
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.data.store.WidgetPreferencesStore
+import fr.berliat.hskwidget.domain.SearchQuery
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -83,6 +84,13 @@ class WidgetViewModel private constructor(
             // Persist it in preferences for cross-App convenience
             widgetStore.currentWord.value = newWord?.simplified ?: ""
         }
+    }
+
+    fun openDictionary() {
+        val query = SearchQuery.fromString(word.value?.simplified ?: "")
+        query.ignoreAnnotation = true
+
+        Utils.openAppForSearchQuery(query)
     }
 
     suspend fun getAllowedLists(): List<WordListWithCount> = withContext(Dispatchers.IO) {
