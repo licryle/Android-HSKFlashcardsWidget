@@ -1,5 +1,6 @@
 package fr.berliat.hskwidget.ui.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,6 +28,7 @@ fun WidgetWordView(
     word: ChineseWord,
     onClickUpdate: () -> Unit = {},
     onClickSpeak: () -> Unit = {},
+    onClickWord: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -66,7 +68,11 @@ fun WidgetWordView(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 8.dp),
+                .padding(top = 8.dp)
+                .clickable(
+                    enabled = true,
+                    onClick = onClickWord
+                ),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
