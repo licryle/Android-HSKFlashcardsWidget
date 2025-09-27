@@ -6,7 +6,6 @@ import fr.berliat.hsktextviews.HSKTextSegmenter
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.dao.AnkiDAO
 import fr.berliat.hskwidget.data.repo.ChineseWordFrequencyRepo
-import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.domain.SearchQuery
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -36,11 +35,6 @@ object Utils {
     fun logAnalyticsError(module: String, error: String, details: String) =
         ExpectedUtils.logAnalyticsError(module, error, details)
 
-    suspend fun getDatabaseInstance(): ChineseWordsDatabase =
-        ExpectedUtils.getDatabaseInstance()
-
-    fun getDatabasePath(): String = ExpectedUtils.getDatabasePath()
-
     fun getDataStore(file: String): DataStore<Preferences> =
         ExpectedUtils.getDataStore(file)
 
@@ -59,7 +53,7 @@ object Utils {
 
     fun incrementConsultedWord(word: String) {
         HSKAppServices.appScope.launch(Dispatchers.IO) {
-            val db = getDatabaseInstance()
+            val db = HSKAppServices.database
             val frequencyWordsRepo = ChineseWordFrequencyRepo(
                 db.chineseWordFrequencyDAO(),
                 db.annotatedChineseWordDAO()
@@ -67,6 +61,13 @@ object Utils {
 
             frequencyWordsRepo.incrementConsulted(word)
         }
+    }
+
+    fun getRandomString(length: Int): String {
+        val allowedChars = ('A'..'Z') + ('a'..'z') + ('0'..'9')
+        return (1..length)
+            .map { allowedChars.random() }
+            .joinToString("")
     }
 
     enum class ANALYTICS_EVENTS {
@@ -123,9 +124,6 @@ expect object ExpectedUtils {
     fun logAnalyticsEvent(event: Utils.ANALYTICS_EVENTS,
                           params: Map<String, String> = mapOf())
     fun logAnalyticsError(module: String, error: String, details: String)
-
-    internal suspend fun getDatabaseInstance() : ChineseWordsDatabase
-    fun getDatabasePath(): String
 
     fun getDataStore(file: String): DataStore<Preferences>
 

@@ -56,19 +56,8 @@ actual private object ExpectedUtils {
         return requireNotNull(documentDirectory?.path)
     }
 
-    actual suspend fun getDatabaseInstance(): ChineseWordsDatabase {
-        val dbFilePath = getDatabasePath()
-        return Room.databaseBuilder<ChineseWordsDatabase>(
-            name = dbFilePath,
-        ).build()
-    }
-
-    actual fun getDatabasePath(): String {
-        return documentDirectory() + "/$DATABASE_FILENAME"
-    }
-
     const val DATABASE_FILENAME = "Mandarin_Assistant.db"
-    actual fun logAnalyticsEvent(event: ANALYTICS_EVENTS) {
+    actual fun logAnalyticsEvent(event: Utils.ANALYTICS_EVENTS) {
     }
 
     @OptIn(ExperimentalForeignApi::class)
@@ -87,7 +76,7 @@ actual private object ExpectedUtils {
         )
     }
 
-    actual fun logAnalyticsEvent(event: ANALYTICS_EVENTS, params: Map<String, String>) {
+    actual fun logAnalyticsEvent(event: Utils.ANALYTICS_EVENTS, params: Map<String, String>) {
     }
 
     actual fun logAnalyticsError(module: String, error: String, details: String) {

@@ -14,11 +14,11 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.Observer
-import androidx.room.Room
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.workDataOf
+
 import co.touchlab.kermit.Logger
 
 import fr.berliat.hsktextviews.HSKTextSegmenter
@@ -26,7 +26,6 @@ import fr.berliat.hskwidget.Utils.incrementConsultedWord
 import fr.berliat.hskwidget.core.BackgroundSpeechService
 import fr.berliat.hskwidget.core.JiebaHSKTextSegmenter
 import fr.berliat.hskwidget.data.dao.AnkiDAO
-import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.domain.SearchQuery
 
 import hskflashcardswidget.crossplatform.generated.resources.Res
@@ -39,11 +38,7 @@ import hskflashcardswidget.crossplatform.generated.resources.speech_failure_toas
 import hskflashcardswidget.crossplatform.generated.resources.speech_failure_toast_muted
 import hskflashcardswidget.crossplatform.generated.resources.speech_failure_toast_unknown
 
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
 
 import okio.Path.Companion.toPath
 
@@ -114,52 +109,6 @@ actual object ExpectedUtils {
             )
         )
     }
-
-
-
-    private var databasePath = ""
-    private var databaseInstance : ChineseWordsDatabase? = null
-    private var databaseMutex = Mutex()
-    actual suspend fun getDatabaseInstance(): ChineseWordsDatabase = withContext(
-        Dispatchers.IO) {
-            val instance = databaseInstance
-            instance?.let { return@withContext instance }
-
-            databaseMutex.withLock {
-                databaseInstance ?: run {
-
-                    val dbBuilder = Room.databaseBuilder(
-                        context().applicationContext,
-                        ChineseWordsDatabase::class.java,
-                        DATABASE_FILENAME
-                    )
-                        .createFromAsset(DATABASE_ASSET_PATH)
-
-                    /*if (BuildConfig.DEBUG) {
-                    dbBuilder.setQueryCallback(
-                        { sqlQuery, bindArgs ->
-                            Logger.d(tag = TAG, messageString = "SQL Query: $sqlQuery SQL Args: $bindArgs")
-                        }, Executors.newSingleThreadExecutor()
-                    )
-                }*/
-
-                    val db = dbBuilder.build()
-
-                    databasePath = db.openHelper.writableDatabase.path.toString()
-                    databaseInstance = db
-
-                    return@withContext db
-                }
-            }
-        }
-
-    actual fun getDatabasePath(): String {
-        return databasePath
-    }
-
-    const val DATABASE_FILENAME = "Mandarin_Assistant.db"
-    const val DATABASE_ASSET_PATH = "databases/$DATABASE_FILENAME"
-
 
     actual fun getDataStore(file: String): DataStore<Preferences> {
         return PreferenceDataStoreFactory.createWithPath(

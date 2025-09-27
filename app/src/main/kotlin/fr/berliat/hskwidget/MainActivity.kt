@@ -29,11 +29,9 @@ import fr.berliat.hskwidget.ExpectedUtils.INTENT_SEARCH_WORD
 import fr.berliat.hskwidget.core.AppServices
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
-import fr.berliat.hskwidget.data.store.DatabaseHelper
 import fr.berliat.hskwidget.data.store.SupportDevStore
 import fr.berliat.hskwidget.databinding.ActivityMainBinding
 import fr.berliat.hskwidget.domain.DatabaseDiskBackup
-import fr.berliat.hskwidget.domain.DatabaseBackupCallbacks
 import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.domain.getParcelableExtraCompat
 import fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragment
@@ -42,18 +40,15 @@ import fr.berliat.hskwidget.ui.widget.WidgetProvider
 import hskflashcardswidget.crossplatform.generated.resources.Res
 import hskflashcardswidget.crossplatform.generated.resources.support_status_tpl
 import hskflashcardswidget.crossplatform.generated.resources.support_total_error
-import kotlinx.coroutines.Dispatchers
+import io.github.vinceglb.filekit.FileKit
+import io.github.vinceglb.filekit.dialogs.init
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import multiplatform.network.cmptoast.AppContext
-import okio.Path
 import org.jetbrains.compose.resources.getString
-import java.io.FileInputStream
 
-class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
+class MainActivity : AppCompatActivity() {
     companion object {
         private const val TAG = "MainActivity"
     }
@@ -83,6 +78,7 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
 
         WidgetProvider.init({ applicationContext })
         AppContext.apply { set(applicationContext) }
+        FileKit.init(this)
 
         // Enable StrictMode in Debug mode
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -92,7 +88,7 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        databaseDiskBackup = DatabaseDiskBackup(this, this, this)
+        databaseDiskBackup = DatabaseDiskBackup()
 
         setupSupporter()
         setupActionBar()
@@ -104,13 +100,13 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
 
         handleIntents(intent)
 
-        handleDbOperations()
+       // handleDbOperations()
         handleAppUpdate()
     }
 
-    private fun handleDbOperations() {
+    /*private fun handleDbOperations() {
         lifecycleScope.launch(Dispatchers.IO) {
-            DatabaseHelper.getInstance(applicationContext).cleanTempDatabaseFiles()
+            DatabaseHelper.getInstance().cleanTempDatabaseFiles()
         }
 
         if (shouldUpdateDatabaseFromAsset()) {
@@ -138,7 +134,7 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
         } else {
             handleBackUp()
         }
-    }
+    }*/
 
     private fun handleAppUpdate() {
         if (appConfig.appVersionCode.value != BuildConfig.VERSION_CODE) {
@@ -159,19 +155,18 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
         }
     }
 
-    private fun updateDatabaseFromAsset(successCallback: () -> Unit, failureCallback: (e: Exception) -> Unit) {
+   /* private fun updateDatabaseFromAsset(successCallback: () -> Unit, failureCallback: (e: Exception) -> Unit) {
         lifecycleScope.launch(Dispatchers.IO) {
-            val dbHelper = DatabaseHelper.getInstance(applicationContext)
+            val dbHelper = DatabaseHelper.getInstance()
 
             try {
-                val assetDbStream = { applicationContext.assets.open(DatabaseHelper.DATABASE_ASSET_PATH) }
-                val liveDbStream = { FileInputStream(dbHelper.DATABASE_LIVE_PATH) }
+                val assetDbStream = createRoomDatabaseFromFile(DatabaseHelper.DATABASE_ASSET_PATH)
 
                 dbHelper.liveDatabase.flushToDisk()
-                val newDb = dbHelper.replaceWordsDataInDB(liveDbStream,assetDbStream)
+                val newDb = dbHelper.replaceWordsDataInDB(dbHelper.liveDatabase,assetDbStream)
                 newDb.flushToDisk()
                 newDb.close()
-                dbHelper.updateDatabaseFileOnDisk(newDb.databasePath)
+                dbHelper.updateDatabaseFileOnDisk(newDb)
 
                 withContext(Dispatchers.Main) {
                     successCallback()
@@ -184,7 +179,7 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
                 dbHelper.cleanTempDatabaseFiles()
             }
         }
-    }
+    }*/
 
     private fun showOCRReminderIfActive() {
         if (!showOCRReminder) return // user asked to hide
@@ -227,7 +222,7 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
         handleImageOCRIntent(intent)
     }
 
-    override fun onBackupFolderSet(path: Path) {
+    /*override fun onBackupFolderSet(path: Path) {
         Utils.getAppScope(applicationContext).launch(Dispatchers.IO) {
             val success = databaseDiskBackup.backUp(path)
 
@@ -248,21 +243,13 @@ class MainActivity : AppCompatActivity(), DatabaseBackupCallbacks {
         Toast.makeText(applicationContext, getString(R.string.dbbackup_failure_folderpermission), Toast.LENGTH_LONG).show()
     }
 
-    override fun onBackupFileSelected(path: Path) {
-        throw Error("This should never be hit")
-    }
-
-    override fun onBackupFileSelectionCancelled() {
-        throw Error("This should never be hit")
-    }
-
-    override fun onSupportNavigateUp(): Boolean {
-        return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
-    }
-
     private fun handleBackUp() {
         if (appConfig.dbBackUpDiskActive.value)
             databaseDiskBackup.getFolder()
+    }*/
+
+    override fun onSupportNavigateUp(): Boolean {
+        return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
     private fun handleWidgetConfigIntent(intent: Intent?) {

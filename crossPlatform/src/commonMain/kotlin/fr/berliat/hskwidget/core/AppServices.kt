@@ -33,12 +33,12 @@ open class AppServices {
     open fun init(scope: CoroutineScope) {
         scope.launch(Dispatchers.IO) {
             try {
-                    factories.forEach { (name, factory) ->
-                        val instance = factory()
-                        mutex.withLock {
-                            instances[name] = instance
-                        }
+                factories.forEach { (name, factory) ->
+                    val instance = factory()
+                    mutex.withLock {
+                        instances[name] = instance
                     }
+                }
                 _status.value = Status.Ready
             } catch (t: Throwable) {
                 _status.value = Status.Failed(t)

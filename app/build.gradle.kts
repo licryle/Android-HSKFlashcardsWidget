@@ -168,6 +168,8 @@ dependencies {
 
     implementation(libs.kotlinx.datetime)
     implementation(libs.compose.resources)
+    implementation(libs.filekit.core)
+    implementation(libs.filekit.dialogs)
 }
 
 // TODO: Remove these unhappy hacks. I've search for a while and couldn't find why my resources aren't exported despite export configuration.

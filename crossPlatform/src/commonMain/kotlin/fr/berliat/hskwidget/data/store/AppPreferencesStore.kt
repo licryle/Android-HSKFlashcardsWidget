@@ -3,10 +3,13 @@ package fr.berliat.hskwidget.data.store
 import androidx.compose.ui.unit.sp
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
-import kotlinx.datetime.Instant
-import okio.Path.Companion.toPath
+
 import fr.berliat.hskwidget.data.type.ClassLevel
 import fr.berliat.hskwidget.data.type.ClassType
+import io.github.vinceglb.filekit.BookmarkData
+import io.github.vinceglb.filekit.PlatformFile
+
+import kotlinx.datetime.Instant
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -83,8 +86,8 @@ class AppPreferencesStore private constructor(store: DataStore<Preferences>):
         PreferenceConverter({ Instant.fromEpochMilliseconds(it) }, { it.toEpochMilliseconds() })
     )
     val dbBackUpDiskDirectory = registerStringPref(
-        "database_backup_disk_directory", "".toPath(),
-        PreferenceConverter({ it.toPath() }, { it.toString() })
+        "database_backup_disk_directory", null,
+        ByteArrayPreferenceConverter()
     )
     val lastAnnotatedClassLevel = registerStringPref("class_level", ClassLevel.NotFromClass,
         PreferenceConverter({ ClassLevel.from(it) }, { it.name })

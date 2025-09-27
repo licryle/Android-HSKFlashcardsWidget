@@ -24,9 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
 import fr.berliat.hskwidget.data.store.SupportDevStore
 import fr.berliat.hskwidget.data.store.SupportDevStore.SupportTier
@@ -90,9 +88,7 @@ fun SupportScreen(
     ) {
         Text(
             text = stringResource(Res.string.support_devintro_title),
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Start
+            style = MaterialTheme.typography.titleMedium
         )
 
         Spacer(Modifier.height(8.dp))

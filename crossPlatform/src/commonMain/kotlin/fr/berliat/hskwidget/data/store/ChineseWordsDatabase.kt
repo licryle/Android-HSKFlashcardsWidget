@@ -47,9 +47,6 @@ abstract class ChineseWordsDatabase: RoomDatabase() {
     abstract fun widgetListDAO(): WidgetListDAO
     fun databaseManagementDAO() = DatabaseManagementDAO(this)
 
-    val databasePath
-        get() = Utils.getDatabasePath()
-
     companion object {
         const val TAG = "ChineseWordsDatabase"
     }

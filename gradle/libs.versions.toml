@@ -1,6 +1,7 @@
 [versions]
 ankiAndroid = "api-v1.1.0"
 datastorePreferences = "1.1.7"
+filekitCore = "0.11.0"
 jiebaAnalysis = "1.0.3"
 kotlin = "2.2.20"
 compose = "1.8.2"
@@ -31,6 +32,9 @@ androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtim
 androidx-lifecycle-service = { module = "androidx.lifecycle:lifecycle-service", version.ref = "androidx-viewmodel" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtxVersion" }
 anki-android = { module = "com.github.ankidroid:Anki-Android", version.ref = "ankiAndroid" }
+filekit-core = { module = "io.github.vinceglb:filekit-core", version.ref = "filekitCore" }
+filekit-dialogs = { module = "io.github.vinceglb:filekit-dialogs", version.ref = "filekitCore" }
+filekit-dialogs-compose = { module = "io.github.vinceglb:filekit-dialogs-compose", version.ref = "filekitCore" }
 jieba-analysis = { module = "io.github.yrjyrj123:jieba-analysis", version.ref = "jiebaAnalysis" }
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
 compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose" }

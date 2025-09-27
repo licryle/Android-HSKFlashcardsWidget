@@ -77,6 +77,10 @@ kotlin {
                 implementation(libs.androidx.datastore.preferences)
                 api(libs.androidx.lifecycle.viewmodel)
 
+                implementation(libs.filekit.core)
+                implementation(libs.filekit.dialogs)
+                implementation(libs.filekit.dialogs.compose)
+
                 implementation(project(":hsktextviews"))
             }
         }
@@ -113,7 +117,7 @@ kotlin {
                 implementation(libs.review.ktx)
 
                 implementation(libs.androidx.documentfile)
-               // implementation("org.jetbrains.kotlinx:kotlinx-io-core:0.8.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-io-core-jvm:0.8.0")
             }
             resources.srcDirs("src/commonMain/composeResources")
         }

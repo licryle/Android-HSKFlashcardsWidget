@@ -26,9 +26,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 import fr.berliat.hskwidget.HSKHelperApp
-import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 
 fun <T : Parcelable> Intent.getParcelableExtraCompat(key: String, clazz: Class<T>): T? {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -50,13 +47,6 @@ class Utils {
     companion object {
         fun getAppContext() : HSKHelperApp {
             return HSKHelperApp.instance
-        }
-
-        fun formatDate(time: Instant) : String {
-            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-                .withZone(ZoneId.systemDefault())
-
-            return formatter.format(time)
         }
 
         fun getAppScope(context: Context) = (context.applicationContext as HSKHelperApp).applicationScope

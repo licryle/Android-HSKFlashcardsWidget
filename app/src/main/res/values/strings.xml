@@ -49,24 +49,6 @@
 
     <string name="dbbackup_success">Successfully backed-up the full database</string>
     <string name="dbbackup_failure_write">Couldn\'t write / back-up the full database</string>
-    <string name="dbbackup_failure_folderpermission">No folder allowed to perform local backup, cancelling</string>
-    <string name="config_backup_title">Backup/Restore from local file</string>
-    <string name="config_backup_activate">Activate backup</string>
-    <string name="config_backup_frequency">Backup frequency</string>
-    <string name="config_backup_frequency_options">When app starts</string>
-    <string name="config_backup_location">Backup directory</string>
-    <string name="config_backup_directory_choose">Choose directory</string>
-    <string name="config_backup_icon_alt">Database upload</string>
-    <string name="config_backup_max_number">Number of backups to keep</string>
-    <string name="config_backup_select_number">Select how many</string>
-    <string-array name="config_backup_max_locally">
-        <item>2 (~100MB)</item>
-        <item>5 (~250MB)</item>
-        <item>10 (~500MB)</item>
-    </string-array>
-
-    <string name="config_restore_file">Restore from file</string>
-    <string name="config_restore_file_choose">Choose file</string>
     <string name="config_backup_cloud_title">Backup/Restore from Google</string>
     <string name="config_backup_cloud_account">Google Account</string>
     <string name="config_backup_cloud_account_notconfigured">Logged out</string>
@@ -74,11 +56,6 @@
     <string name="config_backup_cloud_lastone_never">Never</string>
     <string name="config_backup_cloud_backupnow">Backup now</string>
     <string name="config_backup_cloud_restorenow">Restore now</string>
-
-    <string name="dbrestore_failure_fileformat">File doesn\'t seem to be a backup for this app</string>
-    <string name="dbrestore_failure_import">Restoration failed: %s</string>
-    <string name="dbrestore_failure_nofileselected">No file selected: restoration cancelled</string>
-    <string name="dbrestore_success">Database successfully restored</string>
 
     <string name="config_anki_title">Anki integration</string>
     <string name="config_anki_integration">Save lists and corresponding notes in Anki automatically</string>

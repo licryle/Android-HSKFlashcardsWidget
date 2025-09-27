@@ -65,13 +65,11 @@ You can come back to this screen at any time to set up a new widget, or reconfig
     <string name="speech_failure_toast_chinese_unsupported">The "Chinese (China)" voice if missing from your Text-To-Speech. Please install it.</string>
     <string name="speech_failure_toast_init">Failed to initialize the Text-To-Speech service, we need to activate, download or configure it in Settings.</string>
 
-
     <string name="annotation_edit_notes_hint">Enter your notes:</string>
     <string name="annotation_edit_is_exam_hint">Is it at the exam?</string>
     <string name="annotation_edit_themes_hint">Themes covered:</string>
     <string name="annotation_edit_class_level_hint">Class level:</string>
     <string name="annotation_edit_class_type_hint">Class type:</string>
-
     <string name="annotation_edit_delete_success">%1$s successfully deleted</string>
     <string name="annotation_edit_delete_failure">Couldn't delete %1$s: %2$s</string>
     <string name="annotation_edit_save_success">%1$s successfully saved</string>
@@ -105,6 +103,30 @@ You can come back to this screen at any time to set up a new widget, or reconfig
     <string name="ocr_display_no_text_found">No text found</string>
     <string name="ocr_display_text_segmentation_failed">Text segmentation failed</string>
     <string name="ocr_display_ocr_failed">Text recognition failed</string>
+
+    <string name="config_backup_title">Backup/Restore from local file</string>
+    <string name="config_backup_activate">Activate backup</string>
+    <string name="config_backup_frequency">Backup frequency</string>
+    <string name="config_backup_frequency_options">When app starts</string>
+    <string name="config_backup_location">Backup directory</string>
+    <string name="config_backup_directory_choose">Choose directory</string>
+    <string name="config_backup_directory_failed_selection">No folder allowed to perform local backup, cancelling</string>
+    <string name="config_backup_icon_alt">Database upload</string>
+    <string name="config_backup_max_number">Number of backups to keep</string>
+    <string-array name="config_backup_max_locally"> <!-- Must be in format "{Int} {String}" -->
+        <item>2 (~100MB)</item>
+        <item>5 (~250MB)</item>
+        <item>10 (~500MB)</item>
+    </string-array>
+
+
+    <string name="dbrestore_failure_fileformat">File doesn\'t seem to be a backup for this app</string>
+    <string name="dbrestore_failure_import">Restoration failed: %s</string>
+    <string name="dbrestore_failure_nofileselected">No file selected: restoration cancelled</string>
+    <string name="dbrestore_success">Database successfully restored</string>
+
+    <string name="config_restore_file">Restore from file</string>
+    <string name="config_restore_file_choose">Choose file</string>
 
     <string name="anki_sync_start_message">Preparing for a full import of lists to Anki.</string>
     <string name="anki_sync_progress_message" formatted="false">Syncing word %s to AnkiDroid: %d / %d</string>

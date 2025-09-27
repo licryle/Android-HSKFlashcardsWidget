@@ -44,7 +44,7 @@ class DictionaryViewModel(val appSearchQueryProvider : () -> SearchQuery,
 
     init {
         CoroutineScope(Dispatchers.IO).launch {
-            dao = Utils.getDatabaseInstance().annotatedChineseWordDAO()
+            dao = HSKAppServices.database.annotatedChineseWordDAO()
         }
     }
 

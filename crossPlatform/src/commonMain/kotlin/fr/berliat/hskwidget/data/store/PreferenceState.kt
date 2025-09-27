@@ -13,11 +13,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-class PreferenceConverter<S, T>(
-    val fromStore: (S) -> T,
-    val toStore: (T) -> S
-)
-
 /**
  * Two-way bound preference state: updates to `.value` automatically persist to DataStore
  */
