@@ -2,18 +2,25 @@ package fr.berliat.hskwidget.data.type
 
 import androidx.room.TypeConverter
 import fr.berliat.hskwidget.core.Locale
+import fr.berliat.hskwidget.core.LocaleSerializer
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWordAnnotation
 import fr.berliat.hskwidget.data.model.WordList
 import kotlinx.datetime.Instant
+import kotlinx.serialization.builtins.MapSerializer
+import kotlinx.serialization.builtins.serializer
 
 import kotlinx.serialization.json.Json
 
 object DefinitionsConverter {
     @TypeConverter
     fun fromStringMap(value: Map<Locale, String>?): String? {
-        return Json.encodeToString(value)
+        if (value == null) return null
+        return Json.encodeToString(
+            MapSerializer(LocaleSerializer, String.serializer()),
+            value
+        )
     }
 
     @TypeConverter
@@ -21,8 +28,10 @@ object DefinitionsConverter {
         if (s == null)
             return mapOf()
 
-        val defs = Json.decodeFromString<Map<String, String>>(s)
-        return defs.mapKeys { Locale.fromCode(it.key)!! }
+        return Json.decodeFromString(
+            MapSerializer(LocaleSerializer, String.serializer()),
+            s
+        )
     }
 }
 
