@@ -1,6 +1,8 @@
 package fr.berliat.hskwidget.data.store
 
 import io.github.vinceglb.filekit.BookmarkData
+import io.github.vinceglb.filekit.PlatformFile
+import io.github.vinceglb.filekit.fromBookmarkData
 import kotlin.io.encoding.Base64
 
 open class PreferenceConverter<S, T>(
@@ -11,13 +13,21 @@ open class PreferenceConverter<S, T>(
 class ByteArrayPreferenceConverter : PreferenceConverter<String, BookmarkData?>(
     fromStore = { stored ->
         try {
-            BookmarkData(Base64.decode(stored))
+            if (stored == "") {
+                null
+            } else {
+                // Let's try to decode, if it fails, goes into the catch. We don't need to keep invalid data
+                val bookMark = BookmarkData(Base64.decode(stored))
+                PlatformFile.fromBookmarkData(bookMark)
+
+                bookMark
+            }
         } catch (_: Exception) {
             null
         }
     },
     toStore = { value -> if (value == null) {
-            Base64.encode(byteArrayOf(0))
+            ""
         } else {
             Base64.encode(value.bytes)
         }
