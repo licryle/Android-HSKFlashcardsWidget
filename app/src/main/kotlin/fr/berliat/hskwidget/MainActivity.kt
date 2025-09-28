@@ -32,18 +32,29 @@ import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.data.store.SupportDevStore
 import fr.berliat.hskwidget.databinding.ActivityMainBinding
 import fr.berliat.hskwidget.domain.DatabaseDiskBackup
+import fr.berliat.hskwidget.domain.DatabaseHelper
 import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.domain.getParcelableExtraCompat
 import fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragment
 import fr.berliat.hskwidget.ui.utils.StrictModeManager
 import fr.berliat.hskwidget.ui.widget.WidgetProvider
 import hskflashcardswidget.crossplatform.generated.resources.Res
+import hskflashcardswidget.crossplatform.generated.resources.database_update_failure
+import hskflashcardswidget.crossplatform.generated.resources.database_update_start
+import hskflashcardswidget.crossplatform.generated.resources.database_update_success
+import hskflashcardswidget.crossplatform.generated.resources.dbbackup_failure_folderpermission
+import hskflashcardswidget.crossplatform.generated.resources.dbbackup_failure_write
+import hskflashcardswidget.crossplatform.generated.resources.dbbackup_success
 import hskflashcardswidget.crossplatform.generated.resources.support_status_tpl
 import hskflashcardswidget.crossplatform.generated.resources.support_total_error
 import io.github.vinceglb.filekit.FileKit
+import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.dialogs.init
+import io.github.vinceglb.filekit.fromBookmarkData
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import multiplatform.network.cmptoast.AppContext
 import org.jetbrains.compose.resources.getString
@@ -88,8 +99,6 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        databaseDiskBackup = DatabaseDiskBackup()
-
         setupSupporter()
         setupActionBar()
 
@@ -100,48 +109,33 @@ class MainActivity : AppCompatActivity() {
 
         handleIntents(intent)
 
-       // handleDbOperations()
+        handleDbOperations()
         handleAppUpdate()
     }
 
-    /*private fun handleDbOperations() {
+    private fun handleDbOperations() {
         lifecycleScope.launch(Dispatchers.IO) {
             DatabaseHelper.getInstance().cleanTempDatabaseFiles()
         }
 
         if (shouldUpdateDatabaseFromAsset()) {
-            Toast.makeText(
-                applicationContext,
-                getString(R.string.database_update_start),
-                Toast.LENGTH_LONG
-            ).show()
+            ExpectedUtils.toast(Res.string.database_update_start)
 
-            updateDatabaseFromAsset({
-                Toast.makeText(this, getString(R.string.database_update_success), Toast.LENGTH_LONG).show()
+            lifecycleScope.launch {
+                DatabaseHelper.getInstance().updateLiveDatabaseFromAsset({
+                    ExpectedUtils.toast(Res.string.database_update_success)
 
-                handleBackUp()
-            }, { e ->
-                Toast.makeText(
-                    this,
-                    getString(R.string.database_update_failure, e.toString()),
-                    Toast.LENGTH_LONG
-                ).show()
+                    handleBackUp()
+                }, { e ->
+                    ExpectedUtils.toast(Res.string.database_update_failure, listOf(e.message ?: ""))
 
-                Utils.logAnalyticsError(TAG, "UpdateDatabaseFromAssetFailure", e.message ?: "")
+                    Utils.logAnalyticsError(TAG, "UpdateDatabaseFromAssetFailure", e.message ?: "")
 
-                handleBackUp()
-            })
+                    handleBackUp()
+                })
+            }
         } else {
             handleBackUp()
-        }
-    }*/
-
-    private fun handleAppUpdate() {
-        if (appConfig.appVersionCode.value != BuildConfig.VERSION_CODE) {
-            appConfig.appVersionCode.value = BuildConfig.VERSION_CODE
-
-            // Now we can upgrade stuff
-            WidgetProvider().updateAllFlashCardWidgets()
         }
     }
 
@@ -155,31 +149,46 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-   /* private fun updateDatabaseFromAsset(successCallback: () -> Unit, failureCallback: (e: Exception) -> Unit) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            val dbHelper = DatabaseHelper.getInstance()
-
-            try {
-                val assetDbStream = createRoomDatabaseFromFile(DatabaseHelper.DATABASE_ASSET_PATH)
-
-                dbHelper.liveDatabase.flushToDisk()
-                val newDb = dbHelper.replaceWordsDataInDB(dbHelper.liveDatabase,assetDbStream)
-                newDb.flushToDisk()
-                newDb.close()
-                dbHelper.updateDatabaseFileOnDisk(newDb)
-
-                withContext(Dispatchers.Main) {
-                    successCallback()
-                }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    failureCallback(e)
-                }
-            } finally {
-                dbHelper.cleanTempDatabaseFiles()
+    private fun handleBackUp() {
+        val bookMark = appConfig.dbBackUpDiskDirectory.value
+        if (appConfig.dbBackUpDiskActive.value && bookMark != null) {
+            val backupFolder = PlatformFile.fromBookmarkData(bookMark)
+            lifecycleScope.launch(Dispatchers.IO) {
+                DatabaseDiskBackup.getFolder(
+                    bookMark,
+                    onSuccess = {
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            DatabaseDiskBackup.backUp(
+                                bookMark,
+                                onSuccess = {
+                                    ExpectedUtils.toast(Res.string.dbbackup_success)
+                                    lifecycleScope.launch(Dispatchers.IO) {
+                                        DatabaseDiskBackup.cleanOldBackups(
+                                            backupFolder,
+                                            appConfig.dbBackUpDiskMaxFiles.value
+                                        )
+                                    }
+                                },
+                                onFail = { ExpectedUtils.toast(Res.string.dbbackup_failure_write) }
+                            )
+                        }
+                    },
+                    onFail = {
+                        ExpectedUtils.toast(Res.string.dbbackup_failure_folderpermission)
+                    }
+                )
             }
         }
-    }*/
+    }
+
+    private fun handleAppUpdate() {
+        if (appConfig.appVersionCode.value != BuildConfig.VERSION_CODE) {
+            appConfig.appVersionCode.value = BuildConfig.VERSION_CODE
+
+            // Now we can upgrade stuff
+            WidgetProvider().updateAllFlashCardWidgets()
+        }
+    }
 
     private fun showOCRReminderIfActive() {
         if (!showOCRReminder) return // user asked to hide
@@ -221,32 +230,6 @@ class MainActivity : AppCompatActivity() {
         handleTextSearchIntent(intent)
         handleImageOCRIntent(intent)
     }
-
-    /*override fun onBackupFolderSet(path: Path) {
-        Utils.getAppScope(applicationContext).launch(Dispatchers.IO) {
-            val success = databaseDiskBackup.backUp(path)
-
-            if (success) {
-                databaseDiskBackup.cleanOldBackups(path, appConfig.dbBackUpDiskMaxFiles.value)
-            }
-
-            withContext(Dispatchers.Main) {
-                if (success)
-                    Toast.makeText(applicationContext, getString(R.string.dbbackup_success), Toast.LENGTH_LONG).show()
-                else
-                    Toast.makeText(applicationContext, getString(R.string.dbbackup_failure_write), Toast.LENGTH_LONG).show()
-            }
-        }
-    }
-
-    override fun onBackupFolderError() {
-        Toast.makeText(applicationContext, getString(R.string.dbbackup_failure_folderpermission), Toast.LENGTH_LONG).show()
-    }
-
-    private fun handleBackUp() {
-        if (appConfig.dbBackUpDiskActive.value)
-            databaseDiskBackup.getFolder()
-    }*/
 
     override fun onSupportNavigateUp(): Boolean {
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()

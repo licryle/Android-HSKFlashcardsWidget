@@ -120,10 +120,19 @@ You can come back to this screen at any time to set up a new widget, or reconfig
     </string-array>
 
 
-    <string name="dbrestore_failure_fileformat">File doesn\'t seem to be a backup for this app</string>
+    <string name="dbrestore_start">Database restoration started</string>
+    <string name="dbrestore_failure_fileformat">File doesn't seem to be a backup for this app</string>
     <string name="dbrestore_failure_import">Restoration failed: %s</string>
     <string name="dbrestore_failure_nofileselected">No file selected: restoration cancelled</string>
     <string name="dbrestore_success">Database successfully restored</string>
+
+    <string name="dbbackup_success">Successfully backed-up the database</string>
+    <string name="dbbackup_failure_write">Couldn't back-up the database</string>
+    <string name="dbbackup_failure_folderpermission">Cancelling back-up: no write permission on folder</string>
+
+    <string name="database_update_start">Updating base dictionary, backup will be delayed.</string>
+    <string name="database_update_success">Updated base dictionary</string>
+    <string name="database_update_failure">Error while updating base dictionary: %1$s</string>
 
     <string name="config_restore_file">Restore from file</string>
     <string name="config_restore_file_choose">Choose file</string>

@@ -3,7 +3,6 @@ package fr.berliat.hskwidget.data.store
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import fr.berliat.hskwidget.Utils
 import fr.berliat.hskwidget.data.dao.AnnotatedChineseWordDAO
 import fr.berliat.hskwidget.data.dao.ChineseWordAnnotationDAO
 import fr.berliat.hskwidget.data.dao.ChineseWordDAO
@@ -24,6 +23,7 @@ import fr.berliat.hskwidget.data.type.ListTypeConverter
 import fr.berliat.hskwidget.data.type.ModalityConverter
 import fr.berliat.hskwidget.data.type.Pinyins
 import fr.berliat.hskwidget.data.type.WordTypeConverter
+import io.github.vinceglb.filekit.PlatformFile
 
 @Database(
     entities = [ChineseWordAnnotation::class, ChineseWord::class, ChineseWordFrequency::class,
@@ -50,6 +50,10 @@ abstract class ChineseWordsDatabase: RoomDatabase() {
     companion object {
         const val TAG = "ChineseWordsDatabase"
     }
+
+    var _databaseFile : PlatformFile? = null
+    val databaseFile
+        get() = _databaseFile!!
 
     suspend fun flushToDisk() {
         databaseManagementDAO().flushDatabase()

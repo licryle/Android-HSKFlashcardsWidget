@@ -1,7 +1,6 @@
 package fr.berliat.hskwidget.domain
 
 import co.touchlab.kermit.Logger
-import fr.berliat.hskwidget.data.model.ChineseWordAnnotation
 
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 
@@ -14,14 +13,15 @@ import io.github.vinceglb.filekit.copyTo
 import io.github.vinceglb.filekit.delete
 import io.github.vinceglb.filekit.div
 import io.github.vinceglb.filekit.exists
-import io.github.vinceglb.filekit.extension
 import io.github.vinceglb.filekit.filesDir
 import io.github.vinceglb.filekit.list
 import io.github.vinceglb.filekit.name
 import io.github.vinceglb.filekit.parent
+import io.github.vinceglb.filekit.path
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -113,9 +113,9 @@ class DatabaseHelper private constructor() {
         } ?: emptyList()
 
         filesToRename.forEach {
-            val ext = it.extension
+            val ext = it.name.substring(baseFileName.length)
 
-            it.atomicMove(liveFile)
+            it.atomicMove(PlatformFile(liveFile.path + ext))
         }
 
         _db = createRoomDatabaseLive()
@@ -169,11 +169,34 @@ class DatabaseHelper private constructor() {
         }
 
         // Doing the opposite for efficacy: let's get user data into the importedDb, then copy file
-        replaceUserDataInDB(dbToUpdate, updateWith)
+        replaceUserDataInDB(updateWith, dbToUpdate)
         updateWith.flushToDisk()
 
         Logger.i(tag = TAG, messageString = "Database update done")
         return@withContext updateWith
+    }
+
+    suspend fun updateLiveDatabaseFromAsset(successCallback: () -> Unit, failureCallback: (e: Exception) -> Unit)
+            = withContext(Dispatchers.IO) {
+        try {
+            val assetDbStream = createRoomDatabaseFromAsset()
+
+            liveDatabase.flushToDisk()
+            val newDb = replaceWordsDataInDB(liveDatabase,assetDbStream)
+            newDb.flushToDisk()
+            newDb.close()
+            updateDatabaseFileOnDisk(newDb.databaseFile)
+
+            withContext(Dispatchers.Main) {
+                successCallback()
+            }
+        } catch (e: Exception) {
+            withContext(Dispatchers.Main) {
+                failureCallback(e)
+            }
+        } finally {
+            cleanTempDatabaseFiles()
+        }
     }
 
     suspend fun snapshotDatabase(): PlatformFile {
@@ -191,4 +214,5 @@ class DatabaseHelper private constructor() {
 
 expect suspend fun createRoomDatabaseLive() : ChineseWordsDatabase
 expect suspend fun createRoomDatabaseFromFile(file: PlatformFile) : ChineseWordsDatabase
+expect suspend fun createRoomDatabaseFromAsset() : ChineseWordsDatabase
 expect suspend fun createRoomDatabaseFromStream(stream: () -> RawSource) : ChineseWordsDatabase

@@ -12,6 +12,7 @@ import fr.berliat.hskwidget.domain.DatabaseHelper
 import hskflashcardswidget.crossplatform.generated.resources.Res
 import hskflashcardswidget.crossplatform.generated.resources.config_backup_directory_failed_selection
 import hskflashcardswidget.crossplatform.generated.resources.dbrestore_failure_nofileselected
+import hskflashcardswidget.crossplatform.generated.resources.dbrestore_start
 import hskflashcardswidget.crossplatform.generated.resources.dbrestore_success
 
 import io.github.vinceglb.filekit.FileKit
@@ -40,14 +41,13 @@ class BackupDiskViewModel(
     val backupDiskActive = appConfig.dbBackUpDiskActive.asStateFlow()
     val backupDiskMaxFiles = appConfig.dbBackUpDiskMaxFiles.asStateFlow()
 
-    private val databaseDiskBackup = DatabaseDiskBackup(appConfig)
     val backupDiskFolder: StateFlow<PlatformFile?> = appConfig.dbBackUpDiskDirectory
         .asStateFlow()
-        .map { path -> databaseDiskBackup.getPlatformFileFromBookmarkOrNull(path) } // Ensuring the view only sees an accessible directory
+        .map { path -> DatabaseDiskBackup.getPlatformFileFromBookmarkOrNull(path) } // Ensuring the view only sees an accessible directory
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
-            initialValue = databaseDiskBackup.getPlatformFileFromBookmarkOrNull(appConfig.dbBackUpDiskDirectory.value)
+            initialValue = DatabaseDiskBackup.getPlatformFileFromBookmarkOrNull(appConfig.dbBackUpDiskDirectory.value)
         )
 
     init {
@@ -75,8 +75,9 @@ class BackupDiskViewModel(
 
     fun selectRestoreFile() {
         viewModelScope.launch(Dispatchers.Main) {
-            databaseDiskBackup.selectBackupFile(
+            DatabaseDiskBackup.selectBackupFile(
                 onSuccess = { file ->
+                    Utils.toast(Res.string.dbrestore_start)
                     viewModelScope.launch(Dispatchers.IO) {
                         val dbHelper = DatabaseHelper.getInstance()
                         val copiedFile = FileKit.cacheDir / file.name
@@ -118,7 +119,7 @@ class BackupDiskViewModel(
 
     fun selectBackupFolder() {
         viewModelScope.launch(Dispatchers.Main) {
-            databaseDiskBackup.selectFolder(
+            DatabaseDiskBackup.selectFolder(
                 onSuccess = { folder ->
                     // persist permissions in Platform && DataStore
                     viewModelScope.launch { appConfig.dbBackUpDiskDirectory.value = folder.bookmarkData() }

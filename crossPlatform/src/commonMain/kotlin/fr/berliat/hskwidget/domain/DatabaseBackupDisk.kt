@@ -1,33 +1,29 @@
 package fr.berliat.hskwidget.domain
 
+import fr.berliat.hskwidget.ExpectedUtils
 import fr.berliat.hskwidget.YYMMDDHHMMSS
-import fr.berliat.hskwidget.core.HSKAppServices
-import fr.berliat.hskwidget.data.store.AppPreferencesStore
+import fr.berliat.hskwidget.createdAt
+import fr.berliat.hskwidget.lastModified
 import io.github.vinceglb.filekit.BookmarkData
 import io.github.vinceglb.filekit.FileKit
 
 import io.github.vinceglb.filekit.PlatformFile
-import io.github.vinceglb.filekit.atomicMove
 import io.github.vinceglb.filekit.delete
 import io.github.vinceglb.filekit.dialogs.openDirectoryPicker
 import io.github.vinceglb.filekit.dialogs.openFilePicker
-import io.github.vinceglb.filekit.div
 import io.github.vinceglb.filekit.exists
 import io.github.vinceglb.filekit.fromBookmarkData
 import io.github.vinceglb.filekit.isDirectory
 import io.github.vinceglb.filekit.list
 import io.github.vinceglb.filekit.name
-import io.github.vinceglb.filekit.nameWithoutExtension
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import okio.FileNotFoundException
 
-class DatabaseDiskBackup(
-    private val appPreferences: AppPreferencesStore = HSKAppServices.appPreferences
-) {
-
+object DatabaseDiskBackup {
     /**
      * Clean old backups, keeping only [maxBackups] most recent files.
      */
@@ -37,7 +33,7 @@ class DatabaseDiskBackup(
         withContext(Dispatchers.Default) {
             val files = destinationFolder.list()
                 .filter { it.name.endsWith(DatabaseHelper.DATABASE_FILENAME) }
-                .sortedByDescending { it.nameWithoutExtension } // Todo: use timestamp someday
+                .sortedByDescending { it.createdAt() ?: it.lastModified() }
 
             if (files.size > maxBackups) {
                 files.drop(maxBackups).forEach { try { it.delete() } catch (_: Exception) {} }
@@ -58,23 +54,25 @@ class DatabaseDiskBackup(
      * Perform backup to [destinationFolder].
      */
     suspend fun backUp(
-        destinationFolder: PlatformFile,
+        destinationFolder: BookmarkData,
         onSuccess: () -> Unit,
         onFail: (Throwable) -> Unit
-    ) {
+    ) = withContext(Dispatchers.IO){
         try {
-            withContext(Dispatchers.Default) {
-                val snapshot = DatabaseHelper.getInstance().snapshotDatabase()
-                val timestamp = Clock.System.now()
-                val fileName = "${timestamp.YYMMDDHHMMSS()}_${DatabaseHelper.DATABASE_FILENAME}"
+            val snapshot = DatabaseHelper.getInstance().snapshotDatabase()
+            val timestamp = Clock.System.now()
+            val filename = "${timestamp.YYMMDDHHMMSS()}_${DatabaseHelper.DATABASE_FILENAME}"
 
-                val destFile = destinationFolder / fileName
+            ExpectedUtils.copyFileSafely(snapshot, destinationFolder, filename)
+            snapshot.delete()
 
-                snapshot.atomicMove(destFile)
+            withContext(Dispatchers.Main) {
+                onSuccess()
             }
-            onSuccess()
         } catch (e: Throwable) {
-            onFail(e)
+            withContext(Dispatchers.Main) {
+                onFail(e)
+            }
         }
     }
 
@@ -82,12 +80,13 @@ class DatabaseDiskBackup(
      * Retrieve previously set folder.
      */
     suspend fun getFolder(
+        bookMark: BookmarkData,
         onSuccess: (PlatformFile) -> Unit,
         onFail: () -> Unit
     ) {
-        val backUpFolderBookmark = appPreferences.dbBackUpDiskDirectory.value
-        if (getPlatformFileFromBookmarkOrNull(backUpFolderBookmark) != null)
-            onSuccess
+        val accessibleFolder = getPlatformFileFromBookmarkOrNull(bookMark)
+        if (accessibleFolder != null)
+            onSuccess(accessibleFolder)
         else {
             selectFolder(onSuccess, onFail)
         }

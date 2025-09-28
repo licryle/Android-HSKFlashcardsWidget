@@ -47,8 +47,6 @@
     <string name="appbar_ocr">Start OCR</string>
     <string name="ocr_display_analysis_failure">Text Analysis failed - try again</string>
 
-    <string name="dbbackup_success">Successfully backed-up the full database</string>
-    <string name="dbbackup_failure_write">Couldn\'t write / back-up the full database</string>
     <string name="config_backup_cloud_title">Backup/Restore from Google</string>
     <string name="config_backup_cloud_account">Google Account</string>
     <string name="config_backup_cloud_account_notconfigured">Logged out</string>
@@ -79,7 +77,6 @@
     <string name="nav_host_ocr_reminder_text">Your scanned text is still accessible by clicking here.</string>
     <string name="menu_ocr_display">OCR: Scanned Text</string>
 
-    <string name="dbrestore_start">Database restoration started</string>
     <string name="menu_support">Support the creator!</string>
 
     <string name="wordlist_word_count">%1$d words</string>
@@ -108,9 +105,7 @@
     <string name="googledrive_restore_failed_title">Restoration failed</string>
     <string name="googledrive_restore_failed_message">Restoration from Google Drive failed with error %s.</string>
     <string name="googledrive_logout_confirm">Would you like to logout of your Google Drive account?\nNo data will be deleted from Google Drive.</string>
-    <string name="database_update_start">Updating base dictionary, backup will be delayed.</string>
-    <string name="database_update_success">Updated base dictionary</string>
-    <string name="database_update_failure">Error while updating base dictionary: %1$s</string>
+
 
     // To move
     <string name="menu_annotate">Annotate a word</string>
