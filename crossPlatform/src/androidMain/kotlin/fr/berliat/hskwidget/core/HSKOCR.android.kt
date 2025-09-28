@@ -24,7 +24,7 @@ actual class HSKOCR actual constructor() {
                                successCallback: (String?) -> Unit,
                                failureCallBack: (Exception) -> Unit) {
         withContext(Dispatchers.Default) {
-            val image = InputImage.fromFilePath(ExpectedUtils.context(), imagePath.toUri())
+            val image = InputImage.fromFilePath(ExpectedUtils.context, imagePath.toUri())
             Logger.d(tag = TAG, messageString = "recognizeText starting")
 
             val options = ChineseTextRecognizerOptions.Builder()

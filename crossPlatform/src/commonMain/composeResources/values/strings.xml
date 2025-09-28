@@ -5,7 +5,7 @@
     <string name="cancel">Cancel</string>
     <string name="loading">Loading</string>
     <string name="fix_it">Attempt to fix it</string>
-    <string name="copied_to_clipboard">Copied %s to clipboard</string>
+    <string name="copied_to_clipboard">Copied %1$s to clipboard</string>
 
     <string name="about_btn_view_source">View source code</string>
     <string name="about_intro1">HSK Flashcard Widget (v%1$s) is an open source project by Cyrille Berliat that stems from a personal need to learn Mandarin. \n \nIf it's useful to you, please consider supporting me and my countless hours of development :)</string>
@@ -122,7 +122,7 @@ You can come back to this screen at any time to set up a new widget, or reconfig
 
     <string name="dbrestore_start">Database restoration started</string>
     <string name="dbrestore_failure_fileformat">File doesn't seem to be a backup for this app</string>
-    <string name="dbrestore_failure_import">Restoration failed: %s</string>
+    <string name="dbrestore_failure_import">Restoration failed: %1$s</string>
     <string name="dbrestore_failure_nofileselected">No file selected: restoration cancelled</string>
     <string name="dbrestore_success">Database successfully restored</string>
 
@@ -137,11 +137,24 @@ You can come back to this screen at any time to set up a new widget, or reconfig
     <string name="config_restore_file">Restore from file</string>
     <string name="config_restore_file_choose">Choose file</string>
 
+
+    <string name="config_anki_title">Anki integration</string>
+    <string name="config_anki_activate">Activate Anki integration</string>
+    <string name="config_anki_integration">Save lists and corresponding notes in Anki automatically.
+Upon toggling on, operates a full sync from scratch.</string>
+
     <string name="anki_sync_start_message">Preparing for a full import of lists to Anki.</string>
-    <string name="anki_sync_progress_message" formatted="false">Syncing word %s to AnkiDroid: %d / %d</string>
+    <string name="anki_sync_progress_message" formatted="false">Syncing word %3$d/%2$d to AnkiDroid: %1$s</string>
     <string name="anki_sync_notification_name">Anki Sync Progress</string>
     <string name="anki_sync_notification_description">Provides you with a progress notification for the Anki Sync.</string>
 
+    <string name="anki_sync_start_title">Anki Import in progress</string>
+    <string name="anki_sync_cancelled_title">Anki Import cancelled</string>
+    <string name="anki_sync_cancelled_message">The Anki Import was cancelled.</string>
+    <string name="anki_sync_success_title">Anki Import complete</string>
+    <string name="anki_sync_success_message">Successfully imported all cards to Anki at %1$s.</string>
+    <string name="anki_sync_failure_title">Anki Import failed</string>
+    <string name="anki_sync_failure_message">Anki Import failed, try disabling/enabling again.\nError: %1$s.</string>
 
     <string name="anki_card_CNEN_front"><![CDATA[
         <h1 class="mobile">{{Hanzi}}</h1>

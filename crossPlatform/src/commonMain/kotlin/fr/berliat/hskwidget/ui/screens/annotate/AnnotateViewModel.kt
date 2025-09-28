@@ -2,7 +2,7 @@ package fr.berliat.hskwidget.ui.screens.annotate
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import fr.berliat.hskwidget.AnkiDelegator
+import fr.berliat.hskwidget.KAnkiDelegator
 import fr.berliat.hskwidget.Utils
 import fr.berliat.hskwidget.Utils.incrementConsultedWord
 
@@ -29,7 +29,7 @@ class AnnotateViewModel(
     prefsStore: AppPreferencesStore = HSKAppServices.appPreferences,
     private val database: ChineseWordsDatabase = HSKAppServices.database,
     private val wordListRepo: WordListRepository = HSKAppServices.wordListRepo,
-    private val ankiCaller : AnkiDelegator
+    private val ankiCaller : KAnkiDelegator
 ) : ViewModel() {
     private val _annotatedWord = MutableStateFlow<AnnotatedChineseWord?>(null)
     val annotatedWord: StateFlow<AnnotatedChineseWord?> get() = _annotatedWord

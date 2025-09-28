@@ -1,16 +1,22 @@
 package fr.berliat.hskwidget
 
+import android.Manifest
+import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Intent
 import android.content.Context
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import android.speech.tts.TextToSpeech
 import android.widget.Toast
 
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
@@ -64,13 +70,38 @@ import java.io.InputStream
 import java.nio.file.Files
 import java.nio.file.attribute.BasicFileAttributes
 
+@SuppressLint("StaticFieldLeak") // Only Storing Application context. No memory leak.
 actual object ExpectedUtils {
-    private var _contextProvider: (() -> Context)? = null
-    fun context() = _contextProvider!!.invoke()
+
+    private var _context: Context? = null
+    val context
+        get() = _context!!
+
+    private var _activityProvider: (() -> Activity)? = null
+    val activity
+        get() = _activityProvider!!.invoke()
 
     // Initialize once from Compose or Activity
-    fun init(contextProvider: () -> Context) {
-        this._contextProvider = contextProvider
+    fun init(activity: Activity) {
+        _context = activity.applicationContext
+        _activityProvider = { activity }
+    }
+
+    fun requestPermissionNotification() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    context.applicationContext,
+                    Manifest.permission.POST_NOTIFICATIONS
+                )
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    activity,
+                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                    0
+                )
+            }
+        }
     }
 
     actual fun openLink(url: String) {
@@ -79,7 +110,7 @@ actual object ExpectedUtils {
             Uri.parse(url)
         ).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
-        context().startActivity(intent)
+        context.startActivity(intent)
     }
 
     actual fun sendEmail(email: String, subject: String, body: String) : Boolean {
@@ -90,11 +121,11 @@ actual object ExpectedUtils {
             putExtra(Intent.EXTRA_TEXT, body)
         }
 
-        if (intent.resolveActivity(context().packageManager) != null) {
-            context().startActivity(intent)
+        if (intent.resolveActivity(context.packageManager) != null) {
+            context.startActivity(intent)
         } else {
             try {
-                context().startActivity(Intent.createChooser(intent, "Send email with..."))
+                context.startActivity(Intent.createChooser(intent, "Send email with..."))
             } catch (_: Exception) {
                 return false
             }
@@ -130,12 +161,12 @@ actual object ExpectedUtils {
 
     actual fun getDataStore(file: String): DataStore<Preferences> {
         return PreferenceDataStoreFactory.createWithPath(
-            produceFile = { context().filesDir.resolve(file).absolutePath.toPath() }
+            produceFile = { context.filesDir.resolve(file).absolutePath.toPath() }
         )
     }
 
     actual fun getAnkiDAO(): AnkiDAO {
-        return AnkiDAO(context())
+        return AnkiDAO(context)
     }
 
     actual fun getHSKSegmenter() : HSKTextSegmenter {
@@ -144,7 +175,7 @@ actual object ExpectedUtils {
 
     actual fun copyToClipBoard(s: String) {
         // https://stackoverflow.com/a/28780585/3059536
-        val context = context()
+        val context = context
 
         val clipboard =
             context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
@@ -159,7 +190,7 @@ actual object ExpectedUtils {
     }
 
     actual fun playWordInBackground(word: String) {
-        val context = context()
+        val context = context
         val speechRequest = OneTimeWorkRequestBuilder<BackgroundSpeechService>()
             .setInputData(workDataOf(Pair("word", word)))
             .build()
@@ -248,13 +279,13 @@ actual object ExpectedUtils {
             val s = getString(stringRes).format(args)
 
             withContext(Dispatchers.Main) {
-                Toast.makeText(context(), s.format(args), Toast.LENGTH_LONG).show()
+                Toast.makeText(context, s.format(args), Toast.LENGTH_LONG).show()
             }
         }
     }
 
     actual fun openAppForSearchQuery(query: SearchQuery) {
-        val context = context()
+        val context = context
         val pm = context.packageManager
         val launchIntent = pm.getLaunchIntentForPackage(context.packageName)?.apply {
             putExtra(INTENT_SEARCH_WORD, query.toString())
@@ -272,7 +303,7 @@ actual object ExpectedUtils {
 
     actual suspend fun copyFileSafely(sourceFile: PlatformFile, destinationDir: BookmarkData, filename: String) {
         withContext(Dispatchers.IO) {
-            val context = context()
+            val context = context
             // Open input stream for the source database file
             val inputStream: InputStream = FileInputStream(File(sourceFile.path))
 

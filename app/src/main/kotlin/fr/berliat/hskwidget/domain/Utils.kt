@@ -1,31 +1,32 @@
 package fr.berliat.hskwidget.domain
 
-import android.Manifest
-import android.app.Activity
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.ktx.Firebase
+
 import fr.berliat.hskwidget.ui.widget.WidgetProvider
+import fr.berliat.hskwidget.HSKHelperApp
+
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+
 import java.util.concurrent.TimeUnit
-import fr.berliat.hskwidget.HSKHelperApp
+
 
 fun <T : Parcelable> Intent.getParcelableExtraCompat(key: String, clazz: Class<T>): T? {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -49,8 +50,6 @@ class Utils {
             return HSKHelperApp.instance
         }
 
-        fun getAppScope(context: Context) = (context.applicationContext as HSKHelperApp).applicationScope
-
         fun hideKeyboard(context: Context, view: View) {
             val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             view.let {
@@ -63,23 +62,6 @@ class Utils {
                 View.GONE
             } else {
                 View.VISIBLE
-            }
-        }
-
-        fun requestPermissionNotification(activity: Activity) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                if (ContextCompat.checkSelfPermission(
-                        activity.applicationContext,
-                        Manifest.permission.POST_NOTIFICATIONS
-                    )
-                    != PackageManager.PERMISSION_GRANTED
-                ) {
-                    ActivityCompat.requestPermissions(
-                        activity,
-                        arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-                        0
-                    )
-                }
             }
         }
 

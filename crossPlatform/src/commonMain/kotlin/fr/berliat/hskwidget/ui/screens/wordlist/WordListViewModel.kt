@@ -3,7 +3,7 @@ package fr.berliat.hskwidget.ui.screens.wordlist
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 
-import fr.berliat.hskwidget.AnkiDelegator
+import fr.berliat.hskwidget.KAnkiDelegator
 import fr.berliat.hskwidget.Utils
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.model.WordList
@@ -21,7 +21,7 @@ import kotlinx.coroutines.withContext
 
 class WordListViewModel(
     private val repo: WordListRepository,
-    private val ankiCaller: AnkiDelegator
+    private val ankiCaller: KAnkiDelegator
 ) : ViewModel() {
     private val _allLists = MutableStateFlow<List<WordListWithCount>>(emptyList())
     val allLists: StateFlow<List<WordListWithCount>> = _allLists

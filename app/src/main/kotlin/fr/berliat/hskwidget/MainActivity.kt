@@ -75,7 +75,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        ExpectedUtils.init { this }
+        ExpectedUtils.init(this)
         HSKAppServices.init(lifecycleScope)
 
         // TODO: Temporary until moved to compose

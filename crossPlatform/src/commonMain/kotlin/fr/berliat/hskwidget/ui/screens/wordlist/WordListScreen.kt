@@ -24,7 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.unit.dp
-import fr.berliat.hskwidget.AnkiDelegator
+import fr.berliat.hskwidget.KAnkiDelegator
 
 import fr.berliat.hskwidget.data.model.WordList
 import fr.berliat.hskwidget.data.model.WordListWithCount
@@ -52,7 +52,7 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun WordListScreen(
-    ankiCaller: AnkiDelegator,
+    ankiCaller: KAnkiDelegator,
     onClickList: (WordList) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: WordListViewModel = remember {

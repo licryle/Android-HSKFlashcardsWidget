@@ -1,27 +1,31 @@
 package fr.berliat.hskwidget.ui.screens.config.ankiSync
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import fr.berliat.hskwidget.KAnkiServiceDelegator
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
-import kotlinx.coroutines.launch
 
-class AnkiSyncViewModel(
-    val appConfig: AppPreferencesStore = HSKAppServices.appPreferences): ViewModel() {
+import kotlinx.coroutines.flow.StateFlow
 
-    val ankiActive = appConfig.ankiSaveNotes.asStateFlow()
+enum class SyncState {
+    NOT_STARTED,
+    STARTING,
+    IN_PROGRESS,
+    SUCCESS,
+    CANCELLED,
+    FAILED
+}
 
-    fun toggleAnkiActive(enabled: Boolean) {
-        appConfig.ankiSaveNotes.value = enabled
+class SyncProgress(val state: SyncState, val current: Int, val total: Int, val message: String)
 
-        if (enabled) {
-            importsAllNotesToAnkiDroid()
-        }
-    }
+expect class AnkiSyncViewModel(
+    ankiDelegate: KAnkiServiceDelegator,
+    appConfig: AppPreferencesStore = HSKAppServices.appPreferences
+) {
+    val isAvailableOnThisPlatform: Boolean
+    val ankiActive : StateFlow<Boolean>
+    val syncProgress : StateFlow<SyncProgress>
 
-    private fun importsAllNotesToAnkiDroid() {
-        viewModelScope.launch {
-            //ankiDelegate.invoke(HSKAppServices.wordListRepo.syncListsToAnki())
-        }
-    }
+    fun toggleAnkiActive(enabled: Boolean)
+
+    fun cancelSync()
 }

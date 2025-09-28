@@ -26,9 +26,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import fr.berliat.hskwidget.AnkiDelegator
-import fr.berliat.hskwidget.core.HSKAppServices
 
+import fr.berliat.hskwidget.KAnkiDelegator
+import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.model.WordListWithCount
 import fr.berliat.hskwidget.ui.components.LoadingView
@@ -44,7 +44,7 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun WordListSelectionDialog(
-    ankiCaller: AnkiDelegator,
+    ankiCaller: KAnkiDelegator,
     word: ChineseWord,
     onDismiss: () -> Unit,
     onSaved: () -> Unit,

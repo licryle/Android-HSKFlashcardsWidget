@@ -58,14 +58,6 @@
     <string name="config_anki_title">Anki integration</string>
     <string name="config_anki_integration">Save lists and corresponding notes in Anki automatically</string>
 
-    <string name="anki_sync_start_message">Preparing for a full import of lists to Anki.</string>
-    <string name="anki_sync_start_title">Anki Import in progress</string>
-    <string name="anki_sync_cancelled_title">Anki Import cancelled</string>
-    <string name="anki_sync_cancelled_message">The Anki Import was cancelled.</string>
-    <string name="anki_sync_success_title">Anki Import complete</string>
-    <string name="anki_sync_success_message">Successfully imported all cards to Anki at %s.</string>
-    <string name="anki_sync_failure_title">Anki Import failed</string>
-    <string name="anki_sync_failure_message">Anki Import failed, try disabling/enabling again.\nError: %s.</string>
     <string name="anki_not_installed"><![CDATA[AnkiDroid is not installed, or runs a very old version (<2.5)]]></string>
     <string name="anki_permission_denied">Permission to call AnkiDroid API denied.</string>
     <string name="anki_must_start">To save to Anki, Anki must be started. Starting Anki. Feel free to go back.</string>
@@ -105,7 +97,6 @@
     <string name="googledrive_restore_failed_title">Restoration failed</string>
     <string name="googledrive_restore_failed_message">Restoration from Google Drive failed with error %s.</string>
     <string name="googledrive_logout_confirm">Would you like to logout of your Google Drive account?\nNo data will be deleted from Google Drive.</string>
-
 
     // To move
     <string name="menu_annotate">Annotate a word</string>

@@ -19,7 +19,7 @@ import java.io.File
 
 actual suspend fun createRoomDatabaseLive(): ChineseWordsDatabase {
     val db = Room.databaseBuilder(
-                ExpectedUtils.context().applicationContext,
+                ExpectedUtils.context.applicationContext,
                 ChineseWordsDatabase::class.java,
                 DATABASE_FILENAME)
         .createFromAsset(DATABASE_ASSET_PATH)
@@ -41,7 +41,7 @@ actual suspend fun createRoomDatabaseLive(): ChineseWordsDatabase {
 actual suspend fun createRoomDatabaseFromAsset(): ChineseWordsDatabase {
     val filename = "Temp_HSK_DB_${Utils.getRandomString(10)}"
     val db = Room.databaseBuilder(
-        ExpectedUtils.context().applicationContext,
+        ExpectedUtils.context.applicationContext,
         ChineseWordsDatabase::class.java,
         filename)
 
@@ -56,7 +56,7 @@ actual suspend fun createRoomDatabaseFromAsset(): ChineseWordsDatabase {
 actual suspend fun createRoomDatabaseFromFile(file: PlatformFile): ChineseWordsDatabase {
     val filename = "Temp_HSK_DB_${Utils.getRandomString(10)}"
     val db = Room.databaseBuilder(
-        ExpectedUtils.context().applicationContext,
+        ExpectedUtils.context.applicationContext,
         ChineseWordsDatabase::class.java,
         filename)
         .createFromFile(File(file.path))
@@ -72,7 +72,7 @@ actual suspend fun createRoomDatabaseFromStream(stream: () -> RawSource): Chines
     TODO()
 
     val db = Room.databaseBuilder(
-        ExpectedUtils.context().applicationContext,
+        ExpectedUtils.context.applicationContext,
         ChineseWordsDatabase::class.java,
         "Temp_HSK_DB_${Utils.getRandomString(10)}")
         .createFromInputStream({ null })

@@ -23,7 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import fr.berliat.hskwidget.AnkiDelegator
+import fr.berliat.hskwidget.KAnkiDelegator
 
 import fr.berliat.hskwidget.data.type.ClassLevel
 import fr.berliat.hskwidget.data.type.ClassType
@@ -52,7 +52,7 @@ fun AnnotateScreen(
     onCopy: (String) -> Unit,
     onSave: (String, Exception?) -> Unit,
     onDelete: (String, Exception?) -> Unit,
-    ankiCaller : AnkiDelegator,
+    ankiCaller : KAnkiDelegator,
     modifier: Modifier = Modifier
 ) {
     val viewModel = remember { AnnotateViewModel(ankiCaller = ankiCaller) }

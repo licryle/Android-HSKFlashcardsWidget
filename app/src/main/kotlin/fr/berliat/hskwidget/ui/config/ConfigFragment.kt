@@ -32,8 +32,9 @@ class ConfigFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val viewModel = ConfigViewModel(
-            ankiDelegate = ankiDelegate::delegateToAnki
+            ankiDelegate = ankiDelegate::delegateToAnkiService
         )
+        ankiDelegate.replaceListener(viewModel.ankiSyncViewModel)
 
         return ComposeView(requireContext()).apply {
             setContent {

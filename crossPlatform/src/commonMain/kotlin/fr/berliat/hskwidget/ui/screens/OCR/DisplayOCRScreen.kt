@@ -29,7 +29,7 @@ import fr.berliat.hsktextviews.HSKTextSegmenter
 import fr.berliat.hsktextviews.views.HSKTextView
 import fr.berliat.hsktextviews.views.ShowPinyins
 
-import fr.berliat.hskwidget.AnkiDelegator
+import fr.berliat.hskwidget.KAnkiDelegator
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWord
@@ -60,7 +60,7 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun DisplayOCRScreen(
-    ankiCaller : AnkiDelegator,
+    ankiCaller : KAnkiDelegator,
     modifier: Modifier = Modifier,
     viewModel: DisplayOCRViewModel = remember { DisplayOCRViewModel(
         appPreferences = HSKAppServices.appPreferences,

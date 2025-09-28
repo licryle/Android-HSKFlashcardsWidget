@@ -29,9 +29,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import fr.berliat.hskwidget.AnkiDelegator
-import fr.berliat.hskwidget.data.model.ChineseWord
 
+import fr.berliat.hskwidget.KAnkiDelegator
+import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.ui.components.DetailedWordView
 import fr.berliat.hskwidget.ui.components.LoadingView
 import fr.berliat.hskwidget.ui.screens.wordlist.WordListSelectionDialog
@@ -130,7 +130,7 @@ private fun DictionarySearchNoResult(
 @Composable
 fun DictionarySearchScreen(
     viewModel: DictionaryViewModel,
-    ankiCaller : AnkiDelegator,
+    ankiCaller : KAnkiDelegator,
     onSpeak: (String) -> Unit,
     onAnnotate: (String) -> Unit,
     onCopy: (String) -> Unit,
