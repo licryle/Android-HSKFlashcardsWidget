@@ -3,11 +3,12 @@ package fr.berliat.hskwidget
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
-import androidx.room.Room
+
 import fr.berliat.hsktextviews.HSKTextSegmenter
 import fr.berliat.hskwidget.data.dao.AnkiDAO
-import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
+
 import kotlinx.cinterop.ExperimentalForeignApi
+
 import platform.UIKit.UIDevice
 import platform.Foundation.NSURL
 import platform.UIKit.UIApplication
@@ -17,6 +18,7 @@ import platform.Foundation.NSFileManager
 import platform.Foundation.NSUserDomainMask
 
 import okio.Path.Companion.toPath
+
 import org.jetbrains.compose.resources.StringResource
 
 actual private object ExpectedUtils {
@@ -98,4 +100,27 @@ actual private object ExpectedUtils {
 
     actual fun toast(stringRes: StringResource, args: List<String>) {
     }
+}
+
+
+import io.github.vinceglb.filekit.PlatformFile
+import kotlinx.cinterop.ExperimentalForeignApi
+import platform.Foundation.NSDate
+import platform.Foundation.NSURLContentModificationDateKey
+import platform.Foundation.NSURLCreationDateKey
+import platform.Foundation.timeIntervalSince1970
+import kotlin.time.Instant
+
+@OptIn(ExperimentalForeignApi::class)
+actual fun PlatformFile.createdAt(): Instant? {
+    val values = this.nsUrl.resourceValuesForKeys(listOf(NSURLCreationDateKey), null)
+    val date = values?.get(NSURLCreationDateKey) as? NSDate
+    return Instant.fromEpochSeconds(date?.timeIntervalSince1970?.toLong() ?: 0L)
+}
+
+@OptIn(ExperimentalForeignApi::class)
+actual fun PlatformFile.lastModified(): Instant {
+    val values = this.nsUrl.resourceValuesForKeys(listOf(NSURLContentModificationDateKey), null)
+    val date = values?.get(NSURLContentModificationDateKey) as? NSDate
+    return Instant.fromEpochSeconds(date?.timeIntervalSince1970?.toLong() ?: 0L)
 }

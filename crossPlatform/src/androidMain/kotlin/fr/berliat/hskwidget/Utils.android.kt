@@ -6,6 +6,7 @@ import android.content.ClipboardManager
 import android.content.Intent
 import android.content.Context
 import android.net.Uri
+import android.os.Build
 import android.provider.Settings
 import android.speech.tts.TextToSpeech
 import android.widget.Toast
@@ -13,6 +14,7 @@ import android.widget.Toast
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
+import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.Observer
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
@@ -37,18 +39,34 @@ import hskflashcardswidget.crossplatform.generated.resources.speech_failure_toas
 import hskflashcardswidget.crossplatform.generated.resources.speech_failure_toast_init
 import hskflashcardswidget.crossplatform.generated.resources.speech_failure_toast_muted
 import hskflashcardswidget.crossplatform.generated.resources.speech_failure_toast_unknown
+import io.github.vinceglb.filekit.AndroidFile
+import io.github.vinceglb.filekit.BookmarkData
+import io.github.vinceglb.filekit.FileKit
+import io.github.vinceglb.filekit.PlatformFile
+import io.github.vinceglb.filekit.context
+import io.github.vinceglb.filekit.fromBookmarkData
+import io.github.vinceglb.filekit.path
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import kotlinx.datetime.Instant
 
 import okio.Path.Companion.toPath
 
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.getString
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.InputStream
+import java.nio.file.Files
+import java.nio.file.attribute.BasicFileAttributes
 
 actual object ExpectedUtils {
     private var _contextProvider: (() -> Context)? = null
     fun context() = _contextProvider!!.invoke()
-
 
     // Initialize once from Compose or Activity
     fun init(contextProvider: () -> Context) {
@@ -133,14 +151,7 @@ actual object ExpectedUtils {
         val clip = ClipData.newPlainText("Copied Text", s)
         clipboard.setPrimaryClip(clip)
 
-        // TODO clean the runBlocking
-        val str = runBlocking { getString(Res.string.copied_to_clipboard) }
-
-        Toast.makeText(
-            context,
-            String.format(str, s),
-            Toast.LENGTH_SHORT
-        ).show()
+        toast(Res.string.copied_to_clipboard, listOf(s))
 
         logAnalyticsEvent(Utils.ANALYTICS_EVENTS.WIDGET_COPY_WORD)
 
@@ -192,28 +203,28 @@ actual object ExpectedUtils {
 
                         logAnalyticsError("SPEECH", errId, "")
 
-                        // TODO clean the runBlocking
-                        val errString = runBlocking { getString(errStringId) }
-                        val titleString = runBlocking { getString(Res.string.dialog_tts_error) }
-                        val yesButton = runBlocking { getString(Res.string.fix_it) }
-                        val noButton = runBlocking { getString(Res.string.cancel) }
+                        CoroutineScope(Dispatchers.IO).launch {
+                            val errString = getString(errStringId)
+                            val titleString =getString(Res.string.dialog_tts_error)
+                            val yesButton = getString(Res.string.fix_it)
+                            val noButton = getString(Res.string.cancel)
 
-                        if (errRemedyIntent == null) {
-                            Toast.makeText(
-                                context, errString,
-                                Toast.LENGTH_LONG
-                            ).show()
-                        } else {
-                            AlertDialog.Builder(context)
-                                .setTitle(titleString)
-                                .setMessage(errString)
-                                .setPositiveButton(yesButton) { _, _ ->
-                                    val intent = Intent(errRemedyIntent)
-                                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                                    context.startActivity(intent)
+                            if (errRemedyIntent == null) {
+                                toast(errStringId)
+                            } else {
+                                withContext(Dispatchers.Main) {
+                                    AlertDialog.Builder(context)
+                                        .setTitle(titleString)
+                                        .setMessage(errString)
+                                        .setPositiveButton(yesButton) { _, _ ->
+                                            val intent = Intent(errRemedyIntent)
+                                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                                            context.startActivity(intent)
+                                        }
+                                        .setNegativeButton(noButton, null)
+                                        .show()
                                 }
-                                .setNegativeButton(noButton, null)
-                                .show()
+                            }
                         }
                     }
 
@@ -233,10 +244,13 @@ actual object ExpectedUtils {
     }
 
     actual fun toast(stringRes: StringResource, args: List<String>) {
-        val s = runBlocking { getString(stringRes) } // Todo change to coroutine
-        s.format(args)
+        CoroutineScope(Dispatchers.IO).launch {
+            val s = getString(stringRes).format(args)
 
-        Toast.makeText(context(), s.format(args), Toast.LENGTH_LONG).show()
+            withContext(Dispatchers.Main) {
+                Toast.makeText(context(), s.format(args), Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
     actual fun openAppForSearchQuery(query: SearchQuery) {
@@ -256,6 +270,76 @@ actual object ExpectedUtils {
         }
     }
 
+    actual suspend fun copyFileSafely(sourceFile: PlatformFile, destinationDir: BookmarkData, filename: String) {
+        withContext(Dispatchers.IO) {
+            val context = context()
+            // Open input stream for the source database file
+            val inputStream: InputStream = FileInputStream(File(sourceFile.path))
+
+            // Convert BookmarkData -> PlatformFile -> Uri
+            val folderPF = PlatformFile.fromBookmarkData(destinationDir)
+            val folderUri = (folderPF.androidFile as? AndroidFile.UriWrapper)?.uri
+                ?: throw IllegalArgumentException("BookmarkData must point to a Uri folder")
+
+            val dir = DocumentFile.fromTreeUri(context, folderUri)
+                ?: throw IllegalStateException("Cannot access folder DocumentFile")
+
+            val destinationFile = dir.createFile("application/octet-stream", filename)
+                ?: throw IllegalStateException("Could not create file in destination folder")
+
+            // Open OutputStream to the destination file
+            context.contentResolver.openFileDescriptor(destinationFile!!.uri, "w")
+                ?.use { parcelFileDescriptor ->
+                    FileOutputStream(parcelFileDescriptor.fileDescriptor).use { output ->
+                        // Copy data from source to destination
+                        inputStream.use { input ->
+                            val buffer = ByteArray(1024)
+                            var length: Int
+                            while (input.read(buffer).also { length = it } > 0) {
+                                output.write(buffer, 0, length)
+                            }
+                        }
+                    }
+                }
+        }
+    }
+
     const val TAG = "Utils"
     const val INTENT_SEARCH_WORD = "INTENT_SEARCH_WORD"
+}
+
+actual fun PlatformFile.createdAt(): Instant? {
+    return this.androidFile.let { androidFile ->
+        when (androidFile) {
+            is AndroidFile.FileWrapper -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    val attributes = Files.readAttributes(
+                        androidFile.file.toPath(),
+                        BasicFileAttributes::class.java
+                    )
+                    val timestamp = attributes.creationTime().toMillis()
+                    Instant.fromEpochMilliseconds(timestamp)
+                } else {
+                    // Fallback for older Android versions
+                    null
+                }
+            }
+
+            is AndroidFile.UriWrapper -> null
+        }
+    }
+}
+
+actual fun PlatformFile.lastModified(): Instant {
+    val timestamp = this.androidFile.let { androidFile ->
+        when (androidFile) {
+            is AndroidFile.FileWrapper -> androidFile.file.lastModified()
+            is AndroidFile.UriWrapper -> DocumentFile
+                .fromSingleUri(FileKit.context, androidFile.uri)
+                ?.lastModified()
+                ?: throw IllegalStateException("Unable to get last modified date for URI")
+        }
+    }
+
+    return Instant.fromEpochMilliseconds(timestamp)
 }

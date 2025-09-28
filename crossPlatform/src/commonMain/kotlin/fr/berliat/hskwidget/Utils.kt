@@ -2,17 +2,24 @@ package fr.berliat.hskwidget
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+
+
 import fr.berliat.hsktextviews.HSKTextSegmenter
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.dao.AnkiDAO
 import fr.berliat.hskwidget.data.repo.ChineseWordFrequencyRepo
 import fr.berliat.hskwidget.domain.SearchQuery
+
+import io.github.vinceglb.filekit.BookmarkData
+import io.github.vinceglb.filekit.PlatformFile
+
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+
 import org.jetbrains.compose.resources.StringResource
 
 typealias AnkiDelegator = suspend ((suspend () -> Result<Unit>)?) -> Unit
@@ -138,7 +145,13 @@ expect object ExpectedUtils {
     fun toast(stringRes: StringResource, args: List<String> = emptyList<String>())
 
     fun openAppForSearchQuery(query: SearchQuery)
+
+    suspend fun copyFileSafely(sourceFile: PlatformFile, destinationDir: BookmarkData, filename: String)
 }
+
+expect fun PlatformFile.createdAt(): Instant?
+
+expect fun PlatformFile.lastModified(): Instant
 
 fun String.capitalize() =
     this.toString().lowercase().replaceFirstChar { it.uppercaseChar() }
