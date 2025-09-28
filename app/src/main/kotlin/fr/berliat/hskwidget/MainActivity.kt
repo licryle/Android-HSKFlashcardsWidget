@@ -68,7 +68,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
     private lateinit var appConfig: AppPreferencesStore
-    private lateinit var databaseDiskBackup: DatabaseDiskBackup
     private lateinit var supportDevStore: SupportDevStore
     private var showOCRReminder: Boolean = true
 

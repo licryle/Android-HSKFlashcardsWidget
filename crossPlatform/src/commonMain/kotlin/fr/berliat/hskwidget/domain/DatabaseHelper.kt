@@ -7,26 +7,20 @@ import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.absolutePath
-import io.github.vinceglb.filekit.atomicMove
 import io.github.vinceglb.filekit.cacheDir
 import io.github.vinceglb.filekit.copyTo
 import io.github.vinceglb.filekit.delete
 import io.github.vinceglb.filekit.div
-import io.github.vinceglb.filekit.exists
 import io.github.vinceglb.filekit.filesDir
 import io.github.vinceglb.filekit.list
 import io.github.vinceglb.filekit.name
-import io.github.vinceglb.filekit.parent
-import io.github.vinceglb.filekit.path
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
-
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.io.RawSource
-import kotlinx.io.files.FileNotFoundException
 
 class DatabaseHelper private constructor() {
     val liveDatabase
@@ -93,34 +87,6 @@ class DatabaseHelper private constructor() {
         }
     }
 
-    suspend fun updateDatabaseFileOnDisk(newFile: PlatformFile)
-            = withContext(Dispatchers.IO) {
-        val liveFile = getDatabaseLiveFile()
-        if (!newFile.exists()) {
-            FileNotFoundException("No file found when trying to update")
-        }
-
-        liveDatabase.flushToDisk()
-        liveDatabase.close()
-        _db = null
-
-        liveFile.delete()
-
-        val baseFileName = newFile.name
-        val filesToRename = newFile.parent()?.list()?.filter { file ->
-            // Return true for files that match the pattern
-            file.name.contains(baseFileName)
-        } ?: emptyList()
-
-        filesToRename.forEach {
-            val ext = it.name.substring(baseFileName.length)
-
-            it.atomicMove(PlatformFile(liveFile.path + ext))
-        }
-
-        _db = createRoomDatabaseLive()
-    }
-
     suspend fun replaceUserDataInDB(dbToUpdate: ChineseWordsDatabase, updateWith: ChineseWordsDatabase) {
         withContext(Dispatchers.IO) {
             Logger.d(tag = TAG, messageString = "Initiating Database Restoration: reading file")
@@ -159,7 +125,7 @@ class DatabaseHelper private constructor() {
         }
     }
 
-    suspend fun replaceWordsDataInDB(dbToUpdate: ChineseWordsDatabase, updateWith: ChineseWordsDatabase)
+    suspend fun replaceWordsDataInDB(updateWith: ChineseWordsDatabase)
             = withContext(Dispatchers.IO) {
         Logger.d(tag = TAG, messageString = "Initiating Database Update: reading file")
         val importedWordsCount = updateWith.chineseWordDAO().getCount()
@@ -168,24 +134,21 @@ class DatabaseHelper private constructor() {
             throw IllegalStateException("Database is empty")
         }
 
-        // Doing the opposite for efficacy: let's get user data into the importedDb, then copy file
-        replaceUserDataInDB(updateWith, dbToUpdate)
-        updateWith.flushToDisk()
+        // Inserting All succeeds, but corrupts the database. Thank you Room.
+        updateWith.chineseWordDAO().getAll().chunked(5000).forEach { chunk ->
+            liveDatabase.chineseWordDAO().upsertAll(chunk)
+        }
 
         Logger.i(tag = TAG, messageString = "Database update done")
-        return@withContext updateWith
     }
 
     suspend fun updateLiveDatabaseFromAsset(successCallback: () -> Unit, failureCallback: (e: Exception) -> Unit)
             = withContext(Dispatchers.IO) {
         try {
             val assetDbStream = createRoomDatabaseFromAsset()
-
+            replaceWordsDataInDB(assetDbStream)
+            assetDbStream.close()
             liveDatabase.flushToDisk()
-            val newDb = replaceWordsDataInDB(liveDatabase,assetDbStream)
-            newDb.flushToDisk()
-            newDb.close()
-            updateDatabaseFileOnDisk(newDb.databaseFile)
 
             withContext(Dispatchers.Main) {
                 successCallback()
