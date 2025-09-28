@@ -45,6 +45,6 @@ class JiebaHSKTextSegmenter: HSKTextSegmenter {
     }
 
     companion object {
-        const val TAG = "HSKTextSegmenterJieba"
+        private const val TAG = "HSKTextSegmenterJieba"
     }
 }

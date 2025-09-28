@@ -47,7 +47,7 @@ class WordListRepository(
     private val annotatedChineseWordDAO: AnnotatedChineseWordDAO
 ) {
     companion object {
-        const val TAG = "WordListRepository"
+        private const val TAG = "WordListRepository"
     }
 
     /****** NOT TOUCHING ANKI *******/

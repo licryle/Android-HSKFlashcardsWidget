@@ -57,6 +57,6 @@ class AboutViewModel {
     }
 
     companion object {
-        const val TAG = "AboutFragment"
+        private const val TAG = "AboutFragment"
     }
 }

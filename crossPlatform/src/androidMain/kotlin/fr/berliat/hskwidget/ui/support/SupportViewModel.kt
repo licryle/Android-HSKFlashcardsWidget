@@ -114,6 +114,6 @@ class SupportViewModel(
     }
 
     companion object {
-        const val TAG = "SupportViewModel"
+        private const val TAG = "SupportViewModel"
     }
 }

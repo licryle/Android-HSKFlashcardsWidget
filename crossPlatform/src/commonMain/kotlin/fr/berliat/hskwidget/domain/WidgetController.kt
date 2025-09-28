@@ -18,7 +18,7 @@ class WidgetController private constructor(
     val database: ChineseWordsDatabase = HSKAppServices.database
     ) {
     companion object {
-        const val TAG = "WidgetViewModel"
+        private const val TAG = "WidgetViewModel"
         private val mutex = Mutex()
         private val instances = mutableMapOf<Int, WidgetController>()
 

@@ -105,7 +105,7 @@ actual class AnkiSyncWordListsService: AnkiSyncService() {
 
         var nbErrors = 0
         var nbDeckCreationErrors = 0
-        Log.i(WordListRepository.Companion.TAG, "syncListsToAnki.Anki: Creating decks if needed")
+        Log.i(TAG, "syncListsToAnki.Anki: Creating decks if needed")
         val decks = mutableMapOf<Long, WordList>()
         for (list in lists) {
             decks[list.id] = wordListRepository.getOrCreate(list.wordList)
@@ -114,25 +114,25 @@ actual class AnkiSyncWordListsService: AnkiSyncService() {
                 nbDeckCreationErrors += 1
             }
         }
-        Log.i(WordListRepository.Companion.TAG, "syncListsToAnki.Anki: Created decks if possible: $nbDeckCreationErrors errors")
+        Log.i(TAG, "syncListsToAnki.Anki: Created decks if possible: $nbDeckCreationErrors errors")
 
-        Log.i(WordListRepository.Companion.TAG, "syncListsToAnki.Anki: Starting iterating through lists")
+        Log.i(TAG, "syncListsToAnki.Anki: Starting iterating through lists")
         for ((index, entry) in entries.withIndex()) {
             val deck = decks[entry.listId]
             if (deck == null) {
-                Log.e(WordListRepository.Companion.TAG, "syncListsToAnki.Anki: found a WordListEntry not linked to any list. Skipping entry")
+                Log.e(TAG, "syncListsToAnki.Anki: found a WordListEntry not linked to any list. Skipping entry")
                 nbErrors += 1
                 continue
             }
 
             if (words[entry.simplified] == null) {
-                Log.e(WordListRepository.Companion.TAG, "syncListsToAnki.Anki: found a WordListEntry not linked to an actual word. Skipping entry")
+                Log.e(TAG, "syncListsToAnki.Anki: found a WordListEntry not linked to an actual word. Skipping entry")
                 nbErrors += 1
                 continue
             }
 
             if (deck.ankiDeckId == WordList.Companion.ANKI_ID_EMPTY) {
-                Log.e(WordListRepository.Companion.TAG, "syncListsToAnki.Anki: deck with no ID in Anki. Skipping entry")
+                Log.e(TAG, "syncListsToAnki.Anki: deck with no ID in Anki. Skipping entry")
                 nbErrors += 1
                 continue
             }
@@ -148,7 +148,7 @@ actual class AnkiSyncWordListsService: AnkiSyncService() {
             var message = syncProgressMessage
             message = message.format(entry.simplified, progress, nbToImport)
 
-            Log.d(WordListRepository.Companion.TAG, message)
+            Log.d(TAG, message)
 
             currentCoroutineContext().ensureActive() // let the loop stop IF asked to cancel
             // Update notification and Emit progress event
@@ -156,7 +156,7 @@ actual class AnkiSyncWordListsService: AnkiSyncService() {
             yield() // Ensure other small operations can happen. Shouldn't be needed though.
         }
 
-        Log.i(WordListRepository.Companion.TAG, "importOrUpdateAllCards: imported for {$nbToImport-$nbErrors} ouf of $nbToImport")
+        Log.i(TAG, "importOrUpdateAllCards: imported for {$nbToImport-$nbErrors} ouf of $nbToImport")
 
         if (nbErrors > 0) {
             Result.failure(Exception("$nbErrors ouf of $nbToImport imported to Anki."))
@@ -186,6 +186,6 @@ actual class AnkiSyncWordListsService: AnkiSyncService() {
     override fun getNotificationChannelDescription() = notificationChannelDescription
 
     companion object {
-        const val TAG = "AnkiSyncWordListsService"
+        private const val TAG = "AnkiSyncWordListsService"
     }
 }

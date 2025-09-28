@@ -64,9 +64,5 @@ class DictionarySearchFragment : Fragment() {
     fun performSearch() {
         viewModel.performSearch()
     }
-
-    companion object {
-        const val TAG = "DictionarySearchFragment"
-    }
 }
 

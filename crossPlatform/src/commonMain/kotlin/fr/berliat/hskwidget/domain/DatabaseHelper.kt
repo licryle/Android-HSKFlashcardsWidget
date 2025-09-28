@@ -37,7 +37,7 @@ class DatabaseHelper private constructor() {
         private val mutex = Mutex()
         const val DATABASE_FILENAME = "Mandarin_Assistant.db"
         const val DATABASE_ASSET_PATH = "databases/$DATABASE_FILENAME"
-        const val TAG = "ChineseWordsDatabase"
+        private const val TAG = "ChineseWordsDatabase"
 
         fun getDatabaseLiveDir() =  FileKit.filesDir / "../databases"
         fun getDatabaseLiveFile() = getDatabaseLiveDir() / DATABASE_FILENAME

@@ -304,7 +304,7 @@ actual object ExpectedUtils {
         }
     }
 
-    const val TAG = "Utils"
+    private const val TAG = "Utils"
     const val INTENT_SEARCH_WORD = "INTENT_SEARCH_WORD"
 }
 

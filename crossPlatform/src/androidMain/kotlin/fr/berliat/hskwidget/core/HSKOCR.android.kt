@@ -69,6 +69,6 @@ actual class HSKOCR actual constructor() {
     }
 
     companion object {
-        const val TAG = "HSKOCR"
+        private const val TAG = "HSKOCR"
     }
 }

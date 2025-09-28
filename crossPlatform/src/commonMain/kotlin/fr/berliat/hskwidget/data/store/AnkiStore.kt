@@ -26,7 +26,7 @@ class AnkiStore(
     val appPreferences : AppPreferencesStore
 ) {
     companion object {
-        const val TAG = "AnkiDroidHelper"
+        private const val TAG = "AnkiDroidHelper"
 
         // List of field names that will be used in AnkiDroid model
         val FIELDS: Array<String> = arrayOf(

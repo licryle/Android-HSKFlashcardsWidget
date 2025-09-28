@@ -89,7 +89,7 @@ class WidgetProvider
             }
         }
 
-        const val TAG = "WidgetProvider"
+        private const val TAG = "WidgetProvider"
         const val ACTION_CONFIGURE_LATEST = "fr.berliat.hskwidget.APPWIDGET_CONFIGURE_LATEST"
 
         /** Thanks to https://gist.github.com/manishcm/bd05dff09b5b1640d25f **/

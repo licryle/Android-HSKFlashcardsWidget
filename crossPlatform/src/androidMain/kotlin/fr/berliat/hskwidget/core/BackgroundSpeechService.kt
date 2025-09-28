@@ -18,7 +18,7 @@ class BackgroundSpeechService(val context: Context, workerParams: WorkerParamete
     private val word = inputData.getString("word")
 
     companion object {
-        const val TAG = "BackgroundSpeechService"
+        private const val TAG = "BackgroundSpeechService"
         const val FAILURE_UNKNOWN = "FAILURE_UNKNOWN"
         const val FAILURE_REASON = "FAILURE_REASON"
         const val FAILURE_MUTED = "FAILURE_MUTED"
