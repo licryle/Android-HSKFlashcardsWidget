@@ -15,12 +15,14 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
-fun IconButton(text: String, onClick: () -> Unit, drawable: DrawableResource? = null) {
+fun IconButton(text: String, onClick: () -> Unit, drawable: DrawableResource? = null,
+               enabled: Boolean = true) {
     Box(
         modifier = Modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center // Centers content inside Box
     ) {
-        Button(onClick = onClick) {
+        Button(onClick = onClick,
+            enabled = enabled) {
             drawable?.let {
                 Icon(
                     painter = painterResource(drawable),
