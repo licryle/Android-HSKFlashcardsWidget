@@ -2,7 +2,6 @@ package fr.berliat.hskwidget.ui.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -18,7 +17,6 @@ import org.jetbrains.compose.resources.painterResource
 fun IconButton(text: String, onClick: () -> Unit, drawable: DrawableResource? = null,
                enabled: Boolean = true) {
     Box(
-        modifier = Modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center // Centers content inside Box
     ) {
         Button(onClick = onClick,
