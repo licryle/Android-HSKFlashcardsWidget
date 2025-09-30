@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -12,10 +14,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 
 import fr.berliat.hskwidget.ui.components.ProgressView
 
 import hskflashcardswidget.crossplatform.generated.resources.Res
+import hskflashcardswidget.crossplatform.generated.resources.anki_icon
 import hskflashcardswidget.crossplatform.generated.resources.anki_sync_cancelled_message
 import hskflashcardswidget.crossplatform.generated.resources.anki_sync_cancelled_title
 import hskflashcardswidget.crossplatform.generated.resources.anki_sync_failure_message
@@ -29,6 +33,7 @@ import hskflashcardswidget.crossplatform.generated.resources.config_anki_integra
 import hskflashcardswidget.crossplatform.generated.resources.config_anki_title
 
 import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -43,6 +48,14 @@ fun AnkiSyncView(
 
     Column {
         Row {
+            Icon(
+                painter = painterResource(Res.drawable.anki_icon),
+                contentDescription = stringResource(Res.string.config_anki_title),
+                modifier = modifier
+            )
+
+            Spacer(modifier = Modifier.width(8.dp))
+
             Text(
                 stringResource(Res.string.config_anki_title),
                 style = MaterialTheme.typography.titleMedium

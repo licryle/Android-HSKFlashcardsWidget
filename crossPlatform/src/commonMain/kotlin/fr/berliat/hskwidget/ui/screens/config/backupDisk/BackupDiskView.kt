@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -39,11 +40,13 @@ import hskflashcardswidget.crossplatform.generated.resources.config_backup_max_n
 import hskflashcardswidget.crossplatform.generated.resources.config_backup_title
 import hskflashcardswidget.crossplatform.generated.resources.config_restore_file
 import hskflashcardswidget.crossplatform.generated.resources.config_restore_file_choose
+import hskflashcardswidget.crossplatform.generated.resources.database_upload_24px
 import hskflashcardswidget.crossplatform.generated.resources.folder_open_24px
 import hskflashcardswidget.hsktextviews.generated.resources.arrow_dropdown_noborder
 import hskflashcardswidget.hsktextviews.generated.resources.pinyinselector_dropdown_icon
 
 import io.github.vinceglb.filekit.name
+import org.jetbrains.compose.resources.painterResource
 
 import org.jetbrains.compose.resources.stringArrayResource
 import org.jetbrains.compose.resources.stringResource
@@ -62,6 +65,14 @@ fun BackupDiskView(
 
     Column {
         Row {
+            Icon(
+                painter = painterResource(Res.drawable.database_upload_24px),
+                contentDescription = stringResource(Res.string.config_backup_title),
+                modifier = modifier
+            )
+
+            Spacer(modifier = Modifier.width(8.dp))
+
             Text(stringResource(Res.string.config_backup_title),
                 style = MaterialTheme.typography.titleMedium)
         }
