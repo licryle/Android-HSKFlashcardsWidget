@@ -47,16 +47,6 @@
     <string name="appbar_ocr">Start OCR</string>
     <string name="ocr_display_analysis_failure">Text Analysis failed - try again</string>
 
-    <string name="config_backup_cloud_title">Backup/Restore from Google</string>
-    <string name="config_backup_cloud_account">Google Account</string>
-    <string name="config_backup_cloud_account_notconfigured">Logged out</string>
-    <string name="config_backup_cloud_lastone">Last successful backup</string>
-    <string name="config_backup_cloud_lastone_never">Never</string>
-    <string name="config_backup_cloud_backupnow">Backup now</string>
-    <string name="config_backup_cloud_restorenow">Restore now</string>
-
-    <string name="config_anki_title">Anki integration</string>
-    <string name="config_anki_integration">Save lists and corresponding notes in Anki automatically</string>
 
     <string name="anki_not_installed"><![CDATA[AnkiDroid is not installed, or runs a very old version (<2.5)]]></string>
     <string name="anki_permission_denied">Permission to call AnkiDroid API denied.</string>
@@ -64,7 +54,7 @@
     <string name="anki_operation_success">Successfully applied changes to Anki</string>
     <string name="anki_operation_failed">Failed to apply changes to Anki: %s</string>
     <string name="anki_operation_cancelled">You cancelled the sync to Anki</string>
-    <string name="anki_import_failed">Full import into Anki failed: %s</string>
+
     <string name="nav_host_ocr_reminder_close">Close OCR Reminder</string>
     <string name="nav_host_ocr_reminder_text">Your scanned text is still accessible by clicking here.</string>
     <string name="menu_ocr_display">OCR: Scanned Text</string>

@@ -137,6 +137,14 @@ You can come back to this screen at any time to set up a new widget, or reconfig
     <string name="config_restore_file">Restore from file</string>
     <string name="config_restore_file_choose">Choose file</string>
 
+    <string name="config_backup_cloud_title">Backup/Restore from Google</string>
+    <string name="config_backup_cloud_account">Google Account</string>
+    <string name="config_backup_cloud_account_notconfigured">Logged out</string>
+    <string name="config_backup_cloud_lastone">Last successful backup</string>
+    <string name="config_backup_cloud_lastone_never">Never</string>
+    <string name="config_backup_cloud_backupnow">Backup now</string>
+    <string name="config_backup_cloud_restorenow">Restore now</string>
+
 
     <string name="config_anki_title">Anki integration</string>
     <string name="config_anki_activate">Activate Anki integration</string>
