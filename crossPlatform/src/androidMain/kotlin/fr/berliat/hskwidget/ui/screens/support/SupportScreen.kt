@@ -1,4 +1,4 @@
-package fr.berliat.hskwidget.ui.support
+package fr.berliat.hskwidget.ui.screens.support
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
