@@ -3,12 +3,14 @@ activityCompose = "1.11.0"
 ankiAndroid = "api-v1.1.0"
 datastorePreferences = "1.1.7"
 filekitCore = "0.11.0"
+googleApiServicesDrive = "v3-rev20250829-2.0.0"
 jiebaAnalysis = "1.0.3"
 kotlin = "2.2.20"
 compose = "1.8.2"
 kotlinxDatetime = "0.7.1-0.6.x-compat"
 kotlinxSerializationJson = "1.9.0"
 normalize = "1.2.0"
+playServicesAuth = "21.4.0"
 room = "2.8.0"
 sqlite = "2.6.0"
 kermit = "2.0.8"
@@ -37,6 +39,7 @@ anki-android = { module = "com.github.ankidroid:Anki-Android", version.ref = "an
 filekit-core = { module = "io.github.vinceglb:filekit-core", version.ref = "filekitCore" }
 filekit-dialogs = { module = "io.github.vinceglb:filekit-dialogs", version.ref = "filekitCore" }
 filekit-dialogs-compose = { module = "io.github.vinceglb:filekit-dialogs-compose", version.ref = "filekitCore" }
+google-api-services-drive = { module = "com.google.apis:google-api-services-drive", version.ref = "googleApiServicesDrive" }
 jieba-analysis = { module = "io.github.yrjyrj123:jieba-analysis", version.ref = "jiebaAnalysis" }
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
 compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose" }
@@ -49,6 +52,7 @@ kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotl
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 normalize = { module = "com.doist.x:normalize", version.ref = "normalize" }
+play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }

@@ -118,6 +118,10 @@ kotlin {
 
                 implementation(libs.androidx.documentfile)
 
+                implementation(libs.play.services.auth)
+                implementation(libs.google.api.services.drive)
+
+                implementation(project(":googledrivebackup"))
             }
             resources.srcDirs("src/commonMain/composeResources")
         }
