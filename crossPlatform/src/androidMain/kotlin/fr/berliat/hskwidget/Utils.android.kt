@@ -31,6 +31,7 @@ import co.touchlab.kermit.Logger
 
 import fr.berliat.hsktextviews.HSKTextSegmenter
 import fr.berliat.hskwidget.Utils.incrementConsultedWord
+import fr.berliat.hskwidget.Utils.toast
 import fr.berliat.hskwidget.core.BackgroundSpeechService
 import fr.berliat.hskwidget.core.JiebaHSKTextSegmenter
 import fr.berliat.hskwidget.data.dao.AnkiDAO
@@ -45,6 +46,7 @@ import hskflashcardswidget.crossplatform.generated.resources.speech_failure_toas
 import hskflashcardswidget.crossplatform.generated.resources.speech_failure_toast_init
 import hskflashcardswidget.crossplatform.generated.resources.speech_failure_toast_muted
 import hskflashcardswidget.crossplatform.generated.resources.speech_failure_toast_unknown
+
 import io.github.vinceglb.filekit.AndroidFile
 import io.github.vinceglb.filekit.BookmarkData
 import io.github.vinceglb.filekit.FileKit
@@ -52,10 +54,10 @@ import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.context
 import io.github.vinceglb.filekit.fromBookmarkData
 import io.github.vinceglb.filekit.path
+
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 
@@ -274,13 +276,9 @@ actual object ExpectedUtils {
         logAnalyticsEvent(Utils.ANALYTICS_EVENTS.WIDGET_PLAY_WORD)
     }
 
-    actual fun toast(stringRes: StringResource, args: List<String>) {
-        CoroutineScope(Dispatchers.IO).launch {
-            val s = getString(stringRes).format(args)
-
-            withContext(Dispatchers.Main) {
-                Toast.makeText(context, s.format(args), Toast.LENGTH_LONG).show()
-            }
+    actual fun toast(s: String) {
+        CoroutineScope(Dispatchers.Main).launch {
+            Toast.makeText(context, s, Toast.LENGTH_LONG).show()
         }
     }
 

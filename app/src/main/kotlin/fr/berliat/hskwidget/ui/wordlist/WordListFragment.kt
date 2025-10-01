@@ -13,7 +13,7 @@ import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.data.model.WordList
 import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.ui.screens.wordlist.WordListScreen
-import fr.berliat.hskwidget.ui.utils.HSKAnkiDelegate
+import fr.berliat.hskwidget.ui.HSKAnkiDelegate
 
 class WordListFragment : Fragment() {
     private lateinit var ankiDelegate: HSKAnkiDelegate

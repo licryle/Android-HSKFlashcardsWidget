@@ -2,19 +2,26 @@
     <string name="app_name">Mandarin Assistant</string>
     <string name="app_slogan">Study at every phone unlock</string>
 
-    <string name="date_format">yyyy-MM-dd</string>
-
-    <string name="cancel">Cancel</string>
-    <string name="delete">Delete</string>
-    <string name="save">Save</string>
-    <string name="proceed">Proceed</string>
-    <string name="understood">Understood</string>
     <string name="settings">Settings</string>
     <string name="about">About</string>
+    <string name="understood">Understood</string>
 
     <string name="nav_header_desc">Navigation header</string>
 
+    <string name="menu_dictionary">Dictionary</string>
+    <string name="menu_lists">Lists</string>
     <string name="menu_widgets">Widgets</string>
+    <string name="menu_ocr">OCR</string>
+    <string name="menu_support">Support the creator!</string>
+    <string name="menu_annotate">Annotate a word</string>
+
+    <!-- Widget Default -->
+    <string name="widget_not_configured">No word.\nClick to configure list(s)</string>
+    <string name="widget_default_chinese">你好</string>
+    <string name="widget_default_english">Hello</string>
+    <string name="widget_default_pinyin">nĭ hăo</string>
+    <string name="widget_default_loading">…Loading…</string>
+
     <string name="widgets_add_widget">Add a new widget</string>
     <string name="widgets_add_widget_instructions">Your launcher does not support automatically adding widgets.\nPlease add the Flashcard widget manually:\nLong press on the home screen → Widgets → Mandarin Assistant.</string>
 
@@ -24,70 +31,18 @@
     <string name="widget_btn_reload">New word</string>
     <string name="app_widget_description"><![CDATA[Display a flashcard of random HSK characters & words.]]></string>
     <!-- Preference Titles -->
-    <string name="sync_header">Sync</string>
-
-
-    <!-- Widget Preferences -->
-    <string name="flashcard_widget_configure_section_hsk">Vocabulary list to include</string>
-
     <string name="flashcard_widget_configure_saved">Widget configuration updated</string>
-    <string name="flashcard_widget_configure_empty">Widget NOT updated, select least 1 vocabulary list</string>
 
-    <!-- Widget Default -->
-    <string name="widget_not_configured">No word.\nClick to configure list(s)</string>
-    <string name="widget_default_chinese">你好</string>
-    <string name="widget_default_english">Hello</string>
-    <string name="widget_default_pinyin">nĭ hăo</string>
-    <string name="widget_default_loading">…Loading…</string>
-    <string name="menu_dictionary">Dictionary</string>
-    <string name="menu_lists">Lists</string>
-
-    <string name="menu_ocr">OCR</string>
     <string name="image_capture_button" />
     <string name="appbar_ocr">Start OCR</string>
     <string name="ocr_display_analysis_failure">Text Analysis failed - try again</string>
-
-
-    <string name="anki_not_installed"><![CDATA[AnkiDroid is not installed, or runs a very old version (<2.5)]]></string>
-    <string name="anki_permission_denied">Permission to call AnkiDroid API denied.</string>
-    <string name="anki_must_start">To save to Anki, Anki must be started. Starting Anki. Feel free to go back.</string>
-    <string name="anki_operation_success">Successfully applied changes to Anki</string>
-    <string name="anki_operation_failed">Failed to apply changes to Anki: %s</string>
-    <string name="anki_operation_cancelled">You cancelled the sync to Anki</string>
 
     <string name="nav_host_ocr_reminder_close">Close OCR Reminder</string>
     <string name="nav_host_ocr_reminder_text">Your scanned text is still accessible by clicking here.</string>
     <string name="menu_ocr_display">OCR: Scanned Text</string>
 
-    <string name="menu_support">Support the creator!</string>
-
     <string name="wordlist_word_count">%1$d words</string>
     <string name="wordlist_name">Word list</string>
 
-    <string name="googledrive_backup_start_title">Backup in progress</string>
-    <string name="googledrive_backup_start_message">Preparing for backup.</string>
-    <string name="googledrive_backup_success_title">Backup complete</string>
-    <string name="googledrive_backup_success_message">Backup succeeded at %s.</string>
-    <string name="googledrive_backup_cancel_title">Backup cancelled</string>
-    <string name="googledrive_backup_cancel_message">Backup cancelled.</string>
-    <string name="googledrive_backup_progress_message">Backup in progress: %1$s MB / %2$s MB.</string>
-    <string name="googledrive_backup_denied_scope">Google authorization not secured</string>
-    <string name="googledrive_backup_failed_title">Backup failed</string>
-    <string name="googledrive_backup_failed_message">Backup failed with error message: %s.</string>
-    <string name="googledrive_backup_nogoogleapi">No Google API available on this device</string>
-    <string name="googledrive_backup_noaccountselected">No Google account was selected, cancelling.</string>
-    <string name="googledrive_restore_empty_message">No backup available on Google Drive.</string>
-    <string name="googledrive_restore_start_title">Restoration starting</string>
-    <string name="googledrive_restore_start_message">Restoration from Google Drive started.</string>
-    <string name="googledrive_restore_success_title">Restoration download complete</string>
-    <string name="googledrive_restore_success_message">Files from Google Drive downloaded at %s.</string>
-    <string name="googledrive_restore_confirm_overwrite">"You're about to delete your local data and replace it with a backup from %s.\n\nThis is irrevocable. Proceed?"</string>
-    <string name="googledrive_restore_cancel_title">Restoration cancelled</string>
-    <string name="googledrive_restore_cancel_message">Restoration cancelled.</string>
-    <string name="googledrive_restore_failed_title">Restoration failed</string>
-    <string name="googledrive_restore_failed_message">Restoration from Google Drive failed with error %s.</string>
     <string name="googledrive_logout_confirm">Would you like to logout of your Google Drive account?\nNo data will be deleted from Google Drive.</string>
-
-    // To move
-    <string name="menu_annotate">Annotate a word</string>
 </resources>

@@ -15,7 +15,7 @@ import fr.berliat.hskwidget.Utils
 import fr.berliat.hskwidget.domain.SearchQuery
 import fr.berliat.hskwidget.ui.screens.dictionary.DictionarySearchScreen
 import fr.berliat.hskwidget.ui.screens.dictionary.DictionaryViewModel
-import fr.berliat.hskwidget.ui.utils.HSKAnkiDelegate
+import fr.berliat.hskwidget.ui.HSKAnkiDelegate
 
 class DictionarySearchFragment : Fragment() {
     private lateinit var ankiDelegate: HSKAnkiDelegate

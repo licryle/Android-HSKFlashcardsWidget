@@ -14,7 +14,7 @@ import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.Utils
 
 import fr.berliat.hskwidget.ui.screens.annotate.AnnotateScreen
-import fr.berliat.hskwidget.ui.utils.HSKAnkiDelegate
+import fr.berliat.hskwidget.ui.HSKAnkiDelegate
 
 import hskflashcardswidget.crossplatform.generated.resources.Res
 import hskflashcardswidget.crossplatform.generated.resources.annotation_edit_delete_failure

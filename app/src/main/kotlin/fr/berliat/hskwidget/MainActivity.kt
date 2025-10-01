@@ -33,7 +33,6 @@ import fr.berliat.hskwidget.data.store.SupportDevStore
 import fr.berliat.hskwidget.databinding.ActivityMainBinding
 import fr.berliat.hskwidget.domain.DatabaseDiskBackup
 import fr.berliat.hskwidget.domain.DatabaseHelper
-import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.domain.getParcelableExtraCompat
 import fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragment
 import fr.berliat.hskwidget.ui.utils.StrictModeManager
@@ -118,15 +117,15 @@ class MainActivity : AppCompatActivity() {
         }
 
         if (shouldUpdateDatabaseFromAsset()) {
-            ExpectedUtils.toast(Res.string.database_update_start)
+            Utils.toast(Res.string.database_update_start)
 
             lifecycleScope.launch {
                 DatabaseHelper.getInstance().updateLiveDatabaseFromAsset({
-                    ExpectedUtils.toast(Res.string.database_update_success)
+                    Utils.toast(Res.string.database_update_success)
 
                     handleBackUp()
                 }, { e ->
-                    ExpectedUtils.toast(Res.string.database_update_failure, listOf(e.message ?: ""))
+                    Utils.toast(Res.string.database_update_failure, listOf(e.message ?: ""))
 
                     Utils.logAnalyticsError(TAG, "UpdateDatabaseFromAssetFailure", e.message ?: "")
 
@@ -160,7 +159,7 @@ class MainActivity : AppCompatActivity() {
                             DatabaseDiskBackup.backUp(
                                 bookMark,
                                 onSuccess = {
-                                    ExpectedUtils.toast(Res.string.dbbackup_success)
+                                    Utils.toast(Res.string.dbbackup_success)
                                     lifecycleScope.launch(Dispatchers.IO) {
                                         DatabaseDiskBackup.cleanOldBackups(
                                             backupFolder,
@@ -168,12 +167,12 @@ class MainActivity : AppCompatActivity() {
                                         )
                                     }
                                 },
-                                onFail = { ExpectedUtils.toast(Res.string.dbbackup_failure_write) }
+                                onFail = { Utils.toast(Res.string.dbbackup_failure_write) }
                             )
                         }
                     },
                     onFail = {
-                        ExpectedUtils.toast(Res.string.dbbackup_failure_folderpermission)
+                        Utils.toast(Res.string.dbbackup_failure_folderpermission)
                     }
                 )
             }
@@ -335,7 +334,7 @@ class MainActivity : AppCompatActivity() {
             // Triggered when the search button is pressed (or search query submitted)
             override fun onQueryTextSubmit(query: String?): Boolean {
                 if (currentFocus != null)
-                    Utils.hideKeyboard(applicationContext, currentFocus!!)
+                    fr.berliat.hskwidget.domain.Utils.hideKeyboard(applicationContext, currentFocus!!)
 
                 return onQueryTextChange(query)
             }

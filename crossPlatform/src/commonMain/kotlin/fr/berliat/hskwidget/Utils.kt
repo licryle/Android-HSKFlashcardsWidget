@@ -12,6 +12,7 @@ import fr.berliat.hskwidget.domain.SearchQuery
 
 import io.github.vinceglb.filekit.BookmarkData
 import io.github.vinceglb.filekit.PlatformFile
+import kotlinx.coroutines.CoroutineScope
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -21,6 +22,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
 import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.getString
 import kotlin.reflect.KClass
 
 // KMP e
@@ -45,6 +47,9 @@ object Utils {
     fun logAnalyticsError(module: String, error: String, details: String) =
         ExpectedUtils.logAnalyticsError(module, error, details)
 
+    fun logAnalyticsError(module: String, error: String, e: Exception) =
+        ExpectedUtils.logAnalyticsError(module, error, e.message ?: "")
+
     fun getDataStore(file: String): DataStore<Preferences> =
         ExpectedUtils.getDataStore(file)
 
@@ -56,8 +61,13 @@ object Utils {
 
     fun playWordInBackground(word: String) = ExpectedUtils.playWordInBackground(word)
 
-    fun toast(stringRes: StringResource, args: List<String> = emptyList()) =
-        ExpectedUtils.toast(stringRes, args)
+    fun toast(stringRes: StringResource, args: List<String> = emptyList()) {
+        CoroutineScope(Dispatchers.IO).launch {
+            toast(getString(stringRes, *args.toTypedArray()))
+        }
+    }
+
+    fun toast(s: String) = ExpectedUtils.toast(s)
 
     fun openAppForSearchQuery(query: SearchQuery) = ExpectedUtils.openAppForSearchQuery(query)
 
@@ -145,7 +155,7 @@ expect object ExpectedUtils {
     fun copyToClipBoard(s: String)
     fun playWordInBackground(word: String)
 
-    fun toast(stringRes: StringResource, args: List<String> = emptyList<String>())
+    fun toast(s: String)
 
     fun openAppForSearchQuery(query: SearchQuery)
 

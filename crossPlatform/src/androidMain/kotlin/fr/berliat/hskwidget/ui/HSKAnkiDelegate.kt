@@ -1,16 +1,23 @@
-package fr.berliat.hskwidget.ui.utils
+package fr.berliat.hskwidget.ui
 
 import android.content.Context
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import fr.berliat.ankidroidhelper.AnkiDelegate
-import fr.berliat.hskwidget.R
+import fr.berliat.hskwidget.Utils
 import fr.berliat.hskwidget.core.HSKAppServices
+import hskflashcardswidget.crossplatform.generated.resources.Res
+import hskflashcardswidget.crossplatform.generated.resources.anki_must_start
+import hskflashcardswidget.crossplatform.generated.resources.anki_not_installed
+import hskflashcardswidget.crossplatform.generated.resources.anki_operation_cancelled
+import hskflashcardswidget.crossplatform.generated.resources.anki_operation_failed
+import hskflashcardswidget.crossplatform.generated.resources.anki_operation_success
+import hskflashcardswidget.crossplatform.generated.resources.anki_permission_denied
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import org.jetbrains.compose.resources.getString
 
 class HSKAnkiDelegate(val fragment: Fragment, handler: HandlerInterface? = null)  : AnkiDelegate(fragment, handler) {
-    private val context = fragment.requireContext()
     private val appConfig = HSKAppServices.appPreferences
     private var ankiStore = HSKAppServices.ankiStore
 
@@ -18,16 +25,16 @@ class HSKAnkiDelegate(val fragment: Fragment, handler: HandlerInterface? = null)
         appConfig.ankiSaveNotes.value = granted
         super.onAnkiRequestPermissionsResult(granted)
         if (!granted) {
-            Toast.makeText(context, R.string.anki_permission_denied, Toast.LENGTH_LONG).show()
+            Utils.toast(Res.string.anki_permission_denied)
         }
     }
 
     override fun startAnkiDroid(): Boolean {
-        Toast.makeText(context, R.string.anki_must_start, Toast.LENGTH_LONG).show()
+        Utils.toast(Res.string.anki_must_start)
 
         val result = super.startAnkiDroid()
         if (!result) {
-            Toast.makeText(context, R.string.anki_not_installed, Toast.LENGTH_LONG).show()
+            Utils.toast(Res.string.anki_not_installed)
         }
 
         return result
@@ -53,32 +60,29 @@ class HSKAnkiDelegate(val fragment: Fragment, handler: HandlerInterface? = null)
             || e is AnkiOperationsFailures.AnkiFailure_Off
             || context == null
         )) {
-            var message = context.getString(R.string.anki_operation_failed)
+            // Todo remove runBlocking
+            var message = runBlocking { getString(Res.string.anki_operation_failed) }
             message = message.format(e.message)
-            appContextToast(context, message)
+            Utils.toast(message)
         }
 
         super.onAnkiOperationFailed(context, e)
     }
 
     override fun onAnkiOperationSuccess(context: Context?) {
-        context?.let {
-            appContextToast(context, context.getString(R.string.anki_operation_success))
-        }
+        Utils.toast(Res.string.anki_operation_success)
 
         super.onAnkiOperationSuccess(context)
     }
 
     override fun onAnkiOperationCancelled(context: Context?) {
-        context?.let {
-            appContextToast(context, context.getString(R.string.anki_operation_cancelled))
-        }
+        Utils.toast(Res.string.anki_operation_cancelled)
 
         super.onAnkiOperationCancelled(context)
     }
 
     override fun onAnkiNotInstalled() {
-        appContextToast(context, context.getString(R.string.anki_not_installed))
+        Utils.toast(Res.string.anki_not_installed)
         appConfig.ankiSaveNotes.value = false
 
         super.onAnkiNotInstalled()

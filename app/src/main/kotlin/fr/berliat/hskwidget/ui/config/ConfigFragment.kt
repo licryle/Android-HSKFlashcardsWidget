@@ -12,7 +12,7 @@ import fr.berliat.hskwidget.data.store.GoogleDriveBackup
 import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.ui.screens.config.ConfigScreen
 import fr.berliat.hskwidget.ui.screens.config.ConfigViewModel
-import fr.berliat.hskwidget.ui.utils.HSKAnkiDelegate
+import fr.berliat.hskwidget.ui.HSKAnkiDelegate
 
 class ConfigFragment : Fragment() {
     private lateinit var ankiDelegate: HSKAnkiDelegate

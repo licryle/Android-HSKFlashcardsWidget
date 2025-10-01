@@ -20,7 +20,7 @@ import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragmentDirections
 import fr.berliat.hskwidget.ui.screens.OCR.DisplayOCRScreen
 import fr.berliat.hskwidget.ui.screens.OCR.DisplayOCRViewModel
-import fr.berliat.hskwidget.ui.utils.HSKAnkiDelegate
+import fr.berliat.hskwidget.ui.HSKAnkiDelegate
 
 class DisplayOCRFragment : Fragment(), HSKTextSegmenterListener {
     private lateinit var ankiCaller : HSKAnkiDelegate
