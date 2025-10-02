@@ -27,7 +27,7 @@ import fr.berliat.hskwidget.KAnkiDelegator
 
 import fr.berliat.hskwidget.data.type.ClassLevel
 import fr.berliat.hskwidget.data.type.ClassType
-import fr.berliat.hskwidget.ui.components.ConfirmDeletionDialog
+import fr.berliat.hskwidget.ui.components.ConfirmDialog
 import fr.berliat.hskwidget.ui.components.DetailedWordView
 import fr.berliat.hskwidget.ui.components.DropdownSelector
 import fr.berliat.hskwidget.ui.components.LoadingView
@@ -94,14 +94,15 @@ fun AnnotateScreen(
     }
 
     if (confirmDeleteDialog) {
-        ConfirmDeletionDialog(
+        ConfirmDialog(
             title = Res.string.annotation_edit_delete_confirm_title,
-            message = Res.string.annotation_edit_delete_confirm_message,
+            message = stringResource(Res.string.annotation_edit_delete_confirm_message),
             onDismiss = { confirmDeleteDialog = false },
             onConfirm = {
                 viewModel.deleteAnnotation(word) { word, e -> onDelete(word, e) }
                 confirmDeleteDialog = false
-            }
+            },
+            confirmButtonLabel = Res.string.delete,
         )
     }
 

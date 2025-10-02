@@ -28,7 +28,7 @@ import fr.berliat.hskwidget.KAnkiDelegator
 
 import fr.berliat.hskwidget.data.model.WordList
 import fr.berliat.hskwidget.data.model.WordListWithCount
-import fr.berliat.hskwidget.ui.components.ConfirmDeletionDialog
+import fr.berliat.hskwidget.ui.components.ConfirmDialog
 import fr.berliat.hskwidget.YYMMDD
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.ui.components.PrettyCard
@@ -37,6 +37,7 @@ import fr.berliat.hskwidget.ui.components.RoundIconButton
 import hskflashcardswidget.crossplatform.generated.resources.Res
 import hskflashcardswidget.crossplatform.generated.resources.annotation_edit_delete_confirm_message
 import hskflashcardswidget.crossplatform.generated.resources.annotation_edit_delete_confirm_title
+import hskflashcardswidget.crossplatform.generated.resources.delete
 import hskflashcardswidget.crossplatform.generated.resources.delete_24px
 import hskflashcardswidget.crossplatform.generated.resources.edit_24px
 import hskflashcardswidget.crossplatform.generated.resources.ic_add_24dp
@@ -77,14 +78,15 @@ fun WordListScreen(
 
     val cDL = confirmDeleteList
     if (cDL != null) {
-        ConfirmDeletionDialog(
+        ConfirmDialog(
             title = Res.string.annotation_edit_delete_confirm_title,
-            message = Res.string.annotation_edit_delete_confirm_message,
+            message = stringResource(Res.string.annotation_edit_delete_confirm_message),
             onConfirm = {
                 viewModel.deleteList(cDL)
                 confirmDeleteList = null
             },
             onDismiss = { confirmDeleteList = null },
+            confirmButtonLabel = Res.string.delete,
             modifier = modifier
         )
     }
