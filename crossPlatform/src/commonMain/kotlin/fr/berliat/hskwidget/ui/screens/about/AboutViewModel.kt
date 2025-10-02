@@ -3,6 +3,8 @@ package fr.berliat.hskwidget.ui.screens.about
 import co.touchlab.kermit.Logger
 import fr.berliat.hskwidget.Utils
 import fr.berliat.hskwidget.core.HSKAppServices
+import hskflashcardswidget.crossplatform.generated.resources.Res
+import hskflashcardswidget.crossplatform.generated.resources.about_email_noapp
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,9 +30,12 @@ class AboutViewModel {
         Utils.logAnalyticsScreenView("Github")
     }
 
-    fun onClickEmail() : Boolean {
+    fun openEmail() {
         Utils.logAnalyticsScreenView("Email")
-        return Utils.sendEmail("cyrille.berliat+hsk@gmail.com", "About Mandarin Assistant App", "")
+
+        if (!Utils.sendEmail("cyrille.berliat+hsk@gmail.com", "About Mandarin Assistant App", "")) {
+            Utils.toast(Res.string.about_email_noapp)
+        }
     }
 
     fun registerVisit() {

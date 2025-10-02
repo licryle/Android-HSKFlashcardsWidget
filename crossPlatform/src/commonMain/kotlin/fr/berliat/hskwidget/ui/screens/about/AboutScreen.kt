@@ -20,7 +20,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+
 import fr.berliat.hskwidget.ui.components.IconButton
+
 import hskflashcardswidget.crossplatform.generated.resources.Res
 import hskflashcardswidget.crossplatform.generated.resources.about_btn_email2
 import hskflashcardswidget.crossplatform.generated.resources.about_btn_view_source
@@ -28,12 +30,11 @@ import hskflashcardswidget.crossplatform.generated.resources.about_intro1
 import hskflashcardswidget.crossplatform.generated.resources.about_intro2
 import hskflashcardswidget.crossplatform.generated.resources.about_stats_title
 import hskflashcardswidget.crossplatform.generated.resources.about_terms_conditions_title
-import hskflashcardswidget.crossplatform.generated.resources.about_email_noapp
 import hskflashcardswidget.crossplatform.generated.resources.about_intro3
 import hskflashcardswidget.crossplatform.generated.resources.about_stats_text
 import hskflashcardswidget.crossplatform.generated.resources.ic_email
 import hskflashcardswidget.crossplatform.generated.resources.ic_github
-import multiplatform.network.cmptoast.showToast
+
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -47,13 +48,6 @@ fun AboutScreen(viewModel: AboutViewModel) {
         viewModel.fetchStats()
     }
 
-    val emailFailMessage = stringResource(Res.string.about_email_noapp)
-    fun handleEmailClick() {
-        if (!viewModel.onClickEmail()) {
-            showToast(emailFailMessage)
-        }
-    }
-
     @Composable
     fun Spacer() {
         Spacer(Modifier.height(12.dp))
@@ -61,7 +55,7 @@ fun AboutScreen(viewModel: AboutViewModel) {
 
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = { handleEmailClick() }) {
+            FloatingActionButton(onClick = viewModel::openEmail) {
                 Icon(
                     painter = painterResource(Res.drawable.ic_email),
                     contentDescription = null,
@@ -97,7 +91,7 @@ fun AboutScreen(viewModel: AboutViewModel) {
 
                 IconButton(
                     stringResource(Res.string.about_btn_email2),
-                    { handleEmailClick() },
+                    viewModel::openEmail,
                     Res.drawable.ic_email
                 )
 

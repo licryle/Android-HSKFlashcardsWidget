@@ -63,7 +63,6 @@ kotlin {
                 implementation(libs.compose.foundation)
                 implementation(libs.compose.material3)
                 implementation(libs.compose.resources)
-                implementation(libs.cmptoast)
                 implementation(libs.kermit)
 
                 implementation(libs.room.runtime)
