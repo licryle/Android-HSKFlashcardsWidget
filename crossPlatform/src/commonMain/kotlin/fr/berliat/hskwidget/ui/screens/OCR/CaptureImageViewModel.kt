@@ -6,16 +6,22 @@ import co.touchlab.kermit.Logger
 
 import com.kashif.cameraK.controller.CameraController
 import com.kashif.cameraK.result.ImageCaptureResult
-import com.kashif.imagesaverplugin.ImageSaverPlugin
 
 import fr.berliat.hskwidget.Utils
 import fr.berliat.hskwidget.YYMMDDHHMMSS
+import fr.berliat.hskwidget.toSafeFileName
+
 import hskflashcardswidget.crossplatform.generated.resources.Res
 import hskflashcardswidget.crossplatform.generated.resources.ocr_capture_error_processed
 import hskflashcardswidget.crossplatform.generated.resources.ocr_capture_error_save
 
+import io.github.vinceglb.filekit.FileKit
+import io.github.vinceglb.filekit.cacheDir
+import io.github.vinceglb.filekit.div
+import io.github.vinceglb.filekit.path
+import io.github.vinceglb.filekit.write
+
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -30,7 +36,7 @@ class CaptureImageViewModel(
     val _cameraController = MutableStateFlow<CameraController?>(null)
     val cameraController = _cameraController.asStateFlow()
 
-    fun takePhoto(imageSaverPlugin: ImageSaverPlugin) {
+    fun takePhoto() {
         Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.OCR_CAPTURE)
 
         cameraController.value?.let {
@@ -38,18 +44,17 @@ class CaptureImageViewModel(
             viewModelScope.launch(Dispatchers.IO) {
                 when (val result = it.takePicture()) {
                     is ImageCaptureResult.Success -> {
-                        val filePath = imageSaverPlugin.saveImage(
-                            // TODO reinstate Crop
-                            byteArray = result.byteArray,
-                            imageName = "Photo_" + Clock.System.now().YYMMDDHHMMSS()
-                        )
+                        val file = FileKit.cacheDir / "Photo_${Clock.System.now().YYMMDDHHMMSS().toSafeFileName()}.jpg"
 
-                        if (filePath == null) {
+                        try {
+                            file.write(result.byteArray)
+                        } catch (e: Exception) {
                             Utils.toast(Res.string.ocr_capture_error_save)
-                        } else {
-                            onImageReady(filePath)
+                        } finally {
+                            _isProcessing.value = false
                         }
-                        _isProcessing.value = false
+
+                        onImageReady(file.path)
                     }
 
                     is ImageCaptureResult.Error -> {

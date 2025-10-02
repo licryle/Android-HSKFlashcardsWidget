@@ -1,6 +1,6 @@
 package fr.berliat.hskwidget.core
 
-import androidx.core.net.toUri
+import android.graphics.BitmapFactory
 
 import co.touchlab.kermit.Logger
 
@@ -9,8 +9,6 @@ import com.google.mlkit.vision.text.Text
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.TextRecognizer
 import com.google.mlkit.vision.text.chinese.ChineseTextRecognizerOptions
-
-import fr.berliat.hskwidget.ExpectedUtils
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -24,7 +22,8 @@ actual class HSKOCR actual constructor() {
                                successCallback: (String?) -> Unit,
                                failureCallBack: (Exception) -> Unit) {
         withContext(Dispatchers.Default) {
-            val image = InputImage.fromFilePath(ExpectedUtils.context, imagePath.toUri())
+            val bitmap = BitmapFactory.decodeFile(imagePath)
+            val image = InputImage.fromBitmap(bitmap, 0)
             Logger.d(tag = TAG, messageString = "recognizeText starting")
 
             val options = ChineseTextRecognizerOptions.Builder()

@@ -28,18 +28,16 @@ import com.kashif.cameraK.enums.CameraLens
 import com.kashif.cameraK.enums.Directory
 import com.kashif.cameraK.enums.FlashMode
 import com.kashif.cameraK.enums.ImageFormat
+import com.kashif.cameraK.enums.PinchToZoom
 import com.kashif.cameraK.enums.QualityPrioritization
 import com.kashif.cameraK.permissions.providePermissions
 import com.kashif.cameraK.ui.CameraPreview
-import com.kashif.imagesaverplugin.ImageSaverConfig
-import com.kashif.imagesaverplugin.rememberImageSaverPlugin
 
 import fr.berliat.hskwidget.ui.components.Error
 import fr.berliat.hskwidget.ui.components.ErrorView
 import fr.berliat.hskwidget.ui.components.LoadingProgressView
 
 import hskflashcardswidget.crossplatform.generated.resources.Res
-import hskflashcardswidget.crossplatform.generated.resources.app_name
 import hskflashcardswidget.crossplatform.generated.resources.ic_launcher
 import hskflashcardswidget.crossplatform.generated.resources.ocr_capture_btn
 import hskflashcardswidget.crossplatform.generated.resources.ocr_capture_permission_denied
@@ -90,7 +88,6 @@ fun CaptureImageScreen(
     } else {
         Column(modifier = modifier.fillMaxSize()) {
             Box(modifier = Modifier.weight(1f)) {
-                // Todo, implement pinch to zoom
                 CameraPreview(
                     modifier = Modifier.fillMaxSize(),
                     cameraConfiguration = {
@@ -98,20 +95,10 @@ fun CaptureImageScreen(
                         setFlashMode(FlashMode.OFF)
                         setImageFormat(ImageFormat.PNG)
                         setDirectory(Directory.PICTURES)
+                        setPinchToZoom(PinchToZoom.ON)
                         setQualityPrioritization(QualityPrioritization.BALANCED)
                     },
                     onCameraControllerReady = viewModel::onCameraControllerReady
-                )
-
-                val appName = stringResource(Res.string.app_name)
-                // Display custom camera UI once controller is ready
-                val imageSaverPlugin = rememberImageSaverPlugin(
-                    config = ImageSaverConfig(
-                        isAutoSave = false,
-                        prefix = appName,
-                        directory = Directory.PICTURES,
-                        customFolderName = appName  // Android only
-                    )
                 )
 
                 if (isProcessing) {
@@ -129,7 +116,7 @@ fun CaptureImageScreen(
                     }
                 } else {
                     CaptureButton(
-                        onClick = { viewModel.takePhoto(imageSaverPlugin) },
+                        onClick = { viewModel.takePhoto() },
                         modifier = Modifier
                             .align(Alignment.BottomCenter)
                             .padding(bottom = 50.dp)

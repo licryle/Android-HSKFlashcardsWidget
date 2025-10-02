@@ -61,9 +61,8 @@ kotlin {
                 implementation(libs.filekit.core)
                 implementation(libs.filekit.dialogs)
                 implementation(libs.filekit.dialogs.compose)
-                //implementation(files("libs/Fork-CameraK.klib"))
-                implementation("io.github.kashif-mehmood-km:camerak:+")
-                implementation(libs.camerak.imagesaver)
+                // ./gradlew :cameraK:publishAllPublicationsToLocalRepoRepository in Fork_CameraK
+                implementation("com.kashif.cameraK_fork:camerak:0.0.12")
 
                 implementation(project(":hsktextviews"))
             }

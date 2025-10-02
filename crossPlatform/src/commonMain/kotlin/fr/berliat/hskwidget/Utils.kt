@@ -15,7 +15,6 @@ import io.github.vinceglb.filekit.PlatformFile
 import kotlinx.coroutines.CoroutineScope
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
@@ -171,6 +170,11 @@ expect fun PlatformFile.lastModified(): Instant
 
 fun String.capitalize() =
     this.lowercase().replaceFirstChar { it.uppercaseChar() }
+
+fun String.toSafeFileName(): String {
+    // Keep letters, digits, underscore, dash, and dot
+    return this.replace(Regex("[^A-Za-z0-9._-]"), "_")
+}
 
 fun Long.fromKBToMB(decimals: Int = 2): String {
     val mb = this.toDouble() / (1024 * 1024)
