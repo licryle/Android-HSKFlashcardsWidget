@@ -41,6 +41,7 @@ import hskflashcardswidget.crossplatform.generated.resources.config_backup_title
 import hskflashcardswidget.crossplatform.generated.resources.config_restore_file
 import hskflashcardswidget.crossplatform.generated.resources.config_restore_file_choose
 import hskflashcardswidget.crossplatform.generated.resources.database_upload_24px
+import hskflashcardswidget.crossplatform.generated.resources.file_save_24px
 import hskflashcardswidget.crossplatform.generated.resources.folder_open_24px
 import hskflashcardswidget.hsktextviews.generated.resources.arrow_dropdown_noborder
 import hskflashcardswidget.hsktextviews.generated.resources.pinyinselector_dropdown_icon
@@ -165,7 +166,7 @@ fun BackupDiskView(
             IconButton(
                 onClick = viewModel::selectRestoreFile,
                 text = stringResource(Res.string.config_restore_file_choose),
-                drawable = Res.drawable.folder_open_24px
+                drawable = Res.drawable.file_save_24px
             )
         }
     }
