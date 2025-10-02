@@ -122,7 +122,10 @@ class BackupDiskViewModel(
             DatabaseDiskBackup.selectFolder(
                 onSuccess = { folder ->
                     // persist permissions in Platform && DataStore
-                    viewModelScope.launch { appConfig.dbBackUpDiskDirectory.value = folder.bookmarkData() }
+                    viewModelScope.launch {
+                        // ToDo : unbookmark previous folder
+                        appConfig.dbBackUpDiskDirectory.value = folder.bookmarkData()
+                    }
                     appConfig.dbBackUpDiskActive.value = true
                     Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.CONFIG_BACKUP_ON)
                 },
