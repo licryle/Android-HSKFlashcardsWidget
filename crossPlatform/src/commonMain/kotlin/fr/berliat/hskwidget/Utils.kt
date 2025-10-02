@@ -173,7 +173,7 @@ fun Instant.YYMMDD(timeZone: TimeZone = TimeZone.currentSystemDefault()): String
     val local = this.toLocalDateTime(timeZone)
     val month = local.monthNumber.toString().padStart(2, '0')
     val day = local.dayOfMonth.toString().padStart(2, '0')
-    return "${local.year}-$month-$day"
+    return "${local.year}/$month/$day"
 }
 
 fun Instant.YYMMDDHHMMSS(timeZone: TimeZone = TimeZone.currentSystemDefault()): String {
@@ -185,5 +185,5 @@ fun Instant.YYMMDDHHMMSS(timeZone: TimeZone = TimeZone.currentSystemDefault()): 
     val minutes = local.minute.toString().padStart(2, '0')
     val seconds = local.second.toString().padStart(2, '0')
 
-    return "${local.year}-$month-$day-$hour-$minutes-$seconds"
+    return "${local.year}/$month/$day $hour:$minutes:$seconds"
 }
