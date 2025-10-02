@@ -167,7 +167,7 @@ expect fun PlatformFile.createdAt(): Instant?
 expect fun PlatformFile.lastModified(): Instant
 
 fun String.capitalize() =
-    this.toString().lowercase().replaceFirstChar { it.uppercaseChar() }
+    this.lowercase().replaceFirstChar { it.uppercaseChar() }
 
 fun Instant.YYMMDD(timeZone: TimeZone = TimeZone.currentSystemDefault()): String {
     val local = this.toLocalDateTime(timeZone)
