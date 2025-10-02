@@ -127,6 +127,7 @@ object Utils {
         DICT_ANNOTATION_ON,
         DICT_ANNOTATION_OFF,
         DICT_SEARCH,
+        OCR_CAPTURE,
         OCR_WORD_NOTFOUND,
         OCR_WORD_FOUND,
         PURCHASE_CLICK,

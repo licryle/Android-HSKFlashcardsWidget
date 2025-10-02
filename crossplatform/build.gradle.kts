@@ -59,6 +59,14 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(libs.kotlin.stdlib)
+                implementation(libs.normalize)
+                implementation(libs.kotlinx.datetime)
+                implementation(libs.kotlinx.serialization.json)
+
+                implementation(libs.androidx.datastore)
+                implementation(libs.androidx.datastore.preferences)
+                api(libs.androidx.lifecycle.viewmodel)
+
                 implementation(libs.compose.runtime)
                 implementation(libs.compose.foundation)
                 implementation(libs.compose.material3)
@@ -68,17 +76,13 @@ kotlin {
                 implementation(libs.room.runtime)
                 implementation(libs.sqlite.bundled)
 
-                implementation(libs.normalize)
-                implementation(libs.kotlinx.datetime)
-                implementation(libs.kotlinx.serialization.json)
-
-                implementation(libs.androidx.datastore)
-                implementation(libs.androidx.datastore.preferences)
-                api(libs.androidx.lifecycle.viewmodel)
-
+                implementation(libs.kermit)
                 implementation(libs.filekit.core)
                 implementation(libs.filekit.dialogs)
                 implementation(libs.filekit.dialogs.compose)
+                //implementation(files("libs/Fork-CameraK.klib"))
+                implementation("io.github.kashif-mehmood-km:camerak:+")
+                implementation(libs.camerak.imagesaver)
 
                 implementation(project(":hsktextviews"))
             }
