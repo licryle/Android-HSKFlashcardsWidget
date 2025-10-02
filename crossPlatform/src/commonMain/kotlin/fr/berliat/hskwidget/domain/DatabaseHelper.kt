@@ -14,13 +14,13 @@ import io.github.vinceglb.filekit.div
 import io.github.vinceglb.filekit.filesDir
 import io.github.vinceglb.filekit.list
 import io.github.vinceglb.filekit.name
+import io.github.vinceglb.filekit.path
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import kotlinx.io.RawSource
 
 class DatabaseHelper private constructor() {
     val liveDatabase
@@ -62,11 +62,6 @@ class DatabaseHelper private constructor() {
     suspend fun loadExternalDatabase(dbFilePath: PlatformFile) = withContext(
         Dispatchers.IO) {
         return@withContext createRoomDatabaseFromFile(dbFilePath)
-    }
-
-    suspend fun loadExternalDatabase(stream: () -> RawSource) = withContext(
-        Dispatchers.IO) {
-        return@withContext createRoomDatabaseFromStream(stream)
     }
 
     suspend fun cleanTempDatabaseFiles() {
@@ -125,6 +120,19 @@ class DatabaseHelper private constructor() {
         }
     }
 
+    suspend fun replaceLiveUserDataFromFile(updateFrom: PlatformFile) {
+        // only copy to cache if not already in cache
+        var finalFile = updateFrom
+        if (! updateFrom.absolutePath().contains(FileKit.cacheDir.path)) {
+            finalFile = FileKit.cacheDir / updateFrom.name
+            updateFrom.copyTo(finalFile)
+        }
+
+        val sourceDb = loadExternalDatabase(finalFile)
+        replaceUserDataInDB(liveDatabase, sourceDb)
+        finalFile.delete()
+    }
+
     suspend fun replaceWordsDataInDB(updateWith: ChineseWordsDatabase)
             = withContext(Dispatchers.IO) {
         Logger.d(tag = TAG, messageString = "Initiating Database Update: reading file")
@@ -178,4 +186,3 @@ class DatabaseHelper private constructor() {
 expect suspend fun createRoomDatabaseLive() : ChineseWordsDatabase
 expect suspend fun createRoomDatabaseFromFile(file: PlatformFile) : ChineseWordsDatabase
 expect suspend fun createRoomDatabaseFromAsset() : ChineseWordsDatabase
-expect suspend fun createRoomDatabaseFromStream(stream: () -> RawSource) : ChineseWordsDatabase

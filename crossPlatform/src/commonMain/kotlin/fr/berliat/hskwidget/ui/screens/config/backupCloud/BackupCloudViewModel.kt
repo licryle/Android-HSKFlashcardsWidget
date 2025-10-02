@@ -4,6 +4,7 @@ import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.data.store.GoogleDriveBackup
 
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.datetime.Instant
 
@@ -14,8 +15,10 @@ expect class BackupCloudViewModel(
     val cloudLastBackup: StateFlow<Instant>  // adjust type if needed
     val isBusy: StateFlow<Boolean>
     val transferState: StateFlow<BackupCloudTransferEvent?>
+    val restoreFileFrom: MutableStateFlow<Instant?>
 
     fun backup()
     fun restore()
+    fun confirmRestoration()
     fun cancel()
 }

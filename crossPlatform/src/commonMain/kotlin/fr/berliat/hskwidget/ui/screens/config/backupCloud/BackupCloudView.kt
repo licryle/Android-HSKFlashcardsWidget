@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 import fr.berliat.hskwidget.YYMMDDHHMMSS
+import fr.berliat.hskwidget.ui.components.ConfirmDialog
 import fr.berliat.hskwidget.ui.components.IconButton
 import fr.berliat.hskwidget.ui.components.ProgressView
 
@@ -26,6 +27,7 @@ import hskflashcardswidget.crossplatform.generated.resources.config_backup_cloud
 import hskflashcardswidget.crossplatform.generated.resources.config_backup_cloud_lastone_never
 import hskflashcardswidget.crossplatform.generated.resources.config_backup_cloud_restorenow
 import hskflashcardswidget.crossplatform.generated.resources.config_backup_cloud_title
+import hskflashcardswidget.crossplatform.generated.resources.googledrive_restore_confirm_overwrite
 
 import kotlinx.datetime.Instant
 
@@ -40,6 +42,20 @@ fun BackupCloudView(
     val lastCloudUpdate = viewModel.cloudLastBackup.collectAsState()
     val busy = viewModel.isBusy.collectAsState()
     val transferState = viewModel.transferState.collectAsState()
+    val restoreFileFrom = viewModel.restoreFileFrom.collectAsState()
+
+    val restoreFileTime = restoreFileFrom.value
+    restoreFileTime?.let {
+        ConfirmDialog(
+            title = Res.string.config_backup_cloud_restorenow,
+            message = stringResource(Res.string.googledrive_restore_confirm_overwrite, restoreFileTime.YYMMDDHHMMSS()),
+            onConfirm = {
+                viewModel.restoreFileFrom.value = null
+                viewModel.confirmRestoration()
+            },
+            onDismiss = { viewModel.restoreFileFrom.value = null }
+        )
+    }
 
     Column {
         Row {

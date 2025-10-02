@@ -14,7 +14,6 @@ import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.div
 import io.github.vinceglb.filekit.path
 
-import kotlinx.io.RawSource
 import java.io.File
 
 actual suspend fun createRoomDatabaseLive(): ChineseWordsDatabase {
@@ -60,22 +59,6 @@ actual suspend fun createRoomDatabaseFromFile(file: PlatformFile): ChineseWordsD
         ChineseWordsDatabase::class.java,
         filename)
         .createFromFile(File(file.path))
-        .build()
-
-    db._databaseFile = getDatabaseLiveDir() / filename
-
-    return db
-}
-
-actual suspend fun createRoomDatabaseFromStream(stream: () -> RawSource): ChineseWordsDatabase {
-    val filename = "Temp_HSK_DB_${Utils.getRandomString(10)}"
-    TODO()
-
-    val db = Room.databaseBuilder(
-        ExpectedUtils.context.applicationContext,
-        ChineseWordsDatabase::class.java,
-        "Temp_HSK_DB_${Utils.getRandomString(10)}")
-        .createFromInputStream({ null })
         .build()
 
     db._databaseFile = getDatabaseLiveDir() / filename

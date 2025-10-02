@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Mandarin Assistant</string>
     <string name="delete">Delete</string>
+    <string name="proceed">Proceed</string>
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
     <string name="loading">Loading</string>
@@ -148,7 +149,7 @@ You can come back to this screen at any time to set up a new widget, or reconfig
     <string name="googledrive_backup_start_title">Backup in progress</string>
     <string name="googledrive_backup_start_message">Preparing for backup.</string>
     <string name="googledrive_backup_success_title">Backup complete</string>
-    <string name="googledrive_backup_success_message">Backup succeeded at %s.</string>
+    <string name="googledrive_backup_success_message">Backup succeeded at %1$s.</string>
     <string name="googledrive_backup_cancel_title">Backup cancelled</string>
     <string name="googledrive_backup_cancel_message">Backup cancelled.</string>
     <string name="googledrive_backup_progress_message">Backup in progress: %1$s MB / %2$s MB.</string>
@@ -161,12 +162,12 @@ You can come back to this screen at any time to set up a new widget, or reconfig
     <string name="googledrive_restore_start_title">Restoration starting</string>
     <string name="googledrive_restore_start_message">Restoration from Google Drive started.</string>
     <string name="googledrive_restore_success_title">Restoration download complete</string>
-    <string name="googledrive_restore_success_message">Files from Google Drive downloaded at %s.</string>
-    <string name="googledrive_restore_confirm_overwrite">"You're about to delete your local data and replace it with a backup from %s.\n\nThis is irrevocable. Proceed?"</string>
+    <string name="googledrive_restore_success_message">Files from Google Drive downloaded at %1$s.</string>
+    <string name="googledrive_restore_confirm_overwrite">You're about to delete your local data and replace it with a backup from %1$s.\n\nThis is irrevocable. Proceed?</string>
     <string name="googledrive_restore_cancel_title">Restoration cancelled</string>
     <string name="googledrive_restore_cancel_message">Restoration cancelled.</string>
     <string name="googledrive_restore_failed_title">Restoration failed</string>
-    <string name="googledrive_restore_failed_message">Restoration from Google Drive failed with error %s.</string>
+    <string name="googledrive_restore_failed_message">Restoration from Google Drive failed with error %1$s.</string>
 
     <string name="config_anki_title">Anki integration</string>
     <string name="config_anki_activate">Activate Anki integration</string>
