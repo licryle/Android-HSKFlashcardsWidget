@@ -23,6 +23,8 @@ import kotlinx.datetime.toLocalDateTime
 
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.getString
+import kotlin.math.pow
+import kotlin.math.round
 import kotlin.reflect.KClass
 
 // KMP e
@@ -168,6 +170,13 @@ expect fun PlatformFile.lastModified(): Instant
 
 fun String.capitalize() =
     this.lowercase().replaceFirstChar { it.uppercaseChar() }
+
+fun Long.fromKBToMB(decimals: Int = 2): String {
+    val mb = this.toDouble() / (1024 * 1024)
+    val factor = 10.0.pow(decimals)
+    val rounded = round(mb * factor) / factor
+    return rounded.toString()
+}
 
 fun Instant.YYMMDD(timeZone: TimeZone = TimeZone.currentSystemDefault()): String {
     val local = this.toLocalDateTime(timeZone)

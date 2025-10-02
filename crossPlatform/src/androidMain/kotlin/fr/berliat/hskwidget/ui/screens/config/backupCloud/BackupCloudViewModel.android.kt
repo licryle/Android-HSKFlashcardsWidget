@@ -18,7 +18,6 @@ import hskflashcardswidget.crossplatform.generated.resources.dbrestore_failure_f
 import hskflashcardswidget.crossplatform.generated.resources.dbrestore_failure_import
 import hskflashcardswidget.crossplatform.generated.resources.dbrestore_start
 import hskflashcardswidget.crossplatform.generated.resources.dbrestore_success
-import hskflashcardswidget.crossplatform.generated.resources.googledrive_restore_nofile
 
 import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.PlatformFile
@@ -80,10 +79,10 @@ actual class BackupCloudViewModel actual constructor(
                     !(event is BackupEvent.Success || event is BackupEvent.Failed || event is BackupEvent.Cancelled)
                 }.collect { event ->
                     when (event) {
-                        is BackupEvent.Cancelled -> _transferState.emit(Cancelled)
-                        is BackupEvent.Failed -> _transferState.emit(Failed(event.exception))
+                        is BackupEvent.Cancelled -> _transferState.emit(BackupCancelled)
+                        is BackupEvent.Failed -> _transferState.emit(BackupFailed(event.exception))
                         is BackupEvent.Progress -> _transferState.emit(
-                            Progress(
+                            BackupProgress(
                                 fileIndex = event.fileIndex,
                                 fileCount = event.fileCount,
                                 bytesReceived = event.bytesSent,
@@ -91,9 +90,9 @@ actual class BackupCloudViewModel actual constructor(
                             )
                         )
 
-                        is BackupEvent.Started -> _transferState.emit(Started)
+                        is BackupEvent.Started -> _transferState.emit(BackupStarted)
                         is BackupEvent.Success -> {
-                            _transferState.emit(Success)
+                            _transferState.emit(BackupSuccess)
                             appConfig.dbBackupCloudLastSuccess.value = Clock.System.now()
                             gDriveBackup.deletePreviousBackups()
                         }
@@ -120,10 +119,10 @@ actual class BackupCloudViewModel actual constructor(
                             || event is RestoreEvent.Cancelled || event is RestoreEvent.Empty)
                 }.collect { event ->
                     when (event) {
-                        is RestoreEvent.Cancelled -> _transferState.emit(Cancelled)
-                        is RestoreEvent.Failed -> _transferState.emit(Failed(event.exception))
+                        is RestoreEvent.Cancelled -> _transferState.emit(RestorationCancelled)
+                        is RestoreEvent.Failed -> _transferState.emit(RestorationFailed(event.exception))
                         is RestoreEvent.Progress -> _transferState.emit(
-                            Progress(
+                            RestorationProgress(
                                 fileIndex = event.fileIndex,
                                 fileCount = event.fileCount,
                                 bytesReceived = event.bytesReceived,
@@ -131,9 +130,9 @@ actual class BackupCloudViewModel actual constructor(
                             )
                         )
 
-                        is RestoreEvent.Started -> _transferState.emit(Started)
+                        is RestoreEvent.Started -> _transferState.emit(RestorationStarted)
                         is RestoreEvent.Success -> {
-                            _transferState.emit(Success)
+                            _transferState.emit(RestorationSuccess)
 
                             if (event.files.isEmpty() || event.files[0].name != "database.sqlite") {
                                 throw Exception("ConfigFragement.onRestoreSuccess: Something went really wrong in GoogleDriveBackUp lib, wrong backup file")
@@ -141,7 +140,7 @@ actual class BackupCloudViewModel actual constructor(
 
                             restoreFileFrom.value = Instant.fromEpochSeconds(event.files[0].modifiedTime?.epochSecond ?: 0)
                         }
-                        is RestoreEvent.Empty -> _transferState.emit(Failed(Exception("No Backup File")))
+                        is RestoreEvent.Empty -> _transferState.emit(RestorationFailed(Exception("No Backup File")))
                     }
                 }
             }
