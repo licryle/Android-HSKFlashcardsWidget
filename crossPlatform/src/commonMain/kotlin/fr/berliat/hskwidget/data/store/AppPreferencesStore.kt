@@ -6,8 +6,7 @@ import androidx.datastore.preferences.core.*
 
 import fr.berliat.hskwidget.data.type.ClassLevel
 import fr.berliat.hskwidget.data.type.ClassType
-import io.github.vinceglb.filekit.BookmarkData
-import io.github.vinceglb.filekit.PlatformFile
+import fr.berliat.hskwidget.domain.SearchQuery
 
 import kotlinx.datetime.Instant
 import kotlinx.coroutines.sync.Mutex
@@ -98,4 +97,6 @@ class AppPreferencesStore private constructor(store: DataStore<Preferences>):
     val readerTextSize = registerFloatPref("reader_text_size", 30f.sp,
         PreferenceConverter({ it.sp }, { it.value })
     )
+    var searchQuery = registerStringPref("search_query", SearchQuery.fromString(""),
+        PreferenceConverter({ SearchQuery.fromString(it) }, { it.toString() }))
 }

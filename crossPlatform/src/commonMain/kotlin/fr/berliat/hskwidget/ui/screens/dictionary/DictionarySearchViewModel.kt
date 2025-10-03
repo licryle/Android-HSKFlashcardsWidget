@@ -13,14 +13,11 @@ import kotlinx.coroutines.launch
 
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
-import fr.berliat.hskwidget.domain.SearchQuery
 
 
-class DictionaryViewModel(val appSearchQueryProvider : () -> SearchQuery,
-                          prefsStore: AppPreferencesStore = HSKAppServices.appPreferences
+class DictionaryViewModel(prefsStore: AppPreferencesStore = HSKAppServices.appPreferences
 ) {
-    private val _searchQuery = MutableStateFlow(appSearchQueryProvider.invoke())
-    val searchQuery: StateFlow<SearchQuery> = _searchQuery.asStateFlow()
+    val searchQuery =  prefsStore.searchQuery.asStateFlow()
 
     private val _searchResults = MutableStateFlow<List<AnnotatedChineseWord>>(emptyList())
     val searchResults: StateFlow<List<AnnotatedChineseWord>> = _searchResults.asStateFlow()
@@ -62,8 +59,6 @@ class DictionaryViewModel(val appSearchQueryProvider : () -> SearchQuery,
     }
 
     fun performSearch() {
-        _searchQuery.value = appSearchQueryProvider.invoke()
-
         CoroutineScope(Dispatchers.IO).launch {
             _isLoading.value = true
             currentPage = 0
@@ -88,7 +83,7 @@ class DictionaryViewModel(val appSearchQueryProvider : () -> SearchQuery,
     }
 
     private suspend fun fetchResultsForPage(): List<AnnotatedChineseWord> {
-        val searchQuery = _searchQuery.value
+        val searchQuery = searchQuery.value
         val listName = searchQuery.inListName
         val annotatedOnly = appPreferences.searchFilterHasAnnotation.value
 

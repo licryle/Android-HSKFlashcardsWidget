@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 import fr.berliat.hskwidget.KAnkiDelegator
+import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.ui.components.DetailedWordView
 import fr.berliat.hskwidget.ui.components.LoadingView
@@ -50,10 +51,12 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun DictionarySearchScreen(
-    viewModel: DictionaryViewModel,
     ankiCaller : KAnkiDelegator,
     onAnnotate: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: DictionaryViewModel = remember { DictionaryViewModel(
+        prefsStore = HSKAppServices.appPreferences
+    ) }
 ) {
     val searchQuery by viewModel.searchQuery.collectAsState()
     val results by viewModel.searchResults.collectAsState()
