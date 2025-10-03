@@ -49,85 +49,6 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-private fun DictionarySearchFilters(
-    showHSK3: Boolean,
-    onShowHSKToggle: (Boolean) -> Unit,
-    hasAnnotation: Boolean,
-    onHasAnnotationToggle: (Boolean) -> Unit,
-    modifier: Modifier = Modifier) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        tonalElevation = 4.dp // this gives shadow / elevation
-    ) {
-        Row(
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 4.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(horizontalAlignment = Alignment.Start) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Switch(
-                        checked = showHSK3,
-                        onCheckedChange = { onShowHSKToggle(it) },
-                        modifier = modifier.padding(end = 3.dp)
-                    )
-                    Text(
-                        text = stringResource(Res.string.dictionary_search_filter_hsk3definition_hint),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-            }
-            Column(horizontalAlignment = Alignment.End) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        painter = painterResource(Res.drawable.bookmark_heart_24px),
-                        contentDescription = stringResource(Res.string.dictionary_search_filter_hasannotation_hint),
-                        tint = Color.Red
-                    )
-                    Text(
-                        text = stringResource(Res.string.dictionary_search_filter_hasannotation_hint),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Switch(
-                        checked = hasAnnotation,
-                        onCheckedChange = { onHasAnnotationToggle(it) },
-                        modifier = modifier.padding(start = 3.dp)
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun DictionarySearchNoResult(
-    query: String,
-    onClick : ((String) -> Unit)?,
-    modifier : Modifier = Modifier
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .clickable { onClick?.invoke(query) },
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Icon(
-            painter = painterResource(Res.drawable.bookmark_add_24px),
-            contentDescription = stringResource(Res.string.dictionary_noresult_icon),
-            modifier = modifier.size(48.dp)
-        )
-        Text(
-            text = stringResource(Res.string.dictionary_noresult_text, query),
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = modifier.padding(top = 8.dp)
-        )
-    }
-}
-
-@Composable
 fun DictionarySearchScreen(
     viewModel: DictionaryViewModel,
     ankiCaller : KAnkiDelegator,
@@ -203,5 +124,84 @@ fun DictionarySearchScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun DictionarySearchFilters(
+    showHSK3: Boolean,
+    onShowHSKToggle: (Boolean) -> Unit,
+    hasAnnotation: Boolean,
+    onHasAnnotationToggle: (Boolean) -> Unit,
+    modifier: Modifier = Modifier) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        tonalElevation = 4.dp // this gives shadow / elevation
+    ) {
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 4.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(horizontalAlignment = Alignment.Start) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Switch(
+                        checked = showHSK3,
+                        onCheckedChange = { onShowHSKToggle(it) },
+                        modifier = modifier.padding(end = 3.dp)
+                    )
+                    Text(
+                        text = stringResource(Res.string.dictionary_search_filter_hsk3definition_hint),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+            Column(horizontalAlignment = Alignment.End) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        painter = painterResource(Res.drawable.bookmark_heart_24px),
+                        contentDescription = stringResource(Res.string.dictionary_search_filter_hasannotation_hint),
+                        tint = Color.Red
+                    )
+                    Text(
+                        text = stringResource(Res.string.dictionary_search_filter_hasannotation_hint),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Switch(
+                        checked = hasAnnotation,
+                        onCheckedChange = { onHasAnnotationToggle(it) },
+                        modifier = modifier.padding(start = 3.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun DictionarySearchNoResult(
+    query: String,
+    onClick : ((String) -> Unit)?,
+    modifier : Modifier = Modifier
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .clickable { onClick?.invoke(query) },
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Icon(
+            painter = painterResource(Res.drawable.bookmark_add_24px),
+            contentDescription = stringResource(Res.string.dictionary_noresult_icon),
+            modifier = modifier.size(48.dp)
+        )
+        Text(
+            text = stringResource(Res.string.dictionary_noresult_text, query),
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = modifier.padding(top = 8.dp)
+        )
     }
 }
