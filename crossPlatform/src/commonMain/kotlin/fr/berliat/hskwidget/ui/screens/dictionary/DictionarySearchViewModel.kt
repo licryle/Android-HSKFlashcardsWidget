@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.IO
 
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
@@ -103,6 +102,14 @@ class DictionaryViewModel(val appSearchQueryProvider : () -> SearchQuery,
 
         currentPage++
         return results
+    }
+
+    fun speakWord(word: String) {
+        Utils.playWordInBackground(word)
+    }
+
+    fun copyWord(word: String) {
+        Utils.copyToClipBoard(word)
     }
 
     fun listsAssociationChanged() {

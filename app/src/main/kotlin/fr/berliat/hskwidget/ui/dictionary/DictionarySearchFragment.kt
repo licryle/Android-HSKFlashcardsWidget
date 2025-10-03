@@ -38,13 +38,11 @@ class DictionarySearchFragment : Fragment() {
                 DictionarySearchScreen(
                     viewModel = viewModel,
                     ankiCaller = ankiDelegate::delegateToAnki,
-                    onSpeak = Utils::playWordInBackground,
                     onAnnotate = {
                         val action = DictionarySearchFragmentDirections.annotateWord(it, false)
 
                         findNavController().navigate(action)
-                    },
-                    onCopy = Utils::copyToClipBoard
+                    }
                 )
             }
         }

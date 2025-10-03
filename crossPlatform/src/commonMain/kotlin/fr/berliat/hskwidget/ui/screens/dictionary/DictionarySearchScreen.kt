@@ -131,9 +131,7 @@ private fun DictionarySearchNoResult(
 fun DictionarySearchScreen(
     viewModel: DictionaryViewModel,
     ankiCaller : KAnkiDelegator,
-    onSpeak: (String) -> Unit,
     onAnnotate: (String) -> Unit,
-    onCopy: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val searchQuery by viewModel.searchQuery.collectAsState()
@@ -192,8 +190,8 @@ fun DictionarySearchScreen(
                             word = word,
                             showHSK3Definition = showHSK3,
                             onFavoriteClick = { onAnnotate(word.simplified) },
-                            onSpeakClick = { onSpeak(word.simplified) },
-                            onCopyClick = { onCopy(word.simplified) },
+                            onSpeakClick = { viewModel.speakWord(word.simplified) },
+                            onCopyClick = { viewModel.copyWord(word.simplified) },
                             onListsClick = { showWordListDialog = word.word }
                         )
 
