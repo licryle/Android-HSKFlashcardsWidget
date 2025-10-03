@@ -18,7 +18,6 @@ import fr.berliat.hskwidget.data.type.ClassType
 import fr.berliat.hskwidget.data.type.Pinyins
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -122,5 +121,13 @@ class AnnotateViewModel(
                 callback?.invoke(simplified, error)
             }
         }
+    }
+
+    fun speakWord(word: String) {
+        Utils.playWordInBackground(word)
+    }
+
+    fun copyWord(word: String) {
+        Utils.copyToClipBoard(word)
     }
 }

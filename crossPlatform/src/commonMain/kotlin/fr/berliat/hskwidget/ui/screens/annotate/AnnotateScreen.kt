@@ -48,8 +48,6 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun AnnotateScreen(
     word: String,
-    onSpeak: (String) -> Unit,
-    onCopy: (String) -> Unit,
     onSave: (String, Exception?) -> Unit,
     onDelete: (String, Exception?) -> Unit,
     ankiCaller : KAnkiDelegator,
@@ -114,8 +112,8 @@ fun AnnotateScreen(
     ) {
         DetailedWordView(
             word = annotatedWord!!,
-            onSpeakClick = { onSpeak(annotatedWord!!.simplified) },
-            onCopyClick = { onCopy(annotatedWord!!.simplified) },
+            onSpeakClick = { viewModel.speakWord(annotatedWord!!.simplified) },
+            onCopyClick = { viewModel.copyWord(annotatedWord!!.simplified) },
             showHSK3Definition = false,
             onFavoriteClick = null,
             onListsClick = null,

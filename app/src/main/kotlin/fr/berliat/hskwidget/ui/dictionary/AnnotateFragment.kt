@@ -56,8 +56,6 @@ class AnnotateFragment: Fragment() {
                 AnnotateScreen(
                     simplifiedWord,
                     ankiCaller = ankiDelegate::delegateToAnki,
-                    onSpeak = Utils::playWordInBackground,
-                    onCopy = Utils::copyToClipBoard,
                     onSave = { word, e -> handleSaveResult(word, ACTION.UPDATE, e)},
                     onDelete = { word, e -> handleSaveResult(word, ACTION.DELETE, e)}
                 )
