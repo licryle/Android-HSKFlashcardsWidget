@@ -20,8 +20,8 @@ class ConfigFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        ankiDelegate = HSKAnkiDelegate(this)
         gDriveBackup = GoogleDriveBackup(this, requireActivity(), getString(R.string.app_name))
+        ankiDelegate = HSKAnkiDelegate(requireActivity())
     }
 
     override fun onResume() {

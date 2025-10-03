@@ -10,17 +10,14 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 
 import fr.berliat.hskwidget.R
+import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.model.WordList
 import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.ui.screens.wordlist.WordListScreen
-import fr.berliat.hskwidget.ui.HSKAnkiDelegate
 
 class WordListFragment : Fragment() {
-    private lateinit var ankiDelegate: HSKAnkiDelegate
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        ankiDelegate = HSKAnkiDelegate(this)
     }
 
     override fun onResume() {
@@ -37,7 +34,7 @@ class WordListFragment : Fragment() {
         return ComposeView(requireContext()).apply {
             setContent {
                 WordListScreen(
-                    ankiCaller = ankiDelegate::delegateToAnki,
+                    ankiCaller = HSKAppServices.ankiDelegator,
                     onClickList = { list -> consultList(list) }
                 )
             }

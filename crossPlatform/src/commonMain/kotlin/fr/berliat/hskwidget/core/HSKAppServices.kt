@@ -1,10 +1,10 @@
 package fr.berliat.hskwidget.core
 
-import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import fr.berliat.ankidroidhelper.AnkiDelegate
 import fr.berliat.hsktextviews.HSKTextSegmenter
-import fr.berliat.hskwidget.ExpectedUtils
+import fr.berliat.hskwidget.KAnkiDelegator
+import fr.berliat.hskwidget.KAnkiServiceDelegator
 import fr.berliat.hskwidget.Utils
-import fr.berliat.hskwidget.data.dao.AnkiDAO
 import fr.berliat.hskwidget.data.repo.WordListRepository
 import fr.berliat.hskwidget.data.store.AnkiStore
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
@@ -12,21 +12,16 @@ import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.data.store.WidgetPreferencesStore
 import fr.berliat.hskwidget.data.store.WidgetPreferencesStoreProvider
 import fr.berliat.hskwidget.domain.DatabaseHelper
-import io.github.vinceglb.filekit.FileKit
-import io.github.vinceglb.filekit.filesDir
-import io.github.vinceglb.filekit.path
-import io.github.vinceglb.filekit.resolve
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
-import okio.Path.Companion.toPath
 
 // --- Singleton instance
 object HSKAppServices : AppServices() {
     override fun init(scope: CoroutineScope) {
-        register("database") { DatabaseHelper.getInstance().liveDatabase }
-        register("appPreferences") {
+        register("appScope", 0) { scope }
+        register("database", 0) { DatabaseHelper.getInstance().liveDatabase }
+        register("appPreferences", 0) {
             AppPreferencesStore.getInstance(Utils.getDataStore("app.preferences_pb"))
         }
 
@@ -39,10 +34,9 @@ object HSKAppServices : AppServices() {
             }
             provider
         }
-        register("ankiDAO") { Utils.getAnkiDAO() }
         register("ankiStore") {
             AnkiStore(
-                getAnyway("ankiDAO"),
+                Utils.getAnkiDAO(),
                 getAnyway<ChineseWordsDatabase>("database").wordListDAO(),
                 getAnyway("appPreferences"))
         }
@@ -53,12 +47,10 @@ object HSKAppServices : AppServices() {
                 getAnyway<ChineseWordsDatabase>("database").annotatedChineseWordDAO()
             )
         }
-        register("appScope") { scope }
-
         register("HSKSegmenter") {
             val segmenter = Utils.getHSKSegmenter()
 
-            scope.launch(Dispatchers.IO) { // Async within Async
+            getAnyway<CoroutineScope>("appScope").launch(Dispatchers.IO) {
                 segmenter.preload()
             }
 
@@ -68,13 +60,25 @@ object HSKAppServices : AppServices() {
         super.init(scope)
     }
 
+    fun registerAnkiDelegators(ankiDelegate: AnkiDelegate) {
+        register("ankiDelegate") { ankiDelegate::delegateToAnki }
+        register("ankiServiceDelegate") { ankiDelegate::delegateToAnkiService }
+
+        super.init(getAnyway("appScope"))
+    }
+
+    // P0
     val database: ChineseWordsDatabase get() = get("database")
+    val appScope: CoroutineScope get() = get("appScope")
+
+    // P2
     val appPreferences: AppPreferencesStore get() = get("appPreferences")
     val widgetsPreferencesProvider: WidgetPreferencesStoreProvider get() = get("widgetsPreferencesProvider")
-    val ankiDAO: AnkiDAO get() = get("ankiDAO")
     val ankiStore: AnkiStore get() = get("ankiStore")
+
+    val ankiDelegator: KAnkiDelegator get() = get("ankiDelegate")
+    val ankiServiceDelegator: KAnkiServiceDelegator get() = get("ankiServiceDelegate")
     val wordListRepo: WordListRepository get() = get("wordListRepo")
-    val appScope: CoroutineScope get() = get("appScope")
     val HSKSegmenter: HSKTextSegmenter get() = get("HSKSegmenter")
 }
 

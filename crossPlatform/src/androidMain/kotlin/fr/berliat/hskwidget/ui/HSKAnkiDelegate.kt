@@ -1,10 +1,12 @@
 package fr.berliat.hskwidget.ui
 
 import android.content.Context
-import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import fr.berliat.ankidroidhelper.AnkiDelegate
 import fr.berliat.hskwidget.Utils
 import fr.berliat.hskwidget.core.HSKAppServices
+import fr.berliat.hskwidget.data.store.AnkiStore
+import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import hskflashcardswidget.crossplatform.generated.resources.Res
 import hskflashcardswidget.crossplatform.generated.resources.anki_must_start
 import hskflashcardswidget.crossplatform.generated.resources.anki_not_installed
@@ -17,12 +19,16 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.getString
 
-class HSKAnkiDelegate(val fragment: Fragment, handler: HandlerInterface? = null)  : AnkiDelegate(fragment, handler) {
-    private val appConfig = HSKAppServices.appPreferences
-    private var ankiStore = HSKAppServices.ankiStore
+class HSKAnkiDelegate(val activity: FragmentActivity,
+                      handler: HandlerInterface? = null,
+                      appConfig: AppPreferencesStore? = HSKAppServices.appPreferences,
+                      ankiStore: AnkiStore? = HSKAppServices.ankiStore)  : AnkiDelegate(activity, handler) {
+    // TODO FIND A WAY TO REMOVE
+    var appConfig: AppPreferencesStore? = appConfig
+    var ankiStore: AnkiStore? = ankiStore
 
     override fun onAnkiRequestPermissionsResult(granted: Boolean) {
-        appConfig.ankiSaveNotes.value = granted
+        appConfig?.ankiSaveNotes?.value = granted
         super.onAnkiRequestPermissionsResult(granted)
         if (!granted) {
             Utils.toast(Res.string.anki_permission_denied)
@@ -42,14 +48,14 @@ class HSKAnkiDelegate(val fragment: Fragment, handler: HandlerInterface? = null)
 
     override suspend fun safelyModifyAnkiDbIfAllowed(ankiDbAction: suspend () -> Result<Unit>): Result<Unit>
             = withContext(Dispatchers.IO) {
-        if (!appConfig.ankiSaveNotes.value)
+        if (!(appConfig?.ankiSaveNotes?.value ?: false))
             return@withContext Result.failure(AnkiOperationsFailures.AnkiFailure_Off)
 
         return@withContext super.safelyModifyAnkiDbIfAllowed(ankiDbAction)
     }
 
     override suspend fun ensureAnkiDroidIsRunning() = withContext(Dispatchers.IO) {
-        if (!ankiStore.isStoreReady()) {
+        if (!(ankiStore?.isStoreReady() ?: false)) {
             super.ensureAnkiDroidIsRunning()
         }
     }
@@ -83,7 +89,7 @@ class HSKAnkiDelegate(val fragment: Fragment, handler: HandlerInterface? = null)
 
     override fun onAnkiNotInstalled() {
         Utils.toast(Res.string.anki_not_installed)
-        appConfig.ankiSaveNotes.value = false
+        appConfig?.ankiSaveNotes?.value = false
 
         super.onAnkiNotInstalled()
     }

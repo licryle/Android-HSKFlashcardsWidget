@@ -12,9 +12,9 @@ import androidx.lifecycle.coroutineScope
 import androidx.navigation.fragment.findNavController
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.Utils
+import fr.berliat.hskwidget.core.HSKAppServices
 
 import fr.berliat.hskwidget.ui.screens.annotate.AnnotateScreen
-import fr.berliat.hskwidget.ui.HSKAnkiDelegate
 
 import hskflashcardswidget.crossplatform.generated.resources.Res
 import hskflashcardswidget.crossplatform.generated.resources.annotation_edit_delete_failure
@@ -28,14 +28,11 @@ import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.getString
 
 class AnnotateFragment: Fragment() {
-    private lateinit var ankiDelegate: HSKAnkiDelegate
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setActionBarTitle(getString(R.string.menu_annotate))
-
-        ankiDelegate = HSKAnkiDelegate(this)
     }
 
     private fun setActionBarTitle(title: String) {
@@ -55,7 +52,7 @@ class AnnotateFragment: Fragment() {
             setContent {
                 AnnotateScreen(
                     simplifiedWord,
-                    ankiCaller = ankiDelegate::delegateToAnki,
+                    ankiCaller = HSKAppServices.ankiDelegator,
                     onSave = { word, e -> handleSaveResult(word, ACTION.UPDATE, e)},
                     onDelete = { word, e -> handleSaveResult(word, ACTION.DELETE, e)}
                 )

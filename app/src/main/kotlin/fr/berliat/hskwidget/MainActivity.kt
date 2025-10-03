@@ -34,6 +34,7 @@ import fr.berliat.hskwidget.databinding.ActivityMainBinding
 import fr.berliat.hskwidget.domain.DatabaseDiskBackup
 import fr.berliat.hskwidget.domain.DatabaseHelper
 import fr.berliat.hskwidget.domain.getParcelableExtraCompat
+import fr.berliat.hskwidget.ui.HSKAnkiDelegate
 import fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragment
 import fr.berliat.hskwidget.ui.utils.StrictModeManager
 import fr.berliat.hskwidget.ui.widget.WidgetProvider
@@ -70,19 +71,36 @@ class MainActivity : AppCompatActivity() {
     private lateinit var supportDevStore: SupportDevStore
     private var showOCRReminder: Boolean = true
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         ExpectedUtils.init(this)
-        HSKAppServices.init(lifecycleScope)
 
+        val ankiDelegate = HSKAnkiDelegate(
+            activity = this,
+            handler = null,
+            appConfig = null,
+            ankiStore = null
+        )
+
+        HSKAppServices.init(lifecycleScope)
         // TODO: Temporary until moved to compose
-        runBlocking {
+        runBlocking(Dispatchers.Default) {
             HSKAppServices.status
-                .filter { it is AppServices.Status.Ready || it is AppServices.Status.Failed}
+                .filter { it is AppServices.Status.Ready || it is AppServices.Status.Failed }
                 .first()
         }
+
+        ankiDelegate.ankiStore = HSKAppServices.ankiStore
+        ankiDelegate.appConfig = HSKAppServices.appPreferences
+        HSKAppServices.registerAnkiDelegators(ankiDelegate)
+        runBlocking(Dispatchers.Default) {
+            HSKAppServices.status
+                .filter { it is AppServices.Status.Ready || it is AppServices.Status.Failed }
+                .first()
+        }
+
+
         appConfig = HSKAppServices.appPreferences
 
         WidgetProvider.init({ applicationContext })

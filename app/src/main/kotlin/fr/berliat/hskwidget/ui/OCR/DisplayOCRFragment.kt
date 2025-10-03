@@ -20,10 +20,8 @@ import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragmentDirections
 import fr.berliat.hskwidget.ui.screens.OCR.DisplayOCRScreen
 import fr.berliat.hskwidget.ui.screens.OCR.DisplayOCRViewModel
-import fr.berliat.hskwidget.ui.HSKAnkiDelegate
 
 class DisplayOCRFragment : Fragment(), HSKTextSegmenterListener {
-    private lateinit var ankiCaller : HSKAnkiDelegate
     private val viewModel = DisplayOCRViewModel(
         appPreferences = HSKAppServices.appPreferences,
         annotatedChineseWordDAO = HSKAppServices.database.annotatedChineseWordDAO(),
@@ -34,7 +32,6 @@ class DisplayOCRFragment : Fragment(), HSKTextSegmenterListener {
         super.onCreate(savedInstanceState)
 
         val mainApp = requireActivity() as MainActivity
-        ankiCaller = HSKAnkiDelegate(this)
 
         if (requireActivity().javaClass.simpleName == "MainActivity") {
             mainApp.setOCRReminderVisible()
@@ -52,7 +49,7 @@ class DisplayOCRFragment : Fragment(), HSKTextSegmenterListener {
         return ComposeView(requireContext()).apply {
             setContent {
                 DisplayOCRScreen(
-                    ankiCaller = ankiCaller::delegateToAnki,
+                    ankiCaller = HSKAppServices.ankiDelegator,
                     viewModel = viewModel,
                     onFavoriteClick = { word -> onFavoriteClick(word) },
                     onClickOCRAdd = {

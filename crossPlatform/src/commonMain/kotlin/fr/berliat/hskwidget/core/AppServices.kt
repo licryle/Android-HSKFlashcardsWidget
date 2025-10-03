@@ -5,12 +5,17 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
+data class FactoryEntry(
+    val priority: Int,
+    val factory: suspend () -> Any
+)
+
 open class AppServices {
     private val _status = MutableStateFlow<Status>(Status.NotReady)
     val status: StateFlow<Status> = _status.asStateFlow()
 
     // Internal backing map for service factories and instances
-    private val factories = mutableMapOf<String, suspend () -> Any>()
+    private val factories = mutableMapOf<String, FactoryEntry>()
     private val instances = mutableMapOf<String, Any>()
     private val mutex = Mutex()
 
@@ -23,8 +28,11 @@ open class AppServices {
     /**
      * Register a service factory.
      */
-    protected fun <T : Any> register(name: String, factory: suspend () -> T) {
-        factories[name] = factory
+    fun <T : Any> register(name: String, priority: Int = 2, factory: suspend () -> T) {
+        if (factories.containsKey(name)) throw Exception("Service $name Already registered")
+
+        factories[name] = FactoryEntry(priority, factory)
+        _status.value = Status.NotReady
     }
 
     /**
@@ -33,12 +41,16 @@ open class AppServices {
     open fun init(scope: CoroutineScope) {
         scope.launch(Dispatchers.IO) {
             try {
-                factories.forEach { (name, factory) ->
-                    val instance = factory()
-                    mutex.withLock {
-                        instances[name] = instance
+                factories.entries
+                    .sortedBy { it.value.priority } // highest first
+                    .forEach { (name, entry) ->
+                        if (!instances.containsKey(name)) {
+                            val instance = entry.factory()
+                            mutex.withLock {
+                                instances[name] = instance
+                            }
+                        }
                     }
-                }
                 _status.value = Status.Ready
             } catch (t: Throwable) {
                 _status.value = Status.Failed(t)
@@ -47,7 +59,11 @@ open class AppServices {
         }
     }
 
-    protected fun <T: Any> getAnyway(name: String): T {
+    fun isRegistered(name: String): Boolean {
+        return instances[name] != null
+    }
+
+    fun <T: Any> getAnyway(name: String): T {
         return instances[name] as? T
             ?: throw IllegalArgumentException("No service registered with name $name")
     }

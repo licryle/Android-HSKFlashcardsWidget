@@ -12,7 +12,7 @@ import fr.berliat.hskwidget.ui.screens.config.backupDisk.BackupDiskViewModel
 
 class ConfigViewModel(
     appConfig: AppPreferencesStore = HSKAppServices.appPreferences,
-    ankiDelegate: KAnkiServiceDelegator,
+    ankiDelegate: KAnkiServiceDelegator = HSKAppServices.ankiServiceDelegator,
     gDriveBackup: GoogleDriveBackup
 ): ViewModel() {
     val backupDiskViewModel = BackupDiskViewModel()

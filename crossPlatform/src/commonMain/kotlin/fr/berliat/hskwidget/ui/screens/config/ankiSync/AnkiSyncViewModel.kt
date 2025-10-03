@@ -18,7 +18,7 @@ enum class SyncState {
 class SyncProgress(val state: SyncState, val current: Int, val total: Int, val message: String)
 
 expect class AnkiSyncViewModel(
-    ankiDelegate: KAnkiServiceDelegator,
+    ankiDelegate: KAnkiServiceDelegator = HSKAppServices.ankiServiceDelegator,
     appConfig: AppPreferencesStore = HSKAppServices.appPreferences
 ) {
     val isAvailableOnThisPlatform: Boolean
