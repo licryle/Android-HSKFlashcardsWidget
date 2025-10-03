@@ -9,6 +9,7 @@ import fr.berliat.hskwidget.data.repo.WordListRepository
 import fr.berliat.hskwidget.data.store.AnkiStore
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
+import fr.berliat.hskwidget.data.store.GoogleDriveBackup
 import fr.berliat.hskwidget.data.store.WidgetPreferencesStore
 import fr.berliat.hskwidget.data.store.WidgetPreferencesStoreProvider
 import fr.berliat.hskwidget.domain.DatabaseHelper
@@ -61,8 +62,15 @@ object HSKAppServices : AppServices() {
     }
 
     fun registerAnkiDelegators(ankiDelegate: AnkiDelegate) {
-        register("ankiDelegate") { ankiDelegate::delegateToAnki }
-        register("ankiServiceDelegate") { ankiDelegate::delegateToAnkiService }
+        register("ankiDelegate") { ankiDelegate }
+        register("ankiDelegator") { ankiDelegate::delegateToAnki }
+        register("ankiServiceDelegator") { ankiDelegate::delegateToAnkiService }
+
+        super.init(getAnyway("appScope"))
+    }
+
+    fun registerGoogleBackup(gDrive: GoogleDriveBackup) {
+        register("gDriveBackup") { gDrive }
 
         super.init(getAnyway("appScope"))
     }
@@ -76,9 +84,11 @@ object HSKAppServices : AppServices() {
     val widgetsPreferencesProvider: WidgetPreferencesStoreProvider get() = get("widgetsPreferencesProvider")
     val ankiStore: AnkiStore get() = get("ankiStore")
 
-    val ankiDelegator: KAnkiDelegator get() = get("ankiDelegate")
-    val ankiServiceDelegator: KAnkiServiceDelegator get() = get("ankiServiceDelegate")
+    val ankiDelegate: AnkiDelegate get() = get("ankiDelegate")
+    val ankiDelegator: KAnkiDelegator get() = get("ankiDelegator")
+    val ankiServiceDelegator: KAnkiServiceDelegator get() = get("ankiServiceDelegator")
     val wordListRepo: WordListRepository get() = get("wordListRepo")
     val HSKSegmenter: HSKTextSegmenter get() = get("HSKSegmenter")
+    val gDriveBackup: GoogleDriveBackup get() = get("gDriveBackup")
 }
 

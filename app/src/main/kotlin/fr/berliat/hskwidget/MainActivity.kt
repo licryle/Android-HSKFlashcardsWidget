@@ -29,6 +29,7 @@ import fr.berliat.hskwidget.ExpectedUtils.INTENT_SEARCH_WORD
 import fr.berliat.hskwidget.core.AppServices
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
+import fr.berliat.hskwidget.data.store.GoogleDriveBackup
 import fr.berliat.hskwidget.data.store.SupportDevStore
 import fr.berliat.hskwidget.databinding.ActivityMainBinding
 import fr.berliat.hskwidget.domain.DatabaseDiskBackup
@@ -94,6 +95,7 @@ class MainActivity : AppCompatActivity() {
         ankiDelegate.ankiStore = HSKAppServices.ankiStore
         ankiDelegate.appConfig = HSKAppServices.appPreferences
         HSKAppServices.registerAnkiDelegators(ankiDelegate)
+        HSKAppServices.registerGoogleBackup(GoogleDriveBackup(this, getString(R.string.app_name)))
         runBlocking(Dispatchers.Default) {
             HSKAppServices.status
                 .filter { it is AppServices.Status.Ready || it is AppServices.Status.Failed }

@@ -6,24 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
-import fr.berliat.hskwidget.R
-import fr.berliat.hskwidget.data.store.GoogleDriveBackup
+import fr.berliat.hskwidget.core.HSKAppServices
 
 import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.ui.screens.config.ConfigScreen
 import fr.berliat.hskwidget.ui.screens.config.ConfigViewModel
-import fr.berliat.hskwidget.ui.HSKAnkiDelegate
 
 class ConfigFragment : Fragment() {
-    private lateinit var ankiDelegate: HSKAnkiDelegate
-    private lateinit var gDriveBackup: GoogleDriveBackup
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        gDriveBackup = GoogleDriveBackup(this, requireActivity(), getString(R.string.app_name))
-        ankiDelegate = HSKAnkiDelegate(requireActivity())
-    }
-
     override fun onResume() {
         super.onResume()
 
@@ -35,9 +24,10 @@ class ConfigFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        val ankiDelegate = HSKAppServices.ankiDelegate
         val viewModel = ConfigViewModel(
             ankiDelegate = ankiDelegate::delegateToAnkiService,
-            gDriveBackup = gDriveBackup
+            gDriveBackup = HSKAppServices.gDriveBackup
         )
         ankiDelegate.replaceListener(viewModel.ankiSyncViewModel)
 

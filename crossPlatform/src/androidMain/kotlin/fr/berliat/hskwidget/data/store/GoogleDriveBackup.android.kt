@@ -1,7 +1,6 @@
 package fr.berliat.hskwidget.data.store
 
-import androidx.activity.ComponentActivity
-import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import fr.berliat.googledrivebackup.GoogleDriveBackup
 import kotlinx.coroutines.flow.StateFlow
 
@@ -16,9 +15,8 @@ actual typealias UploadFile = fr.berliat.googledrivebackup.GoogleDriveBackupFile
 actual typealias File = com.google.api.services.drive.model.File
 actual typealias Account = android.accounts.Account
 
-actual class GoogleDriveBackup(val fragment: Fragment, val activity: ComponentActivity, val appName: String) {
+actual class GoogleDriveBackup(val activity: FragmentActivity, val appName: String) {
     private val gDriveBackup = GoogleDriveBackup(
-        fragment = fragment,
         activity = activity,
         appName = appName
     )
