@@ -27,7 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 
-import fr.berliat.hskwidget.KAnkiDelegator
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.model.WordListWithCount
@@ -44,14 +43,14 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun WordListSelectionDialog(
-    ankiCaller: KAnkiDelegator,
     word: ChineseWord,
     onDismiss: () -> Unit,
     onSaved: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: WordListViewModel = remember {
+        WordListViewModel(HSKAppServices.wordListRepo, HSKAppServices.ankiDelegator)
+    }
 ) {
-    val viewModel = remember(ankiCaller) { WordListViewModel(HSKAppServices.wordListRepo, ankiCaller) }
-
     val allLists by viewModel.userLists.collectAsState()
     val shouldDismiss by viewModel.dismiss.collectAsState()
     var showCreateDialog by remember { mutableStateOf(false) }
@@ -59,8 +58,9 @@ fun WordListSelectionDialog(
     val selectedWordListIds = remember { mutableStateOf(setOf<Long>()) }
     var status by remember { mutableStateOf(WordListViewModel.Status.STARTING) }
 
-    if (shouldDismiss) onDismiss()
-
+    if (shouldDismiss) {
+        LaunchedEffect(Unit) { onDismiss() }
+    }
 
     LaunchedEffect(viewModel) {
         viewModel.status.collect { st ->

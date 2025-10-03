@@ -49,10 +49,12 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun WidgetConfigWithPreviewScreen(
     widgetId: Int,
-    expectsActivityResult: Boolean = false,
     onSuccessfulSave : () -> Unit,
-    viewModel: WidgetConfigViewModel = remember(widgetId) { WidgetConfigViewModel(widgetId, onSuccessfulSave = onSuccessfulSave) },
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    expectsActivityResult: Boolean = false,
+    viewModel: WidgetConfigViewModel = remember(widgetId) {
+        WidgetConfigViewModel(widgetId, onSuccessfulSave = onSuccessfulSave)
+    }
 ) {
     Column(
         modifier = modifier
@@ -78,10 +80,12 @@ fun WidgetConfigWithPreviewScreen(
 @Composable
 fun WidgetConfigScreen(
     widgetId: Int,
-    expectsActivityResult: Boolean = false,
     onSuccessfulSave : () -> Unit,
-    viewModel: WidgetConfigViewModel = remember(widgetId) { WidgetConfigViewModel(widgetId, onSuccessfulSave = onSuccessfulSave) },
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    expectsActivityResult: Boolean = false,
+    viewModel: WidgetConfigViewModel = remember(widgetId) {
+        WidgetConfigViewModel(widgetId, onSuccessfulSave = onSuccessfulSave)
+    }
 ) {
     val allLists = viewModel.allLists.collectAsState()
     val selectedIds = viewModel.selectedListIds.collectAsState()

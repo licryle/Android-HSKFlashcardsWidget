@@ -29,7 +29,6 @@ import fr.berliat.hsktextviews.HSKTextSegmenter
 import fr.berliat.hsktextviews.views.HSKTextView
 import fr.berliat.hsktextviews.views.ShowPinyins
 
-import fr.berliat.hskwidget.KAnkiDelegator
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWord
@@ -60,7 +59,6 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun DisplayOCRScreen(
-    ankiCaller : KAnkiDelegator,
     modifier: Modifier = Modifier,
     viewModel: DisplayOCRViewModel = remember { DisplayOCRViewModel(
         appPreferences = HSKAppServices.appPreferences,
@@ -126,7 +124,6 @@ fun DisplayOCRScreen(
         var showWordListDialog by remember { mutableStateOf<ChineseWord?>(null) }
         showWordListDialog?.let { word ->
             WordListSelectionDialog(
-                ankiCaller = ankiCaller,
                 word = word,
                 onDismiss = { showWordListDialog = null },
                 onSaved = { showWordListDialog = null }

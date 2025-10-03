@@ -18,6 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.model.WordList
 
 import hskflashcardswidget.crossplatform.generated.resources.Res
@@ -32,13 +33,15 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun WordListCreateRenameDialog(
-    viewModel: WordListViewModel,
     list: WordList? = null,
     onSuccess: () -> Unit,
     onCancel: () -> Unit,
+    modifier: Modifier = Modifier,
     onError: () -> Unit = {},
     defaultName: String = "",
-    modifier: Modifier = Modifier
+    viewModel: WordListViewModel = remember {
+        WordListViewModel(HSKAppServices.wordListRepo, HSKAppServices.ankiDelegator)
+    }
 ) {
     var listName by remember { mutableStateOf(defaultName) }
     val error = remember { mutableStateOf<String?>(null) }

@@ -50,7 +50,7 @@ private const val TAG = "CaptureImageScreen"
 @Composable
 fun CaptureImageScreen(
     modifier: Modifier = Modifier,
-    viewModel: CaptureImageViewModel = CaptureImageViewModel {}
+    viewModel: CaptureImageViewModel = remember { CaptureImageViewModel{ } }
 ) {
     val isProcessing by viewModel.isProcessing.collectAsState()
 

@@ -30,7 +30,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
-import fr.berliat.hskwidget.KAnkiDelegator
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.ui.components.DetailedWordView
@@ -51,7 +50,6 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun DictionarySearchScreen(
-    ankiCaller : KAnkiDelegator,
     onAnnotate: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: DictionaryViewModel = remember { DictionaryViewModel(
@@ -74,7 +72,6 @@ fun DictionarySearchScreen(
 
     showWordListDialog?.let {
         WordListSelectionDialog(
-            ankiCaller = ankiCaller,
             word = it,
             onDismiss = { showWordListDialog = null },
             onSaved = {

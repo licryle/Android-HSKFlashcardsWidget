@@ -5,13 +5,13 @@ import androidx.lifecycle.viewModelScope
 
 import fr.berliat.hskwidget.KAnkiDelegator
 import fr.berliat.hskwidget.Utils
+import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.model.WordList
 import fr.berliat.hskwidget.data.model.WordListWithCount
 import fr.berliat.hskwidget.data.repo.WordListRepository
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,8 +20,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class WordListViewModel(
-    private val repo: WordListRepository,
-    private val ankiCaller: KAnkiDelegator
+    private val repo: WordListRepository = HSKAppServices.wordListRepo,
+    private val ankiCaller: KAnkiDelegator = HSKAppServices.ankiDelegator
 ) : ViewModel() {
     private val _allLists = MutableStateFlow<List<WordListWithCount>>(emptyList())
     val allLists: StateFlow<List<WordListWithCount>> = _allLists

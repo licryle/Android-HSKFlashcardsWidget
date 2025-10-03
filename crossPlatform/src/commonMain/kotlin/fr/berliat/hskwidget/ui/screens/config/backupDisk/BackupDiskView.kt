@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import fr.berliat.hskwidget.core.HSKAppServices
 
 import fr.berliat.hskwidget.ui.components.IconButton
 
@@ -55,8 +56,8 @@ import org.jetbrains.compose.resources.vectorResource
 
 @Composable
 fun BackupDiskView(
-    viewModel: BackupDiskViewModel,
     modifier: Modifier = Modifier,
+    viewModel: BackupDiskViewModel = remember { BackupDiskViewModel(HSKAppServices.appPreferences) }
     ) {
     val backupDiskActive by viewModel.backupDiskActive.collectAsState()
     val backupDiskFolder by viewModel.backupDiskFolder.collectAsState()

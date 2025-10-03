@@ -51,9 +51,9 @@ fun AnnotateScreen(
     onSave: (String, Exception?) -> Unit,
     onDelete: (String, Exception?) -> Unit,
     ankiCaller : KAnkiDelegator,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: AnnotateViewModel = remember { AnnotateViewModel(ankiCaller = ankiCaller) }
 ) {
-    val viewModel = remember { AnnotateViewModel(ankiCaller = ankiCaller) }
 
     val annotatedWord by viewModel.annotatedWord.collectAsState()
 

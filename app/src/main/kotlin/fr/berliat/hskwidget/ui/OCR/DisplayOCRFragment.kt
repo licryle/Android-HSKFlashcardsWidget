@@ -49,7 +49,6 @@ class DisplayOCRFragment : Fragment(), HSKTextSegmenterListener {
         return ComposeView(requireContext()).apply {
             setContent {
                 DisplayOCRScreen(
-                    ankiCaller = HSKAppServices.ankiDelegator,
                     viewModel = viewModel,
                     onFavoriteClick = { word -> onFavoriteClick(word) },
                     onClickOCRAdd = {

@@ -8,7 +8,6 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.ui.screens.about.AboutScreen
-import fr.berliat.hskwidget.ui.screens.about.AboutViewModel
 
 class AboutFragment : Fragment() {
     override fun onCreateView(
@@ -19,7 +18,7 @@ class AboutFragment : Fragment() {
 
         return ComposeView(requireContext()).apply {
             setContent {
-                AboutScreen(AboutViewModel()) // Works now
+                AboutScreen()
             }
         }
     }

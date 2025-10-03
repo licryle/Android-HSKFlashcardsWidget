@@ -10,11 +10,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 import fr.berliat.hskwidget.YYMMDDHHMMSS
+import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.fromKBToMB
 import fr.berliat.hskwidget.ui.components.ConfirmDialog
 import fr.berliat.hskwidget.ui.components.IconButton
@@ -57,8 +59,11 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun BackupCloudView(
-    viewModel: BackupCloudViewModel,
     modifier: Modifier = Modifier,
+    viewModel: BackupCloudViewModel = remember { BackupCloudViewModel(
+        HSKAppServices.appPreferences,
+        HSKAppServices.gDriveBackup
+    ) }
 ) {
     val lastCloudUpdate = viewModel.cloudLastBackup.collectAsState()
     val busy = viewModel.isBusy.collectAsState()

@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
@@ -39,7 +40,10 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun AboutScreen(viewModel: AboutViewModel) {
+fun AboutScreen(
+    modifier: Modifier = Modifier,
+    viewModel: AboutViewModel = remember { AboutViewModel() }
+) {
     val stats by viewModel.stats.collectAsState()
     val scrollState = rememberScrollState()
 
