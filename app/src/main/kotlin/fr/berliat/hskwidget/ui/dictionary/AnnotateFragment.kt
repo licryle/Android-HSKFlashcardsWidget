@@ -12,7 +12,6 @@ import androidx.lifecycle.coroutineScope
 import androidx.navigation.fragment.findNavController
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.Utils
-import fr.berliat.hskwidget.core.HSKAppServices
 
 import fr.berliat.hskwidget.ui.screens.annotate.AnnotateScreen
 
@@ -52,7 +51,6 @@ class AnnotateFragment: Fragment() {
             setContent {
                 AnnotateScreen(
                     simplifiedWord,
-                    ankiCaller = HSKAppServices.ankiDelegator,
                     onSave = { word, e -> handleSaveResult(word, ACTION.UPDATE, e)},
                     onDelete = { word, e -> handleSaveResult(word, ACTION.DELETE, e)}
                 )

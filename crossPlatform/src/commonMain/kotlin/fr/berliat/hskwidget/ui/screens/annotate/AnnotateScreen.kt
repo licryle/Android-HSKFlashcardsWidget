@@ -23,7 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import fr.berliat.hskwidget.KAnkiDelegator
+import fr.berliat.hskwidget.core.HSKAppServices
 
 import fr.berliat.hskwidget.data.type.ClassLevel
 import fr.berliat.hskwidget.data.type.ClassType
@@ -50,9 +50,13 @@ fun AnnotateScreen(
     word: String,
     onSave: (String, Exception?) -> Unit,
     onDelete: (String, Exception?) -> Unit,
-    ankiCaller : KAnkiDelegator,
     modifier: Modifier = Modifier,
-    viewModel: AnnotateViewModel = remember { AnnotateViewModel(ankiCaller = ankiCaller) }
+    viewModel: AnnotateViewModel = remember { AnnotateViewModel(
+        prefsStore = HSKAppServices.appPreferences,
+        database = HSKAppServices.database,
+        wordListRepo = HSKAppServices.wordListRepo,
+        ankiCaller = HSKAppServices.ankiDelegator
+    ) }
 ) {
 
     val annotatedWord by viewModel.annotatedWord.collectAsState()
