@@ -42,7 +42,7 @@ import org.jetbrains.compose.resources.stringResource
 fun AnkiSyncView(
     modifier: Modifier = Modifier,
     viewModel: AnkiSyncViewModel = remember {
-        AnkiSyncViewModel(HSKAppServices.ankiServiceDelegator,
+        AnkiSyncViewModel(HSKAppServices.ankiDelegate,
             HSKAppServices.appPreferences) }
     ) {
     if (!viewModel.isAvailableOnThisPlatform) return

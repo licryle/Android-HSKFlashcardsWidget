@@ -13,7 +13,7 @@ import fr.berliat.hskwidget.ui.screens.config.backupDisk.BackupDiskView
 fun ConfigScreen(
     viewModel: ConfigViewModel = remember { ConfigViewModel(
         appConfig = HSKAppServices.appPreferences,
-        ankiDelegate = HSKAppServices.ankiServiceDelegator,
+        ankiDelegate = HSKAppServices.ankiDelegate,
         gDriveBackup = HSKAppServices.gDriveBackup
     ) }
 ) {

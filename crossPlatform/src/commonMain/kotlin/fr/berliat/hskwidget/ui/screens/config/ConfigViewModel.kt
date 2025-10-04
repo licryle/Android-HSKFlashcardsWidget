@@ -1,6 +1,7 @@
 package fr.berliat.hskwidget.ui.screens.config
 
 import androidx.lifecycle.ViewModel
+import fr.berliat.ankidroidhelper.AnkiDelegate
 
 import fr.berliat.hskwidget.KAnkiServiceDelegator
 import fr.berliat.hskwidget.core.HSKAppServices
@@ -12,7 +13,7 @@ import fr.berliat.hskwidget.ui.screens.config.backupDisk.BackupDiskViewModel
 
 class ConfigViewModel(
     appConfig: AppPreferencesStore = HSKAppServices.appPreferences,
-    ankiDelegate: KAnkiServiceDelegator = HSKAppServices.ankiServiceDelegator,
+    ankiDelegate: AnkiDelegate = HSKAppServices.ankiDelegate,
     gDriveBackup: GoogleDriveBackup
 ): ViewModel() {
     val backupDiskViewModel = BackupDiskViewModel()

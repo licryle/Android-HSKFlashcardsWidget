@@ -4,11 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 
 import co.touchlab.kermit.Logger
-
 import fr.berliat.ankidroidhelper.AnkiDelegate
 import fr.berliat.ankidroidhelper.AnkiSyncServiceDelegate
 import fr.berliat.hskwidget.ExpectedUtils.requestPermissionNotification
-import fr.berliat.hskwidget.KAnkiServiceDelegator
 import fr.berliat.hskwidget.Utils
 import fr.berliat.hskwidget.YYMMDDHHMMSS
 import fr.berliat.hskwidget.core.HSKAppServices
@@ -21,7 +19,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 
 actual class AnkiSyncViewModel actual constructor(
-    val ankiDelegate: KAnkiServiceDelegator,
+    val ankiDelegate: AnkiDelegate,
     val appConfig: AppPreferencesStore)
     : ViewModel(), AnkiDelegate.HandlerInterface {
     actual val isAvailableOnThisPlatform = true
@@ -32,6 +30,10 @@ actual class AnkiSyncViewModel actual constructor(
     actual val syncProgress: StateFlow<SyncProgress> = _syncProgress.asStateFlow()
 
     var ankiSyncServiceDelegate: AnkiSyncServiceDelegate? = null
+
+    init {
+        ankiDelegate.replaceListener(this)
+    }
 
     override fun onAnkiOperationSuccess() {
         Logger.i(tag = TAG, messageString = "onAnkiOperationSuccess: completed full import into Anki")
@@ -105,7 +107,7 @@ actual class AnkiSyncViewModel actual constructor(
 
     private fun importsAllNotesToAnkiDroid() {
         viewModelScope.launch {
-            ankiDelegate.invoke(HSKAppServices.wordListRepo.syncListsToAnki())
+            ankiDelegate.delegateToAnkiService(HSKAppServices.wordListRepo.syncListsToAnki())
         }
     }
 
