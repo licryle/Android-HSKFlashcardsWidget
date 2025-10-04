@@ -1,6 +1,7 @@
 package fr.berliat.hskwidget.ui.application.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -27,8 +28,11 @@ fun AppNavHost(modifier: Modifier = Modifier,
 
     NavHost(navController = navController, startDestination = Screen.Dictionary()) {
         composable<Screen.Dictionary> { backStackEntry ->
-            val args = backStackEntry.toRoute<Screen.Dictionary>()
-            prefsStore.searchQuery.value = SearchQuery.fromString(args.search)
+            LaunchedEffect(backStackEntry) {
+                val args = backStackEntry.toRoute<Screen.Dictionary>()
+                prefsStore.searchQuery.value = SearchQuery.fromString(args.search)
+            }
+
             DictionarySearchScreen(
                 onAnnotate = { word ->
                     navController.navigate(Screen.Annotate)

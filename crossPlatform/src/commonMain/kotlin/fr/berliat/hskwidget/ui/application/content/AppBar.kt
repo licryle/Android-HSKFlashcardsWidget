@@ -1,5 +1,6 @@
 package fr.berliat.hskwidget.ui.application.content
 
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -11,8 +12,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 
@@ -33,31 +35,41 @@ fun AppBar(
     onMenuClick: () -> Unit,
     viewModel: AppBarViewModel = remember { AppBarViewModel() }
 ) {
-    val searchQuery by viewModel.searchQuery.collectAsState()
+    val searchQuery = viewModel.searchQuery.collectAsState("")
+    val localText = remember { mutableStateOf(searchQuery.value.toString()) }
 
-    fun onValueChange(s: String) {
-        viewModel.updateSearchQuery(s)
-        onSearch(s)
+    // Update localText only if different from current user input
+    LaunchedEffect(searchQuery.value) {
+        if (localText.value != searchQuery.value.toString()) {
+            localText.value = searchQuery.value.toString()
+        }
+    }
+
+    fun onValueChange(newValue: String) {
+        localText.value = newValue
+        onSearch(newValue)
     }
 
     TopAppBar(
         title = {
-            Text(title)
+            Row {
+                Text(title)
 
-            TextField(
-                value = searchQuery,
-                onValueChange = { onValueChange(it) },
-                placeholder = { Text(stringResource(Res.string.search_hint)) },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                trailingIcon = {
-                    if (searchQuery.isNotEmpty()) {
-                        IconButton(onClick = { onValueChange("") }) {
-                            Icon(Icons.Default.Close, contentDescription = "Clear text")
+                TextField(
+                    value = localText.value,
+                    onValueChange = { onValueChange(it) },
+                    placeholder = { Text(stringResource(Res.string.search_hint)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    trailingIcon = {
+                        if (localText.value.isNotEmpty()) {
+                            IconButton(onClick = { onValueChange("") }) {
+                                Icon(Icons.Default.Close, contentDescription = "Clear text")
+                            }
                         }
                     }
-                }
-            )
+                )
+            }
         },
         navigationIcon = {
             IconButton(onClick = onMenuClick) {
