@@ -35,7 +35,7 @@ fun AppNavHost(modifier: Modifier = Modifier,
 
             DictionarySearchScreen(
                 onAnnotate = { word ->
-                    navController.navigate(Screen.Annotate)
+                    navController.navigate(Screen.Annotate(word))
                 }
             )
         }
@@ -80,8 +80,8 @@ fun AppNavHost(modifier: Modifier = Modifier,
             val args = backStackEntry.toRoute<Screen.Annotate>()
             AnnotateScreen(
                 word = args.simplifiedWord,
-                onSave = { s: String, e: Exception? -> navController.popBackStack() },
-                onDelete = { s: String, e: Exception? -> navController.popBackStack() },
+                onSaveSuccess = { navController.popBackStack() },
+                onDeleteSuccess = { navController.popBackStack() },
             )
         }
 
