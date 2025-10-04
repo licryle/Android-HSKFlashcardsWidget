@@ -20,6 +20,7 @@ import fr.berliat.hskwidget.ui.screens.dictionary.DictionarySearchScreen
 import fr.berliat.hskwidget.ui.screens.widget.WidgetsListScreen
 import fr.berliat.hskwidget.ui.screens.wordlist.WordListScreen
 import io.github.vinceglb.filekit.PlatformFile
+import io.github.vinceglb.filekit.exists
 import io.github.vinceglb.filekit.path
 
 @Composable
@@ -39,6 +40,15 @@ fun AppNavHost(modifier: Modifier = Modifier,
                 onAnnotate = { word ->
                     navController.navigate(Screen.Annotate(word))
                 }
+            )
+        }
+
+        composable<Screen.Annotate> { backStackEntry ->
+            val args = backStackEntry.toRoute<Screen.Annotate>()
+            AnnotateScreen(
+                word = args.simplifiedWord,
+                onSaveSuccess = { navController.popBackStack() },
+                onDeleteSuccess = { navController.popBackStack() },
             )
         }
 
@@ -86,19 +96,21 @@ fun AppNavHost(modifier: Modifier = Modifier,
             })
         }
 
-        composable<Screen.Annotate> { backStackEntry ->
-            val args = backStackEntry.toRoute<Screen.Annotate>()
-            AnnotateScreen(
-                word = args.simplifiedWord,
-                onSaveSuccess = { navController.popBackStack() },
-                onDeleteSuccess = { navController.popBackStack() },
-            )
-        }
-
         composable<Screen.OCRDisplay> { backStackEntry ->
             val args = backStackEntry.toRoute<Screen.OCRDisplay>()
-            val preText = args.preText
+            val imageFile = args.imageFilePath?.let {
+                val f = PlatformFile(it)
+                if (f.exists()) {
+                    f
+                } else {
+                    null
+                }
+            }
             DisplayOCRScreen(
+                preText = args.preText,
+                imageFile = imageFile,
+                onFavoriteClick = { word -> navController.navigate(Screen.Annotate(word.simplified)) },
+                onClickOCRAdd = { preText -> navController.navigate(Screen.OCRCapture(preText)) }
             )
         }
     }

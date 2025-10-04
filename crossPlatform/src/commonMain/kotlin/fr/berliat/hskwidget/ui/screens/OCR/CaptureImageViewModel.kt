@@ -25,6 +25,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 
 class CaptureImageViewModel(
@@ -44,7 +45,9 @@ class CaptureImageViewModel(
             viewModelScope.launch(Dispatchers.IO) {
                 when (val result = it.takePicture()) {
                     is ImageCaptureResult.Success -> {
-                        val file = FileKit.cacheDir / "Photo_${Clock.System.now().YYMMDDHHMMSS().toSafeFileName()}.jpg"
+                        val file = FileKit.cacheDir / "Photo_${
+                            Clock.System.now().YYMMDDHHMMSS().toSafeFileName()
+                        }.jpg"
 
                         try {
                             file.write(result.byteArray)
@@ -54,7 +57,9 @@ class CaptureImageViewModel(
                             _isProcessing.value = false
                         }
 
-                        onImageReady(file)
+                        withContext(Dispatchers.Main) {
+                            onImageReady(file)
+                        }
                     }
 
                     is ImageCaptureResult.Error -> {

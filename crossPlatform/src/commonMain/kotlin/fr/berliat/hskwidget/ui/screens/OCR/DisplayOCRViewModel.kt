@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 
 import co.touchlab.kermit.Logger
 
+import fr.berliat.hsktextviews.HSKTextSegmenter
 import fr.berliat.hskwidget.Utils
 import fr.berliat.hskwidget.core.HSKOCR
 import fr.berliat.hskwidget.data.dao.AnnotatedChineseWordDAO
@@ -21,8 +22,10 @@ import hskflashcardswidget.crossplatform.generated.resources.ocr_display_ocr_fai
 import hskflashcardswidget.crossplatform.generated.resources.ocr_display_smallest_text
 import hskflashcardswidget.crossplatform.generated.resources.ocr_display_word_not_found
 
+import io.github.vinceglb.filekit.PlatformFile
+
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -31,10 +34,13 @@ import kotlinx.coroutines.withContext
 
 import org.jetbrains.compose.resources.StringResource
 
+import kotlin.time.Duration.Companion.milliseconds
+
 class DisplayOCRViewModel(
     private val appPreferences: AppPreferencesStore,
     private val annotatedChineseWordDAO: AnnotatedChineseWordDAO,
-                chineseWordFrequencyDAO: ChineseWordFrequencyDAO) : ViewModel() {
+                chineseWordFrequencyDAO: ChineseWordFrequencyDAO,
+    private val segmenter : HSKTextSegmenter) : ViewModel() {
     private val frequencyWordsRepo: ChineseWordFrequencyRepo = ChineseWordFrequencyRepo(
                 chineseWordFrequencyDAO,
                 annotatedChineseWordDAO
@@ -61,7 +67,28 @@ class DisplayOCRViewModel(
     private val _isProcessing = MutableStateFlow(false)
     val isProcessing: StateFlow<Boolean> = _isProcessing
 
+    private val _isSegmenterReady = MutableStateFlow(false)
+    val isSegmenterReady: StateFlow<Boolean> = _isSegmenterReady
+
     val wordSeparator = WORD_SEPARATOR
+
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            selectedWord.value?.let {
+                fetchWordForDisplay(it.simplified)
+            }
+
+            while (!segmenter.isReady()) {
+                // Do something repeatedly
+                println("Still waiting for segmenter to come online")
+
+                // Wait before checking again (important — don’t busy loop!)
+                delay(100.milliseconds)
+            }
+
+            _isSegmenterReady.value = true
+        }
+    }
 
     fun resetText() {
         _text.value = ""
@@ -146,11 +173,11 @@ class DisplayOCRViewModel(
         Utils.copyToClipBoard(word.simplified)
     }
 
-    fun voiceInBackground(word: AnnotatedChineseWord) {
+    fun speakWord(word: AnnotatedChineseWord) {
         Utils.playWordInBackground(word.simplified)
     }
 
-    fun recognizeText(imagePath: String) {
+    fun recognizeText(imagePath: PlatformFile) {
         viewModelScope.launch(Dispatchers.IO) {
             HSKOCR().process(imagePath, { text ->
                 Logger.d(tag = TAG, messageString = "Recognized text: $text")

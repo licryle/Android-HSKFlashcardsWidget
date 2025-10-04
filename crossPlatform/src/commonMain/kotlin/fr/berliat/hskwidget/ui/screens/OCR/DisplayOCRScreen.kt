@@ -15,6 +15,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -28,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import fr.berliat.hsktextviews.HSKTextSegmenter
 import fr.berliat.hsktextviews.views.HSKTextView
 import fr.berliat.hsktextviews.views.ShowPinyins
+import fr.berliat.hskwidget.Utils
 
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
@@ -53,6 +55,7 @@ import hskflashcardswidget.crossplatform.generated.resources.ocr_display_text_se
 import hskflashcardswidget.crossplatform.generated.resources.photo_camera_24px
 import hskflashcardswidget.crossplatform.generated.resources.text_decrease_24px
 import hskflashcardswidget.crossplatform.generated.resources.text_increase_24px
+import io.github.vinceglb.filekit.PlatformFile
 
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -63,13 +66,31 @@ fun DisplayOCRScreen(
     viewModel: DisplayOCRViewModel = remember { DisplayOCRViewModel(
         appPreferences = HSKAppServices.appPreferences,
         annotatedChineseWordDAO = HSKAppServices.database.annotatedChineseWordDAO(),
-        chineseWordFrequencyDAO = HSKAppServices.database.chineseWordFrequencyDAO()
+        chineseWordFrequencyDAO = HSKAppServices.database.chineseWordFrequencyDAO(),
+        segmenter = HSKAppServices.HSKSegmenter
     ) },
     segmenter : HSKTextSegmenter = HSKAppServices.HSKSegmenter,
     appConfig : AppPreferencesStore = HSKAppServices.appPreferences,
-    onClickOCRAdd : () -> Unit = {},
+    imageFile: PlatformFile? = null,
+    preText: String = "",
+    onClickOCRAdd : (String) -> Unit = {},
     onFavoriteClick : (AnnotatedChineseWord) -> Unit = {}
 ) {
+    val isSegmenterReady by viewModel.isSegmenterReady.collectAsState()
+    LaunchedEffect(preText) {
+        viewModel.setText(preText)
+    }
+
+    LaunchedEffect(isSegmenterReady, imageFile) {
+        if (isSegmenterReady && imageFile != null) {
+            viewModel.recognizeText(imageFile)
+        }
+    }
+
+    if (isSegmenterReady && imageFile == null && preText == "") {
+        Utils.toast("Oops - nothing to display")
+    }
+
     Column (modifier = modifier) {
         val separatorEnabled by viewModel.separatorEnabled.collectAsState()
         val showPinyins by viewModel.showPinyins.collectAsState()
@@ -91,7 +112,7 @@ fun DisplayOCRScreen(
                         error = Error(err)
                     )
                 } else {
-                    val text by viewModel.text.collectAsState("")
+                    val text by viewModel.text.collectAsState(preText)
                     val clickedWords by viewModel.clickedWords.collectAsState(emptyMap())
 
                     Column {
@@ -114,7 +135,7 @@ fun DisplayOCRScreen(
 
                         OcrDisplayAdd(
                             modifier = modifier,
-                            onClick = onClickOCRAdd
+                            onClick = { onClickOCRAdd(viewModel.text.value) }
                         )
                     }
                 }
@@ -135,7 +156,7 @@ fun DisplayOCRScreen(
                 word = word,
                 showHSK3Definition = appConfig.dictionaryShowHSK3Definition.value,
                 onFavoriteClick = onFavoriteClick,
-                onSpeakClick = viewModel::voiceInBackground,
+                onSpeakClick = viewModel::speakWord,
                 onCopyClick = viewModel::copyToClipboard,
                 onListsClick = { showWordListDialog = word.word }
             )

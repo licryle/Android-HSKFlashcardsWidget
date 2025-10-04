@@ -9,6 +9,8 @@ import com.google.mlkit.vision.text.Text
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.TextRecognizer
 import com.google.mlkit.vision.text.chinese.ChineseTextRecognizerOptions
+import io.github.vinceglb.filekit.PlatformFile
+import io.github.vinceglb.filekit.path
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -18,11 +20,11 @@ import kotlin.text.StringBuilder
 actual class HSKOCR actual constructor() {
     actual fun init() {}
 
-    actual suspend fun process(imagePath: String,
+    actual suspend fun process(imagePath: PlatformFile,
                                successCallback: (String?) -> Unit,
                                failureCallBack: (Exception) -> Unit) {
         withContext(Dispatchers.Default) {
-            val bitmap = BitmapFactory.decodeFile(imagePath)
+            val bitmap = BitmapFactory.decodeFile(imagePath.path)
             val image = InputImage.fromBitmap(bitmap, 0)
             Logger.d(tag = TAG, messageString = "recognizeText starting")
 
