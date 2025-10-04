@@ -1,11 +1,11 @@
-package fr.berliat.hskwidget.ui.utils
+package fr.berliat.hskwidget.core
 
 import android.os.Build
 import android.os.StrictMode
 import android.os.strictmode.Violation
 import android.util.Log
 import androidx.annotation.RequiresApi
-import fr.berliat.hskwidget.BuildConfig
+import fr.berliat.hskwidget.androidResources.BuildConfig
 import java.util.concurrent.Executors
 
 /**
@@ -38,7 +38,8 @@ class StrictModeManager {
         }
 
         private fun enableStrictMode() {
-            StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder()
+            StrictMode.setThreadPolicy(
+                StrictMode.ThreadPolicy.Builder()
                 .detectDiskReads()
                 .detectDiskWrites()
                 .detectNetwork()
@@ -47,7 +48,8 @@ class StrictModeManager {
                 .penaltyListener(Executors.newSingleThreadExecutor()) { v -> onVmViolation(v) }
                 .build())
 
-            StrictMode.setVmPolicy(StrictMode.VmPolicy.Builder()
+            StrictMode.setVmPolicy(
+                StrictMode.VmPolicy.Builder()
                 .detectLeakedSqlLiteObjects()
                 .detectLeakedClosableObjects()
                 .detectLeakedRegistrationObjects()
