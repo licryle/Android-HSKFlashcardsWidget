@@ -41,6 +41,7 @@ import hskflashcardswidget.crossplatform.generated.resources.Res
 import hskflashcardswidget.crossplatform.generated.resources.ic_launcher
 import hskflashcardswidget.crossplatform.generated.resources.ocr_capture_btn
 import hskflashcardswidget.crossplatform.generated.resources.ocr_capture_permission_denied
+import io.github.vinceglb.filekit.PlatformFile
 
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -50,7 +51,8 @@ private const val TAG = "CaptureImageScreen"
 @Composable
 fun CaptureImageScreen(
     modifier: Modifier = Modifier,
-    viewModel: CaptureImageViewModel = remember { CaptureImageViewModel{ } }
+    onImageReady: (PlatformFile) -> Unit,
+    viewModel: CaptureImageViewModel = remember { CaptureImageViewModel(onImageReady) }
 ) {
     val isProcessing by viewModel.isProcessing.collectAsState()
 

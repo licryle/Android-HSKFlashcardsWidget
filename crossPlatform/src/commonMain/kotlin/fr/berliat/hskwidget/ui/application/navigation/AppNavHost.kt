@@ -19,6 +19,8 @@ import fr.berliat.hskwidget.ui.screens.config.ConfigScreen
 import fr.berliat.hskwidget.ui.screens.dictionary.DictionarySearchScreen
 import fr.berliat.hskwidget.ui.screens.widget.WidgetsListScreen
 import fr.berliat.hskwidget.ui.screens.wordlist.WordListScreen
+import io.github.vinceglb.filekit.PlatformFile
+import io.github.vinceglb.filekit.path
 
 @Composable
 fun AppNavHost(modifier: Modifier = Modifier,
@@ -75,10 +77,13 @@ fun AppNavHost(modifier: Modifier = Modifier,
         }
 
         composable<Screen.OCRCapture> { backStackEntry ->
-            val args = backStackEntry.toRoute<Screen.Annotate>()
-            CaptureImageScreen(
-
-            )
+            val args = backStackEntry.toRoute<Screen.OCRCapture>()
+            CaptureImageScreen(onImageReady = { imageFile: PlatformFile ->
+                navController.navigate(Screen.OCRDisplay(
+                    preText = args.preText,
+                    imageFilePath = imageFile.path
+                ))
+            })
         }
 
         composable<Screen.Annotate> { backStackEntry ->

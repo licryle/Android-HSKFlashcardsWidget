@@ -16,9 +16,9 @@ import hskflashcardswidget.crossplatform.generated.resources.ocr_capture_error_p
 import hskflashcardswidget.crossplatform.generated.resources.ocr_capture_error_save
 
 import io.github.vinceglb.filekit.FileKit
+import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.cacheDir
 import io.github.vinceglb.filekit.div
-import io.github.vinceglb.filekit.path
 import io.github.vinceglb.filekit.write
 
 import kotlinx.coroutines.Dispatchers
@@ -28,7 +28,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 
 class CaptureImageViewModel(
-    val onImageReady: (String) -> Unit
+    val onImageReady: (PlatformFile) -> Unit
 ): ViewModel() {
     val _isProcessing = MutableStateFlow<Boolean>(true)
     val isProcessing = _isProcessing.asStateFlow()
@@ -48,13 +48,13 @@ class CaptureImageViewModel(
 
                         try {
                             file.write(result.byteArray)
-                        } catch (e: Exception) {
+                        } catch (_: Exception) {
                             Utils.toast(Res.string.ocr_capture_error_save)
                         } finally {
                             _isProcessing.value = false
                         }
 
-                        onImageReady(file.path)
+                        onImageReady(file)
                     }
 
                     is ImageCaptureResult.Error -> {

@@ -43,7 +43,7 @@ sealed class Screen() {
     data class OCRCapture(val preText: String = "") : Screen()
 
     @Serializable
-    data class OCRDisplay(val preText: String = "") : Screen()
+    data class OCRDisplay(val preText: String = "", val imageFilePath: String? = null) : Screen()
 }
 
 sealed class DecoratedScreen(val screen: Screen, val title: StringResource, val icon: DrawableResource) {
