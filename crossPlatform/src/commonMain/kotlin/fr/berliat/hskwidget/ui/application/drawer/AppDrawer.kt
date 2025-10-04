@@ -11,8 +11,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import fr.berliat.hskwidget.ui.application.navigation.DecoratedScreen
-import fr.berliat.hskwidget.ui.application.navigation.Screen
+import fr.berliat.hskwidget.ui.navigation.DecoratedScreen
+import fr.berliat.hskwidget.ui.navigation.Screen
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 

@@ -11,7 +11,7 @@ import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.data.store.GoogleDriveBackup
 import fr.berliat.hskwidget.ui.HSKAnkiDelegate
 import fr.berliat.hskwidget.ui.application.AppView
-import fr.berliat.hskwidget.ui.application.navigation.NavigationManager
+import fr.berliat.hskwidget.ui.navigation.NavigationManager
 import fr.berliat.hskwidget.core.StrictModeManager
 import fr.berliat.hskwidget.domain.WidgetProvider
 import io.github.vinceglb.filekit.FileKit

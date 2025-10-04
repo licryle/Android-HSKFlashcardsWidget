@@ -1,4 +1,4 @@
-package fr.berliat.hskwidget.ui.application.navigation
+package fr.berliat.hskwidget.ui.navigation
 
 import androidx.navigation.NavController
 

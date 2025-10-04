@@ -18,10 +18,10 @@ import androidx.compose.ui.Modifier
 import fr.berliat.hskwidget.ui.application.content.AppBar
 import fr.berliat.hskwidget.ui.application.content.OCRReminder
 import fr.berliat.hskwidget.ui.application.drawer.AppDrawer
-import fr.berliat.hskwidget.ui.application.navigation.AppNavHost
-import fr.berliat.hskwidget.ui.application.navigation.DecoratedScreen
-import fr.berliat.hskwidget.ui.application.navigation.NavigationManager
-import fr.berliat.hskwidget.ui.application.navigation.Screen
+import fr.berliat.hskwidget.ui.navigation.AppNavHost
+import fr.berliat.hskwidget.ui.navigation.DecoratedScreen
+import fr.berliat.hskwidget.ui.navigation.NavigationManager
+import fr.berliat.hskwidget.ui.navigation.Screen
 
 import org.jetbrains.compose.resources.stringResource
 
