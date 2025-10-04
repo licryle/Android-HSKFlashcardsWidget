@@ -7,7 +7,6 @@ import android.view.ViewGroup
 
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 
 import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.ui.screens.OCR.CaptureImageScreen
@@ -33,9 +32,9 @@ class CaptureImageFragment : Fragment() {
     }
 
     fun redirectOnImageReady(filePath: String) {
-        val action = CaptureImageFragmentDirections.displayOCR(
+        /*val action = CaptureImageFragmentDirections.displayOCR(
             filePath,
             arguments?.getString("preText") ?: "")
-        findNavController().navigate(action)
+        findNavController().navigate(action)*/
     }
 }

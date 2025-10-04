@@ -9,6 +9,7 @@ kotlin = "2.2.20"
 compose = "1.8.2"
 kotlinxDatetime = "0.7.1-0.6.x-compat"
 kotlinxSerializationJson = "1.9.0"
+navigationCompose = "2.9.0"
 normalize = "1.2.0"
 playServicesAuth = "21.4.0"
 room = "2.8.0"
@@ -50,6 +51,7 @@ compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview"
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 normalize = { module = "com.doist.x:normalize", version.ref = "normalize" }
 play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }

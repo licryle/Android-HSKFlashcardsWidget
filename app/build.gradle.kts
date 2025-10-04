@@ -170,6 +170,7 @@ dependencies {
     implementation(libs.compose.resources)
     implementation(libs.filekit.core)
     implementation(libs.filekit.dialogs)
+    implementation("androidx.activity:activity-compose:1.11.0")
 }
 
 // TODO: Remove these unhappy hacks. I've search for a while and couldn't find why my resources aren't exported despite export configuration.

@@ -6,11 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 
 import fr.berliat.hskwidget.Utils
 import fr.berliat.hskwidget.core.HSKAppServices
-
 import fr.berliat.hskwidget.ui.screens.dictionary.DictionarySearchScreen
 import fr.berliat.hskwidget.ui.screens.dictionary.DictionaryViewModel
 
@@ -30,9 +28,9 @@ class DictionarySearchFragment : Fragment() {
                 DictionarySearchScreen(
                     viewModel = viewModel,
                     onAnnotate = {
-                        val action = DictionarySearchFragmentDirections.annotateWord(it, false)
+                        /*val action = DictionarySearchFragmentDirections.annotateWord(it, false)
 
-                        findNavController().navigate(action)
+                        findNavController().navigate(action)*/
                     }
                 )
             }

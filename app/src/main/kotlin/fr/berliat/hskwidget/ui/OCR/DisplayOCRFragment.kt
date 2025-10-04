@@ -9,7 +9,6 @@ import android.widget.Toast
 
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.domain.Utils
@@ -17,7 +16,6 @@ import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hsktextviews.HSKTextSegmenterListener
 import fr.berliat.hskwidget.MainActivity
 import fr.berliat.hskwidget.core.HSKAppServices
-import fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragmentDirections
 import fr.berliat.hskwidget.ui.screens.OCR.DisplayOCRScreen
 import fr.berliat.hskwidget.ui.screens.OCR.DisplayOCRViewModel
 
@@ -34,7 +32,7 @@ class DisplayOCRFragment : Fragment(), HSKTextSegmenterListener {
         val mainApp = requireActivity() as MainActivity
 
         if (requireActivity().javaClass.simpleName == "MainActivity") {
-            mainApp.setOCRReminderVisible()
+            //mainApp.setOCRReminderVisible()
         }
     }
 
@@ -52,9 +50,9 @@ class DisplayOCRFragment : Fragment(), HSKTextSegmenterListener {
                     viewModel = viewModel,
                     onFavoriteClick = { word -> onFavoriteClick(word) },
                     onClickOCRAdd = {
-                        val action =
+                       /* val action =
                             DisplayOCRFragmentDirections.appendOCR(viewModel.text.value)
-                        findNavController().navigate(action)
+                        findNavController().navigate(action)*/
                     }
                 )
             }
@@ -106,9 +104,9 @@ class DisplayOCRFragment : Fragment(), HSKTextSegmenterListener {
     }
 
     fun onFavoriteClick(word: AnnotatedChineseWord) {
-        val action = DictionarySearchFragmentDirections.annotateWord(word.simplified, false)
+       /*al action = DictionarySearchFragmentDirections.annotateWord(word.simplified, false)
 
-        findNavController().navigate(action)
+        findNavController().navigate(action)*/
     }
 
     override fun onIsSegmenterReady() {

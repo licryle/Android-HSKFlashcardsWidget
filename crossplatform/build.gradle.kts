@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 
 plugins {
     kotlin("multiplatform") version "2.2.10"
+    kotlin("plugin.serialization") version "1.8.0"
     id("com.android.kotlin.multiplatform.library")
     id("org.jetbrains.compose") version "1.8.2"
     id("org.jetbrains.kotlin.plugin.compose") version "2.2.20"
@@ -63,6 +64,7 @@ kotlin {
                 implementation(libs.filekit.dialogs.compose)
                 // ./gradlew :cameraK:publishAllPublicationsToLocalRepoRepository in Fork_CameraK
                 implementation("com.kashif.cameraK_fork:camerak:0.0.12")
+                implementation(libs.navigation.compose)
 
                 implementation(project(":hsktextviews"))
             }

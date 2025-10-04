@@ -1,76 +1,32 @@
 package fr.berliat.hskwidget
 
-import android.appwidget.AppWidgetManager
-import android.appwidget.AppWidgetManager.ACTION_APPWIDGET_CONFIGURE
-import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
-import android.view.View
-import android.widget.Toast
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.SearchView
-import androidx.core.view.GravityCompat
-import androidx.drawerlayout.widget.DrawerLayout
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.NavController
-import androidx.navigation.findNavController
-import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.navigation.ui.setupWithNavController
-import com.android.billingclient.api.BillingResult
-import com.android.billingclient.api.Purchase
-import fr.berliat.hskwidget.ExpectedUtils.INTENT_SEARCH_WORD
 import fr.berliat.hskwidget.core.AppServices
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.data.store.GoogleDriveBackup
-import fr.berliat.hskwidget.data.store.SupportDevStore
-import fr.berliat.hskwidget.databinding.ActivityMainBinding
-import fr.berliat.hskwidget.domain.DatabaseDiskBackup
-import fr.berliat.hskwidget.domain.DatabaseHelper
-import fr.berliat.hskwidget.domain.getParcelableExtraCompat
 import fr.berliat.hskwidget.ui.HSKAnkiDelegate
-import fr.berliat.hskwidget.ui.dictionary.DictionarySearchFragment
+import fr.berliat.hskwidget.ui.application.AppView
+import fr.berliat.hskwidget.ui.application.navigation.NavigationManager
 import fr.berliat.hskwidget.ui.utils.StrictModeManager
 import fr.berliat.hskwidget.ui.widget.WidgetProvider
-import hskflashcardswidget.crossplatform.generated.resources.Res
-import hskflashcardswidget.crossplatform.generated.resources.database_update_failure
-import hskflashcardswidget.crossplatform.generated.resources.database_update_start
-import hskflashcardswidget.crossplatform.generated.resources.database_update_success
-import hskflashcardswidget.crossplatform.generated.resources.dbbackup_failure_folderpermission
-import hskflashcardswidget.crossplatform.generated.resources.dbbackup_failure_write
-import hskflashcardswidget.crossplatform.generated.resources.dbbackup_success
-import hskflashcardswidget.crossplatform.generated.resources.support_status_tpl
-import hskflashcardswidget.crossplatform.generated.resources.support_total_error
 import io.github.vinceglb.filekit.FileKit
-import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.dialogs.init
-import io.github.vinceglb.filekit.fromBookmarkData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import multiplatform.network.cmptoast.AppContext
-import org.jetbrains.compose.resources.getString
 
 class MainActivity : AppCompatActivity() {
     companion object {
         private const val TAG = "MainActivity"
     }
-
-    private lateinit var appBarConfiguration: AppBarConfiguration
-    private lateinit var binding: ActivityMainBinding
-    private lateinit var navController: NavController
     private lateinit var appConfig: AppPreferencesStore
-    private lateinit var supportDevStore: SupportDevStore
-    private var showOCRReminder: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -114,10 +70,12 @@ class MainActivity : AppCompatActivity() {
             StrictModeManager.init()
         }
 
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        setupSupporter()
+        setContent {
+            AppView(
+                navigationManager = NavigationManager
+            )
+        }
+        /*setupSupporter()
         setupActionBar()
 
         setupSearchBtn()
@@ -128,9 +86,9 @@ class MainActivity : AppCompatActivity() {
         handleIntents(intent)
 
         handleDbOperations()
-        handleAppUpdate()
+        handleAppUpdate()*/
     }
-
+/*
     private fun handleDbOperations() {
         lifecycleScope.launch(Dispatchers.IO) {
             DatabaseHelper.getInstance().cleanTempDatabaseFiles()
@@ -435,5 +393,5 @@ class MainActivity : AppCompatActivity() {
             },
             true // recursive = true, to catch nested fragments too
         )
-    }
+    }*/
 }

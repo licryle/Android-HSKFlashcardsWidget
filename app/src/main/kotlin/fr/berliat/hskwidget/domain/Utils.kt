@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.os.Build
-import android.os.Bundle
 import android.os.Parcelable
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -15,15 +14,6 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-
-import com.google.firebase.analytics.ktx.analytics
-import com.google.firebase.ktx.Firebase
-
-import fr.berliat.hskwidget.ui.widget.WidgetProvider
-import fr.berliat.hskwidget.HSKHelperApp
-
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 import java.util.concurrent.TimeUnit
 
@@ -46,9 +36,6 @@ class Utils {
     }
 
     companion object {
-        fun getAppContext() : HSKHelperApp {
-            return HSKHelperApp.instance
-        }
 
         fun hideKeyboard(context: Context, view: View) {
             val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -92,7 +79,7 @@ class Utils {
             event: ANALYTICS_EVENTS,
             params: Map<String, String> = mapOf()
         ) {
-            val appContext = getAppContext()
+            /*val appContext = getAppContext()
             val bundle = Bundle()
             params.forEach {
                 bundle.putString(it.key, it.value)
@@ -107,24 +94,13 @@ class Utils {
                 bundle.putString("MAX_WIDGET_ID", widgets.last().toString())
             }
 
-            appContext.applicationScope.launch(Dispatchers.IO) {
+            getAppContext().launch(Dispatchers.IO) {
                 Firebase.analytics.logEvent(event.name, bundle)
-            }
-        }
-
-        fun logAnalyticsError(module: String, error: String, details: String) {
-            logAnalyticsEvent(
-                ANALYTICS_EVENTS.ERROR,
-                mapOf(
-                    "MODULE" to module,
-                    "ERROR_ID" to error,
-                    "DETAILS" to details
-                )
-            )
+            }*/
         }
 
         fun logAnalyticsWidgetAction(event: ANALYTICS_EVENTS, widgetId: Int) {
-            val appContext = getAppContext()
+            /*val appContext = getAppContext()
             val widgets = WidgetProvider.getWidgetIds()
             val size = WidgetSizeProvider(appContext).getWidgetsSize(widgetId)
 
@@ -134,7 +110,7 @@ class Utils {
                     "WIDGET_NUMBER" to widgets.indexOf(widgetId).toString(),
                     "WIDGET_SIZE" to "${size.first}x${size.second}"
                 )
-            )
+            )*/
         }
 
         fun logAnalyticsScreenView(screenName: String) {

@@ -10,9 +10,8 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.coroutineScope
 import androidx.navigation.fragment.findNavController
-import fr.berliat.hskwidget.R
-import fr.berliat.hskwidget.Utils
 
+import fr.berliat.hskwidget.Utils
 import fr.berliat.hskwidget.ui.screens.annotate.AnnotateScreen
 
 import hskflashcardswidget.crossplatform.generated.resources.Res
@@ -31,7 +30,7 @@ class AnnotateFragment: Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setActionBarTitle(getString(R.string.menu_annotate))
+        setActionBarTitle(("Annotate"))
     }
 
     private fun setActionBarTitle(title: String) {
