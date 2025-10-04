@@ -13,14 +13,13 @@ import fr.berliat.hskwidget.ui.HSKAnkiDelegate
 import fr.berliat.hskwidget.ui.application.AppView
 import fr.berliat.hskwidget.ui.application.navigation.NavigationManager
 import fr.berliat.hskwidget.ui.utils.StrictModeManager
-import fr.berliat.hskwidget.ui.widget.WidgetProvider
+import fr.berliat.hskwidget.domain.WidgetProvider
 import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.dialogs.init
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
-import multiplatform.network.cmptoast.AppContext
 
 class MainActivity : AppCompatActivity() {
     companion object {
@@ -62,7 +61,6 @@ class MainActivity : AppCompatActivity() {
         appConfig = HSKAppServices.appPreferences
 
         WidgetProvider.init({ applicationContext })
-        AppContext.apply { set(applicationContext) }
         FileKit.init(this)
 
         // Enable StrictMode in Debug mode

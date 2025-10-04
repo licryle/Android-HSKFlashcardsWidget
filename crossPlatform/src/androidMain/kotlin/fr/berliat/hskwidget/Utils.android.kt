@@ -150,6 +150,9 @@ actual object ExpectedUtils {
                                  params: Map<String, String>) {
     }
 
+    actual fun logAnalyticsWidgetAction(event: Utils.ANALYTICS_EVENTS, widgetId: Int) {
+    }
+
     actual fun logAnalyticsError(module: String, error: String, details: String) {
         logAnalyticsEvent(
             Utils.ANALYTICS_EVENTS.ERROR,
@@ -317,7 +320,7 @@ actual object ExpectedUtils {
                 ?: throw IllegalStateException("Could not create file in destination folder")
 
             // Open OutputStream to the destination file
-            context.contentResolver.openFileDescriptor(destinationFile!!.uri, "w")
+            context.contentResolver.openFileDescriptor(destinationFile.uri, "w")
                 ?.use { parcelFileDescriptor ->
                     FileOutputStream(parcelFileDescriptor.fileDescriptor).use { output ->
                         // Copy data from source to destination

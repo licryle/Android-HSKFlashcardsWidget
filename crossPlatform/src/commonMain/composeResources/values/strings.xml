@@ -6,6 +6,7 @@
     <string name="proceed">Proceed</string>
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
+    <string name="understood">Understood</string>
     <string name="loading">Loading</string>
     <string name="fix_it">Attempt to fix it</string>
     <string name="copied_to_clipboard">Copied %1$s to clipboard</string>
@@ -66,11 +67,13 @@ This project uses the awesome projects of:
     <string name="widget_configure_wordlist_title">Vocabulary list to include</string>
     <string name="widget_configure_wordlist_word_count">%1$d words</string>
     <string name="widget_configure_no_change">No change to save</string>
+    <string name="widget_configure_saved">Widget configuration updated</string>
 
     <string name="widget_btn_speak">Listen to this word</string>
     <string name="widget_btn_copy">Copy to clipboard</string>
 
     <string name="widgets_add_widget">Add a new widget</string>
+    <string name="widgets_add_widget_instructions">Your launcher does not support automatically adding widgets.\nPlease add the Flashcard widget manually:\nLong press on the home screen → Widgets → Mandarin Assistant.</string>
     <string name="widgets_intro"><![CDATA[Welcome to HSK Flashcard Widget!
 
 This app enables you to set up as many widgets on your phone, and select which HSK words you want to see.

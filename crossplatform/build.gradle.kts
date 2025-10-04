@@ -5,6 +5,7 @@ plugins {
     kotlin("multiplatform") version "2.2.10"
     kotlin("plugin.serialization") version "1.8.0"
     id("com.android.kotlin.multiplatform.library")
+    //id("com.android.library")
     id("org.jetbrains.compose") version "1.8.2"
     id("org.jetbrains.kotlin.plugin.compose") version "2.2.20"
     alias(libs.plugins.ksp)
@@ -107,6 +108,7 @@ kotlin {
                 implementation(libs.google.api.services.drive)
 
                 implementation(project(":googledrivebackup"))
+                implementation(project(":androidResources"))
             }
             resources.srcDirs("src/commonMain/composeResources")
         }
@@ -170,7 +172,7 @@ dependencies {
 
 // Compose resources
 compose.resources {
-    generateResClass = always
+    generateResClass = auto
     publicResClass = true
 }
 

@@ -51,6 +51,9 @@ object Utils {
     fun logAnalyticsError(module: String, error: String, e: Exception) =
         ExpectedUtils.logAnalyticsError(module, error, e.message ?: "")
 
+    fun logAnalyticsWidgetAction(event: ANALYTICS_EVENTS, widgetId: Int) =
+        ExpectedUtils.logAnalyticsWidgetAction(event, widgetId)
+
     fun getDataStore(file: String): DataStore<Preferences> =
         ExpectedUtils.getDataStore(file)
 
@@ -146,6 +149,7 @@ expect object ExpectedUtils {
     fun logAnalyticsEvent(event: Utils.ANALYTICS_EVENTS,
                           params: Map<String, String> = mapOf())
     fun logAnalyticsError(module: String, error: String, details: String)
+    fun logAnalyticsWidgetAction(event: Utils.ANALYTICS_EVENTS, widgetId: Int)
 
     fun getDataStore(file: String): DataStore<Preferences>
 

@@ -2,6 +2,8 @@ package fr.berliat.hskwidget.ui.screens.widgetConfigure
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+
+import fr.berliat.hskwidget.Utils
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.dao.WidgetListDAO
 import fr.berliat.hskwidget.data.dao.WordListDAO
@@ -10,8 +12,8 @@ import fr.berliat.hskwidget.data.model.WordListWithCount
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.data.store.WidgetPreferencesStoreProvider
 import fr.berliat.hskwidget.domain.WidgetController
+
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -61,6 +63,8 @@ class WidgetConfigViewModel(
                 withContext(Dispatchers.Main) {
                     it.invoke()
                 }
+
+                Utils.logAnalyticsWidgetAction(Utils.ANALYTICS_EVENTS.WIDGET_RECONFIGURE, widgetId)
             }
         }
     }

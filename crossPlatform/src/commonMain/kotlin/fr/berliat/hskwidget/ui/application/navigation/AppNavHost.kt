@@ -57,11 +57,16 @@ fun AppNavHost(modifier: Modifier = Modifier,
         composable<Screen.Widgets> { backStackEntry ->
             val args = backStackEntry.toRoute<Screen.Widgets>()
             WidgetsListScreen(
-                widgetIds = emptyList<Int>().toIntArray(),
-                selectedWidgetId = args.widgetId ?: 0,
-                onAddNewWidget = {},
-                onWidgetPreferenceSaved = {  },
-                expectsActivityResult = false
+                selectedWidgetId = args.widgetId,
+                onWidgetPreferenceSaved = {
+                    if (args.expectsActivityResult) {
+                        /*val resultIntent = Intent()
+                        resultIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
+                        activity.setResult(Activity.RESULT_OK, activity.intent)
+                        activity.finish()*/
+                    }
+                },
+                expectsActivityResult = args.expectsActivityResult
             )
         }
 

@@ -7,8 +7,8 @@ import android.view.ViewGroup
 
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
+import fr.berliat.hskwidget.Utils
 
-import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.ui.screens.OCR.CaptureImageScreen
 import fr.berliat.hskwidget.ui.screens.OCR.CaptureImageViewModel
 

@@ -1,4 +1,4 @@
-package fr.berliat.hskwidget.ui.widget
+package fr.berliat.hskwidget.domain
 
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
@@ -7,30 +7,36 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.RemoteViews
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
 
 import androidx.work.WorkManager
+import androidx.work.Worker
+import androidx.work.WorkerParameters
 
-import fr.berliat.hskwidget.MainActivity
-import fr.berliat.hskwidget.R
+import fr.berliat.hskwidget.androidResources.R
+import fr.berliat.hskwidget.Utils
 import fr.berliat.hskwidget.core.HSKAppServices
-import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.core.Locale
 import fr.berliat.hskwidget.data.dao.AnnotatedChineseWordDAO
 import fr.berliat.hskwidget.data.store.WidgetPreferencesStore
 import fr.berliat.hskwidget.data.store.WidgetPreferencesStoreProvider
 import fr.berliat.hskwidget.data.type.HSK_Level
-import fr.berliat.hskwidget.domain.WidgetController
-import kotlinx.coroutines.CoroutineScope
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+
+import java.util.concurrent.TimeUnit
 
 internal const val ACTION_SPEAK = "fr.berliat.hskwidget.ACTION_WIDGET_SPEAK"
 internal const val ACTION_DICTIONARY = "fr.berliat.hskwidget.ACTION_DICTIONARY"
@@ -168,7 +174,7 @@ class WidgetProvider
                             setTextViewText(R.id.flashcard_hsklevel, word.word?.hskLevel.toString())
                             setViewVisibility(
                                 R.id.flashcard_hsklevel,
-                                Utils.hideViewIf(word.word?.hskLevel == HSK_Level.NOT_HSK)
+                                if (word.word?.hskLevel == HSK_Level.NOT_HSK) View.GONE else View.VISIBLE
                             )
                         }
                     }
@@ -251,8 +257,7 @@ class WidgetProvider
                 ACTION_CONFIGURE_LATEST -> {
                     val latestWidgetId = getWidgetIds().last()
 
-                    val confIntent = Intent(context, MainActivity::class.java)
-                    confIntent.action = ACTION_APPWIDGET_CONFIGURE
+                    val confIntent = Intent(ACTION_APPWIDGET_CONFIGURE)
                     confIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, latestWidgetId)
                     confIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
 
@@ -261,8 +266,7 @@ class WidgetProvider
 
                 ACTION_APPWIDGET_CONFIGURE -> {
                     // TODO background activity bug
-                    val confIntent = Intent(context, MainActivity::class.java)
-                    confIntent.action = ACTION_APPWIDGET_CONFIGURE
+                    val confIntent = Intent(ACTION_APPWIDGET_CONFIGURE)
                     confIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
                     confIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
 
@@ -278,7 +282,7 @@ class WidgetProvider
                 }
 
                 Intent.ACTION_BOOT_COMPLETED, AppWidgetManager.ACTION_APPWIDGET_UPDATE -> {
-                    if (Utils.preventUnnecessaryAppWidgetUpdates(context)) return@launch
+                    if (preventUnnecessaryAppWidgetUpdates(context)) return@launch
 
                     var widgetIds = IntArray(1)
                     if (widgetId == -1) {
@@ -321,7 +325,7 @@ class WidgetProvider
         // Enter relevant functionality for when the first widget is created
         super.onEnabled(context)
 
-        Utils.preventUnnecessaryAppWidgetUpdates(context)
+        preventUnnecessaryAppWidgetUpdates(context)
 
         val appMgr = AppWidgetManager.getInstance(context)
         onUpdate(context, appMgr, getWidgetIds())
@@ -338,5 +342,72 @@ class WidgetProvider
     override fun onRestored(context: Context?, oldWidgetIds: IntArray?, newWidgetIds: IntArray?) {
         Log.i(TAG, "onRestored")
         super.onRestored(context, oldWidgetIds, newWidgetIds)
+    }
+
+    class DummyWorker(context: Context, workerParams: WorkerParameters)
+        : Worker(context, workerParams) {
+        override fun doWork(): Result {
+            return Result.success()
+        }
+    }
+
+    /**
+     * This is a workaround for a Bug in handling system wide events.
+     * An empty WorkManager queue will trigger an APPWIGET_UPDATE event, which is undesired.
+     * Read more at: https://www.reddit.com/r/android_devs/comments/llq2mw/question_why_should_it_be_expected_that/
+     */
+    private fun preventUnnecessaryAppWidgetUpdates(context: Context): Boolean {
+        val workInfos = WorkManager.getInstance(context).getWorkInfosByTag("always_pending_work")
+        if (workInfos.get().size > 0) return false
+
+        val alwaysPendingWork = OneTimeWorkRequestBuilder<DummyWorker>()
+            .setInitialDelay(5000L, TimeUnit.DAYS)
+            .addTag("always_pending_work")
+            .build()
+
+        WorkManager.getInstance(context).enqueueUniqueWork(
+            "always_pending_work",
+            ExistingWorkPolicy.KEEP,
+            alwaysPendingWork
+        )
+
+        return true
+    }
+
+    /* Thank to https://stackoverflow.com/questions/25153604/get-the-size-of-my-homescreen-widget */
+    class WidgetSizeProvider(
+        private val context: Context // Do not pass Application context
+    ) {
+
+        private val appWidgetManager = AppWidgetManager.getInstance(context)
+
+        fun getWidgetsSize(widgetId: Int): Pair<Int, Int> {
+            val isPortrait = context.resources.configuration.orientation == ORIENTATION_PORTRAIT
+            val width = getWidgetWidth(isPortrait, widgetId)
+            val height = getWidgetHeight(isPortrait, widgetId)
+            val widthInPx = context.dip(width)
+            val heightInPx = context.dip(height)
+            return widthInPx to heightInPx
+        }
+
+        private fun getWidgetWidth(isPortrait: Boolean, widgetId: Int): Int =
+            if (isPortrait) {
+                getWidgetSizeInDp(widgetId, AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH)
+            } else {
+                getWidgetSizeInDp(widgetId, AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH)
+            }
+
+        private fun getWidgetHeight(isPortrait: Boolean, widgetId: Int): Int =
+            if (isPortrait) {
+                getWidgetSizeInDp(widgetId, AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT)
+            } else {
+                getWidgetSizeInDp(widgetId, AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT)
+            }
+
+        private fun getWidgetSizeInDp(widgetId: Int, key: String): Int =
+            appWidgetManager.getAppWidgetOptions(widgetId).getInt(key, 0)
+
+        private fun Context.dip(value: Int): Int =
+            (value * resources.displayMetrics.density).toInt()
     }
 }

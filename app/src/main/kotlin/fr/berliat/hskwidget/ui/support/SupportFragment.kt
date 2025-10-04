@@ -10,9 +10,9 @@ import androidx.fragment.app.Fragment
 
 import com.google.android.play.core.review.ReviewManager
 import com.google.android.play.core.review.ReviewManagerFactory
+import fr.berliat.hskwidget.Utils
 
 import fr.berliat.hskwidget.data.store.SupportDevStore
-import fr.berliat.hskwidget.domain.Utils
 import fr.berliat.hskwidget.ui.screens.support.SupportScreen
 import fr.berliat.hskwidget.ui.screens.support.SupportViewModel
 

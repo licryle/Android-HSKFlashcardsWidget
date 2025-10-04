@@ -11,10 +11,10 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
-import fr.berliat.hskwidget.domain.Utils
 
 import fr.berliat.hsktextviews.HSKTextSegmenterListener
 import fr.berliat.hskwidget.MainActivity
+import fr.berliat.hskwidget.Utils
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.ui.screens.OCR.DisplayOCRScreen
 import fr.berliat.hskwidget.ui.screens.OCR.DisplayOCRViewModel

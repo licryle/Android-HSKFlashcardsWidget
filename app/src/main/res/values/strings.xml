@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">Mandarin Assistant</string>
 
-    <string name="understood">Understood</string>
 
 
     <!-- Widget Default -->
@@ -11,15 +10,14 @@
     <string name="widget_default_pinyin">nĭ hăo</string>
     <string name="widget_default_loading">…Loading…</string>
 
-    <string name="widgets_add_widget">Add a new widget</string>
-    <string name="widgets_add_widget_instructions">Your launcher does not support automatically adding widgets.\nPlease add the Flashcard widget manually:\nLong press on the home screen → Widgets → Mandarin Assistant.</string>
-
-
     <string name="widget_btn_speak">Listen to this word</string>
     <string name="widget_btn_reload">New word</string>
+
+    <string name="widgets_add_widget">Add a new widget</string>
+
+
     <string name="app_widget_description"><![CDATA[Display a flashcard of random HSK characters & words.]]></string>
     <!-- Preference Titles -->
-    <string name="flashcard_widget_configure_saved">Widget configuration updated</string>
 
     <string name="image_capture_button" />
     <string name="appbar_ocr">Start OCR</string>

@@ -31,7 +31,7 @@ sealed class Screen() {
     data class Annotate(val simplifiedWord: String): Screen()
 
     @Serializable
-    data class Widgets(val widgetId: Int? = null): Screen()
+    data class Widgets(val widgetId: Int? = null, val expectsActivityResult: Boolean = false): Screen()
 
     @Serializable
     data object Config : Screen()

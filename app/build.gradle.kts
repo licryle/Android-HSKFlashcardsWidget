@@ -163,7 +163,6 @@ dependencies {
 
     // This is important for the app module to access the common resources
     // Make sure the version matches the one in your crossPlatform module
-    implementation("network.chaintech:cmptoast:1.0.7")
     implementation("androidx.compose.runtime:runtime-livedata:1.9.1")
 
     implementation(libs.kotlinx.datetime)
