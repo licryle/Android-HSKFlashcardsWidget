@@ -6,6 +6,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import fr.berliat.hskwidget.core.HSKAppServices
+import fr.berliat.hskwidget.data.store.AppPreferencesStore
 
 import fr.berliat.hskwidget.domain.SearchQuery
 import fr.berliat.hskwidget.ui.screens.OCR.CaptureImageScreen
@@ -18,12 +20,15 @@ import fr.berliat.hskwidget.ui.screens.widget.WidgetsListScreen
 import fr.berliat.hskwidget.ui.screens.wordlist.WordListScreen
 
 @Composable
-fun AppNavHost(modifier: Modifier = Modifier) {
+fun AppNavHost(modifier: Modifier = Modifier,
+               prefsStore : AppPreferencesStore = HSKAppServices.appPreferences) {
     val navController = rememberNavController()
     NavigationManager.init(navController)
 
     NavHost(navController = navController, startDestination = Screen.Dictionary()) {
-        composable<Screen.Dictionary> {
+        composable<Screen.Dictionary> { backStackEntry ->
+            val args = backStackEntry.toRoute<Screen.Dictionary>()
+            prefsStore.searchQuery.value = SearchQuery.fromString(args.search)
             DictionarySearchScreen(
                 onAnnotate = { word ->
                     navController.navigate(Screen.Annotate)

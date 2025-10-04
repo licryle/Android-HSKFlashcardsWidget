@@ -68,7 +68,10 @@ fun DictionarySearchScreen(
     val listState = rememberLazyListState()
 
     // Whenever searchQuery changes, scroll to top
-    LaunchedEffect(searchQuery) { listState.scrollToItem(0) }
+    LaunchedEffect(searchQuery) {
+        viewModel.performSearch()
+        listState.scrollToItem(0)
+    }
 
     showWordListDialog?.let {
         WordListSelectionDialog(
