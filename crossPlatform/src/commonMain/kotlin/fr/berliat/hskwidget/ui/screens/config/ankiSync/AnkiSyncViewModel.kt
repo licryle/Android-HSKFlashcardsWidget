@@ -1,10 +1,8 @@
 package fr.berliat.hskwidget.ui.screens.config.ankiSync
 
 import fr.berliat.ankidroidhelper.AnkiDelegate
-import fr.berliat.hskwidget.KAnkiServiceDelegator
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
-import fr.berliat.hskwidget.ui.screens.config.ConfigViewModel
 
 import kotlinx.coroutines.flow.StateFlow
 

@@ -1,9 +1,8 @@
 package fr.berliat.hskwidget.ui.screens.config
 
 import androidx.lifecycle.ViewModel
-import fr.berliat.ankidroidhelper.AnkiDelegate
 
-import fr.berliat.hskwidget.KAnkiServiceDelegator
+import fr.berliat.ankidroidhelper.AnkiDelegate
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.data.store.GoogleDriveBackup
