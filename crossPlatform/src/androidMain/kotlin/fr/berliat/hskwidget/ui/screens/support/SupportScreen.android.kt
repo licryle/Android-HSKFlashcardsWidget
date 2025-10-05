@@ -56,9 +56,22 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun SupportScreen(
-    viewModel: SupportViewModel,
-    modifier: Modifier = Modifier
+actual fun SupportScreen(
+    modifier: Modifier
+) {
+    _SupportScreen(
+        modifier = modifier
+    )
+}
+
+/*
+ * Breaking it down into 2 to add the vieModel that uses platform specific elements that wouldn't
+ * make sense to expect/actual.
+ */
+@Composable
+private fun _SupportScreen(
+    modifier: Modifier,
+    viewModel: SupportViewModel = SupportViewModel()
 ) {
     val totalSpent by viewModel.totalSpent.collectAsState(0f)
     val purchaseList by viewModel.purchaseList.collectAsState(emptyMap())
@@ -115,10 +128,10 @@ fun SupportScreen(
         Spacer(Modifier.height(26.dp))
 
         val supportTpl = if (totalSpent >= 0f) {
-                Res.string.support_total_support
-            } else {
-                Res.string.support_total_error
-            }
+            Res.string.support_total_support
+        } else {
+            Res.string.support_total_error
+        }
 
         Text(
             text = stringResource(supportTpl).format(totalSpent.toDouble()),

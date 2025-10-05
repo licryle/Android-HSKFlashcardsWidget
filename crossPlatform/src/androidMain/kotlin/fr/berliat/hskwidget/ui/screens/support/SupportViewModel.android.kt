@@ -1,31 +1,39 @@
 package fr.berliat.hskwidget.ui.screens.support
 
 import android.app.Activity
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+
 import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.Purchase
+
 import com.google.android.play.core.review.ReviewException
 import com.google.android.play.core.review.ReviewManager
+import com.google.android.play.core.review.ReviewManagerFactory
 import com.google.android.play.core.review.model.ReviewErrorCode
+
+import fr.berliat.hskwidget.ExpectedUtils
 import fr.berliat.hskwidget.Utils
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.data.store.SupportDevStore
+
 import hskflashcardswidget.crossplatform.generated.resources.Res
 import hskflashcardswidget.crossplatform.generated.resources.support_payment_failed
 import hskflashcardswidget.crossplatform.generated.resources.support_payment_success
 import hskflashcardswidget.crossplatform.generated.resources.support_review_failed
 import hskflashcardswidget.crossplatform.generated.resources.support_reviewed
 import hskflashcardswidget.crossplatform.generated.resources.support_total_error
+
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class SupportViewModel(
-    val supportDevStore : SupportDevStore,
-    val activityProvider: () -> Activity,
-    val reviewManager: ReviewManager,
+actual class SupportViewModel(
+    val supportDevStore : SupportDevStore = SupportDevStore.getInstance(ExpectedUtils.context),
+    val activityProvider: () -> Activity = { ExpectedUtils.activity },
+    val reviewManager: ReviewManager = ReviewManagerFactory.create(ExpectedUtils.context),
     val appConfig : AppPreferencesStore = HSKAppServices.appPreferences,
 ) : ViewModel(),
     SupportDevStore.SupportDevListener {

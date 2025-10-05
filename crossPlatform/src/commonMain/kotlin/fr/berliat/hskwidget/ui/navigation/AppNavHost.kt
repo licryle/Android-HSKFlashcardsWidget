@@ -17,6 +17,7 @@ import fr.berliat.hskwidget.ui.screens.about.AboutScreen
 import fr.berliat.hskwidget.ui.screens.annotate.AnnotateScreen
 import fr.berliat.hskwidget.ui.screens.config.ConfigScreen
 import fr.berliat.hskwidget.ui.screens.dictionary.DictionarySearchScreen
+import fr.berliat.hskwidget.ui.screens.support.SupportScreen
 import fr.berliat.hskwidget.ui.screens.widget.WidgetsListScreen
 import fr.berliat.hskwidget.ui.screens.wordlist.WordListScreen
 import io.github.vinceglb.filekit.PlatformFile
@@ -60,6 +61,10 @@ fun AppNavHost(modifier: Modifier = Modifier,
                     navController.navigate(Screen.Dictionary(sq.toString()))
                 }
             )
+        }
+
+        composable<Screen.Support> {
+            SupportScreen()
         }
 
         composable<Screen.About> {

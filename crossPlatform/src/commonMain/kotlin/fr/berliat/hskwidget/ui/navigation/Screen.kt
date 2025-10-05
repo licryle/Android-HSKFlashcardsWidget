@@ -3,6 +3,7 @@ package fr.berliat.hskwidget.ui.navigation
 import kotlinx.serialization.Serializable
 
 import hskflashcardswidget.crossplatform.generated.resources.Res
+import hskflashcardswidget.crossplatform.generated.resources.bakery_dining_24px
 import hskflashcardswidget.crossplatform.generated.resources.format_list_bulleted_add_24px
 import hskflashcardswidget.crossplatform.generated.resources.ic_dictionary_24dp
 import hskflashcardswidget.crossplatform.generated.resources.menu_dictionary
@@ -12,6 +13,7 @@ import hskflashcardswidget.crossplatform.generated.resources.baseline_widgets_24
 import hskflashcardswidget.crossplatform.generated.resources.menu_about
 import hskflashcardswidget.crossplatform.generated.resources.menu_ocr
 import hskflashcardswidget.crossplatform.generated.resources.menu_settings
+import hskflashcardswidget.crossplatform.generated.resources.menu_support
 import hskflashcardswidget.crossplatform.generated.resources.menu_widgets
 import hskflashcardswidget.crossplatform.generated.resources.photo_camera_24px
 import hskflashcardswidget.crossplatform.generated.resources.settings_24px
@@ -38,6 +40,9 @@ sealed class Screen() {
 
     @Serializable
     data object About : Screen()
+
+    @Serializable
+    data object Support : Screen()
 
     @Serializable
     data class OCRCapture(val preText: String = "") : Screen()
@@ -72,6 +77,11 @@ sealed class DecoratedScreen(val screen: Screen, val title: StringResource, val 
         Res.string.menu_settings,
         Res.drawable.settings_24px)
 
+    data object Support : DecoratedScreen(
+        Screen.Support,
+        Res.string.menu_support,
+        Res.drawable.bakery_dining_24px)
+
     data object About : DecoratedScreen(
         Screen.About,
         Res.string.menu_about,
@@ -89,7 +99,8 @@ sealed class DecoratedScreen(val screen: Screen, val title: StringResource, val 
 
     companion object {
         fun fromScreen(screen: Screen): DecoratedScreen = when(screen) {
-            Screen.About -> About
+            is Screen.About -> About
+            is Screen.Support -> Support
             is Screen.Annotate -> Annotate
             is Screen.Config -> Config
             is Screen.Dictionary -> Dictionary

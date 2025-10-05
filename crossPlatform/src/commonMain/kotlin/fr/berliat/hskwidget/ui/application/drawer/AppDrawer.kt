@@ -12,19 +12,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import fr.berliat.hskwidget.ui.navigation.DecoratedScreen
+import fr.berliat.hskwidget.ui.navigation.MenuItems
 import fr.berliat.hskwidget.ui.navigation.Screen
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun AppDrawer(
-    menuItems: List<DecoratedScreen> = listOf(
-        DecoratedScreen.Dictionary,
-        DecoratedScreen.Lists,
-        DecoratedScreen.Widgets,
-        DecoratedScreen.Config,
-        DecoratedScreen.About
-    ),
+    menuItems: List<DecoratedScreen> = MenuItems,
     currentScreen: Screen,
     onNavigate: (Screen) -> Unit
 ) {
