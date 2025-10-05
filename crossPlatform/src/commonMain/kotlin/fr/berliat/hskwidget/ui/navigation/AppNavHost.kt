@@ -2,14 +2,13 @@ package fr.berliat.hskwidget.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
-
 import fr.berliat.hskwidget.domain.SearchQuery
 import fr.berliat.hskwidget.ui.screens.OCR.CaptureImageScreen
 import fr.berliat.hskwidget.ui.screens.OCR.DisplayOCRScreen
@@ -20,13 +19,13 @@ import fr.berliat.hskwidget.ui.screens.dictionary.DictionarySearchScreen
 import fr.berliat.hskwidget.ui.screens.support.SupportScreen
 import fr.berliat.hskwidget.ui.screens.widget.WidgetsListScreen
 import fr.berliat.hskwidget.ui.screens.wordlist.WordListScreen
+
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.exists
 import io.github.vinceglb.filekit.path
 
 @Composable
-fun AppNavHost(modifier: Modifier = Modifier,
-               prefsStore : AppPreferencesStore = HSKAppServices.appPreferences) {
+fun AppNavHost(prefsStore : AppPreferencesStore = HSKAppServices.appPreferences) {
     val navController = rememberNavController()
     NavigationManager.init(navController)
 
@@ -38,7 +37,6 @@ fun AppNavHost(modifier: Modifier = Modifier,
             }
 
             DictionarySearchScreen(
-                modifier = modifier,
                 onAnnotate = { word ->
                     navController.navigate(Screen.Annotate(word))
                 }
@@ -48,7 +46,6 @@ fun AppNavHost(modifier: Modifier = Modifier,
         composable<Screen.Annotate> { backStackEntry ->
             val args = backStackEntry.toRoute<Screen.Annotate>()
             AnnotateScreen(
-                modifier = modifier,
                 word = args.simplifiedWord,
                 onSaveSuccess = { navController.popBackStack() },
                 onDeleteSuccess = { navController.popBackStack() },
@@ -57,7 +54,6 @@ fun AppNavHost(modifier: Modifier = Modifier,
 
         composable<Screen.Lists> {
             WordListScreen(
-                modifier = modifier,
                 onClickList = { list ->
                     val sq = SearchQuery()
                     sq.inListName = list.name
@@ -67,20 +63,20 @@ fun AppNavHost(modifier: Modifier = Modifier,
         }
 
         composable<Screen.Support> {
-            SupportScreen(modifier = modifier)
+            SupportScreen()
         }
 
         composable<Screen.About> {
-            AboutScreen(modifier = modifier)
+            AboutScreen()
         }
 
         composable<Screen.Widgets> { backStackEntry ->
             val args = backStackEntry.toRoute<Screen.Widgets>()
             WidgetsListScreen(
-                modifier = modifier,
                 selectedWidgetId = args.widgetId,
                 onWidgetPreferenceSaved = {
                     if (args.expectsActivityResult) {
+                        // TODO Reconnect
                         /*val resultIntent = Intent()
                         resultIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
                         activity.setResult(Activity.RESULT_OK, activity.intent)
@@ -92,19 +88,16 @@ fun AppNavHost(modifier: Modifier = Modifier,
         }
 
         composable<Screen.Config> {
-            ConfigScreen(modifier = modifier)
+            ConfigScreen()
         }
 
         composable<Screen.OCRCapture> { backStackEntry ->
             val args = backStackEntry.toRoute<Screen.OCRCapture>()
-            CaptureImageScreen(
-                modifier = modifier,
-                onImageReady = { imageFile: PlatformFile ->
-                    navController.navigate(Screen.OCRDisplay(
-                        preText = args.preText,
-                        imageFilePath = imageFile.path
-                    )
-                )
+            CaptureImageScreen(onImageReady = { imageFile: PlatformFile ->
+                navController.navigate(Screen.OCRDisplay(
+                    preText = args.preText,
+                    imageFilePath = imageFile.path
+                ))
             })
         }
 
@@ -119,7 +112,6 @@ fun AppNavHost(modifier: Modifier = Modifier,
                 }
             }
             DisplayOCRScreen(
-                modifier = modifier,
                 preText = args.preText,
                 imageFile = imageFile,
                 onFavoriteClick = { word -> navController.navigate(Screen.Annotate(word.simplified)) },
