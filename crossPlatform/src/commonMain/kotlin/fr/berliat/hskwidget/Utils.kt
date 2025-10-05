@@ -38,7 +38,7 @@ object Utils {
 
     fun getPlatform(): String = ExpectedUtils.getPlatform()
 
-    fun getAppVersion(): String = ExpectedUtils.getAppVersion()
+    fun getAppVersion(): Int = ExpectedUtils.getAppVersion()
 
     fun logAnalyticsScreenView(screen: String) = ExpectedUtils.logAnalyticsScreenView(screen)
 
@@ -143,7 +143,7 @@ expect object ExpectedUtils {
     fun sendEmail(email: String, subject: String = "", body: String = "") : Boolean
     fun getPlatform(): String
     // commonMain
-    fun getAppVersion(): String
+    fun getAppVersion(): Int
 
     fun logAnalyticsScreenView(screen: String)
     fun logAnalyticsEvent(event: Utils.ANALYTICS_EVENTS,

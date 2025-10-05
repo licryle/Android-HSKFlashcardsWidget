@@ -34,6 +34,7 @@ import fr.berliat.hskwidget.Utils.incrementConsultedWord
 import fr.berliat.hskwidget.Utils.toast
 import fr.berliat.hskwidget.core.BackgroundSpeechService
 import fr.berliat.hskwidget.core.JiebaHSKTextSegmenter
+import fr.berliat.hskwidget.crossPlatform.BuildKonfig
 import fr.berliat.hskwidget.data.dao.AnkiDAO
 import fr.berliat.hskwidget.domain.SearchQuery
 
@@ -85,7 +86,7 @@ actual object ExpectedUtils {
 
     // Initialize once from Compose or Activity
     fun init(activity: Activity) {
-        _context = activity.applicationContext
+        _context = activity
         _activityProvider = { activity }
     }
 
@@ -141,7 +142,7 @@ actual object ExpectedUtils {
     }
 
     // androidMain
-    actual fun getAppVersion(): String = "Not supported yet"
+    actual fun getAppVersion(): Int = BuildKonfig.VERSION_CODE
 
     actual fun logAnalyticsScreenView(screen: String) {
     }

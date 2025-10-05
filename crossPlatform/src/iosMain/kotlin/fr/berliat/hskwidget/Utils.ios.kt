@@ -37,7 +37,7 @@ actual private object ExpectedUtils {
         return UIDevice.currentDevice.systemName() + " " + UIDevice.currentDevice.systemVersion
     }
 
-    actual fun getAppVersion(): String {
+    actual fun getAppVersion(): Int {
         val version = NSBundle.mainBundle.infoDictionary?.get("CFBundleShortVersionString") as? String
         val build = NSBundle.mainBundle.infoDictionary?.get("CFBundleVersion") as? String
         return if (version != null && build != null) "$version ($build)" else "1.0"
