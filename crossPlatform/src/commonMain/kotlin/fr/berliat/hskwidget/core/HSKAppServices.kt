@@ -62,17 +62,13 @@ object HSKAppServices : AppServices() {
     }
 
     fun registerAnkiDelegators(ankiDelegate: AnkiDelegate) {
-        register("ankiDelegate") { ankiDelegate }
-        register("ankiDelegator") { ankiDelegate::delegateToAnki }
-        register("ankiServiceDelegator") { ankiDelegate::delegateToAnkiService }
-
-        super.init(getAnyway("appScope"))
+        registerNow("ankiDelegate") { ankiDelegate }
+        registerNow("ankiDelegator") { ankiDelegate::delegateToAnki }
+        registerNow("ankiServiceDelegator") { ankiDelegate::delegateToAnkiService }
     }
 
     fun registerGoogleBackup(gDrive: GoogleDriveBackup) {
-        register("gDriveBackup") { gDrive }
-
-        super.init(getAnyway("appScope"))
+        registerNow("gDriveBackup") { gDrive }
     }
 
     // P0

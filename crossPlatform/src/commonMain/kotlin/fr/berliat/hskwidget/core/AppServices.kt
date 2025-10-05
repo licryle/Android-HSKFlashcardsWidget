@@ -36,6 +36,16 @@ open class AppServices {
     }
 
     /**
+     * Register & Init blocking a service factory.
+     */
+    fun <T : Any> registerNow(name: String, factory: () -> T) {
+        if (instances.containsKey(name)) throw Exception("Service $name Already registered")
+        if (factories.containsKey(name)) throw Exception("Service $name Already registered")
+        factories[name] = FactoryEntry(2, factory)
+        instances[name] = factory()
+    }
+
+    /**
      * Initialize all services concurrently.
      */
     open fun init(scope: CoroutineScope) {
