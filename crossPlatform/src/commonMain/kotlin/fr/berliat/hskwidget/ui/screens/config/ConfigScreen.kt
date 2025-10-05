@@ -11,6 +11,7 @@ import fr.berliat.hskwidget.ui.screens.config.backupDisk.BackupDiskView
 
 @Composable
 fun ConfigScreen(
+    modifier: Modifier = Modifier,
     viewModel: ConfigViewModel = remember { ConfigViewModel(
         appConfig = HSKAppServices.appPreferences,
         ankiDelegate = HSKAppServices.ankiDelegate,
@@ -18,14 +19,14 @@ fun ConfigScreen(
     ) }
 ) {
     Column(modifier = Modifier.padding(16.dp).fillMaxSize()) {
-        BackupDiskView(viewModel = viewModel.backupDiskViewModel)
+        BackupDiskView(modifier, viewModel = viewModel.backupDiskViewModel)
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = modifier.height(16.dp))
 
-        BackupCloudView(viewModel = viewModel.backupCloudViewModel)
+        BackupCloudView(modifier, viewModel = viewModel.backupCloudViewModel)
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = modifier.height(16.dp))
 
-        AnkiSyncView(viewModel = viewModel.ankiSyncViewModel)
+        AnkiSyncView(modifier, viewModel = viewModel.ankiSyncViewModel)
     }
 }
