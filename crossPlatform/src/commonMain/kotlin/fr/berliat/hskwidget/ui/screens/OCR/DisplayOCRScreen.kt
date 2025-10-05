@@ -44,17 +44,17 @@ import fr.berliat.hskwidget.ui.components.hanziStyle
 import fr.berliat.hskwidget.ui.components.pinyinStyle
 import fr.berliat.hskwidget.ui.screens.wordlist.WordListSelectionDialog
 
-import hskflashcardswidget.crossplatform.generated.resources.Res
-import hskflashcardswidget.crossplatform.generated.resources.ocr_display_add
-import hskflashcardswidget.crossplatform.generated.resources.ocr_display_conf_bigger
-import hskflashcardswidget.crossplatform.generated.resources.ocr_display_conf_smaller
-import hskflashcardswidget.crossplatform.generated.resources.ocr_display_loading
-import hskflashcardswidget.crossplatform.generated.resources.ocr_display_pinyins
-import hskflashcardswidget.crossplatform.generated.resources.ocr_display_separator
-import hskflashcardswidget.crossplatform.generated.resources.ocr_display_text_segmentation_failed
-import hskflashcardswidget.crossplatform.generated.resources.photo_camera_24px
-import hskflashcardswidget.crossplatform.generated.resources.text_decrease_24px
-import hskflashcardswidget.crossplatform.generated.resources.text_increase_24px
+import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.ocr_display_add
+import fr.berliat.hskwidget.ocr_display_conf_bigger
+import fr.berliat.hskwidget.ocr_display_conf_smaller
+import fr.berliat.hskwidget.ocr_display_loading
+import fr.berliat.hskwidget.ocr_display_pinyins
+import fr.berliat.hskwidget.ocr_display_separator
+import fr.berliat.hskwidget.ocr_display_text_segmentation_failed
+import fr.berliat.hskwidget.photo_camera_24px
+import fr.berliat.hskwidget.text_decrease_24px
+import fr.berliat.hskwidget.text_increase_24px
 import io.github.vinceglb.filekit.PlatformFile
 
 import org.jetbrains.compose.resources.painterResource

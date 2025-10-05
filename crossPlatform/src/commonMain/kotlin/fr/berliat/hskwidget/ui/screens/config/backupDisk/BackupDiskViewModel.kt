@@ -9,11 +9,11 @@ import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.domain.DatabaseDiskBackup
 import fr.berliat.hskwidget.domain.DatabaseHelper
 
-import hskflashcardswidget.crossplatform.generated.resources.Res
-import hskflashcardswidget.crossplatform.generated.resources.config_backup_directory_failed_selection
-import hskflashcardswidget.crossplatform.generated.resources.dbrestore_failure_nofileselected
-import hskflashcardswidget.crossplatform.generated.resources.dbrestore_start
-import hskflashcardswidget.crossplatform.generated.resources.dbrestore_success
+import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.config_backup_directory_failed_selection
+import fr.berliat.hskwidget.dbrestore_failure_nofileselected
+import fr.berliat.hskwidget.dbrestore_start
+import fr.berliat.hskwidget.dbrestore_success
 
 import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.PlatformFile

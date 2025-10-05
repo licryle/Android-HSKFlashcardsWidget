@@ -1,11 +1,13 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.*
+
+val versionCodeValue = 40
+val versionCodeName = "4.0.0"
 
 plugins {
     kotlin("multiplatform") version "2.2.10"
     kotlin("plugin.serialization") version "1.8.0"
-    id("com.android.kotlin.multiplatform.library")
+    id("com.android.application") // 🔄 CHANGED from .library
     id("org.jetbrains.compose") version "1.8.2"
     id("org.jetbrains.kotlin.plugin.compose") version "2.2.20"
     alias(libs.plugins.ksp)
@@ -14,40 +16,23 @@ plugins {
 }
 
 buildkonfig {
-    packageName = "fr.berliat.hskwidget.crossPlatform"
+    packageName = "fr.berliat.hskwidget"
 
     defaultConfigs {
-        buildConfigField(INT, "VERSION_CODE", "40")
+        buildConfigField(INT, "VERSION_CODE", "$versionCodeValue")
         buildConfigField(BOOLEAN, "DEBUG_MODE", "true")
     }
 }
 
 kotlin {
-    androidLibrary {
-        namespace = "fr.berliat.hskwidget.crossPlatform"
-        compileSdk = 36
-        minSdk = 26
-
-        withJava() // enable java compilation support
-        withHostTestBuilder {}.configure {}
-        withDeviceTestBuilder {
-            sourceSetTreeName = "test"
-        }
-
+    androidTarget {
         compilations.all {
             compileTaskProvider.configure {
-                compilerOptions {
-                    jvmTarget.set(JvmTarget.JVM_11)
-                }
+                compilerOptions.jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
             }
         }
     }
 
-    // Source set declarations.
-    // Declaring a target automatically creates a source set with the same name. By default, the
-    // Kotlin Gradle Plugin creates additional source sets that depend on each other, since it is
-    // common to share sources between related targets.
-    // See: https://kotlinlang.org/docs/multiplatform-hierarchy.html
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -69,21 +54,15 @@ kotlin {
                 implementation(libs.room.runtime)
                 implementation(libs.sqlite.bundled)
 
-                implementation(libs.kermit)
                 implementation(libs.filekit.core)
                 implementation(libs.filekit.dialogs)
                 implementation(libs.filekit.dialogs.compose)
+
                 // ./gradlew :cameraK:publishAllPublicationsToLocalRepoRepository in Fork_CameraK
                 implementation("com.kashif.cameraK_fork:camerak:0.0.12")
                 implementation(libs.navigation.compose)
 
                 implementation(project(":hsktextviews"))
-            }
-        }
-
-        val commonTest by getting {
-            dependencies {
-                implementation(libs.kotlin.test)
             }
         }
 
@@ -97,53 +76,43 @@ kotlin {
                 implementation(libs.anki.android)
                 implementation(project(":AnkiDroidAPIHelper"))
 
-                implementation(libs.androidx.lifecycle.service) // LifecycleService
+                implementation(libs.androidx.lifecycle.service)
                 implementation(libs.androidx.lifecycle.runtime.ktx)
-
-                implementation(libs.jieba.analysis)
-
-                // Background TTS - maybe review and simplify
-                implementation(libs.androidx.work.runtime.ktx)
                 implementation(libs.androidx.lifecycle.livedata.ktx)
 
-                // OCR
-                implementation(libs.text.recognition.chinese)
+                implementation(libs.androidx.work.runtime.ktx)
+                implementation(libs.jieba.analysis)
 
+                implementation(libs.text.recognition.chinese)
                 implementation(libs.billing.ktx)
                 implementation(libs.review.ktx)
-
                 implementation(libs.androidx.documentfile)
 
                 implementation(libs.play.services.auth)
                 implementation(libs.google.api.services.drive)
 
                 implementation(project(":googledrivebackup"))
-                implementation(project(":androidResources"))
+
+                // TO remove when Widgets more over to Compose.
+                implementation("androidx.constraintlayout:constraintlayout:2.2.1")
+                implementation("com.google.android.material:material:1.1.0")
+
             }
             resources.srcDirs("src/commonMain/composeResources")
         }
 
-        getByName("androidDeviceTest") {
+        val commonTest by getting {
             dependencies {
-                implementation(libs.androidx.test.runner)
-                implementation(libs.androidx.test.core)
-                implementation(libs.androidx.test.junit.ext)
+                implementation(libs.kotlin.test)
             }
         }
 
+        // iOS target config remains identical
         if (System.getProperty("os.name").contains("Mac")) {
-            // For iOS targets, this is also where you should
-            // configure native binary output. For more information, see:
-            // https://kotlinlang.org/docs/multiplatform-build-native-binaries.html#build-xcframeworks
-
             val xcf = XCFramework()
             val iosTargets = listOf(iosX64(), iosArm64(), iosSimulatorArm64())
 
-            // A step-by-step guide on how to include this library in an XCode
-            // project can be found here:
-            // https://developer.android.com/kotlin/multiplatform/migrate
             val xcfName = "crossPlatformKit"
-
             iosTargets.forEach {
                 it.binaries.framework {
                     baseName = xcfName
@@ -153,24 +122,60 @@ kotlin {
 
             iosMain {
                 dependencies {
-                    // Add iOS-specific dependencies here. This a source set created by Kotlin Gradle
-                    // Plugin (KGP) that each specific iOS target (e.g., iosX64) depends on as
-                    // part of KMP’s default source set hierarchy. Note that this source set depends
-                    // on common by default and will correctly pull the iOS artifacts of any
-                    // KMP dependencies declared in commonMain.
+                    // Add iOS-specific dependencies here.
                 }
             }
         }
     }
 }
 
-tasks.matching { it.name.startsWith("extract") && it.name.endsWith("Annotations") }
-    .configureEach {
-        mustRunAfter(tasks.matching { it.name.startsWith("ksp") })
+android {
+    namespace = "fr.berliat.hskwidget"
+    compileSdk = 36
+
+    defaultConfig {
+        applicationId = "fr.berliat.hskwidget"
+        minSdk = 26
+        targetSdk = 36
+        versionCode = versionCodeValue
+        versionName = versionCodeName
     }
 
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+
+    kotlin {
+        jvmToolchain(11)
+    }
+/*
+    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+    sourceSets["main"].res.srcDirs("src/androidMain/res")
+    sourceSets["main"].java.srcDirs("src/androidMain/kotlin")
+    sourceSets["main"].res.srcDir("$buildDir/generated/compose/resourceGenerator/preparedResources/commonMain/composeResources")*/
+
+    buildFeatures {
+        compose = true
+    }
+
+    packaging {
+        resources {
+            excludes += setOf(
+                "META-INF/INDEX.LIST",
+                "META-INF/DEPENDENCIES",
+                "META-INF/NOTICE",
+                "META-INF/LICENSE",
+                "META-INF/LICENSE.txt",
+                "META-INF/NOTICE.txt",
+                "META-INF/ASL2.0",
+                "META-INF/*.kotlin_module"
+            )
+        }
+    }
+}
+
 dependencies {
-    // KSP support for Room Compiler.
     add("kspAndroid", libs.room.compiler)
 
     if (System.getProperty("os.name").contains("Mac")) {
@@ -182,11 +187,56 @@ dependencies {
 
 // Compose resources
 compose.resources {
-    generateResClass = auto
     publicResClass = true
+    packageOfResClass = "fr.berliat.hskwidget"
+    generateResClass = always
 }
 
-// set schema
 room {
     schemaDirectory("$projectDir/schemas")
 }
+/*
+tasks.matching {
+    it.name.contains("processDebugNavigationResources") ||
+            it.name.contains("mapDebugSourceSetPaths") ||
+            it.name.contains("generateDebugResources")
+}.configureEach {
+    val composePrepTasks = listOf(
+        "prepareComposeResourcesTaskForCommonMain",
+        "copyNonXmlValueResourcesForCommonMain",
+        "convertXmlValueResourcesForCommonMain"
+    )
+
+    composePrepTasks.forEach { prepName ->
+        val prepTask = project(":crossPlatform").tasks.findByName(prepName)
+        prepTask?.let {
+            mustRunAfter(it) // <-- now this is called on the task receiver
+        }
+    }
+}
+
+// Resources issues hack
+tasks.register<Delete>("cleanCopyHSKViewsResources") {
+    description = "Deletes the old HSK Vews Resources resources."
+    delete("$rootDir/app/build/intermediates/assets/debug/mergeDebugAssets/composeResources/fr.berliat.hsktextviews")
+}
+
+val copyHSKViewsResources = tasks.register<Copy>("copyHSKViewsResources") {
+    group = "build"
+    description = "Copies my resources from CrossPlatform output to App input"
+
+    val sourceDir = file("$rootDir/hsktextviews/build/generated/compose/resourceGenerator/preparedResources/commonMain/composeResources")
+    from(sourceDir)
+    into("$rootDir/app/build/intermediates/assets/debug/mergeDebugAssets/composeResources/fr.berliat.hsktextviews")
+
+    inputs.dir(sourceDir) // <-- Gradle now knows this directory is an input
+    dependsOn("cleanCopyHSKViewsResources")
+    dependsOn(project(":hsktextviews").tasks.named("prepareComposeResourcesTaskForCommonMain"))
+    dependsOn(project(":hsktextviews").tasks.named("copyNonXmlValueResourcesForCommonMain"))
+    dependsOn(project(":hsktextviews").tasks.named("convertXmlValueResourcesForCommonMain"))
+}
+
+tasks.named("preBuild").configure {
+    dependsOn(":hsktextviews:convertXmlValueResourcesForCommonMain")
+    dependsOn(copyHSKViewsResources)
+}*/

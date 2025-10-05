@@ -36,14 +36,14 @@ import fr.berliat.hskwidget.ui.components.DetailedWordView
 import fr.berliat.hskwidget.ui.components.LoadingView
 import fr.berliat.hskwidget.ui.screens.wordlist.WordListSelectionDialog
 
-import hskflashcardswidget.crossplatform.generated.resources.Res
-import hskflashcardswidget.crossplatform.generated.resources.bookmark_add_24px
-import hskflashcardswidget.crossplatform.generated.resources.bookmark_heart_24px
-import hskflashcardswidget.crossplatform.generated.resources.dictionary_search_loading
-import hskflashcardswidget.crossplatform.generated.resources.dictionary_noresult_icon
-import hskflashcardswidget.crossplatform.generated.resources.dictionary_noresult_text
-import hskflashcardswidget.crossplatform.generated.resources.dictionary_search_filter_hasannotation_hint
-import hskflashcardswidget.crossplatform.generated.resources.dictionary_search_filter_hsk3definition_hint
+import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.bookmark_add_24px
+import fr.berliat.hskwidget.bookmark_heart_24px
+import fr.berliat.hskwidget.dictionary_search_loading
+import fr.berliat.hskwidget.dictionary_noresult_icon
+import fr.berliat.hskwidget.dictionary_noresult_text
+import fr.berliat.hskwidget.dictionary_search_filter_hasannotation_hint
+import fr.berliat.hskwidget.dictionary_search_filter_hsk3definition_hint
 
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -119,7 +119,7 @@ fun DictionarySearchScreen(
                             onListsClick = { showWordListDialog = word.word }
                         )
 
-                        if (!isLoading && hasMoreResults && index >= results.size - 5) {
+                        if (hasMoreResults && index >= results.size - 5) {
                             // Trigger pagination
                             LaunchedEffect(Unit) { viewModel.loadMore() }
                         }

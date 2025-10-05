@@ -12,10 +12,10 @@ import androidx.lifecycle.viewModelScope
 import fr.berliat.hskwidget.core.ExpectedUtils
 import fr.berliat.hskwidget.domain.WidgetProvider
 
-import hskflashcardswidget.crossplatform.generated.resources.Res
-import hskflashcardswidget.crossplatform.generated.resources.understood
-import hskflashcardswidget.crossplatform.generated.resources.widgets_add_widget
-import hskflashcardswidget.crossplatform.generated.resources.widgets_add_widget_instructions
+import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.understood
+import fr.berliat.hskwidget.widgets_add_widget
+import fr.berliat.hskwidget.widgets_add_widget_instructions
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 

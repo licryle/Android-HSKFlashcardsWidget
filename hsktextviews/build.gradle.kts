@@ -1,11 +1,11 @@
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 
 plugins {
-    id("org.jetbrains.kotlin.multiplatform")
+    kotlin("multiplatform")
     id("com.android.kotlin.multiplatform.library")
     id("com.android.lint")
     id("org.jetbrains.kotlin.plugin.compose") version "2.2.20"
-    id("org.jetbrains.compose") version "1.8.2"
+    id("org.jetbrains.compose") version "1.9.0"
 }
 
 kotlin {
@@ -25,6 +25,9 @@ kotlin {
         }.configure {
             instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         }
+
+        // https://youtrack.jetbrains.com/projects/CMP/issues/CMP-8363/Missing-resource-used-in-shared-module
+        experimentalProperties["android.experimental.kmp.enableAndroidResources"] = true
     }
 
 
@@ -73,6 +76,7 @@ kotlin {
         }
 
         androidMain {
+            resources.srcDirs("src/commonMain/composeResources")
             dependencies {
             }
         }
@@ -99,6 +103,7 @@ kotlin {
 
 // Compose resources
 compose.resources {
-    generateResClass = always
     publicResClass = true
+    packageOfResClass = "fr.berliat.hsktextviews"
+    generateResClass = always
 }

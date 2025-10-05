@@ -15,9 +15,10 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 
 import fr.berliat.hsktextviews.PinyinUtils
-import hskflashcardswidget.hsktextviews.generated.resources.Res
-import hskflashcardswidget.hsktextviews.generated.resources.arrow_dropdown_noborder
-import hskflashcardswidget.hsktextviews.generated.resources.pinyinselector_dropdown_icon
+import fr.berliat.hsktextviews.Res
+import fr.berliat.hsktextviews.arrow_dropdown_noborder
+import fr.berliat.hsktextviews.pinyinselector_dropdown_icon
+
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 

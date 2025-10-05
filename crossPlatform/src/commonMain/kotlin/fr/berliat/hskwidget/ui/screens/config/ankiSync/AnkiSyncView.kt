@@ -20,19 +20,19 @@ import fr.berliat.hskwidget.core.HSKAppServices
 
 import fr.berliat.hskwidget.ui.components.ProgressView
 
-import hskflashcardswidget.crossplatform.generated.resources.Res
-import hskflashcardswidget.crossplatform.generated.resources.anki_icon
-import hskflashcardswidget.crossplatform.generated.resources.anki_sync_cancelled_message
-import hskflashcardswidget.crossplatform.generated.resources.anki_sync_cancelled_title
-import hskflashcardswidget.crossplatform.generated.resources.anki_sync_failure_message
-import hskflashcardswidget.crossplatform.generated.resources.anki_sync_failure_title
-import hskflashcardswidget.crossplatform.generated.resources.anki_sync_start_message
-import hskflashcardswidget.crossplatform.generated.resources.anki_sync_start_title
-import hskflashcardswidget.crossplatform.generated.resources.anki_sync_success_message
-import hskflashcardswidget.crossplatform.generated.resources.anki_sync_success_title
-import hskflashcardswidget.crossplatform.generated.resources.config_anki_activate
-import hskflashcardswidget.crossplatform.generated.resources.config_anki_integration
-import hskflashcardswidget.crossplatform.generated.resources.config_anki_title
+import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.anki_icon
+import fr.berliat.hskwidget.anki_sync_cancelled_message
+import fr.berliat.hskwidget.anki_sync_cancelled_title
+import fr.berliat.hskwidget.anki_sync_failure_message
+import fr.berliat.hskwidget.anki_sync_failure_title
+import fr.berliat.hskwidget.anki_sync_start_message
+import fr.berliat.hskwidget.anki_sync_start_title
+import fr.berliat.hskwidget.anki_sync_success_message
+import fr.berliat.hskwidget.anki_sync_success_title
+import fr.berliat.hskwidget.config_anki_activate
+import fr.berliat.hskwidget.config_anki_integration
+import fr.berliat.hskwidget.config_anki_title
 
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource

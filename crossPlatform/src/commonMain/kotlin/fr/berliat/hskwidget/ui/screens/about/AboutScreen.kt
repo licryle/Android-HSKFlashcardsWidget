@@ -24,17 +24,17 @@ import androidx.compose.ui.unit.dp
 
 import fr.berliat.hskwidget.ui.components.IconButton
 
-import hskflashcardswidget.crossplatform.generated.resources.Res
-import hskflashcardswidget.crossplatform.generated.resources.about_btn_email2
-import hskflashcardswidget.crossplatform.generated.resources.about_btn_view_source
-import hskflashcardswidget.crossplatform.generated.resources.about_intro1
-import hskflashcardswidget.crossplatform.generated.resources.about_intro2
-import hskflashcardswidget.crossplatform.generated.resources.about_stats_title
-import hskflashcardswidget.crossplatform.generated.resources.about_terms_conditions_title
-import hskflashcardswidget.crossplatform.generated.resources.about_intro3
-import hskflashcardswidget.crossplatform.generated.resources.about_stats_text
-import hskflashcardswidget.crossplatform.generated.resources.ic_email
-import hskflashcardswidget.crossplatform.generated.resources.ic_github
+import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.about_btn_email2
+import fr.berliat.hskwidget.about_btn_view_source
+import fr.berliat.hskwidget.about_intro1
+import fr.berliat.hskwidget.about_intro2
+import fr.berliat.hskwidget.about_stats_title
+import fr.berliat.hskwidget.about_terms_conditions_title
+import fr.berliat.hskwidget.about_intro3
+import fr.berliat.hskwidget.about_stats_text
+import fr.berliat.hskwidget.ic_email
+import fr.berliat.hskwidget.ic_github
 
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource

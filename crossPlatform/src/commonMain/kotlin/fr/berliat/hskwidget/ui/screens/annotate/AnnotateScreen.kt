@@ -33,20 +33,20 @@ import fr.berliat.hskwidget.ui.components.DetailedWordView
 import fr.berliat.hskwidget.ui.components.DropdownSelector
 import fr.berliat.hskwidget.ui.components.LoadingView
 
-import hskflashcardswidget.crossplatform.generated.resources.Res
-import hskflashcardswidget.crossplatform.generated.resources.annotation_edit_class_level_hint
-import hskflashcardswidget.crossplatform.generated.resources.annotation_edit_class_type_hint
-import hskflashcardswidget.crossplatform.generated.resources.annotation_edit_delete_confirm_message
-import hskflashcardswidget.crossplatform.generated.resources.annotation_edit_delete_confirm_title
-import hskflashcardswidget.crossplatform.generated.resources.annotation_edit_delete_failure
-import hskflashcardswidget.crossplatform.generated.resources.annotation_edit_delete_success
-import hskflashcardswidget.crossplatform.generated.resources.annotation_edit_is_exam_hint
-import hskflashcardswidget.crossplatform.generated.resources.annotation_edit_notes_hint
-import hskflashcardswidget.crossplatform.generated.resources.annotation_edit_save_failure
-import hskflashcardswidget.crossplatform.generated.resources.annotation_edit_save_success
-import hskflashcardswidget.crossplatform.generated.resources.annotation_edit_themes_hint
-import hskflashcardswidget.crossplatform.generated.resources.delete
-import hskflashcardswidget.crossplatform.generated.resources.save
+import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.annotation_edit_class_level_hint
+import fr.berliat.hskwidget.annotation_edit_class_type_hint
+import fr.berliat.hskwidget.annotation_edit_delete_confirm_message
+import fr.berliat.hskwidget.annotation_edit_delete_confirm_title
+import fr.berliat.hskwidget.annotation_edit_delete_failure
+import fr.berliat.hskwidget.annotation_edit_delete_success
+import fr.berliat.hskwidget.annotation_edit_is_exam_hint
+import fr.berliat.hskwidget.annotation_edit_notes_hint
+import fr.berliat.hskwidget.annotation_edit_save_failure
+import fr.berliat.hskwidget.annotation_edit_save_success
+import fr.berliat.hskwidget.annotation_edit_themes_hint
+import fr.berliat.hskwidget.delete
+import fr.berliat.hskwidget.save
 
 import org.jetbrains.compose.resources.stringResource
 

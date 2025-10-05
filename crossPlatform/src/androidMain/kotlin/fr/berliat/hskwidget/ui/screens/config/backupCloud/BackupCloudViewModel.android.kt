@@ -13,11 +13,11 @@ import fr.berliat.hskwidget.domain.DatabaseHelper
 import fr.berliat.hskwidget.data.store.GoogleDriveBackup
 import fr.berliat.hskwidget.ui.screens.config.backupCloud.BackupCloudTransferEvent.*
 
-import hskflashcardswidget.crossplatform.generated.resources.Res
-import hskflashcardswidget.crossplatform.generated.resources.dbrestore_failure_fileformat
-import hskflashcardswidget.crossplatform.generated.resources.dbrestore_failure_import
-import hskflashcardswidget.crossplatform.generated.resources.dbrestore_start
-import hskflashcardswidget.crossplatform.generated.resources.dbrestore_success
+import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.dbrestore_failure_fileformat
+import fr.berliat.hskwidget.dbrestore_failure_import
+import fr.berliat.hskwidget.dbrestore_start
+import fr.berliat.hskwidget.dbrestore_success
 
 import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.PlatformFile

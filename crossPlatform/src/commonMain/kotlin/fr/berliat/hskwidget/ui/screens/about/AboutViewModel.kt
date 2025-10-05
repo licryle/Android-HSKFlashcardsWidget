@@ -3,8 +3,8 @@ package fr.berliat.hskwidget.ui.screens.about
 import co.touchlab.kermit.Logger
 import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.core.HSKAppServices
-import hskflashcardswidget.crossplatform.generated.resources.Res
-import hskflashcardswidget.crossplatform.generated.resources.about_email_noapp
+import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.about_email_noapp
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

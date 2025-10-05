@@ -17,11 +17,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.berliat.hskwidget.core.Locale
 import fr.berliat.hskwidget.data.model.ChineseWord
-import hskflashcardswidget.crossplatform.generated.resources.Res
-import hskflashcardswidget.crossplatform.generated.resources.baseline_refresh_24
-import hskflashcardswidget.crossplatform.generated.resources.baseline_volume_up_24
-import hskflashcardswidget.crossplatform.generated.resources.dictionary_item_reload
-import hskflashcardswidget.crossplatform.generated.resources.widget_btn_speak
+import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.baseline_refresh_24
+import fr.berliat.hskwidget.baseline_volume_up_24
+import fr.berliat.hskwidget.dictionary_item_reload
+import fr.berliat.hskwidget.widget_btn_speak
 
 @Composable
 fun WidgetWordView(

@@ -32,19 +32,19 @@ import co.touchlab.kermit.Logger
 import fr.berliat.hsktextviews.HSKTextSegmenter
 import fr.berliat.hskwidget.core.Utils.incrementConsultedWord
 import fr.berliat.hskwidget.core.Utils.toast
-import fr.berliat.hskwidget.crossPlatform.BuildKonfig
+import fr.berliat.hskwidget.BuildKonfig
 import fr.berliat.hskwidget.data.dao.AnkiDAO
 import fr.berliat.hskwidget.domain.SearchQuery
 
-import hskflashcardswidget.crossplatform.generated.resources.Res
-import hskflashcardswidget.crossplatform.generated.resources.cancel
-import hskflashcardswidget.crossplatform.generated.resources.copied_to_clipboard
-import hskflashcardswidget.crossplatform.generated.resources.dialog_tts_error
-import hskflashcardswidget.crossplatform.generated.resources.fix_it
-import hskflashcardswidget.crossplatform.generated.resources.speech_failure_toast_chinese_unsupported
-import hskflashcardswidget.crossplatform.generated.resources.speech_failure_toast_init
-import hskflashcardswidget.crossplatform.generated.resources.speech_failure_toast_muted
-import hskflashcardswidget.crossplatform.generated.resources.speech_failure_toast_unknown
+import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.cancel
+import fr.berliat.hskwidget.copied_to_clipboard
+import fr.berliat.hskwidget.dialog_tts_error
+import fr.berliat.hskwidget.fix_it
+import fr.berliat.hskwidget.speech_failure_toast_chinese_unsupported
+import fr.berliat.hskwidget.speech_failure_toast_init
+import fr.berliat.hskwidget.speech_failure_toast_muted
+import fr.berliat.hskwidget.speech_failure_toast_unknown
 
 import io.github.vinceglb.filekit.AndroidFile
 import io.github.vinceglb.filekit.BookmarkData

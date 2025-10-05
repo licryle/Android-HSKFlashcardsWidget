@@ -33,19 +33,19 @@ import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.ui.components.PrettyCard
 import fr.berliat.hskwidget.ui.components.RoundIconButton
 
-import hskflashcardswidget.crossplatform.generated.resources.Res
-import hskflashcardswidget.crossplatform.generated.resources.annotation_edit_delete_confirm_message
-import hskflashcardswidget.crossplatform.generated.resources.annotation_edit_delete_confirm_title
-import hskflashcardswidget.crossplatform.generated.resources.delete
-import hskflashcardswidget.crossplatform.generated.resources.delete_24px
-import hskflashcardswidget.crossplatform.generated.resources.edit_24px
-import hskflashcardswidget.crossplatform.generated.resources.ic_add_24dp
-import hskflashcardswidget.crossplatform.generated.resources.wordlist_create_new_list_button
-import hskflashcardswidget.crossplatform.generated.resources.wordlist_createddate
-import hskflashcardswidget.crossplatform.generated.resources.wordlist_delete_button
-import hskflashcardswidget.crossplatform.generated.resources.wordlist_editeddate
-import hskflashcardswidget.crossplatform.generated.resources.wordlist_rename_button
-import hskflashcardswidget.crossplatform.generated.resources.wordlist_word_count
+import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.annotation_edit_delete_confirm_message
+import fr.berliat.hskwidget.annotation_edit_delete_confirm_title
+import fr.berliat.hskwidget.delete
+import fr.berliat.hskwidget.delete_24px
+import fr.berliat.hskwidget.edit_24px
+import fr.berliat.hskwidget.ic_add_24dp
+import fr.berliat.hskwidget.wordlist_create_new_list_button
+import fr.berliat.hskwidget.wordlist_createddate
+import fr.berliat.hskwidget.wordlist_delete_button
+import fr.berliat.hskwidget.wordlist_editeddate
+import fr.berliat.hskwidget.wordlist_rename_button
+import fr.berliat.hskwidget.wordlist_word_count
 
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource

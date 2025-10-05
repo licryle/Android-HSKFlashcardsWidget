@@ -11,9 +11,9 @@ import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.core.YYMMDDHHMMSS
 import fr.berliat.hskwidget.core.toSafeFileName
 
-import hskflashcardswidget.crossplatform.generated.resources.Res
-import hskflashcardswidget.crossplatform.generated.resources.ocr_capture_error_processed
-import hskflashcardswidget.crossplatform.generated.resources.ocr_capture_error_save
+import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.ocr_capture_error_processed
+import fr.berliat.hskwidget.ocr_capture_error_save
 
 import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.PlatformFile

@@ -33,15 +33,15 @@ import fr.berliat.hskwidget.ui.components.LoadingView
 import fr.berliat.hskwidget.ui.components.widgetDefaultBox
 import fr.berliat.hskwidget.ui.screens.widget.WidgetView
 
-import hskflashcardswidget.crossplatform.generated.resources.Res
-import hskflashcardswidget.crossplatform.generated.resources.ic_dictionary_24dp
-import hskflashcardswidget.crossplatform.generated.resources.widget_configure
-import hskflashcardswidget.crossplatform.generated.resources.widget_configure_close
-import hskflashcardswidget.crossplatform.generated.resources.widget_configure_error_no_list
-import hskflashcardswidget.crossplatform.generated.resources.widget_configure_new_back
-import hskflashcardswidget.crossplatform.generated.resources.widget_configure_no_change
-import hskflashcardswidget.crossplatform.generated.resources.widget_configure_wordlist_title
-import hskflashcardswidget.crossplatform.generated.resources.widget_configure_wordlist_word_count
+import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.ic_dictionary_24dp
+import fr.berliat.hskwidget.widget_configure
+import fr.berliat.hskwidget.widget_configure_close
+import fr.berliat.hskwidget.widget_configure_error_no_list
+import fr.berliat.hskwidget.widget_configure_new_back
+import fr.berliat.hskwidget.widget_configure_no_change
+import fr.berliat.hskwidget.widget_configure_wordlist_title
+import fr.berliat.hskwidget.widget_configure_wordlist_word_count
 
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource

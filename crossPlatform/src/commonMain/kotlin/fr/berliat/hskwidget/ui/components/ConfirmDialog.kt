@@ -6,9 +6,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
-import hskflashcardswidget.crossplatform.generated.resources.Res
-import hskflashcardswidget.crossplatform.generated.resources.cancel
-import hskflashcardswidget.crossplatform.generated.resources.proceed
+import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.cancel
+import fr.berliat.hskwidget.proceed
 
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource

@@ -5,7 +5,7 @@ import android.os.StrictMode
 import android.os.strictmode.Violation
 import android.util.Log
 import androidx.annotation.RequiresApi
-import fr.berliat.hskwidget.crossPlatform.BuildKonfig
+import fr.berliat.hskwidget.BuildKonfig
 import java.util.concurrent.Executors
 
 /**

@@ -6,8 +6,8 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
-import hskflashcardswidget.crossplatform.generated.resources.Res
-import hskflashcardswidget.crossplatform.generated.resources.app_name
+import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.app_name
 
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant

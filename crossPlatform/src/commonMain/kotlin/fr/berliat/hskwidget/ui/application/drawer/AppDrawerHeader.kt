@@ -13,11 +13,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 
-import hskflashcardswidget.crossplatform.generated.resources.Res
-import hskflashcardswidget.crossplatform.generated.resources.app_name
-import hskflashcardswidget.crossplatform.generated.resources.app_slogan
-import hskflashcardswidget.crossplatform.generated.resources.ic_launcher
-import hskflashcardswidget.crossplatform.generated.resources.nav_header_desc
+import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.app_name
+import fr.berliat.hskwidget.app_slogan
+import fr.berliat.hskwidget.ic_launcher
+import fr.berliat.hskwidget.nav_header_desc
 
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource

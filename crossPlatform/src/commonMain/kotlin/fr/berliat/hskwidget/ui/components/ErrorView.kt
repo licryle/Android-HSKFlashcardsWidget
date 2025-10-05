@@ -17,11 +17,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import hskflashcardswidget.crossplatform.generated.resources.Res
-import hskflashcardswidget.crossplatform.generated.resources.error_24px
-import hskflashcardswidget.crossplatform.generated.resources.fix_it
-import hskflashcardswidget.crossplatform.generated.resources.loading
-import hskflashcardswidget.crossplatform.generated.resources.refresh_24px
+import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.error_24px
+import fr.berliat.hskwidget.fix_it
+import fr.berliat.hskwidget.loading
+import fr.berliat.hskwidget.refresh_24px
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource

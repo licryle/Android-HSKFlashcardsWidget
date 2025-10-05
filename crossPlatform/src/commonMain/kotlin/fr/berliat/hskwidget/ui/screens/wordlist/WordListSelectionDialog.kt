@@ -32,12 +32,12 @@ import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.model.WordListWithCount
 import fr.berliat.hskwidget.ui.components.LoadingView
 
-import hskflashcardswidget.crossplatform.generated.resources.Res
-import hskflashcardswidget.crossplatform.generated.resources.cancel
-import hskflashcardswidget.crossplatform.generated.resources.save
-import hskflashcardswidget.crossplatform.generated.resources.wordlist_create_button
-import hskflashcardswidget.crossplatform.generated.resources.wordlist_select_lists
-import hskflashcardswidget.crossplatform.generated.resources.wordlist_word_count
+import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.cancel
+import fr.berliat.hskwidget.save
+import fr.berliat.hskwidget.wordlist_create_button
+import fr.berliat.hskwidget.wordlist_select_lists
+import fr.berliat.hskwidget.wordlist_word_count
 
 import org.jetbrains.compose.resources.stringResource
 

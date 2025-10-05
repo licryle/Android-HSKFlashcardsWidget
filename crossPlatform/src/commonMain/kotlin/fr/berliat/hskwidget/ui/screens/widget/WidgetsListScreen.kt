@@ -28,11 +28,11 @@ import fr.berliat.hskwidget.ui.components.WidgetWordView
 import fr.berliat.hskwidget.ui.components.widgetDefaultBox
 import fr.berliat.hskwidget.ui.screens.widgetConfigure.WidgetConfigWithPreviewScreen
 
-import hskflashcardswidget.crossplatform.generated.resources.Res
-import hskflashcardswidget.crossplatform.generated.resources.ic_add_24dp
-import hskflashcardswidget.crossplatform.generated.resources.widget_configure_saved
-import hskflashcardswidget.crossplatform.generated.resources.widgets_add_widget
-import hskflashcardswidget.crossplatform.generated.resources.widgets_intro
+import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.ic_add_24dp
+import fr.berliat.hskwidget.widget_configure_saved
+import fr.berliat.hskwidget.widgets_add_widget
+import fr.berliat.hskwidget.widgets_intro
 
 import kotlinx.coroutines.launch
 

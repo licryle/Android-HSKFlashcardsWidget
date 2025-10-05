@@ -19,12 +19,12 @@ import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.data.store.SupportDevStore
 
-import hskflashcardswidget.crossplatform.generated.resources.Res
-import hskflashcardswidget.crossplatform.generated.resources.support_payment_failed
-import hskflashcardswidget.crossplatform.generated.resources.support_payment_success
-import hskflashcardswidget.crossplatform.generated.resources.support_review_failed
-import hskflashcardswidget.crossplatform.generated.resources.support_reviewed
-import hskflashcardswidget.crossplatform.generated.resources.support_total_error
+import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.support_payment_failed
+import fr.berliat.hskwidget.support_payment_success
+import fr.berliat.hskwidget.support_review_failed
+import fr.berliat.hskwidget.support_reviewed
+import fr.berliat.hskwidget.support_total_error
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

@@ -15,8 +15,8 @@ import fr.berliat.hskwidget.core.StrictModeManager
 import fr.berliat.hskwidget.data.store.GoogleDriveBackup
 import fr.berliat.hskwidget.domain.WidgetProvider
 import fr.berliat.hskwidget.ui.HSKAnkiDelegate
-import hskflashcardswidget.crossplatform.generated.resources.Res
-import hskflashcardswidget.crossplatform.generated.resources.app_name
+import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.app_name
 import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.dialogs.init

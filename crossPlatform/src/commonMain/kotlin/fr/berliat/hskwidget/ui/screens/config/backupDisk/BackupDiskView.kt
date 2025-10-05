@@ -26,26 +26,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+
+import fr.berliat.hsktextviews.arrow_dropdown_noborder
+import fr.berliat.hsktextviews.pinyinselector_dropdown_icon
+
 import fr.berliat.hskwidget.core.HSKAppServices
-
 import fr.berliat.hskwidget.ui.components.IconButton
-
-import hskflashcardswidget.crossplatform.generated.resources.Res
-import hskflashcardswidget.crossplatform.generated.resources.config_backup_activate
-import hskflashcardswidget.crossplatform.generated.resources.config_backup_directory_choose
-import hskflashcardswidget.crossplatform.generated.resources.config_backup_frequency
-import hskflashcardswidget.crossplatform.generated.resources.config_backup_frequency_options
-import hskflashcardswidget.crossplatform.generated.resources.config_backup_location
-import hskflashcardswidget.crossplatform.generated.resources.config_backup_max_locally
-import hskflashcardswidget.crossplatform.generated.resources.config_backup_max_number
-import hskflashcardswidget.crossplatform.generated.resources.config_backup_title
-import hskflashcardswidget.crossplatform.generated.resources.config_restore_file
-import hskflashcardswidget.crossplatform.generated.resources.config_restore_file_choose
-import hskflashcardswidget.crossplatform.generated.resources.database_upload_24px
-import hskflashcardswidget.crossplatform.generated.resources.file_save_24px
-import hskflashcardswidget.crossplatform.generated.resources.folder_open_24px
-import hskflashcardswidget.hsktextviews.generated.resources.arrow_dropdown_noborder
-import hskflashcardswidget.hsktextviews.generated.resources.pinyinselector_dropdown_icon
+import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.config_backup_activate
+import fr.berliat.hskwidget.config_backup_directory_choose
+import fr.berliat.hskwidget.config_backup_frequency
+import fr.berliat.hskwidget.config_backup_frequency_options
+import fr.berliat.hskwidget.config_backup_location
+import fr.berliat.hskwidget.config_backup_max_locally
+import fr.berliat.hskwidget.config_backup_max_number
+import fr.berliat.hskwidget.config_backup_title
+import fr.berliat.hskwidget.config_restore_file
+import fr.berliat.hskwidget.config_restore_file_choose
+import fr.berliat.hskwidget.database_upload_24px
+import fr.berliat.hskwidget.file_save_24px
+import fr.berliat.hskwidget.folder_open_24px
 
 import io.github.vinceglb.filekit.name
 import org.jetbrains.compose.resources.painterResource
@@ -118,8 +118,9 @@ fun BackupDiskView(
                     Text(text = maxFiles.getValue(backupDiskMaxFiles), style = TextStyle.Default)
 
                     Icon(
-                        painter = rememberVectorPainter(vectorResource(hskflashcardswidget.hsktextviews.generated.resources.Res.drawable.arrow_dropdown_noborder)),
-                        contentDescription = stringResource(hskflashcardswidget.hsktextviews.generated.resources.Res.string.pinyinselector_dropdown_icon),
+                        // Todo: use proper resources
+                        painter = rememberVectorPainter(vectorResource(fr.berliat.hsktextviews.Res.drawable.arrow_dropdown_noborder)),
+                        contentDescription = stringResource(fr.berliat.hsktextviews.Res.string.pinyinselector_dropdown_icon),
                         modifier = Modifier.size(10.dp)
                     )
                 }

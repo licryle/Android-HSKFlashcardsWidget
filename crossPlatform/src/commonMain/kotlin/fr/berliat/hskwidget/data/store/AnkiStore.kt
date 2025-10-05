@@ -8,15 +8,14 @@ import fr.berliat.hskwidget.data.dao.WordListDAO
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.WordList
 import fr.berliat.hskwidget.data.model.WordListEntry
-import hskflashcardswidget.crossplatform.generated.resources.Res
-import hskflashcardswidget.crossplatform.generated.resources.anki_card_CNEN_back
-import hskflashcardswidget.crossplatform.generated.resources.anki_card_CNEN_front
-import hskflashcardswidget.crossplatform.generated.resources.anki_card_ENCN_back
-import hskflashcardswidget.crossplatform.generated.resources.anki_card_ENCN_front
-import hskflashcardswidget.crossplatform.generated.resources.anki_card_css
-import hskflashcardswidget.crossplatform.generated.resources.app_name
+import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.anki_card_CNEN_back
+import fr.berliat.hskwidget.anki_card_CNEN_front
+import fr.berliat.hskwidget.anki_card_ENCN_back
+import fr.berliat.hskwidget.anki_card_ENCN_front
+import fr.berliat.hskwidget.anki_card_css
+import fr.berliat.hskwidget.app_name
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.getString
 

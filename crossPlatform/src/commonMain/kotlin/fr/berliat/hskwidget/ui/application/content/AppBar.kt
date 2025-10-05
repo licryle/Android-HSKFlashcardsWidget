@@ -18,10 +18,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 
-import hskflashcardswidget.crossplatform.generated.resources.Res
-import hskflashcardswidget.crossplatform.generated.resources.menu_ocr
-import hskflashcardswidget.crossplatform.generated.resources.photo_camera_24px
-import hskflashcardswidget.crossplatform.generated.resources.search_hint
+import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.menu_ocr
+import fr.berliat.hskwidget.photo_camera_24px
+import fr.berliat.hskwidget.search_hint
 
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource

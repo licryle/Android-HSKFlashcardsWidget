@@ -6,20 +6,20 @@ import androidx.lifecycle.viewModelScope
 import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.core.AppServices
 import fr.berliat.hskwidget.core.HSKAppServices
-import fr.berliat.hskwidget.crossPlatform.BuildKonfig
+import fr.berliat.hskwidget.BuildKonfig
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.domain.DatabaseDiskBackup
 import fr.berliat.hskwidget.domain.DatabaseHelper
 import fr.berliat.hskwidget.domain.SearchQuery
 import fr.berliat.hskwidget.ui.navigation.Screen
 
-import hskflashcardswidget.crossplatform.generated.resources.Res
-import hskflashcardswidget.crossplatform.generated.resources.database_update_failure
-import hskflashcardswidget.crossplatform.generated.resources.database_update_start
-import hskflashcardswidget.crossplatform.generated.resources.database_update_success
-import hskflashcardswidget.crossplatform.generated.resources.dbbackup_failure_folderpermission
-import hskflashcardswidget.crossplatform.generated.resources.dbbackup_failure_write
-import hskflashcardswidget.crossplatform.generated.resources.dbbackup_success
+import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.database_update_failure
+import fr.berliat.hskwidget.database_update_start
+import fr.berliat.hskwidget.database_update_success
+import fr.berliat.hskwidget.dbbackup_failure_folderpermission
+import fr.berliat.hskwidget.dbbackup_failure_write
+import fr.berliat.hskwidget.dbbackup_success
 
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.fromBookmarkData

@@ -30,5 +30,4 @@ include(":floatlayouts")
 include(":googledrivebackup")
 include(":AnkiDroidAPIHelper")
 include(":crossPlatform")
-include(":androidResources")
 

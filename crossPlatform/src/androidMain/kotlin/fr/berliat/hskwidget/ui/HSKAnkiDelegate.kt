@@ -9,13 +9,13 @@ import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.store.AnkiStore
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 
-import hskflashcardswidget.crossplatform.generated.resources.Res
-import hskflashcardswidget.crossplatform.generated.resources.anki_must_start
-import hskflashcardswidget.crossplatform.generated.resources.anki_not_installed
-import hskflashcardswidget.crossplatform.generated.resources.anki_operation_cancelled
-import hskflashcardswidget.crossplatform.generated.resources.anki_operation_failed
-import hskflashcardswidget.crossplatform.generated.resources.anki_operation_success
-import hskflashcardswidget.crossplatform.generated.resources.anki_permission_denied
+import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.anki_must_start
+import fr.berliat.hskwidget.anki_not_installed
+import fr.berliat.hskwidget.anki_operation_cancelled
+import fr.berliat.hskwidget.anki_operation_failed
+import fr.berliat.hskwidget.anki_operation_success
+import fr.berliat.hskwidget.anki_permission_denied
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking

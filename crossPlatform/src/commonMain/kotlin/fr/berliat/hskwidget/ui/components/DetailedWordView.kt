@@ -35,23 +35,23 @@ import fr.berliat.hskwidget.data.type.HSK_Level
 
 import HSKWordView
 
-import hskflashcardswidget.crossplatform.generated.resources.Res
-import hskflashcardswidget.crossplatform.generated.resources.baseline_volume_up_24
-import hskflashcardswidget.crossplatform.generated.resources.bookmark_24px
-import hskflashcardswidget.crossplatform.generated.resources.bookmark_heart_24px
-import hskflashcardswidget.crossplatform.generated.resources.content_copy_24px
-import hskflashcardswidget.crossplatform.generated.resources.dictionary_item_altdefinition
-import hskflashcardswidget.crossplatform.generated.resources.dictionary_item_annotate
-import hskflashcardswidget.crossplatform.generated.resources.dictionary_item_antonym
-import hskflashcardswidget.crossplatform.generated.resources.dictionary_item_examples
-import hskflashcardswidget.crossplatform.generated.resources.dictionary_item_lists
-import hskflashcardswidget.crossplatform.generated.resources.dictionary_item_synonyms
-import hskflashcardswidget.crossplatform.generated.resources.dictionary_item_toggle
-import hskflashcardswidget.crossplatform.generated.resources.format_list_bulleted_add_24px
-import hskflashcardswidget.crossplatform.generated.resources.keyboard_arrow_down_24px
-import hskflashcardswidget.crossplatform.generated.resources.keyboard_arrow_up_24px
-import hskflashcardswidget.crossplatform.generated.resources.widget_btn_copy
-import hskflashcardswidget.crossplatform.generated.resources.widget_btn_speak
+import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.baseline_volume_up_24
+import fr.berliat.hskwidget.bookmark_24px
+import fr.berliat.hskwidget.bookmark_heart_24px
+import fr.berliat.hskwidget.content_copy_24px
+import fr.berliat.hskwidget.dictionary_item_altdefinition
+import fr.berliat.hskwidget.dictionary_item_annotate
+import fr.berliat.hskwidget.dictionary_item_antonym
+import fr.berliat.hskwidget.dictionary_item_examples
+import fr.berliat.hskwidget.dictionary_item_lists
+import fr.berliat.hskwidget.dictionary_item_synonyms
+import fr.berliat.hskwidget.dictionary_item_toggle
+import fr.berliat.hskwidget.format_list_bulleted_add_24px
+import fr.berliat.hskwidget.keyboard_arrow_down_24px
+import fr.berliat.hskwidget.keyboard_arrow_up_24px
+import fr.berliat.hskwidget.widget_btn_copy
+import fr.berliat.hskwidget.widget_btn_speak
 
 import org.jetbrains.compose.resources.stringResource
 

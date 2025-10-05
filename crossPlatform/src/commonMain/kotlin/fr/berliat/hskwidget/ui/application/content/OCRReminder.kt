@@ -18,10 +18,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import hskflashcardswidget.crossplatform.generated.resources.Res
-import hskflashcardswidget.crossplatform.generated.resources.close_24px
-import hskflashcardswidget.crossplatform.generated.resources.nav_host_ocr_reminder_close
-import hskflashcardswidget.crossplatform.generated.resources.nav_host_ocr_reminder_text
+import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.close_24px
+import fr.berliat.hskwidget.nav_host_ocr_reminder_close
+import fr.berliat.hskwidget.nav_host_ocr_reminder_text
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 

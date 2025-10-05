@@ -19,7 +19,7 @@ import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 
-import fr.berliat.hskwidget.androidResources.R
+import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.core.Locale

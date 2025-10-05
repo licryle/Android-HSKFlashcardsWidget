@@ -37,10 +37,10 @@ import fr.berliat.hskwidget.ui.components.Error
 import fr.berliat.hskwidget.ui.components.ErrorView
 import fr.berliat.hskwidget.ui.components.LoadingProgressView
 
-import hskflashcardswidget.crossplatform.generated.resources.Res
-import hskflashcardswidget.crossplatform.generated.resources.ic_launcher
-import hskflashcardswidget.crossplatform.generated.resources.ocr_capture_btn
-import hskflashcardswidget.crossplatform.generated.resources.ocr_capture_permission_denied
+import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.ic_launcher
+import fr.berliat.hskwidget.ocr_capture_btn
+import fr.berliat.hskwidget.ocr_capture_permission_denied
 import io.github.vinceglb.filekit.PlatformFile
 
 import org.jetbrains.compose.resources.painterResource

@@ -2,21 +2,21 @@ package fr.berliat.hskwidget.ui.navigation
 
 import kotlinx.serialization.Serializable
 
-import hskflashcardswidget.crossplatform.generated.resources.Res
-import hskflashcardswidget.crossplatform.generated.resources.bakery_dining_24px
-import hskflashcardswidget.crossplatform.generated.resources.format_list_bulleted_add_24px
-import hskflashcardswidget.crossplatform.generated.resources.ic_dictionary_24dp
-import hskflashcardswidget.crossplatform.generated.resources.menu_dictionary
-import hskflashcardswidget.crossplatform.generated.resources.menu_lists
-import hskflashcardswidget.crossplatform.generated.resources.baseline_info_24
-import hskflashcardswidget.crossplatform.generated.resources.baseline_widgets_24
-import hskflashcardswidget.crossplatform.generated.resources.menu_about
-import hskflashcardswidget.crossplatform.generated.resources.menu_ocr
-import hskflashcardswidget.crossplatform.generated.resources.menu_settings
-import hskflashcardswidget.crossplatform.generated.resources.menu_support
-import hskflashcardswidget.crossplatform.generated.resources.menu_widgets
-import hskflashcardswidget.crossplatform.generated.resources.photo_camera_24px
-import hskflashcardswidget.crossplatform.generated.resources.settings_24px
+import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.bakery_dining_24px
+import fr.berliat.hskwidget.format_list_bulleted_add_24px
+import fr.berliat.hskwidget.ic_dictionary_24dp
+import fr.berliat.hskwidget.menu_dictionary
+import fr.berliat.hskwidget.menu_lists
+import fr.berliat.hskwidget.baseline_info_24
+import fr.berliat.hskwidget.baseline_widgets_24
+import fr.berliat.hskwidget.menu_about
+import fr.berliat.hskwidget.menu_ocr
+import fr.berliat.hskwidget.menu_settings
+import fr.berliat.hskwidget.menu_support
+import fr.berliat.hskwidget.menu_widgets
+import fr.berliat.hskwidget.photo_camera_24px
+import fr.berliat.hskwidget.settings_24px
 
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource

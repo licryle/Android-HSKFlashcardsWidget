@@ -21,13 +21,13 @@ import androidx.compose.ui.unit.dp
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.model.WordList
 
-import hskflashcardswidget.crossplatform.generated.resources.Res
-import hskflashcardswidget.crossplatform.generated.resources.cancel
-import hskflashcardswidget.crossplatform.generated.resources.wordlist_create_button
-import hskflashcardswidget.crossplatform.generated.resources.wordlist_create_new_list_button
-import hskflashcardswidget.crossplatform.generated.resources.wordlist_list_name
-import hskflashcardswidget.crossplatform.generated.resources.wordlist_list_name_dupe
-import hskflashcardswidget.crossplatform.generated.resources.wordlist_rename_button
+import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.cancel
+import fr.berliat.hskwidget.wordlist_create_button
+import fr.berliat.hskwidget.wordlist_create_new_list_button
+import fr.berliat.hskwidget.wordlist_list_name
+import fr.berliat.hskwidget.wordlist_list_name_dupe
+import fr.berliat.hskwidget.wordlist_rename_button
 
 import org.jetbrains.compose.resources.stringResource
 

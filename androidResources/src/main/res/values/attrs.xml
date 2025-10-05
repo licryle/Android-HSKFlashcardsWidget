@@ -1,5 +1,0 @@
-<resources>
-    <attr name="appWidgetRadius" />
-    <attr name="appWidgetInnerRadius" />
-    <attr name="appWidgetPadding" />
-</resources>

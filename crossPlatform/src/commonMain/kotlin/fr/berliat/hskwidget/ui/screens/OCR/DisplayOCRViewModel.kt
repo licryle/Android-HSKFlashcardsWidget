@@ -16,11 +16,11 @@ import fr.berliat.hskwidget.data.repo.ChineseWordFrequencyRepo
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.ui.components.smallestHanziFontSize
 
-import hskflashcardswidget.crossplatform.generated.resources.Res
-import hskflashcardswidget.crossplatform.generated.resources.ocr_display_no_text_found
-import hskflashcardswidget.crossplatform.generated.resources.ocr_display_ocr_failed
-import hskflashcardswidget.crossplatform.generated.resources.ocr_display_smallest_text
-import hskflashcardswidget.crossplatform.generated.resources.ocr_display_word_not_found
+import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.ocr_display_no_text_found
+import fr.berliat.hskwidget.ocr_display_ocr_failed
+import fr.berliat.hskwidget.ocr_display_smallest_text
+import fr.berliat.hskwidget.ocr_display_word_not_found
 
 import io.github.vinceglb.filekit.PlatformFile
 
