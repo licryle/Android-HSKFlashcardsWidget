@@ -2,11 +2,13 @@ package fr.berliat.hskwidget.ui
 
 import android.content.Context
 import androidx.fragment.app.FragmentActivity
+
 import fr.berliat.ankidroidhelper.AnkiDelegate
 import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.store.AnkiStore
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
+
 import hskflashcardswidget.crossplatform.generated.resources.Res
 import hskflashcardswidget.crossplatform.generated.resources.anki_must_start
 import hskflashcardswidget.crossplatform.generated.resources.anki_not_installed
@@ -14,19 +16,17 @@ import hskflashcardswidget.crossplatform.generated.resources.anki_operation_canc
 import hskflashcardswidget.crossplatform.generated.resources.anki_operation_failed
 import hskflashcardswidget.crossplatform.generated.resources.anki_operation_success
 import hskflashcardswidget.crossplatform.generated.resources.anki_permission_denied
+
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+
 import org.jetbrains.compose.resources.getString
 
 class HSKAnkiDelegate(val activity: FragmentActivity,
                       handler: HandlerInterface? = null,
-                      appConfig: AppPreferencesStore? = HSKAppServices.appPreferences,
-                      ankiStore: AnkiStore? = HSKAppServices.ankiStore)  : AnkiDelegate(activity, handler) {
-    // TODO FIND A WAY TO REMOVE
-    var appConfig: AppPreferencesStore? = appConfig
-    var ankiStore: AnkiStore? = ankiStore
-
+                      var appConfig: AppPreferencesStore? = HSKAppServices.appPreferences,
+                      var ankiStore: AnkiStore? = HSKAppServices.ankiStore)  : AnkiDelegate(activity, handler) {
     override fun onAnkiRequestPermissionsResult(granted: Boolean) {
         appConfig?.ankiSaveNotes?.value = granted
         super.onAnkiRequestPermissionsResult(granted)

@@ -27,7 +27,7 @@ actual class AppViewModel(val activity: () -> FragmentActivity)
     : CommonAppViewModel() {
 
     // Needs instantiation before onResume
-    private lateinit var ankiDelegate : HSKAnkiDelegate
+    private var ankiDelegate : HSKAnkiDelegate
 
     init {
         // Enable StrictMode in Debug mode
@@ -47,6 +47,7 @@ actual class AppViewModel(val activity: () -> FragmentActivity)
             )
         )
 
+        // HSKAnkiDelegate must be init before onResume, yet HSKAppServices aren't ready
         ankiDelegate = HSKAnkiDelegate(
             activity = activity.invoke(),
             handler = null,
@@ -58,7 +59,7 @@ actual class AppViewModel(val activity: () -> FragmentActivity)
     override fun finishInitialization() {
         super.finishInitialization()
 
-        // Now we may be after onResume()
+        // Now we may be after onResume() and HSK AppServices is ready for consumption
         ankiDelegate.ankiStore = HSKAppServices.ankiStore
         ankiDelegate.appConfig = HSKAppServices.appPreferences
         HSKAppServices.registerAnkiDelegators(ankiDelegate)
