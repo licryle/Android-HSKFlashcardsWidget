@@ -1,0 +1,40 @@
+<!-- @Todo: find a way to implement androidx.constraintlayout.widget.ConstraintLayout... -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/Widget.HSKFlashcardsWidget.AppWidget.Container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_gravity="center"
+    android:padding="10dp"
+    android:theme="@style/Theme.HSKFlashcardsWidget.AppWidgetContainer">
+
+    <ImageView
+        android:id="@+id/flashcard_loading_icon"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center"
+        android:layout_margin="30dp"
+        android:contentDescription="@string/app_name"
+        android:maxWidth="50dp"
+        android:src="@mipmap/ic_launcher_round"
+        android:foreground="@drawable/round_foreground"
+        android:foregroundTint="?android:attr/colorBackground"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/flashcard_loading_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/widget_default_loading"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        app:layout_constraintTop_toBottomOf="@id/flashcard_loading_icon"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+</LinearLayout>
