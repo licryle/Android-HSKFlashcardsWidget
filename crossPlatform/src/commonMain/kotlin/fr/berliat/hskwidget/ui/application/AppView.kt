@@ -10,13 +10,16 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import fr.berliat.hskwidget.core.AppServices
 
 import fr.berliat.hskwidget.ui.application.content.AppBar
 import fr.berliat.hskwidget.ui.application.content.OCRReminder
 import fr.berliat.hskwidget.ui.application.drawer.AppDrawer
+import fr.berliat.hskwidget.ui.components.LoadingView
 import fr.berliat.hskwidget.ui.navigation.AppNavHost
 import fr.berliat.hskwidget.ui.navigation.DecoratedScreen
 import fr.berliat.hskwidget.ui.navigation.NavigationManager
@@ -26,12 +29,20 @@ import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppView(navigationManager: NavigationManager
+fun AppView(
+    navigationManager: NavigationManager,
+    viewModel: AppViewModel
 ) {
     val drawerIsOpen = remember { mutableStateOf(false) }
     val drawerState = rememberDrawerState(if (drawerIsOpen.value) DrawerValue.Open else DrawerValue.Closed)
 
     val showOCRReminder = remember { mutableStateOf(true) }
+
+    val isHSKAppServicesStatus = viewModel.isHSKAppServicesStatus.collectAsState()
+    if (isHSKAppServicesStatus.value != AppServices.Status.Ready) {
+        LoadingView()
+        return
+    }
 
     LaunchedEffect(drawerIsOpen.value) {
         if (drawerIsOpen.value) drawerState.open() else drawerState.close()
@@ -77,7 +88,7 @@ fun AppView(navigationManager: NavigationManager
                         }
 
                         // Screen
-                        AppNavHost()
+                        AppNavHost(viewModel = viewModel)
                     }
                 }
             )

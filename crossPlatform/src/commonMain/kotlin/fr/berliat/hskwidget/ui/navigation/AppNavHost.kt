@@ -7,9 +7,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 
-import fr.berliat.hskwidget.core.HSKAppServices
-import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.domain.SearchQuery
+import fr.berliat.hskwidget.ui.application.AppViewModel
 import fr.berliat.hskwidget.ui.screens.OCR.CaptureImageScreen
 import fr.berliat.hskwidget.ui.screens.OCR.DisplayOCRScreen
 import fr.berliat.hskwidget.ui.screens.about.AboutScreen
@@ -19,21 +18,28 @@ import fr.berliat.hskwidget.ui.screens.dictionary.DictionarySearchScreen
 import fr.berliat.hskwidget.ui.screens.support.SupportScreen
 import fr.berliat.hskwidget.ui.screens.widget.WidgetsListScreen
 import fr.berliat.hskwidget.ui.screens.wordlist.WordListScreen
-
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.exists
 import io.github.vinceglb.filekit.path
 
 @Composable
-fun AppNavHost(prefsStore : AppPreferencesStore = HSKAppServices.appPreferences) {
+fun AppNavHost(viewModel : AppViewModel) {
     val navController = rememberNavController()
-    NavigationManager.init(navController)
+    LaunchedEffect(navController) {
+        NavigationManager.init(navController)
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.navigation.collect { route ->
+            navController.navigate(route)
+        }
+    }
 
     NavHost(navController = navController, startDestination = Screen.Dictionary()) {
         composable<Screen.Dictionary> { backStackEntry ->
             LaunchedEffect(backStackEntry) {
                 val args = backStackEntry.toRoute<Screen.Dictionary>()
-                prefsStore.searchQuery.value = SearchQuery.fromString(args.search)
+                viewModel.search(args.search)
             }
 
             DictionarySearchScreen(

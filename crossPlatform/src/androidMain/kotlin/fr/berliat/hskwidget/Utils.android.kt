@@ -86,7 +86,7 @@ actual object ExpectedUtils {
 
     // Initialize once from Compose or Activity
     fun init(activity: Activity) {
-        _context = activity
+        _context = activity.applicationContext
         _activityProvider = { activity }
     }
 
