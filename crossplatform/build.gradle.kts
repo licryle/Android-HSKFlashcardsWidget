@@ -1,15 +1,25 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
+import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.*
 
 plugins {
     kotlin("multiplatform") version "2.2.10"
     kotlin("plugin.serialization") version "1.8.0"
     id("com.android.kotlin.multiplatform.library")
-    //id("com.android.library")
     id("org.jetbrains.compose") version "1.8.2"
     id("org.jetbrains.kotlin.plugin.compose") version "2.2.20"
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
+    id("com.codingfeline.buildkonfig") version "0.17.1"
+}
+
+buildkonfig {
+    packageName = "fr.berliat.hskwidget.crossPlatform"
+
+    defaultConfigs {
+        buildConfigField(INT, "VERSION_CODE", "40")
+        buildConfigField(BOOLEAN, "DEBUG_MODE", "true")
+    }
 }
 
 kotlin {
