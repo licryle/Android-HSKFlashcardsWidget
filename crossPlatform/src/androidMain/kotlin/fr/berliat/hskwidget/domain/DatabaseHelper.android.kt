@@ -1,6 +1,8 @@
 package fr.berliat.hskwidget.domain
 
 import androidx.room.Room
+import co.touchlab.kermit.Logger
+import fr.berliat.hskwidget.BuildKonfig
 
 import fr.berliat.hskwidget.core.ExpectedUtils
 import fr.berliat.hskwidget.core.Utils
@@ -15,25 +17,26 @@ import io.github.vinceglb.filekit.div
 import io.github.vinceglb.filekit.path
 
 import java.io.File
+import java.util.concurrent.Executors
 
 actual suspend fun createRoomDatabaseLive(): ChineseWordsDatabase {
-    val db = Room.databaseBuilder(
+    val dbBuilder = Room.databaseBuilder(
                 ExpectedUtils.context.applicationContext,
                 ChineseWordsDatabase::class.java,
                 DATABASE_FILENAME)
         .createFromAsset(DATABASE_ASSET_PATH)
-        .build()
 
+
+    if (BuildKonfig.DEBUG_MODE) {
+        dbBuilder.setQueryCallback(
+            { sqlQuery, bindArgs ->
+                Logger.d(tag = "DatabaseHelper", messageString = "SQL Query: $sqlQuery SQL Args: $bindArgs")
+            }, Executors.newSingleThreadExecutor()
+        )
+    }
+
+    val db = dbBuilder.build()
     db._databaseFile = getDatabaseLiveFile()
-
-    /*if (BuildConfig.DEBUG) {
-    dbBuilder.setQueryCallback(
-        { sqlQuery, bindArgs ->
-            Logger.d(tag = TAG, messageString = "SQL Query: $sqlQuery SQL Args: $bindArgs")
-        }, Executors.newSingleThreadExecutor()
-    )
-}*/
-
     return db
 }
 
