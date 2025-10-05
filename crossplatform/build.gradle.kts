@@ -149,11 +149,6 @@ android {
     kotlin {
         jvmToolchain(11)
     }
-/*
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    sourceSets["main"].res.srcDirs("src/androidMain/res")
-    sourceSets["main"].java.srcDirs("src/androidMain/kotlin")
-    sourceSets["main"].res.srcDir("$buildDir/generated/compose/resourceGenerator/preparedResources/commonMain/composeResources")*/
 
     buildFeatures {
         compose = true
@@ -195,48 +190,3 @@ compose.resources {
 room {
     schemaDirectory("$projectDir/schemas")
 }
-/*
-tasks.matching {
-    it.name.contains("processDebugNavigationResources") ||
-            it.name.contains("mapDebugSourceSetPaths") ||
-            it.name.contains("generateDebugResources")
-}.configureEach {
-    val composePrepTasks = listOf(
-        "prepareComposeResourcesTaskForCommonMain",
-        "copyNonXmlValueResourcesForCommonMain",
-        "convertXmlValueResourcesForCommonMain"
-    )
-
-    composePrepTasks.forEach { prepName ->
-        val prepTask = project(":crossPlatform").tasks.findByName(prepName)
-        prepTask?.let {
-            mustRunAfter(it) // <-- now this is called on the task receiver
-        }
-    }
-}
-
-// Resources issues hack
-tasks.register<Delete>("cleanCopyHSKViewsResources") {
-    description = "Deletes the old HSK Vews Resources resources."
-    delete("$rootDir/app/build/intermediates/assets/debug/mergeDebugAssets/composeResources/fr.berliat.hsktextviews")
-}
-
-val copyHSKViewsResources = tasks.register<Copy>("copyHSKViewsResources") {
-    group = "build"
-    description = "Copies my resources from CrossPlatform output to App input"
-
-    val sourceDir = file("$rootDir/hsktextviews/build/generated/compose/resourceGenerator/preparedResources/commonMain/composeResources")
-    from(sourceDir)
-    into("$rootDir/app/build/intermediates/assets/debug/mergeDebugAssets/composeResources/fr.berliat.hsktextviews")
-
-    inputs.dir(sourceDir) // <-- Gradle now knows this directory is an input
-    dependsOn("cleanCopyHSKViewsResources")
-    dependsOn(project(":hsktextviews").tasks.named("prepareComposeResourcesTaskForCommonMain"))
-    dependsOn(project(":hsktextviews").tasks.named("copyNonXmlValueResourcesForCommonMain"))
-    dependsOn(project(":hsktextviews").tasks.named("convertXmlValueResourcesForCommonMain"))
-}
-
-tasks.named("preBuild").configure {
-    dependsOn(":hsktextviews:convertXmlValueResourcesForCommonMain")
-    dependsOn(copyHSKViewsResources)
-}*/

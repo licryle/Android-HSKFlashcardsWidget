@@ -27,6 +27,7 @@ import io.github.vinceglb.filekit.path
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
@@ -39,6 +40,10 @@ open class CommonAppViewModel(): ViewModel() {
     var _appConfig: AppPreferencesStore? = null
     val appConfig
         get() = _appConfig!!
+
+    private val _isReady = MutableStateFlow<Boolean>(false)
+    val isReady = _isReady.asSharedFlow()
+
 
     val isHSKAppServicesStatus = HSKAppServices.status
 
@@ -56,6 +61,8 @@ open class CommonAppViewModel(): ViewModel() {
 
     protected open fun finishInitialization() {
         _appConfig = HSKAppServices.appPreferences
+        _isReady.value = true
+
         setupSupporter()
         handleDbOperations()
 

@@ -52,8 +52,9 @@ import org.jetbrains.compose.resources.stringResource
 fun DictionarySearchScreen(
     onAnnotate: (String) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: DictionaryViewModel = remember { DictionaryViewModel(
-        prefsStore = HSKAppServices.appPreferences
+    viewModel: DictionarySearchViewModel = remember { DictionarySearchViewModel(
+        prefsStore = HSKAppServices.appPreferences,
+        annotatedChineseWordDAO = HSKAppServices.database.annotatedChineseWordDAO()
     ) }
 ) {
     val searchQuery by viewModel.searchQuery.collectAsState()
@@ -80,7 +81,7 @@ fun DictionarySearchScreen(
             onSaved = {
                 viewModel.listsAssociationChanged()
                 showWordListDialog = null
-            }, // we touched lists, let's
+            },
             modifier = modifier
         )
     }
@@ -119,7 +120,7 @@ fun DictionarySearchScreen(
                             onListsClick = { showWordListDialog = word.word }
                         )
 
-                        if (hasMoreResults && index >= results.size - 5) {
+                        if (!isLoading && hasMoreResults && index >= results.size - 5) {
                             // Trigger pagination
                             LaunchedEffect(Unit) { viewModel.loadMore() }
                         }

@@ -15,7 +15,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 
-import fr.berliat.hskwidget.core.AppServices
 import fr.berliat.hskwidget.ui.application.content.AppBar
 import fr.berliat.hskwidget.ui.application.content.OCRReminder
 import fr.berliat.hskwidget.ui.application.drawer.AppDrawer
@@ -33,13 +32,13 @@ fun AppView(
     navigationManager: NavigationManager,
     viewModel: AppViewModel
 ) {
+    val isReady = viewModel.isReady.collectAsState(false)
     val drawerIsOpen = remember { mutableStateOf(false) }
     val drawerState = rememberDrawerState(if (drawerIsOpen.value) DrawerValue.Open else DrawerValue.Closed)
 
     val showOCRReminder = remember { mutableStateOf(true) }
 
-    val isHSKAppServicesStatus = viewModel.isHSKAppServicesStatus.collectAsState()
-    if (isHSKAppServicesStatus.value != AppServices.Status.Ready) {
+    if (!isReady.value) {
         LoadingView()
         return
     }
