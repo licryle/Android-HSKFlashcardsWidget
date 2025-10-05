@@ -2,9 +2,6 @@ package fr.berliat.hskwidget.core
 
 import fr.berliat.ankidroidhelper.AnkiDelegate
 import fr.berliat.hsktextviews.HSKTextSegmenter
-import fr.berliat.hskwidget.KAnkiDelegator
-import fr.berliat.hskwidget.KAnkiServiceDelegator
-import fr.berliat.hskwidget.Utils
 import fr.berliat.hskwidget.data.repo.WordListRepository
 import fr.berliat.hskwidget.data.store.AnkiStore
 import fr.berliat.hskwidget.data.store.AppPreferencesStore

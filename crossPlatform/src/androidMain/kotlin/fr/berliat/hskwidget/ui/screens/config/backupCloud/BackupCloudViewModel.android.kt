@@ -7,7 +7,7 @@ import fr.berliat.googledrivebackup.BackupEvent
 import fr.berliat.googledrivebackup.GoogleDriveBackupFile
 import fr.berliat.googledrivebackup.GoogleDriveState
 import fr.berliat.googledrivebackup.RestoreEvent
-import fr.berliat.hskwidget.Utils
+import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.domain.DatabaseHelper
 import fr.berliat.hskwidget.data.store.GoogleDriveBackup

@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
 
 import fr.berliat.hsktextviews.HSKTextSegmenter
-import fr.berliat.hskwidget.Utils
+import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.core.HSKOCR
 import fr.berliat.hskwidget.data.dao.AnnotatedChineseWordDAO
 import fr.berliat.hskwidget.data.dao.ChineseWordFrequencyDAO

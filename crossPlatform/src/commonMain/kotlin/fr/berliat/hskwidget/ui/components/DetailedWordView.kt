@@ -29,8 +29,8 @@ import fr.berliat.hskwidget.core.Locale
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.type.Modality
 import fr.berliat.hskwidget.data.type.WordType
-import fr.berliat.hskwidget.capitalize
-import fr.berliat.hskwidget.Utils
+import fr.berliat.hskwidget.core.capitalize
+import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.data.type.HSK_Level
 
 import HSKWordView

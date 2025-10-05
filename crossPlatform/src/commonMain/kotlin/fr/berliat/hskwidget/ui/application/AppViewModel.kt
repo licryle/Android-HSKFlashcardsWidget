@@ -3,7 +3,7 @@ package fr.berliat.hskwidget.ui.application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 
-import fr.berliat.hskwidget.Utils
+import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.core.AppServices
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.crossPlatform.BuildKonfig

@@ -2,9 +2,9 @@ package fr.berliat.hskwidget.ui.screens.annotate
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import fr.berliat.hskwidget.KAnkiDelegator
-import fr.berliat.hskwidget.Utils
-import fr.berliat.hskwidget.Utils.incrementConsultedWord
+import fr.berliat.hskwidget.core.KAnkiDelegator
+import fr.berliat.hskwidget.core.Utils
+import fr.berliat.hskwidget.core.Utils.incrementConsultedWord
 
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.store.AppPreferencesStore

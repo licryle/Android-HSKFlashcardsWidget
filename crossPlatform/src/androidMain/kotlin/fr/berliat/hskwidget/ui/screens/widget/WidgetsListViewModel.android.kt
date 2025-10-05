@@ -9,7 +9,7 @@ import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 
-import fr.berliat.hskwidget.ExpectedUtils
+import fr.berliat.hskwidget.core.ExpectedUtils
 import fr.berliat.hskwidget.domain.WidgetProvider
 
 import hskflashcardswidget.crossplatform.generated.resources.Res

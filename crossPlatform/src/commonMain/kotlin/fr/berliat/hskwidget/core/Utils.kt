@@ -1,11 +1,10 @@
-package fr.berliat.hskwidget
+package fr.berliat.hskwidget.core
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 
 import fr.berliat.hskwidget.domain.AnkiSyncWordListsService
 import fr.berliat.hsktextviews.HSKTextSegmenter
-import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.dao.AnkiDAO
 import fr.berliat.hskwidget.data.repo.ChineseWordFrequencyRepo
 import fr.berliat.hskwidget.domain.SearchQuery

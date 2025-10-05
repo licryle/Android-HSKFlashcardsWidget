@@ -2,8 +2,8 @@ package fr.berliat.hskwidget.domain
 
 import androidx.room.Room
 
-import fr.berliat.hskwidget.ExpectedUtils
-import fr.berliat.hskwidget.Utils
+import fr.berliat.hskwidget.core.ExpectedUtils
+import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.domain.DatabaseHelper.Companion.DATABASE_ASSET_PATH
 import fr.berliat.hskwidget.domain.DatabaseHelper.Companion.DATABASE_FILENAME

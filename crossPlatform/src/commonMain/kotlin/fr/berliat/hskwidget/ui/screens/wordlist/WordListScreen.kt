@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.dp
 import fr.berliat.hskwidget.data.model.WordList
 import fr.berliat.hskwidget.data.model.WordListWithCount
 import fr.berliat.hskwidget.ui.components.ConfirmDialog
-import fr.berliat.hskwidget.YYMMDD
+import fr.berliat.hskwidget.core.YYMMDD
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.ui.components.PrettyCard
 import fr.berliat.hskwidget.ui.components.RoundIconButton

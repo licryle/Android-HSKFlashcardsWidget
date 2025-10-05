@@ -13,8 +13,8 @@ import com.google.android.play.core.review.ReviewManager
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.google.android.play.core.review.model.ReviewErrorCode
 
-import fr.berliat.hskwidget.ExpectedUtils
-import fr.berliat.hskwidget.Utils
+import fr.berliat.hskwidget.core.ExpectedUtils
+import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.data.store.SupportDevStore

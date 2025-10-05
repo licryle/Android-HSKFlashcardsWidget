@@ -6,9 +6,9 @@ import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
 import fr.berliat.ankidroidhelper.AnkiDelegate
 import fr.berliat.ankidroidhelper.AnkiSyncServiceDelegate
-import fr.berliat.hskwidget.ExpectedUtils.requestPermissionNotification
-import fr.berliat.hskwidget.Utils
-import fr.berliat.hskwidget.YYMMDDHHMMSS
+import fr.berliat.hskwidget.core.ExpectedUtils.requestPermissionNotification
+import fr.berliat.hskwidget.core.Utils
+import fr.berliat.hskwidget.core.YYMMDDHHMMSS
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import kotlinx.coroutines.flow.MutableStateFlow

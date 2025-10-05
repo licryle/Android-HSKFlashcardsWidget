@@ -1,6 +1,6 @@
 package fr.berliat.hskwidget.ui.screens.dictionary
 
-import fr.berliat.hskwidget.Utils
+import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.dao.AnnotatedChineseWordDAO
 

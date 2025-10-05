@@ -7,9 +7,9 @@ import co.touchlab.kermit.Logger
 import com.kashif.cameraK.controller.CameraController
 import com.kashif.cameraK.result.ImageCaptureResult
 
-import fr.berliat.hskwidget.Utils
-import fr.berliat.hskwidget.YYMMDDHHMMSS
-import fr.berliat.hskwidget.toSafeFileName
+import fr.berliat.hskwidget.core.Utils
+import fr.berliat.hskwidget.core.YYMMDDHHMMSS
+import fr.berliat.hskwidget.core.toSafeFileName
 
 import hskflashcardswidget.crossplatform.generated.resources.Res
 import hskflashcardswidget.crossplatform.generated.resources.ocr_capture_error_processed

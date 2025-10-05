@@ -1,9 +1,9 @@
 package fr.berliat.hskwidget.domain
 
-import fr.berliat.hskwidget.ExpectedUtils
-import fr.berliat.hskwidget.YYMMDDHHMMSS
-import fr.berliat.hskwidget.createdAt
-import fr.berliat.hskwidget.lastModified
+import fr.berliat.hskwidget.core.ExpectedUtils
+import fr.berliat.hskwidget.core.YYMMDDHHMMSS
+import fr.berliat.hskwidget.core.createdAt
+import fr.berliat.hskwidget.core.lastModified
 import io.github.vinceglb.filekit.BookmarkData
 import io.github.vinceglb.filekit.FileKit
 
@@ -18,7 +18,6 @@ import io.github.vinceglb.filekit.list
 import io.github.vinceglb.filekit.name
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import okio.FileNotFoundException

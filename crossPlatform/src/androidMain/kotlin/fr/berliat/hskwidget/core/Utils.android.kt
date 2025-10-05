@@ -1,4 +1,4 @@
-package fr.berliat.hskwidget
+package fr.berliat.hskwidget.core
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -30,10 +30,8 @@ import androidx.work.workDataOf
 import co.touchlab.kermit.Logger
 
 import fr.berliat.hsktextviews.HSKTextSegmenter
-import fr.berliat.hskwidget.Utils.incrementConsultedWord
-import fr.berliat.hskwidget.Utils.toast
-import fr.berliat.hskwidget.core.BackgroundSpeechService
-import fr.berliat.hskwidget.core.JiebaHSKTextSegmenter
+import fr.berliat.hskwidget.core.Utils.incrementConsultedWord
+import fr.berliat.hskwidget.core.Utils.toast
 import fr.berliat.hskwidget.crossPlatform.BuildKonfig
 import fr.berliat.hskwidget.data.dao.AnkiDAO
 import fr.berliat.hskwidget.domain.SearchQuery

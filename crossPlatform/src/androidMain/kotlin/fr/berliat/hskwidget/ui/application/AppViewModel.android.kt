@@ -8,8 +8,8 @@ import android.os.Build
 import android.os.Parcelable
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
-import fr.berliat.hskwidget.ExpectedUtils
-import fr.berliat.hskwidget.ExpectedUtils.INTENT_SEARCH_WORD
+import fr.berliat.hskwidget.core.ExpectedUtils
+import fr.berliat.hskwidget.core.ExpectedUtils.INTENT_SEARCH_WORD
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.core.StrictModeManager
 import fr.berliat.hskwidget.data.store.GoogleDriveBackup

@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import fr.berliat.hsktextviews.HSKTextSegmenter
 import fr.berliat.hsktextviews.views.HSKTextView
 import fr.berliat.hsktextviews.views.ShowPinyins
-import fr.berliat.hskwidget.Utils
+import fr.berliat.hskwidget.core.Utils
 
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord

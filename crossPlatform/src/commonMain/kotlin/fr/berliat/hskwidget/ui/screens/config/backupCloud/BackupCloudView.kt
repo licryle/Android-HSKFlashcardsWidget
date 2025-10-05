@@ -15,9 +15,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
-import fr.berliat.hskwidget.YYMMDDHHMMSS
+import fr.berliat.hskwidget.core.YYMMDDHHMMSS
 import fr.berliat.hskwidget.core.HSKAppServices
-import fr.berliat.hskwidget.fromKBToMB
+import fr.berliat.hskwidget.core.fromKBToMB
 import fr.berliat.hskwidget.ui.components.ConfirmDialog
 import fr.berliat.hskwidget.ui.components.IconButton
 import fr.berliat.hskwidget.ui.components.ProgressView

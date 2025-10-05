@@ -17,7 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import fr.berliat.hskwidget.Utils
+import fr.berliat.hskwidget.core.Utils
 
 import fr.berliat.hskwidget.core.Locale
 import fr.berliat.hskwidget.data.model.ChineseWord

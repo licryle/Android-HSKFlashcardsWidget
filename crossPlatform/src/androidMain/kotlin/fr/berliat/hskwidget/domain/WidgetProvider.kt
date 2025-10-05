@@ -20,7 +20,7 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 
 import fr.berliat.hskwidget.androidResources.R
-import fr.berliat.hskwidget.Utils
+import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.core.Locale
 import fr.berliat.hskwidget.data.dao.AnnotatedChineseWordDAO

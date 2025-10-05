@@ -3,7 +3,7 @@ package fr.berliat.hskwidget.ui
 import android.content.Context
 import androidx.fragment.app.FragmentActivity
 import fr.berliat.ankidroidhelper.AnkiDelegate
-import fr.berliat.hskwidget.Utils
+import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.store.AnkiStore
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
