@@ -5,7 +5,7 @@ import android.os.StrictMode
 import android.os.strictmode.Violation
 import android.util.Log
 import androidx.annotation.RequiresApi
-import fr.berliat.hskwidget.androidResources.BuildConfig
+import fr.berliat.hskwidget.crossPlatform.BuildKonfig
 import java.util.concurrent.Executors
 
 /**
@@ -32,7 +32,7 @@ class StrictModeManager {
          */
         @JvmStatic
         fun init() {
-            if (BuildConfig.DEBUG) {
+            if (BuildKonfig.DEBUG_MODE) {
                 enableStrictMode()
             }
         }
