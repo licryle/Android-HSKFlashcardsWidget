@@ -9,8 +9,6 @@ import fr.berliat.hskwidget.data.dao.AnkiDAO
 import fr.berliat.hskwidget.data.repo.ChineseWordFrequencyRepo
 import fr.berliat.hskwidget.domain.SearchQuery
 
-import io.github.vinceglb.filekit.BookmarkData
-import io.github.vinceglb.filekit.PlatformFile
 import kotlinx.coroutines.CoroutineScope
 
 import kotlinx.coroutines.Dispatchers
@@ -163,8 +161,6 @@ expect object ExpectedUtils {
     fun toast(s: String)
 
     fun openAppForSearchQuery(query: SearchQuery)
-
-    suspend fun copyFileSafely(sourceFile: PlatformFile, destinationDir: BookmarkData, filename: String)
 }
 
 fun String.capitalize() =

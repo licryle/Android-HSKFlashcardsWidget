@@ -1,11 +1,12 @@
 package fr.berliat.hskwidget.domain
 
-import fr.berliat.hskwidget.core.ExpectedUtils
 import fr.berliat.hskwidget.core.YYMMDDHHMMSS
+import fr.berliat.hskwidget.core.toSafeFileName
 
 import io.github.vinceglb.filekit.BookmarkData
 import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.PlatformFile
+import io.github.vinceglb.filekit.atomicMove
 import io.github.vinceglb.filekit.delete
 import io.github.vinceglb.filekit.createdAt
 import io.github.vinceglb.filekit.lastModified
@@ -16,6 +17,8 @@ import io.github.vinceglb.filekit.fromBookmarkData
 import io.github.vinceglb.filekit.isDirectory
 import io.github.vinceglb.filekit.list
 import io.github.vinceglb.filekit.name
+import io.github.vinceglb.filekit.parent
+import io.github.vinceglb.filekit.path
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -62,10 +65,11 @@ object DatabaseDiskBackup {
         try {
             val snapshot = DatabaseHelper.getInstance().snapshotDatabase()
             val timestamp = Clock.System.now()
-            val filename = "${timestamp.YYMMDDHHMMSS()}_${DatabaseHelper.DATABASE_FILENAME}"
+            val filename = "${timestamp.YYMMDDHHMMSS()}_${DatabaseHelper.DATABASE_FILENAME}".toSafeFileName()
+            val newCacheFile = PlatformFile("${snapshot.parent()!!.path}/${filename}")
 
-            ExpectedUtils.copyFileSafely(snapshot, destinationFolder, filename)
-            snapshot.delete()
+            snapshot.atomicMove(newCacheFile)
+            newCacheFile.atomicMove(PlatformFile.fromBookmarkData(destinationFolder))
 
             withContext(Dispatchers.Main) {
                 onSuccess()

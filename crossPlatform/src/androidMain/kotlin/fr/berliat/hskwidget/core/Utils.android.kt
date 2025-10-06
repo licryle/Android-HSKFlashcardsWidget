@@ -46,12 +46,6 @@ import fr.berliat.hskwidget.speech_failure_toast_init
 import fr.berliat.hskwidget.speech_failure_toast_muted
 import fr.berliat.hskwidget.speech_failure_toast_unknown
 
-import io.github.vinceglb.filekit.AndroidFile
-import io.github.vinceglb.filekit.BookmarkData
-import io.github.vinceglb.filekit.PlatformFile
-import io.github.vinceglb.filekit.fromBookmarkData
-import io.github.vinceglb.filekit.path
-
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -61,10 +55,6 @@ import okio.Path.Companion.toPath
 
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.getString
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
-import java.io.InputStream
 
 @SuppressLint("StaticFieldLeak") // Only Storing Application context. No memory leak.
 actual object ExpectedUtils {
@@ -293,40 +283,6 @@ actual object ExpectedUtils {
         } else {
             // fallback: app has no launch intent?
             Logger.e(tag = TAG, messageString = "No launch intent found for ${context.packageName}")
-        }
-    }
-
-    actual suspend fun copyFileSafely(sourceFile: PlatformFile, destinationDir: BookmarkData, filename: String) {
-        withContext(Dispatchers.IO) {
-            val context = context
-            // Open input stream for the source database file
-            val inputStream: InputStream = FileInputStream(File(sourceFile.path))
-
-            // Convert BookmarkData -> PlatformFile -> Uri
-            val folderPF = PlatformFile.fromBookmarkData(destinationDir)
-            val folderUri = (folderPF.androidFile as? AndroidFile.UriWrapper)?.uri
-                ?: throw IllegalArgumentException("BookmarkData must point to a Uri folder")
-
-            val dir = DocumentFile.fromTreeUri(context, folderUri)
-                ?: throw IllegalStateException("Cannot access folder DocumentFile")
-
-            val destinationFile = dir.createFile("application/octet-stream", filename)
-                ?: throw IllegalStateException("Could not create file in destination folder")
-
-            // Open OutputStream to the destination file
-            context.contentResolver.openFileDescriptor(destinationFile.uri, "w")
-                ?.use { parcelFileDescriptor ->
-                    FileOutputStream(parcelFileDescriptor.fileDescriptor).use { output ->
-                        // Copy data from source to destination
-                        inputStream.use { input ->
-                            val buffer = ByteArray(1024)
-                            var length: Int
-                            while (input.read(buffer).also { length = it } > 0) {
-                                output.write(buffer, 0, length)
-                            }
-                        }
-                    }
-                }
         }
     }
 
