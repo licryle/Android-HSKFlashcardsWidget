@@ -88,11 +88,6 @@ class DictionarySearchViewModel(private val prefsStore: AppPreferencesStore = HS
         val listName = searchQuery.inListName
         val annotatedOnly = prefsStore.searchFilterHasAnnotation.value
 
-        Logger.e(
-            tag = TAG,
-            messageString = "fetchResultsForPage(${searchQuery.toString()}) at page ${currentPage} on Thread ${Thread.currentThread().name}",
-        )
-
         val results = if (listName != null) {
             // Search within the specified word list
             annotatedChineseWordDAO.searchFromWordList(listName, annotatedOnly && !searchQuery.ignoreAnnotation, currentPage, itemsPerPage)
