@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.core.AppServices
 import fr.berliat.hskwidget.core.HSKAppServices
-import fr.berliat.hskwidget.BuildKonfig
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.domain.DatabaseDiskBackup
 import fr.berliat.hskwidget.domain.DatabaseHelper
@@ -70,11 +69,11 @@ open class CommonAppViewModel(): ViewModel() {
     }
 
     protected open fun handleAppUpdate() {
-        appConfig.appVersionCode.value = BuildKonfig.VERSION_CODE
+        appConfig.appVersionCode.value = Utils.getAppVersion()
     }
 
     fun didUpdateApp(): Boolean {
-        return appConfig.appVersionCode.value != BuildKonfig.VERSION_CODE
+        return appConfig.appVersionCode.value != Utils.getAppVersion()
     }
 
     private fun handleDbOperations() {

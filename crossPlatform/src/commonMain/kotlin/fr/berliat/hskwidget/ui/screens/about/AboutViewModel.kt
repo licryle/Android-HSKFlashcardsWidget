@@ -14,7 +14,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
 class AboutViewModel {
-    val version = Utils.getPlatform()
+    val version = Utils.getAppVersion()
 
     private val viewModelScope = CoroutineScope(SupervisorJob())
 

@@ -1,4 +1,4 @@
-package fr.berliat.hskwidget
+package fr.berliat.hskwidget.core
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
@@ -6,22 +6,19 @@ import androidx.datastore.preferences.core.Preferences
 
 import fr.berliat.hsktextviews.HSKTextSegmenter
 import fr.berliat.hskwidget.data.dao.AnkiDAO
+import fr.berliat.hskwidget.domain.SearchQuery
 
 import kotlinx.cinterop.ExperimentalForeignApi
 
-import platform.UIKit.UIDevice
 import platform.Foundation.NSURL
 import platform.UIKit.UIApplication
-import platform.Foundation.NSBundle
 import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSUserDomainMask
 
 import okio.Path.Companion.toPath
 
-import org.jetbrains.compose.resources.StringResource
-
-actual private object ExpectedUtils {
+actual object ExpectedUtils {
     actual fun openLink(url: String) {
         val nsUrl = NSURL.URLWithString(url) ?: return
         UIApplication.sharedApplication.openURL(nsUrl)
@@ -31,16 +28,6 @@ actual private object ExpectedUtils {
         val urlString = "mailto:$email?subject=${subject}&body=${body}"
         openLink(urlString)
         return true
-    }
-
-    actual fun getPlatform(): String {
-        return UIDevice.currentDevice.systemName() + " " + UIDevice.currentDevice.systemVersion
-    }
-
-    actual fun getAppVersion(): Int {
-        val version = NSBundle.mainBundle.infoDictionary?.get("CFBundleShortVersionString") as? String
-        val build = NSBundle.mainBundle.infoDictionary?.get("CFBundleVersion") as? String
-        return if (version != null && build != null) "$version ($build)" else "1.0"
     }
     
     actual fun logAnalyticsScreenView(screen: String) {
@@ -59,8 +46,6 @@ actual private object ExpectedUtils {
     }
 
     const val DATABASE_FILENAME = "Mandarin_Assistant.db"
-    actual fun logAnalyticsEvent(event: Utils.ANALYTICS_EVENTS) {
-    }
 
     @OptIn(ExperimentalForeignApi::class)
     actual fun getDataStore(file: String): DataStore<Preferences> {
@@ -98,6 +83,12 @@ actual private object ExpectedUtils {
     actual fun playWordInBackground(word: String) {
     }
 
-    actual fun toast(stringRes: StringResource, args: List<String>) {
+    actual fun logAnalyticsWidgetAction(event: Utils.ANALYTICS_EVENTS, widgetId: Int) {
+    }
+
+    actual fun toast(s: String) {
+    }
+
+    actual fun openAppForSearchQuery(query: SearchQuery) {
     }
 }

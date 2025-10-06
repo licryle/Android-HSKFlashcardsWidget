@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 
 import fr.berliat.hskwidget.domain.AnkiSyncWordListsService
 import fr.berliat.hsktextviews.HSKTextSegmenter
+import fr.berliat.hskwidget.BuildKonfig
 import fr.berliat.hskwidget.data.dao.AnkiDAO
 import fr.berliat.hskwidget.data.repo.ChineseWordFrequencyRepo
 import fr.berliat.hskwidget.domain.SearchQuery
@@ -32,9 +33,7 @@ object Utils {
     fun sendEmail(email: String, subject: String, body: String): Boolean =
         ExpectedUtils.sendEmail(email, subject, body)
 
-    fun getPlatform(): String = ExpectedUtils.getPlatform()
-
-    fun getAppVersion(): Int = ExpectedUtils.getAppVersion()
+    fun getAppVersion(): Int = BuildKonfig.VERSION_CODE
 
     fun logAnalyticsScreenView(screen: String) = ExpectedUtils.logAnalyticsScreenView(screen)
 
@@ -137,9 +136,6 @@ object Utils {
 expect object ExpectedUtils {
     fun openLink(url: String)
     fun sendEmail(email: String, subject: String = "", body: String = "") : Boolean
-    fun getPlatform(): String
-    // commonMain
-    fun getAppVersion(): Int
 
     fun logAnalyticsScreenView(screen: String)
     fun logAnalyticsEvent(event: Utils.ANALYTICS_EVENTS,

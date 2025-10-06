@@ -53,6 +53,7 @@ kotlin {
                 implementation(libs.filekit.core)
                 implementation(libs.filekit.dialogs)
                 implementation(libs.filekit.dialogs.compose)
+                // ./gradlew :cameraK:publishAllPublicationsToLocalRepoRepository
                 implementation("com.kashif.cameraK_fork:camerak:0.0.12")
                 implementation(libs.navigation.compose)
                 implementation(project(":hsktextviews"))

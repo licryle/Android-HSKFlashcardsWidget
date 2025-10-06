@@ -20,7 +20,6 @@ import androidx.core.content.ContextCompat
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
-import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.Observer
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
@@ -32,7 +31,6 @@ import co.touchlab.kermit.Logger
 import fr.berliat.hsktextviews.HSKTextSegmenter
 import fr.berliat.hskwidget.core.Utils.incrementConsultedWord
 import fr.berliat.hskwidget.core.Utils.toast
-import fr.berliat.hskwidget.BuildKonfig
 import fr.berliat.hskwidget.data.dao.AnkiDAO
 import fr.berliat.hskwidget.domain.SearchQuery
 
@@ -119,13 +117,6 @@ actual object ExpectedUtils {
 
         return true
     }
-
-    actual fun getPlatform(): String {
-        return "Android ${getAppVersion()}"
-    }
-
-    // androidMain
-    actual fun getAppVersion(): Int = BuildKonfig.VERSION_CODE
 
     actual fun logAnalyticsScreenView(screen: String) {
     }

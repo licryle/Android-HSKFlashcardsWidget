@@ -1,14 +1,5 @@
-package fr.berliat.hskwidget
-
-import androidx.compose.ui.window.ComposeUIViewController
-import fr.berliat.hskwidget.ui.application.AppView
-import fr.berliat.hskwidget.ui.application.AppViewModel
-import fr.berliat.hskwidget.ui.navigation.NavigationManager
-
+// Use the `ComposeUIViewController` function
 fun AppViewController() = ComposeUIViewController {
-    val viewModel = AppViewModel { /* platform context if needed */ null }
-    AppView(
-        navigationManager = NavigationManager,
-        viewModel = viewModel
-    )
+    // This is a composable context, so we can call our composable functions
+    App()
 }
