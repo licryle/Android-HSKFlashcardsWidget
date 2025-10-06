@@ -2,9 +2,11 @@ package fr.berliat.hskwidget.domain
 
 import android.database.sqlite.SQLiteException
 import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.drawable.Drawable
 import android.util.Log
+
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.graphics.drawable.toBitmap
+
 import fr.berliat.ankidroidhelper.AnkiSyncService
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
@@ -17,10 +19,14 @@ import fr.berliat.hskwidget.anki_sync_progress_message
 import fr.berliat.hskwidget.anki_sync_start_message
 import fr.berliat.hskwidget.app_name
 import fr.berliat.hskwidget.cancel
+import fr.berliat.hskwidget.core.ExpectedUtils
+
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.yield
+
 import org.jetbrains.compose.resources.getString
+
 import kotlin.collections.chunked
 
 actual class AnkiSyncWordListsService: AnkiSyncService() {
@@ -43,19 +49,10 @@ actual class AnkiSyncWordListsService: AnkiSyncService() {
         notificationCancelText = getString(Res.string.cancel)
         notificationChannelDescription = getString(Res.string.anki_sync_notification_description)
         notificationChannelTitle = getString(Res.string.anki_sync_notification_name)
-        notificationLargeIcon = drawableToBitmap(resources.getDrawable(resources.getIdentifier("anki_icon", "drawable", packageName)))
-    }
-
-    private fun drawableToBitmap(drawable: Drawable): Bitmap {
-        val bitmap = Bitmap.createBitmap(
-            drawable.intrinsicWidth.takeIf { it > 0 } ?: 1,
-            drawable.intrinsicHeight.takeIf { it > 0 } ?: 1,
-            Bitmap.Config.ARGB_8888
-        )
-        val canvas = Canvas(bitmap)
-        drawable.setBounds(0, 0, canvas.width, canvas.height)
-        drawable.draw(canvas)
-        return bitmap
+        notificationLargeIcon = AppCompatResources
+            .getDrawable(ExpectedUtils.context,
+            ExpectedUtils.context.resources.getIdentifier("anki_icon", "drawable", packageName))!!
+            .toBitmap()
     }
 
     override suspend fun syncToAnki() {
