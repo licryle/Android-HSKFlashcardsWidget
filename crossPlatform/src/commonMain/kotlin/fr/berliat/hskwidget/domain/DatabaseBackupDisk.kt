@@ -2,13 +2,13 @@ package fr.berliat.hskwidget.domain
 
 import fr.berliat.hskwidget.core.ExpectedUtils
 import fr.berliat.hskwidget.core.YYMMDDHHMMSS
-import fr.berliat.hskwidget.core.createdAt
-import fr.berliat.hskwidget.core.lastModified
+
 import io.github.vinceglb.filekit.BookmarkData
 import io.github.vinceglb.filekit.FileKit
-
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.delete
+import io.github.vinceglb.filekit.createdAt
+import io.github.vinceglb.filekit.lastModified
 import io.github.vinceglb.filekit.dialogs.openDirectoryPicker
 import io.github.vinceglb.filekit.dialogs.openFilePicker
 import io.github.vinceglb.filekit.exists
@@ -21,11 +21,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import okio.FileNotFoundException
+import kotlin.time.ExperimentalTime
 
 object DatabaseDiskBackup {
     /**
      * Clean old backups, keeping only [maxBackups] most recent files.
      */
+    @OptIn(ExperimentalTime::class)
     suspend fun cleanOldBackups(destinationFolder: PlatformFile, maxBackups: Int) {
         if (! destinationFolder.isDirectory()) throw IllegalStateException("Not a folder")
 

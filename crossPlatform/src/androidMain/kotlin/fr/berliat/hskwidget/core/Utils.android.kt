@@ -48,9 +48,7 @@ import fr.berliat.hskwidget.speech_failure_toast_unknown
 
 import io.github.vinceglb.filekit.AndroidFile
 import io.github.vinceglb.filekit.BookmarkData
-import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.PlatformFile
-import io.github.vinceglb.filekit.context
 import io.github.vinceglb.filekit.fromBookmarkData
 import io.github.vinceglb.filekit.path
 
@@ -58,7 +56,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.datetime.Instant
 
 import okio.Path.Companion.toPath
 
@@ -68,8 +65,6 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.InputStream
-import java.nio.file.Files
-import java.nio.file.attribute.BasicFileAttributes
 
 @SuppressLint("StaticFieldLeak") // Only Storing Application context. No memory leak.
 actual object ExpectedUtils {
@@ -337,40 +332,4 @@ actual object ExpectedUtils {
 
     private const val TAG = "Utils"
     const val INTENT_SEARCH_WORD = "INTENT_SEARCH_WORD"
-}
-
-actual fun PlatformFile.createdAt(): Instant? {
-    return this.androidFile.let { androidFile ->
-        when (androidFile) {
-            is AndroidFile.FileWrapper -> {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    val attributes = Files.readAttributes(
-                        androidFile.file.toPath(),
-                        BasicFileAttributes::class.java
-                    )
-                    val timestamp = attributes.creationTime().toMillis()
-                    Instant.fromEpochMilliseconds(timestamp)
-                } else {
-                    // Fallback for older Android versions
-                    null
-                }
-            }
-
-            is AndroidFile.UriWrapper -> null
-        }
-    }
-}
-
-actual fun PlatformFile.lastModified(): Instant {
-    val timestamp = this.androidFile.let { androidFile ->
-        when (androidFile) {
-            is AndroidFile.FileWrapper -> androidFile.file.lastModified()
-            is AndroidFile.UriWrapper -> DocumentFile
-                .fromSingleUri(FileKit.context, androidFile.uri)
-                ?.lastModified()
-                ?: throw IllegalStateException("Unable to get last modified date for URI")
-        }
-    }
-
-    return Instant.fromEpochMilliseconds(timestamp)
 }

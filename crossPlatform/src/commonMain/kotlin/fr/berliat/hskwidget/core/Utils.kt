@@ -167,10 +167,6 @@ expect object ExpectedUtils {
     suspend fun copyFileSafely(sourceFile: PlatformFile, destinationDir: BookmarkData, filename: String)
 }
 
-expect fun PlatformFile.createdAt(): Instant?
-
-expect fun PlatformFile.lastModified(): Instant
-
 fun String.capitalize() =
     this.lowercase().replaceFirstChar { it.uppercaseChar() }
 
