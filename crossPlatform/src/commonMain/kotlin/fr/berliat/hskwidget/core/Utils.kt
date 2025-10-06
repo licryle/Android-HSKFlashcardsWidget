@@ -3,7 +3,6 @@ package fr.berliat.hskwidget.core
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 
-import fr.berliat.hskwidget.domain.AnkiSyncWordListsService
 import fr.berliat.hsktextviews.HSKTextSegmenter
 import fr.berliat.hskwidget.BuildKonfig
 import fr.berliat.hskwidget.data.dao.AnkiDAO
@@ -21,11 +20,6 @@ import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.getString
 import kotlin.math.pow
 import kotlin.math.round
-import kotlin.reflect.KClass
-
-// KMP e
-typealias KAnkiDelegator = suspend ((suspend () -> Result<Unit>)?) -> Unit
-typealias KAnkiServiceDelegator = suspend (serviceClass: KClass<out AnkiSyncWordListsService>) -> Unit
 
 object Utils {
     fun openLink(url: String) = ExpectedUtils.openLink(url)

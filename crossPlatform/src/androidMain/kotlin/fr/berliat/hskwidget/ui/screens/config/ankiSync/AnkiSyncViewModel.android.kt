@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 
 import co.touchlab.kermit.Logger
+
 import fr.berliat.ankidroidhelper.AnkiDelegate
 import fr.berliat.ankidroidhelper.AnkiSyncServiceDelegate
 import fr.berliat.hskwidget.core.ExpectedUtils.requestPermissionNotification
@@ -11,6 +12,8 @@ import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.core.YYMMDDHHMMSS
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
+import fr.berliat.hskwidget.domain.HSKAnkiDelegate
+
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,7 +22,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 
 actual class AnkiSyncViewModel actual constructor(
-    val ankiDelegate: AnkiDelegate,
+    val ankiDelegate: HSKAnkiDelegate,
     val appConfig: AppPreferencesStore)
     : ViewModel(), AnkiDelegate.HandlerInterface {
     actual val isAvailableOnThisPlatform = true
@@ -107,7 +110,7 @@ actual class AnkiSyncViewModel actual constructor(
 
     private fun importsAllNotesToAnkiDroid() {
         viewModelScope.launch {
-            ankiDelegate.delegateToAnkiService(HSKAppServices.wordListRepo.syncListsToAnki())
+            ankiDelegate.modifyAnkiViaService(HSKAppServices.wordListRepo.syncListsToAnki())
         }
     }
 

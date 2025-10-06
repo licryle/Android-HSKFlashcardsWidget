@@ -1,6 +1,5 @@
 package fr.berliat.hskwidget.core
 
-import fr.berliat.ankidroidhelper.AnkiDelegate
 import fr.berliat.hsktextviews.HSKTextSegmenter
 import fr.berliat.hskwidget.data.repo.WordListRepository
 import fr.berliat.hskwidget.data.store.AnkiStore
@@ -10,6 +9,9 @@ import fr.berliat.hskwidget.data.store.GoogleDriveBackup
 import fr.berliat.hskwidget.data.store.WidgetPreferencesStore
 import fr.berliat.hskwidget.data.store.WidgetPreferencesStoreProvider
 import fr.berliat.hskwidget.domain.DatabaseHelper
+import fr.berliat.hskwidget.domain.HSKAnkiDelegate
+import fr.berliat.hskwidget.domain.KAnkiDelegator
+import fr.berliat.hskwidget.domain.KAnkiServiceDelegator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -57,10 +59,10 @@ object HSKAppServices : AppServices() {
         super.init(scope)
     }
 
-    fun registerAnkiDelegators(ankiDelegate: AnkiDelegate) {
+    fun registerAnkiDelegators(ankiDelegate: HSKAnkiDelegate) {
         registerNow("ankiDelegate") { ankiDelegate }
-        registerNow("ankiDelegator") { ankiDelegate::delegateToAnki }
-        registerNow("ankiServiceDelegator") { ankiDelegate::delegateToAnkiService }
+        registerNow("ankiDelegator") { ankiDelegate::modifyAnki }
+        registerNow("ankiServiceDelegator") { ankiDelegate::modifyAnkiViaService }
     }
 
     fun registerGoogleBackup(gDrive: GoogleDriveBackup) {
@@ -76,7 +78,7 @@ object HSKAppServices : AppServices() {
     val widgetsPreferencesProvider: WidgetPreferencesStoreProvider get() = get("widgetsPreferencesProvider")
     val ankiStore: AnkiStore get() = get("ankiStore")
 
-    val ankiDelegate: AnkiDelegate get() = get("ankiDelegate")
+    val ankiDelegate: HSKAnkiDelegate get() = get("ankiDelegate")
     val ankiDelegator: KAnkiDelegator get() = get("ankiDelegator")
     val ankiServiceDelegator: KAnkiServiceDelegator get() = get("ankiServiceDelegator")
     val wordListRepo: WordListRepository get() = get("wordListRepo")

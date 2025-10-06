@@ -3,7 +3,6 @@ package fr.berliat.hskwidget.ui.screens.annotate
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import fr.berliat.hskwidget.core.AppDispatchers
-import fr.berliat.hskwidget.core.KAnkiDelegator
 import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.core.Utils.incrementConsultedWord
 
@@ -17,6 +16,7 @@ import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.data.type.ClassLevel
 import fr.berliat.hskwidget.data.type.ClassType
 import fr.berliat.hskwidget.data.type.Pinyins
+import fr.berliat.hskwidget.domain.KAnkiDelegator
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
