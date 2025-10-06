@@ -2,9 +2,6 @@ package fr.berliat.hskwidget.ui.application.content
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -19,6 +16,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 
 import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.close_24px
+import fr.berliat.hskwidget.menu_24px
 import fr.berliat.hskwidget.menu_ocr
 import fr.berliat.hskwidget.photo_camera_24px
 import fr.berliat.hskwidget.search_hint
@@ -64,7 +63,7 @@ fun AppBar(
                     trailingIcon = {
                         if (localText.value.isNotEmpty()) {
                             IconButton(onClick = { onValueChange("") }) {
-                                Icon(Icons.Default.Close, contentDescription = "Clear text")
+                                Icon(painterResource(Res.drawable.close_24px), contentDescription = "Clear text")
                             }
                         }
                     }
@@ -73,7 +72,7 @@ fun AppBar(
         },
         navigationIcon = {
             IconButton(onClick = onMenuClick) {
-                Icon(Icons.Default.Menu, contentDescription = "Menu")
+                Icon(painterResource(Res.drawable.menu_24px), contentDescription = "Menu")
             }
         },
         actions = {
