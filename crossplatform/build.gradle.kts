@@ -8,7 +8,7 @@ plugins {
     kotlin("multiplatform") version "2.2.10"
     kotlin("plugin.serialization") version "1.8.0"
     id("com.android.application") // 🔄 CHANGED from .library
-    id("org.jetbrains.compose") version "1.8.2"
+    id("org.jetbrains.compose") version "1.9.0"
     id("org.jetbrains.kotlin.plugin.compose") version "2.2.20"
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
@@ -94,9 +94,8 @@ kotlin {
                 implementation(project(":googledrivebackup"))
 
                 // TO remove when Widgets more over to Compose.
-                implementation("androidx.constraintlayout:constraintlayout:2.2.1")
-                implementation("com.google.android.material:material:1.1.0")
-
+                implementation(libs.androidx.constraintlayout)
+                implementation(libs.material)
             }
             resources.srcDirs("src/commonMain/composeResources")
         }
