@@ -1,18 +1,19 @@
-//
-//  hskwidgetApp.swift
-//  hskwidget
-//
-//  Created by Licryle on 9/10/25.
-//
-
 import SwiftUI
 import crossPlatformKit
+
+struct ComposeView: UIViewControllerRepresentable {
+    func makeUIViewController(context: Context) -> UIViewController {
+        AppViewController() // Call the Kotlin ViewController
+    }
+
+    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
+}
 
 @main
 struct hskwidgetApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView(viewModel: .init())
+            ComposeView()
         }
     }
 }
