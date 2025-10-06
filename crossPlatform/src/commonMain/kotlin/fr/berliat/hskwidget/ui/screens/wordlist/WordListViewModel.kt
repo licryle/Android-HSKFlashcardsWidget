@@ -2,6 +2,7 @@ package fr.berliat.hskwidget.ui.screens.wordlist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import fr.berliat.hskwidget.core.AppDispatchers
 
 import fr.berliat.hskwidget.core.KAnkiDelegator
 import fr.berliat.hskwidget.core.Utils
@@ -50,7 +51,7 @@ class WordListViewModel(
     fun loadUserLists() {
         viewModelScope.launch(Dispatchers.Main) {
             try {
-                _userLists.value = withContext(Dispatchers.IO) { repo.getUserLists() }
+                _userLists.value = withContext(AppDispatchers.IO) { repo.getUserLists() }
             } catch (_: Exception) {
                 _allLists.value = emptyList()
                 _status.emit(Status.ERROR)
@@ -62,8 +63,8 @@ class WordListViewModel(
     fun loadAllLists() {
         viewModelScope.launch(Dispatchers.Main) {
             try {
-                _allLists.value = withContext(Dispatchers.IO) { repo.getAllLists() }
-                _userLists.value = withContext(Dispatchers.IO) { repo.getUserLists() }
+                _allLists.value = withContext(AppDispatchers.IO) { repo.getAllLists() }
+                _userLists.value = withContext(AppDispatchers.IO) { repo.getUserLists() }
             } catch (_: Exception) {
                 _allLists.value = emptyList()
                 _userLists.value = emptyList()
@@ -111,7 +112,7 @@ class WordListViewModel(
         viewModelScope.launch(Dispatchers.Main) {
             _status.emit(Status.SAVING)
             try {
-                withContext(Dispatchers.IO) {
+                withContext(AppDispatchers.IO) {
                     ankiCaller(
                         repo.updateWordListAssociations(word.simplified, selectedWordListIds)
                     )
@@ -130,7 +131,7 @@ class WordListViewModel(
     }
 
     private fun launchSafe(block: suspend () -> Unit) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(AppDispatchers.IO) {
             try {
                 block()
             } catch (_: Exception) {

@@ -1,20 +1,19 @@
 package fr.berliat.hskwidget.data.repo
 
+import fr.berliat.hskwidget.core.AppDispatchers
 import fr.berliat.hskwidget.data.dao.AnnotatedChineseWordDAO
 import fr.berliat.hskwidget.data.dao.ChineseWordFrequencyDAO
 import fr.berliat.hskwidget.data.model.ChineseWordFrequency
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 
 class ChineseWordFrequencyRepo(private val frequencyDAO: ChineseWordFrequencyDAO,
                                private val annotationDAO: AnnotatedChineseWordDAO
 ) {
-    suspend fun increment(freq: ChineseWordFrequency) = withContext(Dispatchers.IO) {
+    suspend fun increment(freq: ChineseWordFrequency) = withContext(AppDispatchers.IO) {
         increment(listOf(freq))
     }
 
-    suspend fun increment(freq: List<ChineseWordFrequency>) = withContext(Dispatchers.IO) {
+    suspend fun increment(freq: List<ChineseWordFrequency>) = withContext(AppDispatchers.IO) {
         val words = freq.map { it.simplified }
 
         val currentFreq = frequencyDAO.getFrequencyMapped(words)
@@ -42,7 +41,7 @@ class ChineseWordFrequencyRepo(private val frequencyDAO: ChineseWordFrequencyDAO
             frequencyDAO.insertOrUpdate(newFreq)
     }
 
-    suspend fun incrementConsulted(words: Map<String, Int>) = withContext(Dispatchers.IO) {
+    suspend fun incrementConsulted(words: Map<String, Int>) = withContext(AppDispatchers.IO) {
         val newFreq: MutableList<ChineseWordFrequency> = mutableListOf()
 
         words.forEach { (simplified, consultedCnt) ->
@@ -58,11 +57,11 @@ class ChineseWordFrequencyRepo(private val frequencyDAO: ChineseWordFrequencyDAO
         increment(newFreq)
     }
 
-    suspend fun incrementConsulted(simplified: String) = withContext(Dispatchers.IO) {
+    suspend fun incrementConsulted(simplified: String) = withContext(AppDispatchers.IO) {
         incrementConsulted(mapOf(Pair(simplified, 1)))
     }
 
-    suspend fun incrementAppeared(words: Map<String, Int>) = withContext(Dispatchers.IO) {
+    suspend fun incrementAppeared(words: Map<String, Int>) = withContext(AppDispatchers.IO) {
         val newFreq: MutableList<ChineseWordFrequency> = mutableListOf()
 
         words.forEach { (simplified, appearedCnt) ->

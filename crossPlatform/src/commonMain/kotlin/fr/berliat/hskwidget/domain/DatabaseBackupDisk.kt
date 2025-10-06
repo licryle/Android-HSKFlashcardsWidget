@@ -1,5 +1,6 @@
 package fr.berliat.hskwidget.domain
 
+import fr.berliat.hskwidget.core.AppDispatchers
 import fr.berliat.hskwidget.core.YYMMDDHHMMSS
 import fr.berliat.hskwidget.core.toSafeFileName
 
@@ -61,7 +62,7 @@ object DatabaseDiskBackup {
         destinationFolder: BookmarkData,
         onSuccess: () -> Unit,
         onFail: (Throwable) -> Unit
-    ) = withContext(Dispatchers.IO){
+    ) = withContext(AppDispatchers.IO){
         try {
             val snapshot = DatabaseHelper.getInstance().snapshotDatabase()
             val timestamp = Clock.System.now()

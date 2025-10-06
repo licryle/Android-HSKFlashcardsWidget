@@ -17,6 +17,7 @@ import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.ui.components.smallestHanziFontSize
 
 import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.core.AppDispatchers
 import fr.berliat.hskwidget.ocr_display_no_text_found
 import fr.berliat.hskwidget.ocr_display_ocr_failed
 import fr.berliat.hskwidget.ocr_display_smallest_text
@@ -73,7 +74,7 @@ class DisplayOCRViewModel(
     val wordSeparator = WORD_SEPARATOR
 
     init {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(AppDispatchers.IO) {
             selectedWord.value?.let {
                 fetchWordForDisplay(it.simplified)
             }
@@ -98,18 +99,18 @@ class DisplayOCRViewModel(
 
     // TODO reconnect
     fun augmentWordFrequencyAppeared(words: Map<String, Int>) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(AppDispatchers.IO) {
             frequencyWordsRepo.incrementAppeared(words)
         }
     }
 
     fun augmentWordFrequencyConsulted(hanzi: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(AppDispatchers.IO) {
             frequencyWordsRepo.incrementConsulted(hanzi)
         }
     }
 
-    suspend fun fetchWord(hanzi: String): AnnotatedChineseWord? = withContext(Dispatchers.IO) {
+    suspend fun fetchWord(hanzi: String): AnnotatedChineseWord? = withContext(AppDispatchers.IO) {
         Logger.d(tag = TAG, messageString = "Searching for $hanzi")
 
         try {
@@ -125,7 +126,7 @@ class DisplayOCRViewModel(
     }
 
     fun fetchWordForDisplay(simplified: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(AppDispatchers.IO) {
             // Switch to the IO dispatcher to perform background work
             val annotatedWord = fetchWord(simplified)
 
@@ -178,7 +179,7 @@ class DisplayOCRViewModel(
     }
 
     fun recognizeText(imagePath: PlatformFile) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(AppDispatchers.IO) {
             HSKOCR().process(imagePath, { text ->
                 Logger.d(tag = TAG, messageString = "Recognized text: $text")
 

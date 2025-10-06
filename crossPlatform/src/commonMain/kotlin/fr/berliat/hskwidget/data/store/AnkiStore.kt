@@ -15,7 +15,7 @@ import fr.berliat.hskwidget.anki_card_ENCN_back
 import fr.berliat.hskwidget.anki_card_ENCN_front
 import fr.berliat.hskwidget.anki_card_css
 import fr.berliat.hskwidget.app_name
-import kotlinx.coroutines.Dispatchers
+import fr.berliat.hskwidget.core.AppDispatchers
 import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.getString
 
@@ -35,11 +35,11 @@ class AnkiStore(
         // List of card names that will be used in AnkiDroid (one for each direction of learning)
         val CARD_NAMES: Array<String> = arrayOf("English>Chinese", "Chinese>English")
     }
-    suspend fun isStoreReady() : Boolean = withContext(Dispatchers.IO) {
+    suspend fun isStoreReady() : Boolean = withContext(AppDispatchers.IO) {
         ankiDAO.getDeckList() != null
     }
 
-    suspend fun getOrCreateModelId(): Long? = withContext(Dispatchers.IO) {
+    suspend fun getOrCreateModelId(): Long? = withContext(AppDispatchers.IO) {
         var mid : Long? = getModelId()
 
         if (mid == null || mid.toInt() == 0 || !ankiDAO.isModelExist(mid)) {
@@ -58,7 +58,7 @@ class AnkiStore(
         return@withContext mid
     }
 
-    suspend fun deleteCard(word: WordListEntry): Boolean = withContext(Dispatchers.IO) {
+    suspend fun deleteCard(word: WordListEntry): Boolean = withContext(AppDispatchers.IO) {
         word.ankiNoteId.let { ankiDAO.deleteNote(it) }
     }
 
@@ -72,7 +72,7 @@ class AnkiStore(
 
     private suspend fun getModelName() : String { return getString(Res.string.app_name) }
 
-    private suspend fun createModel() : Long? = withContext(Dispatchers.IO) {
+    private suspend fun createModel() : Long? = withContext(AppDispatchers.IO) {
         ankiDAO.addNewCustomModel(
             getModelName(),
             FIELDS,
@@ -92,7 +92,7 @@ class AnkiStore(
     }
 
     suspend fun importOrUpdateCard(deck: WordList, wordEntry: WordListEntry, word: AnnotatedChineseWord): Long?
-            = withContext(Dispatchers.IO) {
+            = withContext(AppDispatchers.IO) {
         Logger.d(tag = TAG, messageString = "importOrUpdateCard: ${word.simplified} to Anki")
         val modelId = getOrCreateModelId() ?: return@withContext null
         if (deck.ankiDeckId == WordList.Companion.ANKI_ID_EMPTY) throw IllegalStateException("Couldn't create a new Deck in Anki")

@@ -1,5 +1,6 @@
 package fr.berliat.hskwidget.data.repo
 
+import fr.berliat.hskwidget.core.AppDispatchers
 import fr.berliat.hskwidget.data.dao.AnnotatedChineseWordDAO
 import fr.berliat.hskwidget.data.dao.WordListDAO
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
@@ -7,8 +8,6 @@ import fr.berliat.hskwidget.data.model.WordList
 import fr.berliat.hskwidget.data.model.WordListEntry
 import fr.berliat.hskwidget.data.store.AnkiStore
 import fr.berliat.hskwidget.domain.AnkiSyncWordListsService
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 import kotlin.reflect.KClass
 
@@ -51,21 +50,21 @@ class WordListRepository(
     }
 
     /****** NOT TOUCHING ANKI *******/
-    suspend fun getAllLists() = withContext(Dispatchers.IO) { wordListDAO.getAllLists() }
-    suspend fun getSystemLists() = withContext(Dispatchers.IO) { wordListDAO.getSystemLists() }
-    suspend fun getUserLists() = withContext(Dispatchers.IO) { wordListDAO.getUserLists() }
-    suspend fun getWordListsForWord(simplified: String) = withContext(Dispatchers.IO) { wordListDAO.getWordListsForWord(simplified) }
+    suspend fun getAllLists() = withContext(AppDispatchers.IO) { wordListDAO.getAllLists() }
+    suspend fun getSystemLists() = withContext(AppDispatchers.IO) { wordListDAO.getSystemLists() }
+    suspend fun getUserLists() = withContext(AppDispatchers.IO) { wordListDAO.getUserLists() }
+    suspend fun getWordListsForWord(simplified: String) = withContext(AppDispatchers.IO) { wordListDAO.getWordListsForWord(simplified) }
 
-    suspend fun isWordInList(wordList: WordList, simplified: String) : Boolean = withContext(Dispatchers.IO) {
+    suspend fun isWordInList(wordList: WordList, simplified: String) : Boolean = withContext(AppDispatchers.IO) {
         val existingEntries = wordListDAO.getEntriesForWord(simplified)
         return@withContext (existingEntries.any { it.listId == wordList.id })
     }
 
-    suspend fun isNameUnique(name: String, excludeId: Long = 0): Boolean = withContext(Dispatchers.IO) {
+    suspend fun isNameUnique(name: String, excludeId: Long = 0): Boolean = withContext(AppDispatchers.IO) {
         wordListDAO.countByName(name, excludeId) == 0
     }
 
-    suspend fun createList(name: String) = withContext(Dispatchers.IO) {
+    suspend fun createList(name: String) = withContext(AppDispatchers.IO) {
         val list = WordList(name)
 
         if (!isNameUnique(name)) {
@@ -75,7 +74,7 @@ class WordListRepository(
         wordListDAO.insertList(list)
     }
 
-    suspend fun renameList(id: Long, newName: String) = withContext(Dispatchers.IO) {
+    suspend fun renameList(id: Long, newName: String) = withContext(AppDispatchers.IO) {
         if (!isNameUnique(newName, id)) {
             throw Exception("A word list with this name already exists")
         }
@@ -90,7 +89,7 @@ class WordListRepository(
     }
 
     suspend fun updateWordListAssociations(simplified: String, listIds: Set<Long>): (suspend () -> Result<Unit>)?
-            = withContext(Dispatchers.IO) {
+            = withContext(AppDispatchers.IO) {
         // First remove all existing associations for this word
         val entries = wordListDAO.getEntriesForWord(simplified)
 
@@ -134,7 +133,7 @@ class WordListRepository(
         }
     }
 
-    suspend fun deleteList(list: WordList): (suspend () -> Result<Unit>)? = withContext(Dispatchers.IO) {
+    suspend fun deleteList(list: WordList): (suspend () -> Result<Unit>)? = withContext(AppDispatchers.IO) {
         val entries = wordListDAO.getListEntries(list.id)
         wordListDAO.deleteList(list)
 
@@ -160,7 +159,7 @@ class WordListRepository(
     }
 
     suspend fun insertWordToList(wordList: WordList, word: AnnotatedChineseWord): (suspend () -> Result<Unit>)?
-            = withContext(Dispatchers.IO) {
+            = withContext(AppDispatchers.IO) {
         val entries = wordListDAO.getEntriesForWord(word.simplified)
         var entry = entries.find { it.listId == wordList.id }
 
@@ -185,7 +184,7 @@ class WordListRepository(
     }
 
     suspend fun removeWordFromList(wordList: WordList, simplified: String): (suspend () -> Result<Unit>)?
-            = withContext(Dispatchers.IO) {
+            = withContext(AppDispatchers.IO) {
         if (!isWordInList(wordList, simplified)) return@withContext null
 
         val entries = wordListDAO.getEntriesForWord(simplified)
@@ -206,7 +205,7 @@ class WordListRepository(
     }
 
     suspend fun removeWordFromAllLists(simplified: String): (suspend () -> Result<Unit>)?
-            = withContext(Dispatchers.IO) {
+            = withContext(AppDispatchers.IO) {
         if (wordListDAO.getEntriesForWord(simplified).isEmpty()) return@withContext null
 
         // saving entries for callback before deleting in DB
@@ -232,7 +231,7 @@ class WordListRepository(
     }
 
     suspend fun addWordToList(wordList: WordList, word: AnnotatedChineseWord): (suspend () -> Result<Unit>)?
-            = withContext(Dispatchers.IO) {
+            = withContext(AppDispatchers.IO) {
         var entry = wordListDAO.getEntriesForWord(word.simplified).find { it.listId == wordList.id }
 
         if (entry == null) {
@@ -257,7 +256,7 @@ class WordListRepository(
     }
 
     suspend fun addWordToSysAnnotatedList(word: AnnotatedChineseWord): (suspend () -> Result<Unit>)?
-            = withContext(Dispatchers.IO) {
+            = withContext(AppDispatchers.IO) {
         val wordList = getSystemLists()
 
         val annotList = wordList.find { it.name == WordList.Companion.SYSTEM_ANNOTATED_NAME }
@@ -266,7 +265,7 @@ class WordListRepository(
         return@withContext addWordToList(annotList.wordList, word)
     }
 
-    suspend fun touchAnnotatedList() : Boolean = withContext(Dispatchers.IO) {
+    suspend fun touchAnnotatedList() : Boolean = withContext(AppDispatchers.IO) {
         val wordList = getSystemLists()
 
         val annotList = wordList.find { it.name == WordList.Companion.SYSTEM_ANNOTATED_NAME }
@@ -276,7 +275,7 @@ class WordListRepository(
     }
 
     suspend fun updateInAllLists(simplified: String): (suspend () -> Result<Unit>)?
-            = withContext(Dispatchers.IO) {
+            = withContext(AppDispatchers.IO) {
         if (wordListDAO.getEntriesForWord(simplified).isEmpty()) return@withContext null
 
         return@withContext suspend { // Will execute only if Anki integration is active, allowed and ready to fire
@@ -308,7 +307,7 @@ class WordListRepository(
         }
     }
 
-    suspend fun getOrCreate(deck: WordList): WordList = withContext(Dispatchers.IO) {
+    suspend fun getOrCreate(deck: WordList): WordList = withContext(AppDispatchers.IO) {
         val decks = ankiStore.ankiDAO.getDeckList()?: emptyMap()
 
         if (deck.ankiDeckId == WordList.ANKI_ID_EMPTY || decks.none { it.key == deck.ankiDeckId }) {

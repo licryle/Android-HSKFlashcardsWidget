@@ -2,6 +2,7 @@ package fr.berliat.hskwidget.ui.screens.annotate
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import fr.berliat.hskwidget.core.AppDispatchers
 import fr.berliat.hskwidget.core.KAnkiDelegator
 import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.core.Utils.incrementConsultedWord
@@ -47,7 +48,7 @@ class AnnotateViewModel(
         }
     }
     suspend fun getAnnotatedChineseWord(simplifiedWord: String): AnnotatedChineseWord
-            = withContext(Dispatchers.IO) {
+            = withContext(AppDispatchers.IO) {
         val annot = HSKAppServices.database.annotatedChineseWordDAO().getFromSimplified(simplifiedWord)
         return@withContext if (annot == null || !annot.hasAnnotation()) {
             AnnotatedChineseWord(
@@ -83,7 +84,7 @@ class AnnotateViewModel(
 
     // Save or update annotation
     fun updateAnnotation(annotatedWord: AnnotatedChineseWord, callback: (Exception?) -> Unit) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(AppDispatchers.IO) {
             var error: Exception? = null
             try {
                 database.chineseWordAnnotationDAO().insertOrUpdate(annotatedWord.annotation!!)
@@ -103,7 +104,7 @@ class AnnotateViewModel(
 
     // Delete annotation
     fun deleteAnnotation(simplified: String, callback: ((String, Exception?) -> Unit)? = null) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(AppDispatchers.IO) {
             var error: Exception? = null
             try {
                 val nbRowAffected = database.chineseWordAnnotationDAO().deleteBySimplified(simplified)

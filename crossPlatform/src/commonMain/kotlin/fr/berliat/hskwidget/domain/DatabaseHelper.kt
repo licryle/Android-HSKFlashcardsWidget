@@ -1,6 +1,7 @@
 package fr.berliat.hskwidget.domain
 
 import co.touchlab.kermit.Logger
+import fr.berliat.hskwidget.core.AppDispatchers
 
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 
@@ -17,7 +18,6 @@ import io.github.vinceglb.filekit.name
 import io.github.vinceglb.filekit.path
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -42,7 +42,7 @@ class DatabaseHelper private constructor() {
         fun getDatabaseLiveDir() =  FileKit.filesDir / "../databases"
         fun getDatabaseLiveFile() = getDatabaseLiveDir() / DATABASE_FILENAME
 
-        suspend fun getInstance(): DatabaseHelper = withContext(Dispatchers.IO) {
+        suspend fun getInstance(): DatabaseHelper = withContext(AppDispatchers.IO) {
             INSTANCE?.let { return@withContext it }
 
             mutex.withLock {
@@ -60,7 +60,7 @@ class DatabaseHelper private constructor() {
     }
 
     suspend fun loadExternalDatabase(dbFilePath: PlatformFile) = withContext(
-        Dispatchers.IO) {
+        AppDispatchers.IO) {
         return@withContext createRoomDatabaseFromFile(dbFilePath)
     }
 
@@ -83,7 +83,7 @@ class DatabaseHelper private constructor() {
     }
 
     suspend fun replaceUserDataInDB(dbToUpdate: ChineseWordsDatabase, updateWith: ChineseWordsDatabase) {
-        withContext(Dispatchers.IO) {
+        withContext(AppDispatchers.IO) {
             Logger.d(tag = TAG, messageString = "Initiating Database Restoration: reading file")
             val importedAnnotations = updateWith.chineseWordAnnotationDAO().getAll()
             val importedListEntries = updateWith.wordListDAO().getAllListEntries()
@@ -134,7 +134,7 @@ class DatabaseHelper private constructor() {
     }
 
     suspend fun replaceWordsDataInDB(updateWith: ChineseWordsDatabase)
-            = withContext(Dispatchers.IO) {
+            = withContext(AppDispatchers.IO) {
         Logger.d(tag = TAG, messageString = "Initiating Database Update: reading file")
         val importedWordsCount = updateWith.chineseWordDAO().getCount()
         if (importedWordsCount == 0) {
@@ -151,7 +151,7 @@ class DatabaseHelper private constructor() {
     }
 
     suspend fun updateLiveDatabaseFromAsset(successCallback: () -> Unit, failureCallback: (e: Exception) -> Unit)
-            = withContext(Dispatchers.IO) {
+            = withContext(AppDispatchers.IO) {
         try {
             val assetDbStream = createRoomDatabaseFromAsset()
             replaceWordsDataInDB(assetDbStream)
@@ -173,7 +173,7 @@ class DatabaseHelper private constructor() {
     suspend fun snapshotDatabase(): PlatformFile {
         val cacheFile = FileKit.cacheDir / DATABASE_FILENAME
 
-        withContext(Dispatchers.IO) {
+        withContext(AppDispatchers.IO) {
             liveDatabase.flushToDisk()
 
             getDatabaseLiveFile().copyTo(cacheFile)

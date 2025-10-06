@@ -11,7 +11,6 @@ import fr.berliat.hskwidget.data.store.WidgetPreferencesStore
 import fr.berliat.hskwidget.data.store.WidgetPreferencesStoreProvider
 import fr.berliat.hskwidget.domain.DatabaseHelper
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 // --- Singleton instance
@@ -48,7 +47,7 @@ object HSKAppServices : AppServices() {
         register("HSKSegmenter") {
             val segmenter = Utils.getHSKSegmenter()
 
-            getAnyway<CoroutineScope>("appScope").launch(Dispatchers.IO) {
+            getAnyway<CoroutineScope>("appScope").launch(AppDispatchers.IO) {
                 segmenter.preload()
             }
 

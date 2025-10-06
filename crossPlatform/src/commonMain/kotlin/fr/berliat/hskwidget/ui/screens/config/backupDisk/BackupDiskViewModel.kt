@@ -11,6 +11,7 @@ import fr.berliat.hskwidget.domain.DatabaseHelper
 
 import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.config_backup_directory_failed_selection
+import fr.berliat.hskwidget.core.AppDispatchers
 import fr.berliat.hskwidget.dbrestore_failure_nofileselected
 import fr.berliat.hskwidget.dbrestore_start
 import fr.berliat.hskwidget.dbrestore_success
@@ -77,7 +78,7 @@ class BackupDiskViewModel(
             DatabaseDiskBackup.selectBackupFile(
                 onSuccess = { file ->
                     Utils.toast(Res.string.dbrestore_start)
-                    viewModelScope.launch(Dispatchers.IO) {
+                    viewModelScope.launch(AppDispatchers.IO) {
                         val dbHelper = DatabaseHelper.getInstance()
                         val copiedFile = FileKit.cacheDir / file.name
                         file.copyTo(FileKit.cacheDir / file.name)

@@ -11,7 +11,6 @@ import fr.berliat.hskwidget.domain.SearchQuery
 
 import kotlinx.coroutines.CoroutineScope
 
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
@@ -63,7 +62,7 @@ object Utils {
     fun playWordInBackground(word: String) = ExpectedUtils.playWordInBackground(word)
 
     fun toast(stringRes: StringResource, args: List<String> = emptyList()) {
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(AppDispatchers.IO).launch {
             toast(getString(stringRes, *args.toTypedArray()))
         }
     }
@@ -73,7 +72,7 @@ object Utils {
     fun openAppForSearchQuery(query: SearchQuery) = ExpectedUtils.openAppForSearchQuery(query)
 
     fun incrementConsultedWord(word: String) {
-        HSKAppServices.appScope.launch(Dispatchers.IO) {
+        HSKAppServices.appScope.launch(AppDispatchers.IO) {
             val db = HSKAppServices.database
             val frequencyWordsRepo = ChineseWordFrequencyRepo(
                 db.chineseWordFrequencyDAO(),

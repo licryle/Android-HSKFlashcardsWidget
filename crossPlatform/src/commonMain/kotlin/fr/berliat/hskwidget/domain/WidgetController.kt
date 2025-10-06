@@ -1,12 +1,12 @@
 package fr.berliat.hskwidget.domain
 
 import co.touchlab.kermit.Logger
+import fr.berliat.hskwidget.core.AppDispatchers
 import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.model.WordListWithCount
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.data.store.WidgetPreferencesStore
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -46,7 +46,7 @@ class WidgetController private constructor(
         Utils.playWordInBackground(simplified.value)
     }
 
-    suspend fun updateWord() = withContext(Dispatchers.IO) {
+    suspend fun updateWord() = withContext(AppDispatchers.IO) {
         val allowedListIds = getAllowedLists().map { it.wordList.id }
         val newWord =
             annotatedWordDAO.getRandomWordFromLists(
@@ -67,7 +67,7 @@ class WidgetController private constructor(
         Utils.openAppForSearchQuery(query)
     }
 
-    suspend fun getAllowedLists(): List<WordListWithCount> = withContext(Dispatchers.IO) {
+    suspend fun getAllowedLists(): List<WordListWithCount> = withContext(AppDispatchers.IO) {
         val widgetListIds = widgetListDAO.getListsForWidget(widgetId)
         val lists = wordListDAO.getAllLists()
 

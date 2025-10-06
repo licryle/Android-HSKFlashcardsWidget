@@ -14,6 +14,7 @@ import fr.berliat.hskwidget.domain.SearchQuery
 import fr.berliat.hskwidget.ui.navigation.Screen
 
 import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.core.AppDispatchers
 import fr.berliat.hskwidget.database_update_failure
 import fr.berliat.hskwidget.database_update_start
 import fr.berliat.hskwidget.database_update_success
@@ -25,7 +26,6 @@ import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.fromBookmarkData
 import io.github.vinceglb.filekit.path
 
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -78,14 +78,14 @@ open class CommonAppViewModel(): ViewModel() {
     }
 
     private fun handleDbOperations() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(AppDispatchers.IO) {
             DatabaseHelper.getInstance().cleanTempDatabaseFiles()
         }
 
         if (shouldUpdateDatabaseFromAsset()) {
             Utils.toast(Res.string.database_update_start)
 
-            viewModelScope.launch(Dispatchers.IO) {
+            viewModelScope.launch(AppDispatchers.IO) {
                 DatabaseHelper.getInstance().updateLiveDatabaseFromAsset({
                     Utils.toast(Res.string.database_update_success)
 
@@ -117,16 +117,16 @@ open class CommonAppViewModel(): ViewModel() {
         val bookMark = appConfig.dbBackUpDiskDirectory.value
         if (appConfig.dbBackUpDiskActive.value && bookMark != null) {
             val backupFolder = PlatformFile.fromBookmarkData(bookMark)
-            viewModelScope.launch(Dispatchers.IO) {
+            viewModelScope.launch(AppDispatchers.IO) {
                 DatabaseDiskBackup.getFolder(
                     bookMark,
                     onSuccess = {
-                        viewModelScope.launch(Dispatchers.IO) {
+                        viewModelScope.launch(AppDispatchers.IO) {
                             DatabaseDiskBackup.backUp(
                                 bookMark,
                                 onSuccess = {
                                     Utils.toast(Res.string.dbbackup_success)
-                                    viewModelScope.launch(Dispatchers.IO) {
+                                    viewModelScope.launch(AppDispatchers.IO) {
                                         DatabaseDiskBackup.cleanOldBackups(
                                             backupFolder,
                                             appConfig.dbBackUpDiskMaxFiles.value
@@ -150,13 +150,13 @@ open class CommonAppViewModel(): ViewModel() {
     }
 
     fun configureWidget(widgetId: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(AppDispatchers.IO) {
             _navigation.emit(Screen.Widgets(widgetId))
         }
     }
 
     fun ocrImage(imageFile: PlatformFile) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(AppDispatchers.IO) {
             _navigation.emit(Screen.OCRDisplay("", imageFile.path))
         }
     }

@@ -1,7 +1,9 @@
 package fr.berliat.hskwidget.data.store
 
+import androidx.room.ConstructedBy
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import androidx.room.RoomDatabaseConstructor
 import androidx.room.TypeConverters
 import fr.berliat.hskwidget.data.dao.AnnotatedChineseWordDAO
 import fr.berliat.hskwidget.data.dao.ChineseWordAnnotationDAO
@@ -38,6 +40,7 @@ import io.github.vinceglb.filekit.PlatformFile
     AnnotatedChineseWordsConverter::class,
     ListTypeConverter::class)
 
+@ConstructedBy(ChineseWordsDatabaseConstructor::class)
 abstract class ChineseWordsDatabase: RoomDatabase() {
     abstract fun annotatedChineseWordDAO(): AnnotatedChineseWordDAO
     abstract fun chineseWordAnnotationDAO(): ChineseWordAnnotationDAO
@@ -54,4 +57,9 @@ abstract class ChineseWordsDatabase: RoomDatabase() {
     suspend fun flushToDisk() {
         databaseManagementDAO().flushDatabase()
     }
+}
+
+@Suppress("KotlinNoActualForExpect")
+expect object ChineseWordsDatabaseConstructor : RoomDatabaseConstructor<ChineseWordsDatabase> {
+    override fun initialize(): ChineseWordsDatabase
 }

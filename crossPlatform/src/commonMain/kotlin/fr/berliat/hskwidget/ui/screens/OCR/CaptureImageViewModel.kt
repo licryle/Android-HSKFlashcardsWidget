@@ -12,6 +12,7 @@ import fr.berliat.hskwidget.core.YYMMDDHHMMSS
 import fr.berliat.hskwidget.core.toSafeFileName
 
 import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.core.AppDispatchers
 import fr.berliat.hskwidget.ocr_capture_error_processed
 import fr.berliat.hskwidget.ocr_capture_error_save
 
@@ -42,7 +43,7 @@ class CaptureImageViewModel(
 
         cameraController.value?.let {
             _isProcessing.value = true
-            viewModelScope.launch(Dispatchers.IO) {
+            viewModelScope.launch(AppDispatchers.IO) {
                 when (val result = it.takePicture()) {
                     is ImageCaptureResult.Success -> {
                         val file = FileKit.cacheDir / "Photo_${

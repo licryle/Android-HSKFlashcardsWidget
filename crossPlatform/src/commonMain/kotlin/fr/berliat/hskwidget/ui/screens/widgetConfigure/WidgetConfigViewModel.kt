@@ -2,6 +2,7 @@ package fr.berliat.hskwidget.ui.screens.widgetConfigure
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import fr.berliat.hskwidget.core.AppDispatchers
 
 import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.core.HSKAppServices
@@ -39,7 +40,7 @@ class WidgetConfigViewModel(
     }
 
     fun loadLists() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(AppDispatchers.IO) {
             val widgetLists = widgetListDAO.getListsForWidget(widgetId)
             val all = wordListDAO.getAllLists()
             _allLists.value = all
@@ -50,7 +51,7 @@ class WidgetConfigViewModel(
     fun savePreferences(newList: Set<Long>) {
         val entriesToAdd = newList.map { listId -> WidgetListEntry(widgetId, listId) }
 
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(AppDispatchers.IO) {
             // Todo, mutex? Low priority
             widgetListDAO.deleteWidget(widgetId)
             widgetListDAO.insertListsToWidget(entriesToAdd)

@@ -49,7 +49,7 @@ open class AppServices {
      * Initialize all services concurrently.
      */
     open fun init(scope: CoroutineScope) {
-        scope.launch(Dispatchers.IO) {
+        scope.launch(AppDispatchers.IO) {
             try {
                 factories.entries
                     .sortedBy { it.value.priority } // highest first

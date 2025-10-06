@@ -5,11 +5,11 @@ import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.about_email_noapp
+import fr.berliat.hskwidget.core.AppDispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
@@ -44,7 +44,7 @@ class AboutViewModel {
     fun fetchStats() {
         Logger.d(tag = TAG, messageString = "fetching stats")
 
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(AppDispatchers.IO) {
             val db = HSKAppServices.database
             val words = db.chineseWordDAO()
             val annotations = db.chineseWordAnnotationDAO()

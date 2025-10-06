@@ -1,6 +1,7 @@
 package fr.berliat.hskwidget.ui.screens.dictionary
 
 import co.touchlab.kermit.Logger
+import fr.berliat.hskwidget.core.AppDispatchers
 import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.dao.AnnotatedChineseWordDAO
@@ -53,7 +54,7 @@ class DictionarySearchViewModel(private val prefsStore: AppPreferencesStore = HS
     }
 
     fun performSearch() {
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(AppDispatchers.IO).launch {
             _isLoading.value = true
             currentPage = 0
             val results = fetchResultsForPage()
@@ -71,7 +72,7 @@ class DictionarySearchViewModel(private val prefsStore: AppPreferencesStore = HS
     fun loadMore() {
         if (_isLoading.value) return
         _isLoading.value = true
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(AppDispatchers.IO).launch {
             val newResults = fetchResultsForPage()
 
             withContext(Dispatchers.Main) {

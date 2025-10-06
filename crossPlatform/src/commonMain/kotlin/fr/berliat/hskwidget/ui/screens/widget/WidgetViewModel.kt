@@ -2,13 +2,12 @@ package fr.berliat.hskwidget.ui.screens.widget
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import fr.berliat.hskwidget.core.AppDispatchers
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.data.store.WidgetPreferencesStore
 import fr.berliat.hskwidget.domain.WidgetController
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,7 +24,7 @@ class WidgetViewModel(
     val word = _word.asStateFlow()
 
     init {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(AppDispatchers.IO) {
             controller = WidgetController.getInstance(widgetStore, database)
             simplified.collect { s ->
                 if (s.isEmpty()) {
@@ -41,7 +40,7 @@ class WidgetViewModel(
     fun speakWord() = controller?.speakWord()
     fun openDictionary() = controller?.openDictionary()
     fun updateWord() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(AppDispatchers.IO) {
             controller?.updateWord()
         }
     }

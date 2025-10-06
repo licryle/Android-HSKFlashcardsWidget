@@ -3,9 +3,8 @@ package fr.berliat.hskwidget.data.store
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
+import fr.berliat.hskwidget.core.AppDispatchers
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,7 +22,7 @@ class PreferenceState<S, T>(
     converter: PreferenceConverter<S, T>? = null
 ) {
     private val conv = converter ?: PreferenceConverter({ it as T }, { it as S })
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val scope = CoroutineScope(SupervisorJob() + AppDispatchers.IO)
     private val _flow : MutableStateFlow<T> = MutableStateFlow(initialValue)
     fun asStateFlow(): StateFlow<T> = _flow
 
