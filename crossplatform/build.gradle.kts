@@ -5,14 +5,14 @@ val versionCodeValue = 40
 val versionCodeName = "4.0.0"
 
 plugins {
-    kotlin("multiplatform") version "2.2.10"
-    kotlin("plugin.serialization") version "1.8.0"
-    id("com.android.application") // 🔄 CHANGED from .library
-    id("org.jetbrains.compose") version "1.9.0"
-    id("org.jetbrains.kotlin.plugin.compose") version "2.2.20"
+    alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.serialization)
+    alias(libs.plugins.androidApplication)
+    alias(libs.plugins.composePlugin)
+    alias(libs.plugins.kotlinCompose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
-    id("com.codingfeline.buildkonfig") version "0.17.1"
+    alias(libs.plugins.buildKonfig)
 }
 
 buildkonfig {

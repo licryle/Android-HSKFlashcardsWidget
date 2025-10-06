@@ -1,11 +1,11 @@
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 
 plugins {
-    kotlin("multiplatform")
-    id("com.android.kotlin.multiplatform.library")
-    id("com.android.lint")
-    id("org.jetbrains.kotlin.plugin.compose") version "2.2.20"
-    id("org.jetbrains.compose") version "1.9.0"
+    alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.androidKMP)
+    alias(libs.plugins.androidLint)
+    alias(libs.plugins.kotlinCompose)
+    alias(libs.plugins.composePlugin)
 }
 
 kotlin {
@@ -83,9 +83,9 @@ kotlin {
 
         getByName("androidDeviceTest") {
             dependencies {
-                implementation("androidx.test:runner:1.7.0")
-                implementation("androidx.test:core:1.7.0")
-                implementation("androidx.test.ext:junit:1.3.0")
+                implementation(libs.androidx.runner)
+                implementation(libs.androidx.core)
+                implementation(libs.androidx.junit)
             }
         }
 
