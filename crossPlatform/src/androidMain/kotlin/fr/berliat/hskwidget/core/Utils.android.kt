@@ -105,6 +105,8 @@ actual object ExpectedUtils {
             putExtra(Intent.EXTRA_TEXT, body)
         }
 
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+
         if (intent.resolveActivity(context.packageManager) != null) {
             context.startActivity(intent)
         } else {
