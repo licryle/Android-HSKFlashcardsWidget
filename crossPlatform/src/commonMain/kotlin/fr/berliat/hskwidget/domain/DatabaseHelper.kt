@@ -92,8 +92,7 @@ class DatabaseHelper private constructor() {
         private suspend fun createRoomDatabaseBuilderLive(): RoomDatabase.Builder<ChineseWordsDatabase> {
             val liveFile = getDatabaseLiveFile()
             if (!liveFile.exists()) {
-                val assetFile = PlatformFile(DATABASE_ASSET_PATH)
-                assetFile.copyTo(liveFile)
+                copyDatabaseAssetFile()
             }
 
             return createRoomDatabaseBuilderFromFile(liveFile)
@@ -238,3 +237,5 @@ class DatabaseHelper private constructor() {
     }
 }
 expect suspend fun createRoomDatabaseBuilderFromFile(file: PlatformFile) : RoomDatabase.Builder<ChineseWordsDatabase>
+
+expect suspend fun copyDatabaseAssetFile()
