@@ -22,9 +22,8 @@ class StrictModeManager {
          * are ignored.
          */
         private val STACKTRACE_WHITELIST = listOf(
-            "android.widget.OverScroller.<init>", // Triggered in NavDrawer code
-            "android.graphics.AwareBitmapCacher.-\$\$Nest\$mhandleCheckBgAndRelease", // Triggered at resume by OS?
-            "android.hwtheme.HwThemeManager.getDataSkinThemePackages" // Triggered when Billing activities are summoned
+            "android.graphics.AwareBitmapCacher\$MyHandler.handleMessage",
+            "android.provider.DocumentsProvider.query"
         )
 
         /**
