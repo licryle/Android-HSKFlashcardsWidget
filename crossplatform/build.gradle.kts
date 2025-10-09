@@ -1,5 +1,8 @@
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.*
+import org.gradle.internal.os.OperatingSystem
+
+var os: OperatingSystem? = OperatingSystem.current()
 
 val versionCodeValue = 40
 val versionCodeName = "4.0.0"
@@ -92,33 +95,40 @@ kotlin {
             }
         }
 
-        // Minimal iosTest to avoid Gradle appleTest issues
-        val iosMain by creating {
-            dependsOn(commonMain)
-        }
-        val iosTest by creating {
-            dependsOn(commonTest)
-            dependencies {
-                // No test dependencies yet
+        /* Explicitly exclude iOS when not on iOS. This shouldn't be needed but because we locally
+         * build cameraK makes it suddenly required as an upstream dependency.
+         */
+        if (os?.isMacOsX == true) {
+            // Minimal iosTest to avoid Gradle appleTest issues
+            val iosMain by creating {
+                dependsOn(commonMain)
             }
-        }
-        listOf(iosX64(), iosArm64(), iosSimulatorArm64()).forEach { target ->
-            target.compilations["main"].defaultSourceSet.dependsOn(iosMain)
-            target.compilations["test"].defaultSourceSet.dependsOn(iosTest)
+            val iosTest by creating {
+                dependsOn(commonTest)
+                dependencies {
+                    // No test dependencies yet
+                }
+            }
+            listOf(iosX64(), iosArm64(), iosSimulatorArm64()).forEach { target ->
+                target.compilations["main"].defaultSourceSet.dependsOn(iosMain)
+                target.compilations["test"].defaultSourceSet.dependsOn(iosTest)
+            }
         }
     }
 
-    // --- iOS XCFramework setup
-    val xcf = XCFramework()
-    val iosTargets = listOf(iosX64(), iosArm64(), iosSimulatorArm64())
+    if (os?.isMacOsX == true) {
+        // --- iOS XCFramework setup
+        val xcf = XCFramework()
+        val iosTargets = listOf(iosX64(), iosArm64(), iosSimulatorArm64())
 
-    iosTargets.forEach { target ->
-        target.binaries.framework {
-            baseName = "crossPlatformKit"
-            xcf.add(this)
-        }
-        target.compilations.findByName("test")?.compileTaskProvider?.configure {
-            enabled = false
+        iosTargets.forEach { target ->
+            target.binaries.framework {
+                baseName = "crossPlatformKit"
+                xcf.add(this)
+            }
+            target.compilations.findByName("test")?.compileTaskProvider?.configure {
+                enabled = false
+            }
         }
     }
 }
