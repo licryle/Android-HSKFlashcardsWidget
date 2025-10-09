@@ -61,7 +61,7 @@ actual class BackupCloudViewModel actual constructor(
 
     actual fun backup() {
         gDriveBackup.login {
-            viewModelScope.launch {
+            viewModelScope.launch(Dispatchers.IO) {
                 val gDriveBackupSnapshot = DatabaseHelper.getInstance().snapshotDatabase()
                 val flow = gDriveBackup.backup(
                     listOf(
@@ -104,7 +104,7 @@ actual class BackupCloudViewModel actual constructor(
 
     actual fun restore() {
         gDriveBackup.login {
-            viewModelScope.launch {
+            viewModelScope.launch(Dispatchers.IO) {
                 val flow = gDriveBackup.restore(
                     listOf(
                         GoogleDriveBackupFile.DownloadFile(
