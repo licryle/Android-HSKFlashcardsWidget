@@ -11,6 +11,7 @@
     <string name="fix_it">Attempt to fix it</string>
     <string name="copied_to_clipboard">Copied %1$s to clipboard</string>
 
+    <string name="menu">Menu</string>
     <string name="menu_dictionary">Dictionary</string>
     <string name="menu_lists">Lists</string>
     <string name="menu_widgets">Widgets</string>
@@ -22,6 +23,8 @@
     <string name="menu_ocr_display">OCR: Scanned Text</string>
 
     <string name="search_hint">Search pinyin, definition, hanzi</string>
+    <string name="search_clear">Clear search</string>
+
     <string name="nav_header_desc">Navigation header</string>
     <string name="nav_host_ocr_reminder_close">Close OCR Reminder</string>
     <string name="nav_host_ocr_reminder_text">Your scanned text is still accessible by clicking here.</string>
