@@ -14,6 +14,7 @@ import fr.berliat.hskwidget.data.store.GoogleDriveBackup
 import fr.berliat.hskwidget.ui.screens.config.backupCloud.BackupCloudTransferEvent.*
 
 import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.data.store.snapshotToFile
 import fr.berliat.hskwidget.dbrestore_failure_fileformat
 import fr.berliat.hskwidget.dbrestore_failure_import
 import fr.berliat.hskwidget.dbrestore_start
@@ -62,7 +63,12 @@ actual class BackupCloudViewModel actual constructor(
     actual fun backup() {
         gDriveBackup.login {
             viewModelScope.launch(Dispatchers.IO) {
-                val gDriveBackupSnapshot = DatabaseHelper.getInstance().snapshotDatabase()
+                val gDriveBackupSnapshot = DatabaseHelper.getInstance().liveDatabase.snapshotToFile()
+
+                if (gDriveBackupSnapshot == null) {
+                    _transferState.emit(BackupFailed(Exception("Database snapshot failed")))
+                    return@launch
+                }
                 val flow = gDriveBackup.backup(
                     listOf(
                         GoogleDriveBackupFile.UploadFile(

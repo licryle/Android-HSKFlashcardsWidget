@@ -66,14 +66,15 @@ class DatabaseHelper private constructor() {
             builder: RoomDatabase.Builder<ChineseWordsDatabase>,
             file: PlatformFile
         ): ChineseWordsDatabase {
+            val sqlDriver = BundledSQLiteDriver()
             Logger.d(tag=TAG, messageString = "buildDatabase entering - $file")
             val finalBuilder = builder
-                .setDriver(BundledSQLiteDriver())
+                .setDriver(sqlDriver)
                 .setQueryCoroutineContext(AppDispatchers.IO)
 
             val db = finalBuilder.build()
-
             db._databaseFile = file
+
             Logger.d(tag=TAG, messageString = "buildDatabase exiting - $file")
             return db
         }
@@ -210,7 +211,6 @@ class DatabaseHelper private constructor() {
             val assetDbStream = createRoomDatabaseFromAsset()
             replaceWordsDataInDB(assetDbStream)
             assetDbStream.close()
-            liveDatabase.flushToDisk()
 
             withContext(Dispatchers.Main) {
                 successCallback()
@@ -222,18 +222,6 @@ class DatabaseHelper private constructor() {
         } finally {
             cleanTempDatabaseFiles()
         }
-    }
-
-    suspend fun snapshotDatabase(): PlatformFile {
-        val cacheFile = FileKit.cacheDir / DATABASE_FILENAME
-
-        withContext(AppDispatchers.IO) {
-            liveDatabase.flushToDisk()
-
-            getDatabaseLiveFile().copyTo(cacheFile)
-        }
-
-        return cacheFile
     }
 }
 expect suspend fun createRoomDatabaseBuilderFromFile(file: PlatformFile) : RoomDatabase.Builder<ChineseWordsDatabase>

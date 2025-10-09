@@ -9,7 +9,6 @@ import fr.berliat.hskwidget.data.dao.AnnotatedChineseWordDAO
 import fr.berliat.hskwidget.data.dao.ChineseWordAnnotationDAO
 import fr.berliat.hskwidget.data.dao.ChineseWordDAO
 import fr.berliat.hskwidget.data.dao.ChineseWordFrequencyDAO
-import fr.berliat.hskwidget.data.dao.DatabaseManagementDAO
 import fr.berliat.hskwidget.data.dao.WidgetListDAO
 import fr.berliat.hskwidget.data.dao.WordListDAO
 import fr.berliat.hskwidget.data.model.ChineseWord
@@ -48,18 +47,15 @@ abstract class ChineseWordsDatabase: RoomDatabase() {
     abstract fun chineseWordFrequencyDAO(): ChineseWordFrequencyDAO
     abstract fun wordListDAO(): WordListDAO
     abstract fun widgetListDAO(): WidgetListDAO
-    fun databaseManagementDAO() = DatabaseManagementDAO(this)
 
     var _databaseFile : PlatformFile? = null
     val databaseFile
         get() = _databaseFile!!
-
-    suspend fun flushToDisk() {
-        databaseManagementDAO().flushDatabase()
-    }
 }
 
 @Suppress("KotlinNoActualForExpect")
 expect object ChineseWordsDatabaseConstructor : RoomDatabaseConstructor<ChineseWordsDatabase> {
     override fun initialize(): ChineseWordsDatabase
 }
+
+expect suspend fun ChineseWordsDatabase.snapshotToFile(): PlatformFile?

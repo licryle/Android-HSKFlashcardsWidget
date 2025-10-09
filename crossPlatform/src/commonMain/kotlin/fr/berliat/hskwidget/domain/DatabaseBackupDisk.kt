@@ -3,6 +3,7 @@ package fr.berliat.hskwidget.domain
 import fr.berliat.hskwidget.core.AppDispatchers
 import fr.berliat.hskwidget.core.YYMMDDHHMMSS
 import fr.berliat.hskwidget.core.toSafeFileName
+import fr.berliat.hskwidget.data.store.snapshotToFile
 
 import io.github.vinceglb.filekit.BookmarkData
 import io.github.vinceglb.filekit.FileKit
@@ -64,12 +65,12 @@ object DatabaseDiskBackup {
         onFail: (Throwable) -> Unit
     ) = withContext(AppDispatchers.IO){
         try {
-            val snapshot = DatabaseHelper.getInstance().snapshotDatabase()
+            val snapshot = DatabaseHelper.getInstance().liveDatabase.snapshotToFile()
             val timestamp = Clock.System.now()
             val filename = "${timestamp.YYMMDDHHMMSS()}_${DatabaseHelper.DATABASE_FILENAME}".toSafeFileName()
-            val newCacheFile = PlatformFile("${snapshot.parent()!!.path}/${filename}")
+            val newCacheFile = PlatformFile("${snapshot!!.parent()!!.path}/${filename}")
 
-            snapshot.atomicMove(newCacheFile)
+            snapshot!!.atomicMove(newCacheFile)
             newCacheFile.atomicMove(PlatformFile.fromBookmarkData(destinationFolder))
 
             withContext(Dispatchers.Main) {
