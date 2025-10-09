@@ -15,7 +15,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalFocusManager
 
 import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.close_24px
@@ -56,21 +58,26 @@ fun AppBar(
             Row {
                 Text(title)
 
-                val keyboardController = LocalSoftwareKeyboardController.current
+                val focusRequester = remember { FocusRequester() }
+                val focusManager = LocalFocusManager.current
                 TextField(
                     value = localText.value,
                     onValueChange = { onValueChange(it) },
                     placeholder = { Text(stringResource(Res.string.search_hint)) },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth()
+                        .focusRequester(focusRequester),
                     keyboardActions = KeyboardActions(
                         onDone = {
-                            keyboardController?.hide()
+                            focusManager.clearFocus()
                         }
                     ),
                     singleLine = true,
                     trailingIcon = {
                         if (localText.value.isNotEmpty()) {
-                            IconButton(onClick = { onValueChange("") }) {
+                            IconButton(onClick = {
+                                focusRequester.requestFocus()
+                                onValueChange("")
+                            }) {
                                 Icon(painterResource(Res.drawable.close_24px), contentDescription = "Clear text")
                             }
                         }
