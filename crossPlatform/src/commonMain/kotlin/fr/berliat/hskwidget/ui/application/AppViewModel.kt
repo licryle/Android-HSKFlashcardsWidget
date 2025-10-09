@@ -78,7 +78,7 @@ open class CommonAppViewModel(): ViewModel() {
 
     private fun handleDbOperations() {
         viewModelScope.launch(AppDispatchers.IO) {
-            DatabaseHelper.getInstance().cleanTempDatabaseFiles()
+            DatabaseHelper.cleanTempDatabaseFiles()
         }
 
         if (shouldUpdateDatabaseFromAsset()) {

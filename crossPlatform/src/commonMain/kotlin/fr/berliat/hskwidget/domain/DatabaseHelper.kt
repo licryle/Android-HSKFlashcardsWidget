@@ -1,8 +1,11 @@
 package fr.berliat.hskwidget.domain
 
-import co.touchlab.kermit.Logger
-import fr.berliat.hskwidget.core.AppDispatchers
+import androidx.room.RoomDatabase
+import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 
+import co.touchlab.kermit.Logger
+
+import fr.berliat.hskwidget.core.AppDispatchers
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 
 import io.github.vinceglb.filekit.FileKit
@@ -10,9 +13,10 @@ import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.absolutePath
 import io.github.vinceglb.filekit.cacheDir
 import io.github.vinceglb.filekit.copyTo
+import io.github.vinceglb.filekit.databasesDir
 import io.github.vinceglb.filekit.delete
 import io.github.vinceglb.filekit.div
-import io.github.vinceglb.filekit.filesDir
+import io.github.vinceglb.filekit.exists
 import io.github.vinceglb.filekit.list
 import io.github.vinceglb.filekit.name
 import io.github.vinceglb.filekit.path
@@ -39,7 +43,7 @@ class DatabaseHelper private constructor() {
         const val DATABASE_ASSET_PATH = "databases/$DATABASE_FILENAME"
         private const val TAG = "ChineseWordsDatabase"
 
-        fun getDatabaseLiveDir() =  FileKit.filesDir / "../databases"
+        fun getDatabaseLiveDir() = FileKit.databasesDir
         fun getDatabaseLiveFile() = getDatabaseLiveDir() / DATABASE_FILENAME
 
         suspend fun getInstance(): DatabaseHelper = withContext(AppDispatchers.IO) {
@@ -57,66 +61,117 @@ class DatabaseHelper private constructor() {
 
             return@withContext INSTANCE!!
         }
-    }
 
-    suspend fun loadExternalDatabase(dbFilePath: PlatformFile) = withContext(
-        AppDispatchers.IO) {
-        return@withContext createRoomDatabaseFromFile(dbFilePath)
-    }
+        private suspend fun buildDatabase(
+            builder: RoomDatabase.Builder<ChineseWordsDatabase>,
+            file: PlatformFile
+        ): ChineseWordsDatabase {
+            Logger.d(tag=TAG, messageString = "buildDatabase entering - $file")
+            val finalBuilder = builder
+                .setDriver(BundledSQLiteDriver())
+                .setQueryCoroutineContext(AppDispatchers.IO)
 
-    suspend fun cleanTempDatabaseFiles() {
-        val dir = getDatabaseLiveDir()
-        val filesToDelete = dir.list().filter { file ->
-            // Return true for files that match the pattern
-            file.name.contains("Temp_HSK_DB_")
+            val db = finalBuilder.build()
+
+            db._databaseFile = file
+            Logger.d(tag=TAG, messageString = "buildDatabase exiting - $file")
+            return db
         }
 
-        // Delete the matching files
-        filesToDelete.forEach { file ->
-            try {
-                file.delete()
-                Logger.d(tag = TAG, messageString = "Deleted Temp DB file: ${file.absolutePath()}")
-            } catch(_: Exception) {
-                Logger.d(tag = TAG, messageString = "Failed to delete temp DB file: ${file.absolutePath()}")
+        suspend fun createRoomDatabaseLive() : ChineseWordsDatabase {
+            return buildDatabase(createRoomDatabaseBuilderLive(), getDatabaseLiveFile())
+        }
+        suspend fun createRoomDatabaseFromFile(file: PlatformFile) : ChineseWordsDatabase {
+            return buildDatabase(createRoomDatabaseBuilderFromFile(file), file)
+        }
+        suspend fun createRoomDatabaseFromAsset() : ChineseWordsDatabase {
+            val file = PlatformFile(DATABASE_ASSET_PATH)
+            return buildDatabase(createRoomDatabaseBuilderFromAsset(), file)
+        }
+
+        private suspend fun createRoomDatabaseBuilderLive(): RoomDatabase.Builder<ChineseWordsDatabase> {
+            val liveFile = getDatabaseLiveFile()
+            if (!liveFile.exists()) {
+                val assetFile = PlatformFile(DATABASE_ASSET_PATH)
+                assetFile.copyTo(liveFile)
+            }
+
+            return createRoomDatabaseBuilderFromFile(liveFile)
+        }
+
+        private suspend fun createRoomDatabaseBuilderFromAsset(): RoomDatabase.Builder<ChineseWordsDatabase> {
+            return createRoomDatabaseBuilderFromFile(PlatformFile(DATABASE_ASSET_PATH))
+        }
+
+        suspend fun loadExternalDatabase(dbFilePath: PlatformFile) = withContext(
+            AppDispatchers.IO
+        ) {
+            return@withContext createRoomDatabaseFromFile(dbFilePath)
+        }
+
+        suspend fun cleanTempDatabaseFiles() {
+            val dir = getDatabaseLiveDir()
+            val filesToDelete = dir.list().filter { file ->
+                // Return true for files that match the pattern
+                file.name.contains("Temp_HSK_DB_")
+            }
+
+            // Delete the matching files
+            filesToDelete.forEach { file ->
+                try {
+                    file.delete()
+                    Logger.d(
+                        tag = TAG,
+                        messageString = "Deleted Temp DB file: ${file.absolutePath()}"
+                    )
+                } catch (_: Exception) {
+                    Logger.d(
+                        tag = TAG,
+                        messageString = "Failed to delete temp DB file: ${file.absolutePath()}"
+                    )
+                }
             }
         }
-    }
 
-    suspend fun replaceUserDataInDB(dbToUpdate: ChineseWordsDatabase, updateWith: ChineseWordsDatabase) {
-        withContext(AppDispatchers.IO) {
-            Logger.d(tag = TAG, messageString = "Initiating Database Restoration: reading file")
-            val importedAnnotations = updateWith.chineseWordAnnotationDAO().getAll()
-            val importedListEntries = updateWith.wordListDAO().getAllListEntries()
-            val importedLists = updateWith.wordListDAO().getAllLists()
-            val importedWidgets = updateWith.widgetListDAO().getAllEntries()
-            val importedFreq = updateWith.chineseWordFrequencyDAO().getAll()
-            if (importedAnnotations.isEmpty() && importedListEntries.isEmpty()
-                && importedWidgets.isEmpty() && importedFreq.isEmpty()
-            ) {
-                Logger.i(tag = TAG, messageString = "Backup is empty or incompatible, aborting")
-                throw IllegalStateException("Database is empty")
+        suspend fun replaceUserDataInDB(
+            dbToUpdate: ChineseWordsDatabase,
+            updateWith: ChineseWordsDatabase
+        ) {
+            withContext(AppDispatchers.IO) {
+                Logger.d(tag = TAG, messageString = "Initiating Database Restoration: reading file")
+                val importedAnnotations = updateWith.chineseWordAnnotationDAO().getAll()
+                val importedListEntries = updateWith.wordListDAO().getAllListEntries()
+                val importedLists = updateWith.wordListDAO().getAllLists()
+                val importedWidgets = updateWith.widgetListDAO().getAllEntries()
+                val importedFreq = updateWith.chineseWordFrequencyDAO().getAll()
+                if (importedAnnotations.isEmpty() && importedListEntries.isEmpty()
+                    && importedWidgets.isEmpty() && importedFreq.isEmpty()
+                ) {
+                    Logger.i(tag = TAG, messageString = "Backup is empty or incompatible, aborting")
+                    throw IllegalStateException("Database is empty")
+                }
+
+                // Impoooort
+                Logger.d(tag = TAG, messageString = "Starting to import Annotations to local DB")
+                dbToUpdate.chineseWordAnnotationDAO().deleteAll()
+                dbToUpdate.chineseWordAnnotationDAO().insertAll(importedAnnotations)
+
+                Logger.d(tag = TAG, messageString = "Starting to import Word_List to local DB")
+                dbToUpdate.wordListDAO().deleteAllEntries()
+                dbToUpdate.wordListDAO().deleteAllLists()
+                dbToUpdate.wordListDAO().insertAllLists(importedLists.map { it -> it.wordList })
+                dbToUpdate.wordListDAO().insertAllWords(importedListEntries)
+
+                Logger.d(tag = TAG, messageString = "Starting to import WordFrequency to local DB")
+                dbToUpdate.chineseWordFrequencyDAO().deleteAll()
+                dbToUpdate.chineseWordFrequencyDAO().insertAll(importedFreq)
+
+                Logger.d(tag = TAG, messageString = "Starting to import WidgetList to local DB")
+                dbToUpdate.widgetListDAO().deleteAllWidgets()
+                dbToUpdate.widgetListDAO().insertListsToWidget(importedWidgets)
+
+                Logger.i(tag = TAG, messageString = "Database import done")
             }
-
-            // Impoooort
-            Logger.d(tag = TAG, messageString = "Starting to import Annotations to local DB")
-            dbToUpdate.chineseWordAnnotationDAO().deleteAll()
-            dbToUpdate.chineseWordAnnotationDAO().insertAll(importedAnnotations)
-
-            Logger.d(tag = TAG, messageString = "Starting to import Word_List to local DB")
-            dbToUpdate.wordListDAO().deleteAllEntries()
-            dbToUpdate.wordListDAO().deleteAllLists()
-            dbToUpdate.wordListDAO().insertAllLists(importedLists.map { it -> it.wordList })
-            dbToUpdate.wordListDAO().insertAllWords(importedListEntries)
-
-            Logger.d(tag = TAG, messageString = "Starting to import WordFrequency to local DB")
-            dbToUpdate.chineseWordFrequencyDAO().deleteAll()
-            dbToUpdate.chineseWordFrequencyDAO().insertAll(importedFreq)
-
-            Logger.d(tag = TAG, messageString = "Starting to import WidgetList to local DB")
-            dbToUpdate.widgetListDAO().deleteAllWidgets()
-            dbToUpdate.widgetListDAO().insertListsToWidget(importedWidgets)
-
-            Logger.i(tag = TAG, messageString = "Database import done")
         }
     }
 
@@ -182,7 +237,4 @@ class DatabaseHelper private constructor() {
         return cacheFile
     }
 }
-
-expect suspend fun createRoomDatabaseLive() : ChineseWordsDatabase
-expect suspend fun createRoomDatabaseFromFile(file: PlatformFile) : ChineseWordsDatabase
-expect suspend fun createRoomDatabaseFromAsset() : ChineseWordsDatabase
+expect suspend fun createRoomDatabaseBuilderFromFile(file: PlatformFile) : RoomDatabase.Builder<ChineseWordsDatabase>

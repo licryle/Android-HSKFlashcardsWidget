@@ -65,6 +65,18 @@
 			path = hskwidgetUITests;
 			sourceTree = "<group>";
 		};
+		1CE7E5D52E96CCED00627840 /* commonMain */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			name = commonMain;
+			path = ../crossPlatform/src/commonMain;
+			sourceTree = SOURCE_ROOT;
+		};
+		1CE7E5F92E96CCED00627840 /* iosMain */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			name = iosMain;
+			path = ../crossPlatform/src/iosMain;
+			sourceTree = SOURCE_ROOT;
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -101,6 +113,7 @@
 				1C7166F02E71E189000B4154 /* hskwidgetUITests */,
 				1C8A8BF62E733E1B00B8E39B /* Frameworks */,
 				1C7166D62E71E186000B4154 /* Products */,
+				1CE7E50F2E96CC5F00627840 /* Kotlin Debug */,
 			);
 			sourceTree = "<group>";
 		};
@@ -120,6 +133,15 @@
 				1C8A8BF72E733E1B00B8E39B /* crossPlatformKit.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		1CE7E50F2E96CC5F00627840 /* Kotlin Debug */ = {
+			isa = PBXGroup;
+			children = (
+				1CE7E5D52E96CCED00627840 /* commonMain */,
+				1CE7E5F92E96CCED00627840 /* iosMain */,
+			);
+			path = "Kotlin Debug";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -280,7 +302,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "#!/bin/sh\ncd \"$SRCROOT/..\"\n\n# Let Gradle pick up Xcode's environment variables\nCONFIGURATION=Debug TARGET_BUILD_DIR=some_dir FRAMEWORKS_FOLDER_PATH=other_dir SDK_NAME=iphonesimulator ARCHS=x86_64 ./gradlew :crossPlatform:embedAndSignAppleFrameworkForXcode\n";
+			shellScript = "#!/bin/sh\ncd \"$SRCROOT/..\"\n\n# Let Gradle pick up Xcode's environment variables\n#CONFIGURATION=Debug TARGET_BUILD_DIR=some_dir FRAMEWORKS_FOLDER_PATH=other_dir SDK_NAME=iphonesimulator ARCHS=x86_64 ./gradlew :crossPlatform:embedAndSignAppleFrameworkForXcode\nCONFIGURATION=Debug TARGET_BUILD_DIR=some_dir FRAMEWORKS_FOLDER_PATH=other_dir ./gradlew :crossPlatform:embedAndSignAppleFrameworkForXcode\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

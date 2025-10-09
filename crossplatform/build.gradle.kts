@@ -13,6 +13,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
     alias(libs.plugins.buildKonfig)
+    id("co.touchlab.skie") version "0.10.6"
 }
 
 buildkonfig {
@@ -186,4 +187,10 @@ compose.resources {
 
 room {
     schemaDirectory("$projectDir/schemas")
+}
+
+skie {
+    build {
+        produceDistributableFramework()
+    }
 }

@@ -83,8 +83,8 @@ class BackupDiskViewModel(
                         val copiedFile = FileKit.cacheDir / file.name
                         file.copyTo(FileKit.cacheDir / file.name)
                         // TODO handle copy fail?
-                        val sourceDb = dbHelper.loadExternalDatabase(copiedFile)
-                        dbHelper.replaceUserDataInDB(dbHelper.liveDatabase, sourceDb)
+                        val sourceDb = DatabaseHelper.loadExternalDatabase(copiedFile)
+                        DatabaseHelper.replaceUserDataInDB(dbHelper.liveDatabase, sourceDb)
                         copiedFile.delete()
 
                         withContext(Dispatchers.Main) {
