@@ -26,7 +26,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 
 class AnnotateViewModel(
-    prefsStore: AppPreferencesStore = HSKAppServices.appPreferences,
+    private val prefsStore: AppPreferencesStore = HSKAppServices.appPreferences,
     private val database: ChineseWordsDatabase = HSKAppServices.database,
     private val wordListRepo: WordListRepository = HSKAppServices.wordListRepo,
     private val ankiCaller : KAnkiDelegator
@@ -78,6 +78,9 @@ class AnnotateViewModel(
 
         val annotatedWord = AnnotatedChineseWord(annotatedWord.word, updatedAnnotation)
         updateAnnotation(annotatedWord) { err -> callback?.invoke(annotatedWord, err) }
+
+        prefsStore.lastAnnotatedClassType.value = cType
+        prefsStore.lastAnnotatedClassLevel.value = cLevel
 
         incrementConsultedWord(annotatedWord.simplified)
     }
