@@ -1,6 +1,7 @@
 package fr.berliat.hskwidget.ui.navigation
 
 import androidx.navigation.NavController
+import kotlin.reflect.KClass
 
 object NavigationManager {
     private lateinit var navController: NavController
@@ -35,8 +36,8 @@ object NavigationManager {
         }
     }
 
-    fun isScreenInBackStack(screen: Screen): Boolean {
-        return stackScreen.contains(screen)
+    fun inBackStack(screenClass: KClass<out Screen>): Boolean {
+        return stackScreen.any { it::class == screenClass }
     }
 
     private fun logCurrentScreen() {

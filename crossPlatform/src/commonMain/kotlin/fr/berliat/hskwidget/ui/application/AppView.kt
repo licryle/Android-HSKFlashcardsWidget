@@ -95,8 +95,10 @@ fun AppView(
                 },
                 content = { innerPadding ->
                     Column(Modifier.padding(innerPadding)) {
-                        // Show OCR Reminder overlay if active
-                        if (currentScreen !is Screen.OCRDisplay && showOCRReminder.value) {
+                        // Show OCR Reminder overlay if COR in recent stack, didn't dismiss etc.
+                        if (currentScreen !is Screen.OCRDisplay
+                            && showOCRReminder.value
+                            && navigationManager.inBackStack(Screen.OCRDisplay::class)) {
                             OCRReminder(
                                 onClose = { showOCRReminder.value = false },
                                 onClick = { navigationManager.navigate(Screen.OCRDisplay("")) }
