@@ -1,6 +1,5 @@
 package fr.berliat.hskwidget.ui.screens.dictionary
 
-import co.touchlab.kermit.Logger
 import fr.berliat.hskwidget.core.AppDispatchers
 import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.core.HSKAppServices
@@ -31,6 +30,9 @@ class DictionarySearchViewModel(private val prefsStore: AppPreferencesStore = HS
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
+    private val _isLoadingMore = MutableStateFlow(false)
+    val isLoadingMore: StateFlow<Boolean> = _isLoadingMore.asStateFlow()
 
     val showHSK3: StateFlow<Boolean> = prefsStore.dictionaryShowHSK3Definition.asStateFlow()
 
@@ -70,15 +72,15 @@ class DictionarySearchViewModel(private val prefsStore: AppPreferencesStore = HS
     }
 
     fun loadMore() {
-        if (_isLoading.value) return
-        _isLoading.value = true
+        if (_isLoadingMore.value) return
+        _isLoadingMore.value = true
         CoroutineScope(AppDispatchers.IO).launch {
             val newResults = fetchResultsForPage()
 
             withContext(Dispatchers.Main) {
                 _hasMoreResults.value = newResults.size == itemsPerPage
                 _searchResults.value = _searchResults.value + newResults
-                _isLoading.value = false
+                _isLoadingMore.value = false
             }
         }
     }

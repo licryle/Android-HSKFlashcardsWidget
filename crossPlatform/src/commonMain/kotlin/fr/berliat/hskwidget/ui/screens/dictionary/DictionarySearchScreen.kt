@@ -61,6 +61,7 @@ fun DictionarySearchScreen(
     val results by viewModel.searchResults.collectAsState()
     val hasMoreResults by viewModel.hasMoreResults.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
+    val isLoadingMore by viewModel.isLoadingMore.collectAsState()
     val showHSK3 by viewModel.showHSK3.collectAsState()
     val hasAnnotationFilter by viewModel.hasAnnotationFilter.collectAsState()
 
@@ -120,7 +121,8 @@ fun DictionarySearchScreen(
                             onListsClick = { showWordListDialog = word.word }
                         )
 
-                        if (!isLoading && hasMoreResults && index >= results.size - 5) {
+                        if (!isLoading && !isLoadingMore
+                            && hasMoreResults && index >= results.size - 5) {
                             // Trigger pagination
                             LaunchedEffect(Unit) { viewModel.loadMore() }
                         }
