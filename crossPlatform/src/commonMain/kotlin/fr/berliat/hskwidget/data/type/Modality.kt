@@ -6,6 +6,10 @@ enum class Modality(val mod: String) {
     ORAL_WRITTEN("ORAL_WRITTEN"),
     UNKNOWN("N/A");
 
+    override fun toString(): String {
+        return super.toString().replace("_", " & ")
+    }
+
     companion object {
         fun from(findValue: String): Modality {
             return try {
