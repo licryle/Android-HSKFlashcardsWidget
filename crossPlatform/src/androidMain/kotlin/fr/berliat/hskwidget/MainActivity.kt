@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+
 import fr.berliat.hskwidget.ui.application.AppView
 import fr.berliat.hskwidget.ui.application.AppViewModel
 import fr.berliat.hskwidget.ui.navigation.NavigationManager
@@ -20,7 +21,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = AppViewModel { this }
-
         viewModel.handleIntent(intent)
 
         setContent {

@@ -10,17 +10,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
-fun IconButton(text: String, onClick: () -> Unit, drawable: DrawableResource? = null,
+fun IconButton(text: String, onClick: () -> Unit,
+               modifier: Modifier = Modifier,
+               drawable: DrawableResource? = null,
                enabled: Boolean = true) {
     Box(
-        contentAlignment = Alignment.Center // Centers content inside Box
+        contentAlignment = Alignment.Center, // Centers content inside Box
+        modifier = modifier
     ) {
         Button(onClick = onClick,
-            enabled = enabled) {
+            enabled = enabled
+        ) {
             drawable?.let {
                 Icon(
                     painter = painterResource(drawable),

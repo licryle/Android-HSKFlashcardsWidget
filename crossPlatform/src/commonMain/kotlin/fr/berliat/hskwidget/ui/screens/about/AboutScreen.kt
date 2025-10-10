@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -81,9 +82,10 @@ fun AboutScreen(
                 Spacer()
 
                 IconButton(
-                    stringResource(Res.string.about_btn_view_source),
-                    { viewModel.onClickWebsite() },
-                    Res.drawable.ic_github
+                    text = stringResource(Res.string.about_btn_view_source),
+                    onClick = { viewModel.onClickWebsite() },
+                    modifier = Modifier.fillMaxWidth(),
+                    drawable = Res.drawable.ic_github
                 )
 
                 Spacer()
@@ -94,15 +96,17 @@ fun AboutScreen(
                 Spacer()
 
                 IconButton(
-                    stringResource(Res.string.about_btn_email2),
-                    viewModel::openEmail,
-                    Res.drawable.ic_email
+                    text = stringResource(Res.string.about_btn_email2),
+                    onClick = viewModel::openEmail,
+                    modifier = Modifier.fillMaxWidth(),
+                    drawable = Res.drawable.ic_email
                 )
 
                 Spacer()
 
                 Text(stringResource(Res.string.about_stats_title),
-                    style = MaterialTheme.typography.titleMedium)
+                    style = MaterialTheme.typography.titleLarge)
+                Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     stringResource(
                         Res.string.about_stats_text,
@@ -115,7 +119,8 @@ fun AboutScreen(
                 Spacer()
 
                 Text(stringResource(Res.string.about_terms_conditions_title),
-                    style = MaterialTheme.typography.titleMedium)
+                    style = MaterialTheme.typography.titleLarge)
+                Spacer(modifier = Modifier.height(8.dp))
                 Text(stringResource(Res.string.about_intro3),
                     style = MaterialTheme.typography.bodyMedium)
             }

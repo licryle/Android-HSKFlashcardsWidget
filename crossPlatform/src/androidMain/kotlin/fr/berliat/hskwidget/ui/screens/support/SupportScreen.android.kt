@@ -28,7 +28,6 @@ import androidx.compose.ui.unit.dp
 
 import fr.berliat.hskwidget.data.store.SupportDevStore
 import fr.berliat.hskwidget.data.store.SupportDevStore.SupportTier
-import fr.berliat.hskwidget.ui.components.Colors
 
 import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.bakery_dining_24px
@@ -49,6 +48,7 @@ import fr.berliat.hskwidget.support_status_tier4
 import fr.berliat.hskwidget.support_total_error
 import fr.berliat.hskwidget.support_total_support
 import fr.berliat.hskwidget.trophy_24px
+import fr.berliat.hskwidget.ui.theme.AppColors
 
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
@@ -101,7 +101,7 @@ private fun _SupportScreen(
     ) {
         Text(
             text = stringResource(Res.string.support_devintro_title),
-            style = MaterialTheme.typography.titleMedium
+            style = MaterialTheme.typography.titleLarge
         )
 
         Spacer(Modifier.height(8.dp))
@@ -164,7 +164,7 @@ private fun _SupportScreen(
         if (!purchaseList.containsKey(SupportDevStore.SupportProduct.TIER1)) {
             TieredPurchaseButton(
                 onClick = { viewModel.makePurchase("support_tier1") },
-                btnColor = Colors.bronze,
+                btnColor = AppColors.Bronze,
                 icon = Res.drawable.bakery_dining_24px,
                 text = Res.string.support_purchase_tier1,
                 modifier = modifier
@@ -175,7 +175,7 @@ private fun _SupportScreen(
         if (!purchaseList.containsKey(SupportDevStore.SupportProduct.TIER2)) {
             TieredPurchaseButton(
                 onClick = { viewModel.makePurchase("support_tier2") },
-                btnColor = Colors.silver,
+                btnColor = AppColors.Silver,
                 icon = Res.drawable.bakery_dining_24px,
                 text = Res.string.support_purchase_tier2,
                 modifier = modifier
@@ -186,7 +186,7 @@ private fun _SupportScreen(
         if (!purchaseList.containsKey(SupportDevStore.SupportProduct.TIER3)) {
             TieredPurchaseButton(
                 onClick = { viewModel.makePurchase("support_tier3") },
-                btnColor = Colors.gold,
+                btnColor = AppColors.Gold,
                 icon = Res.drawable.bakery_dining_24px,
                 text = Res.string.support_purchase_tier3,
                 modifier = modifier

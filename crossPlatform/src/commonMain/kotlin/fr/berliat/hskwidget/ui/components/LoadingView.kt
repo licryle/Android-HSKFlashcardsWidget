@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -22,7 +23,7 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun LoadingView(
-    backgroundColor: Color = Color(0xFFFFFFFF), // replace with theme color if needed
+    backgroundColor: Color = MaterialTheme.colorScheme.background, // replace with theme color if needed
     loadingText: StringResource = Res.string.loading,
     modifier: Modifier = Modifier
 ) {
@@ -39,7 +40,8 @@ fun LoadingView(
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = stringResource(loadingText),
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onBackground
         )
     }
 }

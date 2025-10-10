@@ -13,29 +13,43 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+
+sealed interface PrettyCardShapeModifier {
+    object First: PrettyCardShapeModifier
+    object Last: PrettyCardShapeModifier
+    object Single: PrettyCardShapeModifier
+    object Middle: PrettyCardShapeModifier
+}
 
 @Composable
 fun PrettyCard(
     modifier: Modifier = Modifier,
     elevation: Dp = 4.dp,
-    borderColor: Color = Color.Gray,
-    shape: Shape = RoundedCornerShape(8.dp),
+    borderColor: Color = MaterialTheme.colorScheme.background,
+    roundCornerRadius: Dp = 12.dp,
+    shapeModifier: PrettyCardShapeModifier = PrettyCardShapeModifier.Single,
     onClick : () -> Unit = {},
     content: @Composable ColumnScope.() -> Unit
 ) {
+    val modifiedShape = when(shapeModifier) {
+        PrettyCardShapeModifier.First -> RoundedCornerShape(topStart = roundCornerRadius, topEnd = roundCornerRadius)
+        PrettyCardShapeModifier.Last -> RoundedCornerShape(bottomStart = roundCornerRadius, bottomEnd = roundCornerRadius)
+        PrettyCardShapeModifier.Single -> RoundedCornerShape(roundCornerRadius)
+        PrettyCardShapeModifier.Middle -> RoundedCornerShape(size = 0.dp)
+    }
+
     Card(
         modifier = modifier
             .fillMaxWidth()
             .wrapContentHeight()
             .border(
-                width = 0.5.dp,
+                width = 1.5.dp,
                 color = borderColor,
-                shape = shape
+                shape = modifiedShape
             ),
-        shape = shape,
+        shape = modifiedShape,
         elevation = CardDefaults.cardElevation(defaultElevation = elevation),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface,

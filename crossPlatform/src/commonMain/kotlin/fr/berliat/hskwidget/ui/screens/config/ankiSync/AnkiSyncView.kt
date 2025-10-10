@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -51,7 +52,7 @@ fun AnkiSyncView(
     val syncProgress by viewModel.syncProgress.collectAsState()
 
     Column {
-        Row {
+        Row(modifier = Modifier.padding(bottom = 8.dp)) {
             Icon(
                 painter = painterResource(Res.drawable.anki_icon),
                 contentDescription = stringResource(Res.string.config_anki_title),
@@ -62,7 +63,7 @@ fun AnkiSyncView(
 
             Text(
                 stringResource(Res.string.config_anki_title),
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleLarge
             )
         }
 

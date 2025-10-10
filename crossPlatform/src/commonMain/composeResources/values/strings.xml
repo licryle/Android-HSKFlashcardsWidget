@@ -62,6 +62,8 @@ This project uses the awesome projects of:
     <string name="dictionary_item_lists">Manage lists for this word</string>
     <string name="dictionary_item_annotate">Annotate a word</string>
     <string name="dictionary_item_reload">New word</string>
+    <string name="dictionary_item_modality">Usage</string>
+    <string name="dictionary_item_type">Type</string>
 
     <string name="widget_configure">Configure Widget</string>
     <string name="widget_configure_close">Configure Widget &amp; close app</string>

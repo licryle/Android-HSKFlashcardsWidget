@@ -34,7 +34,9 @@ import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.data.type.HSK_Level
 
 import HSKWordView
+import androidx.compose.ui.text.font.FontStyle.Companion.Italic
 
+import fr.berliat.hskwidget.ui.theme.AppTypographies
 import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.baseline_volume_up_24
 import fr.berliat.hskwidget.bookmark_24px
@@ -45,8 +47,10 @@ import fr.berliat.hskwidget.dictionary_item_annotate
 import fr.berliat.hskwidget.dictionary_item_antonym
 import fr.berliat.hskwidget.dictionary_item_examples
 import fr.berliat.hskwidget.dictionary_item_lists
+import fr.berliat.hskwidget.dictionary_item_modality
 import fr.berliat.hskwidget.dictionary_item_synonyms
 import fr.berliat.hskwidget.dictionary_item_toggle
+import fr.berliat.hskwidget.dictionary_item_type
 import fr.berliat.hskwidget.format_list_bulleted_add_24px
 import fr.berliat.hskwidget.keyboard_arrow_down_24px
 import fr.berliat.hskwidget.keyboard_arrow_up_24px
@@ -59,6 +63,7 @@ import org.jetbrains.compose.resources.stringResource
 fun DetailedWordView (
     word: AnnotatedChineseWord,
     showHSK3Definition: Boolean,
+    shapeModifier: PrettyCardShapeModifier,
     onFavoriteClick: ((AnnotatedChineseWord) -> Unit)? = null,
     onSpeakClick: ((AnnotatedChineseWord) -> Unit)? = null,
     onCopyClick: ((AnnotatedChineseWord) -> Unit)? = null,
@@ -100,7 +105,8 @@ fun DetailedWordView (
                 Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.WIDGET_EXPAND)
             else
                 Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.WIDGET_COLLAPSE)
-        }
+        },
+        shapeModifier = shapeModifier
     ) {
         Column {
             Row(
@@ -139,7 +145,11 @@ fun DetailedWordView (
                                 pinyins = it
                                 onPinyinChange(it)
                             }
-                        }
+                        },
+                        hanziStyle = AppTypographies.hanzi,
+                        pinyinStyle = AppTypographies.pinyin,
+                        clickedHanziStyle = AppTypographies.clickedHanzi,
+                        clickedPinyinStyle = AppTypographies.clickedPinyin,
                     )
                     // Definition & Annotation
                     Text(
@@ -149,8 +159,8 @@ fun DetailedWordView (
                     if (!definition.isEmpty() && annotation.isNotEmpty()) {
                         Text(
                             annotation,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = Color.Blue
+                            style = MaterialTheme.typography.bodyMedium.copy(fontStyle = Italic),
+                            color = MaterialTheme.colorScheme.secondary
                         )
                     }
 
@@ -181,7 +191,7 @@ fun DetailedWordView (
                             Icon(
                                 painter = painterResource(resId),
                                 contentDescription = stringResource(Res.string.dictionary_item_annotate),
-                                tint = if (word.hasAnnotation()) Color.Red else Color.Gray
+                                tint = if (word.hasAnnotation()) MaterialTheme.colorScheme.primary else Color.Gray
                             )
                         }
                     }
@@ -191,7 +201,7 @@ fun DetailedWordView (
                     } ?: ""
                     Text(
                         text = hSK,
-                        modifier = Modifier.padding(start = 8.dp),
+                        modifier = Modifier.padding(end = 8.dp),
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.Gray,
                     )
@@ -208,10 +218,15 @@ fun DetailedWordView (
 
             if (isMoreVisible) {
                 // More section
-                Row {
+                Row(
+                    modifier = modifier.padding(10.dp)
+                ) {
                     Column(modifier = modifier.weight(1f)) {
                         val modality = word.word?.modality ?: Modality.UNKNOWN
                         if (modality != Modality.UNKNOWN) {
+                            Text(
+                                stringResource(Res.string.dictionary_item_modality),
+                                style = AppTypographies.detailCardSubTitle)
                             Text(
                                 modality.toString().capitalize(),
                                 style = MaterialTheme.typography.bodyMedium
@@ -219,7 +234,9 @@ fun DetailedWordView (
                         }
 
                         word.word?.synonyms?.takeIf { it.isNotEmpty() }?.let {
-                            Text(stringResource(Res.string.dictionary_item_synonyms))
+                            Text(
+                                stringResource(Res.string.dictionary_item_synonyms),
+                                style = AppTypographies.detailCardSubTitle)
                             Text(it, style = MaterialTheme.typography.bodyMedium)
                         }
                     }
@@ -227,21 +244,30 @@ fun DetailedWordView (
                         val wordType = word.word?.wordType ?: WordType.UNKNOWN
                         if (wordType != WordType.UNKNOWN) {
                             Text(
-                                "Type: ${wordType.toString().capitalize()}",
+                                stringResource(Res.string.dictionary_item_type),
+                                style = AppTypographies.detailCardSubTitle)
+                            Text(
+                                wordType.toString().capitalize(),
                                 style = MaterialTheme.typography.bodyMedium
                             )
                         }
 
                         word.word?.antonym?.takeIf { it.isNotEmpty() }?.let {
-                            Text(stringResource(Res.string.dictionary_item_antonym))
+                            Text(
+                                stringResource(Res.string.dictionary_item_antonym),
+                                style = AppTypographies.detailCardSubTitle)
                             Text(it, style = MaterialTheme.typography.bodyMedium)
                         }
                     }
                 }
 
-                Row {
+                Row(
+                    modifier = modifier.padding(10.dp)
+                ) {
                     Column {
-                        Text(stringResource(Res.string.dictionary_item_examples))
+                        Text(
+                            stringResource(Res.string.dictionary_item_examples),
+                            style = AppTypographies.detailCardSubTitle)
 
                         word.word?.examples?.takeIf { it.isNotEmpty() }?.let {
                             Text(it, style = MaterialTheme.typography.bodyMedium)
@@ -249,9 +275,13 @@ fun DetailedWordView (
                     }
                 }
 
-                Row {
+                Row(
+                    modifier = modifier.padding(10.dp)
+                ) {
                     Column {
-                        Text(stringResource(Res.string.dictionary_item_altdefinition))
+                        Text(
+                            stringResource(Res.string.dictionary_item_altdefinition),
+                            style = AppTypographies.detailCardSubTitle)
 
                         if (altDef.isNotEmpty()) {
                             Text(altDef, style = MaterialTheme.typography.bodyMedium)

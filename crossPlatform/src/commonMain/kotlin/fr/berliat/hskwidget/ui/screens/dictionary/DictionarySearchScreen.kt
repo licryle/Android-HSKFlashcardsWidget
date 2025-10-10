@@ -27,7 +27,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 import fr.berliat.hskwidget.core.HSKAppServices
@@ -44,6 +43,7 @@ import fr.berliat.hskwidget.dictionary_noresult_icon
 import fr.berliat.hskwidget.dictionary_noresult_text
 import fr.berliat.hskwidget.dictionary_search_filter_hasannotation_hint
 import fr.berliat.hskwidget.dictionary_search_filter_hsk3definition_hint
+import fr.berliat.hskwidget.ui.components.PrettyCardShapeModifier
 
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -118,7 +118,13 @@ fun DictionarySearchScreen(
                             onFavoriteClick = { onAnnotate(word.simplified) },
                             onSpeakClick = { viewModel.speakWord(word.simplified) },
                             onCopyClick = { viewModel.copyWord(word.simplified) },
-                            onListsClick = { showWordListDialog = word.word }
+                            onListsClick = { showWordListDialog = word.word },
+                            shapeModifier = when {
+                                results.size == 1 -> PrettyCardShapeModifier.Single
+                                index == 0 -> PrettyCardShapeModifier.First
+                                index == results.size - 1 && !hasMoreResults -> PrettyCardShapeModifier.Last
+                                else -> PrettyCardShapeModifier.Middle
+                            }
                         )
 
                         if (!isLoading && !isLoadingMore
@@ -169,7 +175,7 @@ private fun DictionarySearchFilters(
                     Icon(
                         painter = painterResource(Res.drawable.bookmark_heart_24px),
                         contentDescription = stringResource(Res.string.dictionary_search_filter_hasannotation_hint),
-                        tint = Color.Red
+                        tint = MaterialTheme.colorScheme.primary
                     )
                     Text(
                         text = stringResource(Res.string.dictionary_search_filter_hasannotation_hint),

@@ -24,17 +24,14 @@ import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
 import fr.berliat.hskwidget.data.model.WordListWithCount
 import fr.berliat.hskwidget.ui.components.LoadingView
-import fr.berliat.hskwidget.ui.components.widgetDefaultBox
 import fr.berliat.hskwidget.ui.screens.widget.WidgetView
-
 import fr.berliat.hskwidget.Res
-import fr.berliat.hskwidget.ic_dictionary_24dp
+import fr.berliat.hskwidget.format_list_bulleted_add_24px
+import fr.berliat.hskwidget.ui.theme.widgetDefaultBox
 import fr.berliat.hskwidget.widget_configure
 import fr.berliat.hskwidget.widget_configure_close
 import fr.berliat.hskwidget.widget_configure_error_no_list
@@ -62,7 +59,7 @@ fun WidgetConfigWithPreviewScreen(
             .padding(top = 15.dp)
     ) {
         Box(widgetDefaultBox.align(Alignment.CenterHorizontally)) {
-            WidgetView(widgetId = widgetId, modifier = modifier)
+            WidgetView(widgetId = widgetId)
         }
 
         Spacer(modifier = modifier.height(10.dp))
@@ -105,18 +102,14 @@ fun WidgetConfigScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                painter = painterResource(Res.drawable.ic_dictionary_24dp),
+                painter = painterResource(Res.drawable.format_list_bulleted_add_24px),
                 contentDescription = null,
-                modifier = Modifier.size(24.dp),
-                tint = MaterialTheme.colorScheme.secondary
+                modifier = Modifier.size(24.dp)
             )
             Spacer(modifier = Modifier.width(10.dp))
             Text(
                 text = stringResource(Res.string.widget_configure_wordlist_title),
-                style = MaterialTheme.typography.titleMedium.copy(
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.secondary
-                )
+                style = MaterialTheme.typography.titleMedium
             )
         }
 
@@ -182,12 +175,12 @@ private fun FlashcardConfigListItem(
         Text(
             text = list.name,
             modifier = Modifier.weight(1f),
-            fontSize = 17.sp,
+            style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onBackground
         )
         Text(
             text = stringResource(Res.string.widget_configure_wordlist_word_count, list.wordCount),
-            fontSize = 17.sp,
+            style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.padding(end = 8.dp)
         )

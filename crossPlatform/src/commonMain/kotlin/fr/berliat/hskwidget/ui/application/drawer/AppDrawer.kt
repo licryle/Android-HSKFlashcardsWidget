@@ -3,6 +3,7 @@ package fr.berliat.hskwidget.ui.application.drawer
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.NavigationDrawerItem
@@ -23,7 +24,10 @@ fun AppDrawer(
     currentScreen: Screen,
     onNavigate: (Screen) -> Unit
 ) {
-    ModalDrawerSheet {
+    Text("test")
+    ModalDrawerSheet(
+        modifier = Modifier.width(280.dp)
+    ) {
         AppDrawerHeader()
 
         Spacer(Modifier.height(16.dp))

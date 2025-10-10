@@ -76,7 +76,7 @@ fun BackupDiskView(
             Spacer(modifier = Modifier.width(8.dp))
 
             Text(stringResource(Res.string.config_backup_title),
-                style = MaterialTheme.typography.titleMedium)
+                style = MaterialTheme.typography.titleLarge)
         }
 
         Row(verticalAlignment = Alignment.CenterVertically,

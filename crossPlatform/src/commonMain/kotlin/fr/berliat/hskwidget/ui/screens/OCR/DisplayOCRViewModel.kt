@@ -14,7 +14,6 @@ import fr.berliat.hskwidget.data.dao.ChineseWordFrequencyDAO
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.repo.ChineseWordFrequencyRepo
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
-import fr.berliat.hskwidget.ui.components.smallestHanziFontSize
 
 import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.core.AppDispatchers
@@ -22,6 +21,7 @@ import fr.berliat.hskwidget.ocr_display_no_text_found
 import fr.berliat.hskwidget.ocr_display_ocr_failed
 import fr.berliat.hskwidget.ocr_display_smallest_text
 import fr.berliat.hskwidget.ocr_display_word_not_found
+import fr.berliat.hskwidget.ui.theme.AppTypographies
 
 import io.github.vinceglb.filekit.PlatformFile
 
@@ -150,9 +150,10 @@ class DisplayOCRViewModel(
     }
 
     fun updateTextSize(increment: Float) {
-        val textSize = (appPreferences.readerTextSize.value.value + increment).coerceAtLeast(smallestHanziFontSize.value)
+        val textSize = (appPreferences.readerTextSize.value.value + increment).coerceAtLeast(
+            AppTypographies.smallestHanziFontSize.value)
 
-        if (textSize == smallestHanziFontSize.value) {
+        if (textSize == AppTypographies.smallestHanziFontSize.value) {
             viewModelScope.launch {
                 Utils.toast(Res.string.ocr_display_smallest_text)
             }

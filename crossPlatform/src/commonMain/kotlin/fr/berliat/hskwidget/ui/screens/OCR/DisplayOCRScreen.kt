@@ -39,9 +39,6 @@ import fr.berliat.hskwidget.ui.components.DetailedWordView
 import fr.berliat.hskwidget.ui.components.Error
 import fr.berliat.hskwidget.ui.components.ErrorView
 import fr.berliat.hskwidget.ui.components.LoadingView
-import fr.berliat.hskwidget.ui.components.hanziClickedBackground
-import fr.berliat.hskwidget.ui.components.hanziStyle
-import fr.berliat.hskwidget.ui.components.pinyinStyle
 import fr.berliat.hskwidget.ui.screens.wordlist.WordListSelectionDialog
 
 import fr.berliat.hskwidget.Res
@@ -55,6 +52,8 @@ import fr.berliat.hskwidget.ocr_display_text_segmentation_failed
 import fr.berliat.hskwidget.photo_camera_24px
 import fr.berliat.hskwidget.text_decrease_24px
 import fr.berliat.hskwidget.text_increase_24px
+import fr.berliat.hskwidget.ui.components.PrettyCardShapeModifier
+import fr.berliat.hskwidget.ui.theme.AppTypographies
 import io.github.vinceglb.filekit.PlatformFile
 
 import org.jetbrains.compose.resources.painterResource
@@ -119,11 +118,11 @@ fun DisplayOCRScreen(
                         HSKTextView(
                             text = text,
                             segmenter = segmenter,
-                            hanziStyle = hanziStyle.copy(fontSize = textSize),
-                            pinyinStyle = pinyinStyle,
-                            clickedHanziStyle = hanziStyle.copy(fontSize = textSize),
-                            clickedPinyinStyle = pinyinStyle,
-                            clickedBackgroundColor = hanziClickedBackground,
+                            hanziStyle = AppTypographies.hanzi.copy(fontSize = textSize),
+                            pinyinStyle = AppTypographies.pinyin,
+                            clickedHanziStyle = AppTypographies.hanzi.copy(fontSize = textSize),
+                            clickedPinyinStyle = AppTypographies.pinyin,
+                            clickedBackgroundColor = MaterialTheme.colorScheme.inverseOnSurface,
                             loadingComposable = { LoadingView(loadingText = Res.string.ocr_display_loading) },
                             emptyComposable = { OCRDisplayEmpty() },
                             onWordClick = { word -> viewModel.fetchWordForDisplay(word) },
@@ -158,7 +157,8 @@ fun DisplayOCRScreen(
                 onFavoriteClick = onFavoriteClick,
                 onSpeakClick = viewModel::speakWord,
                 onCopyClick = viewModel::copyToClipboard,
-                onListsClick = { showWordListDialog = word.word }
+                onListsClick = { showWordListDialog = word.word },
+                shapeModifier = PrettyCardShapeModifier.First
             )
         }
     }

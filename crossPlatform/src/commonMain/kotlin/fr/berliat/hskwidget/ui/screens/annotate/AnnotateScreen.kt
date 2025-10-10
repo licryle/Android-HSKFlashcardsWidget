@@ -47,6 +47,7 @@ import fr.berliat.hskwidget.annotation_edit_save_success
 import fr.berliat.hskwidget.annotation_edit_themes_hint
 import fr.berliat.hskwidget.delete
 import fr.berliat.hskwidget.save
+import fr.berliat.hskwidget.ui.components.PrettyCardShapeModifier
 
 import org.jetbrains.compose.resources.stringResource
 
@@ -145,7 +146,8 @@ fun AnnotateScreen(
             showHSK3Definition = false,
             onFavoriteClick = null,
             onListsClick = null,
-            onPinyinChange = { pinyins = it }
+            onPinyinChange = { pinyins = it },
+            shapeModifier = PrettyCardShapeModifier.Single
         )
 
         OutlinedTextField(

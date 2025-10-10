@@ -3,6 +3,7 @@ package fr.berliat.hskwidget.ui.screens.widget
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -17,19 +18,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import fr.berliat.hskwidget.core.Utils
 
+import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.core.Locale
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.type.HSK_Level
 import fr.berliat.hskwidget.data.type.Pinyins
 import fr.berliat.hskwidget.ui.components.IconButton
 import fr.berliat.hskwidget.ui.components.WidgetWordView
-import fr.berliat.hskwidget.ui.components.widgetDefaultBox
 import fr.berliat.hskwidget.ui.screens.widgetConfigure.WidgetConfigWithPreviewScreen
-
 import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.ic_add_24dp
+import fr.berliat.hskwidget.ui.theme.widgetDefaultBox
 import fr.berliat.hskwidget.widget_configure_saved
 import fr.berliat.hskwidget.widgets_add_widget
 import fr.berliat.hskwidget.widgets_intro
@@ -90,7 +90,8 @@ fun WidgetsListScreen(
         IconButton(
             text = stringResource(Res.string.widgets_add_widget),
             onClick = viewModel::addNewWidget,
-            drawable = Res.drawable.ic_add_24dp
+            drawable = Res.drawable.ic_add_24dp,
+            modifier = Modifier.fillMaxWidth()
         )
 
         if (!widgetIds.value.isEmpty()) {

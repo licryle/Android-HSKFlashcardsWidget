@@ -40,6 +40,7 @@ import fr.berliat.hskwidget.delete
 import fr.berliat.hskwidget.delete_24px
 import fr.berliat.hskwidget.edit_24px
 import fr.berliat.hskwidget.ic_add_24dp
+import fr.berliat.hskwidget.ui.components.PrettyCardShapeModifier
 import fr.berliat.hskwidget.wordlist_create_new_list_button
 import fr.berliat.hskwidget.wordlist_createddate
 import fr.berliat.hskwidget.wordlist_delete_button
@@ -109,7 +110,13 @@ fun WordListScreen(
                     onClick = { onClickList(wordList.wordList) },
                     onRename = { wordListToRename = wordList.wordList },
                     onDelete = { confirmDeleteList = wordList.wordList },
-                    modifier = modifier
+                    modifier = modifier,
+                    shapeModifier = when {
+                        wordLists.size == 1 -> PrettyCardShapeModifier.Single
+                        index == 0 -> PrettyCardShapeModifier.First
+                        index == wordLists.size - 1 -> PrettyCardShapeModifier.Last
+                        else -> PrettyCardShapeModifier.Middle
+                    }
                 )
             }
         }
@@ -135,10 +142,12 @@ private fun WordListRow(
     onClick: () -> Unit,
     onRename: () -> Unit,
     onDelete: () -> Unit,
-    modifier: Modifier
+    shapeModifier: PrettyCardShapeModifier,
+    modifier: Modifier = Modifier
 ) {
     PrettyCard(
-        onClick = onClick
+        onClick = onClick,
+        shapeModifier = shapeModifier
     ) {
         Row(modifier = Modifier, verticalAlignment = Alignment.Top,
             horizontalArrangement = Arrangement.SpaceBetween) {
@@ -153,12 +162,13 @@ private fun WordListRow(
 
             Column(modifier = Modifier
                 .weight(1f)
-                .padding(start = 10.dp)) {
+                .padding(10.dp)) {
                 Text(
                     text = wordList.name,
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleLarge
                 )
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Row(modifier = Modifier.fillMaxWidth().padding(top = 15.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween) {
                     Column(
                         modifier = modifier.weight(1f)
                     ) {
