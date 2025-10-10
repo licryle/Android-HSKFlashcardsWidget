@@ -16,6 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import fr.berliat.hskwidget.core.HSKAppServices
 
@@ -56,7 +57,8 @@ fun AnkiSyncView(
             Icon(
                 painter = painterResource(Res.drawable.anki_icon),
                 contentDescription = stringResource(Res.string.config_anki_title),
-                modifier = modifier
+                modifier = modifier,
+                tint = Color.Unspecified
             )
 
             Spacer(modifier = Modifier.width(8.dp))
