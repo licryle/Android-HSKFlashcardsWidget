@@ -23,9 +23,9 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun LoadingView(
-    backgroundColor: Color = MaterialTheme.colorScheme.background, // replace with theme color if needed
-    loadingText: StringResource = Res.string.loading,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    backgroundColor: Color = MaterialTheme.colorScheme.background,
+    loadingText: StringResource = Res.string.loading
 ) {
     Column(
         modifier = modifier

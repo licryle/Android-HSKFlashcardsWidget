@@ -24,7 +24,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import fr.berliat.hskwidget.ui.application.content.AppBar
 import fr.berliat.hskwidget.ui.application.content.OCRReminder
 import fr.berliat.hskwidget.ui.application.drawer.AppDrawer
-import fr.berliat.hskwidget.ui.components.LoadingView
+import fr.berliat.hskwidget.ui.components.AppLoadingView
 import fr.berliat.hskwidget.ui.navigation.AppNavHost
 import fr.berliat.hskwidget.ui.navigation.DecoratedScreen
 import fr.berliat.hskwidget.ui.navigation.NavigationManager
@@ -56,10 +56,6 @@ fun AppView(
 
     val showOCRReminder = remember { mutableStateOf(true) }
 
-    if (!isReady.value) {
-        LoadingView()
-        return
-    }
 
     LaunchedEffect(drawerIsOpen.value) {
         if (drawerIsOpen.value) drawerState.open() else drawerState.close()
@@ -72,6 +68,11 @@ fun AppView(
 
     val currentScreen = navigationManager.currentScreen()
     AppTheme() {
+        if (!isReady.value) {
+            AppLoadingView()
+            return@AppTheme
+        }
+
         ModalNavigationDrawer(
             drawerState = drawerState,
             drawerContent = {
