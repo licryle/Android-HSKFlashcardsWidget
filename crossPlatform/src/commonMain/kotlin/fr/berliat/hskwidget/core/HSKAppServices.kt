@@ -18,13 +18,15 @@ import kotlinx.coroutines.launch
 // --- Singleton instance
 object HSKAppServices : AppServices() {
     override fun init(scope: CoroutineScope) {
+        if (status.value == Status.Ready) return
+
         register("appScope", 0) { scope }
         register("database", 0) { DatabaseHelper.getInstance().liveDatabase }
         register("appPreferences", 0) {
             AppPreferencesStore.getInstance(Utils.getDataStore("app.preferences_pb"))
         }
 
-        // TODO move getDataStore to PrefixedDataPreferences
+        // TODO move getDataStore function to PrefixedDataPreferences
         // A unique datastore is needed, otherwise it fails silently (!) to write anything.
         val widgetDataStore = Utils.getDataStore("widgets.preferences_pb")
         register("widgetsPreferencesProvider") {
@@ -60,12 +62,14 @@ object HSKAppServices : AppServices() {
     }
 
     fun registerAnkiDelegators(ankiDelegate: HSKAnkiDelegate) {
+        if (isRegistered("ankiDelegate")) return
         registerNow("ankiDelegate") { ankiDelegate }
         registerNow("ankiDelegator") { ankiDelegate::modifyAnki }
         registerNow("ankiServiceDelegator") { ankiDelegate::modifyAnkiViaService }
     }
 
     fun registerGoogleBackup(gDrive: GoogleDriveBackup) {
+        if (isRegistered("gDriveBackup")) return
         registerNow("gDriveBackup") { gDrive }
     }
 
