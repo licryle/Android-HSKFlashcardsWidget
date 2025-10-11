@@ -30,7 +30,9 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 
 import fr.berliat.hskwidget.Res
@@ -55,19 +57,20 @@ fun AppBar(
     onMenuClick: () -> Unit,
     viewModel: AppBarViewModel = remember { AppBarViewModel() }
 ) {
-    val searchQuery = viewModel.searchQuery.collectAsState("")
-    val localText = remember { mutableStateOf(searchQuery.value.toString()) }
+    val searchQuery = viewModel.searchQuery.collectAsState()
+    var localText by remember { mutableStateOf(TextFieldValue(searchQuery.value.toString())) }
+    var isSearchFocused by remember { mutableStateOf(false) }
 
     // Update localText only if different from current user input
     LaunchedEffect(searchQuery.value) {
-        if (localText.value != searchQuery.value.toString()) {
-            localText.value = searchQuery.value.toString()
+        if (!isSearchFocused && localText.text != searchQuery.value.toString()) {
+            localText = localText.copy(searchQuery.value.toString())
         }
     }
 
-    fun onValueChange(newValue: String) {
-        localText.value = newValue
-        onSearch(newValue)
+    fun onValueChange(newValue: TextFieldValue) {
+        localText = newValue
+        onSearch(newValue.text)
     }
 
     TopAppBar(
@@ -84,7 +87,6 @@ fun AppBar(
             ) {
                 val focusRequester = remember { FocusRequester() }
                 val focusManager = LocalFocusManager.current
-                var isSearchFocused by remember { mutableStateOf(false) }
 
                 if (!isSearchFocused) {
                     Text(title, modifier = Modifier.padding(end = 8.dp))
@@ -106,7 +108,7 @@ fun AppBar(
                         }
 
                         TextField(
-                            value = localText.value,
+                            value = localText,
                             onValueChange = { onValueChange(it) },
                             placeholder = { Text(stringResource(Res.string.search_hint)) },
                             modifier = Modifier
@@ -114,6 +116,10 @@ fun AppBar(
                                 .focusRequester(focusRequester)
                                 .onFocusChanged { focusState ->
                                     isSearchFocused = focusState.isFocused
+
+                                    localText = localText.copy(
+                                        selection = TextRange(localText.text.length)
+                                    )
                                 },
                             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                             keyboardActions = KeyboardActions(onSearch = {
@@ -121,10 +127,10 @@ fun AppBar(
                             }),
                             singleLine = true,
                             trailingIcon = {
-                                if (localText.value.isNotEmpty()) {
+                                if (localText.text.isNotEmpty()) {
                                     IconButton(onClick = {
                                         focusRequester.requestFocus()
-                                        onValueChange("")
+                                        onValueChange(localText.copy(""))
                                     }) {
                                         Icon(
                                             painterResource(Res.drawable.close_24px),
