@@ -69,8 +69,10 @@ fun AppBar(
     }
 
     fun onValueChange(newValue: TextFieldValue) {
+        if (localText.text != newValue.text)
+            onSearch(newValue.text)
+
         localText = newValue
-        onSearch(newValue.text)
     }
 
     TopAppBar(
