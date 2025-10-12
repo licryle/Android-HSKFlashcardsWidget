@@ -9,7 +9,12 @@ import platform.UIKit.UIViewController
 
 private val viewModel = AppViewModel()
 
-fun AppViewController(): UIViewController = ComposeUIViewController {
+fun AppViewController(): UIViewController = ComposeUIViewController(
+		configure = {
+			// This will prevent the crash by disabling the strict plist sanity check
+			enforceStrictPlistSanityCheck = false
+		}
+	) {
     // This is a composable context, so we can call our composable functions
     AppView(
         viewModel = viewModel,
