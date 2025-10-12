@@ -1,6 +1,5 @@
 package fr.berliat.hskwidget.ui.application
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Column
@@ -33,7 +32,6 @@ import fr.berliat.hskwidget.ui.theme.AppTheme
 
 import org.jetbrains.compose.resources.stringResource
 
-@SuppressLint("UnnecessaryComposedModifier")
 fun Modifier.clearFocusOnAnyOutsideTap() = composed {
     val focusManager = LocalFocusManager.current
     Modifier.pointerInput(Unit) {
