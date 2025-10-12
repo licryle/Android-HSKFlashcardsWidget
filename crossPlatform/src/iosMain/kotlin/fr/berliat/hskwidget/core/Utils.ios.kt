@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 
 import fr.berliat.hsktextviews.HSKTextSegmenter
+import fr.berliat.hsktextviews.HSKTextSegmenterListener
 import fr.berliat.hskwidget.data.dao.AnkiDAO
 import fr.berliat.hskwidget.domain.SearchQuery
 
@@ -69,12 +70,15 @@ actual object ExpectedUtils {
     actual fun logAnalyticsError(module: String, error: String, details: String) {
     }
 
-    actual fun getHSKSegmenter(): HSKTextSegmenter {
-        TODO("Not yet implemented")
-    }
+    actual fun getHSKSegmenter(): HSKTextSegmenter = object : HSKTextSegmenter {
+		override var listener: HSKTextSegmenterListener? = null
+		override suspend fun preload() {}
+		override fun segment(text: String): Array<String>? { return null }
+		override fun isReady(): Boolean { return false }
+	}
 
     internal actual fun getAnkiDAO(): AnkiDAO {
-        TODO("Not yet implemented")
+        return AnkiDAO()
     }
 
     actual fun copyToClipBoard(s: String) {
