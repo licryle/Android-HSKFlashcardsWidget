@@ -11,7 +11,9 @@ import fr.berliat.hskwidget.data.type.ClassLevel
 import fr.berliat.hskwidget.data.type.ClassType
 import fr.berliat.hskwidget.data.type.Pinyins
 import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
 
+@Serializable
 @Entity(
     tableName = "chinese_word_annotation",
     indices = [Index(value = ["a_searchable_text"])])

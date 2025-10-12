@@ -13,7 +13,9 @@ import fr.berliat.hskwidget.data.type.HSK_Level
 import fr.berliat.hskwidget.data.type.Modality
 import fr.berliat.hskwidget.data.type.Pinyins
 import fr.berliat.hskwidget.data.type.WordType
+import kotlinx.serialization.Serializable
 
+@Serializable
 @Entity(
     tableName = "chinese_word",
     indices = [Index(value = ["searchable_text"])])

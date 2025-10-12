@@ -1,8 +1,10 @@
 package fr.berliat.hskwidget.data.type
 
 import androidx.room.TypeConverter
+import kotlinx.serialization.Serializable
 import kotlin.jvm.JvmStatic
 
+@Serializable
 class Pinyins(
     private val items: MutableList<Pinyin> = mutableListOf()
 ) : MutableList<Pinyin> by items {

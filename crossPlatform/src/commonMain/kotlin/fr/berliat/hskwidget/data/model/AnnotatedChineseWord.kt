@@ -4,8 +4,10 @@ import androidx.room.Embedded
 import fr.berliat.hskwidget.core.Locale
 import fr.berliat.hskwidget.data.type.HSK_Level
 import fr.berliat.hskwidget.data.type.Pinyins
+import kotlinx.serialization.Serializable
 import kotlin.time.ExperimentalTime
 
+@Serializable
 data class AnnotatedChineseWord (
     @Embedded val word: ChineseWord?,
     @Embedded val annotation: ChineseWordAnnotation?) {
