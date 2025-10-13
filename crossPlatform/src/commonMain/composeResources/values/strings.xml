@@ -145,6 +145,7 @@ You can come back to this screen at any time to set up a new widget, or reconfig
     <string name="config_backup_directory_failed_selection">No folder allowed to perform local backup, cancelling</string>
     <string name="config_backup_icon_alt">Database upload</string>
     <string name="config_backup_max_number">Number of backups to keep</string>
+    <string name="config_backup_max_number_hint">Max files</string>
     <string-array name="config_backup_max_locally"> <!-- Must be in format "{Int} {String}" -->
         <item>2 (~100MB)</item>
         <item>5 (~250MB)</item>

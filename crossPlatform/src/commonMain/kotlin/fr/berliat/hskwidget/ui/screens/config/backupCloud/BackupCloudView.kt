@@ -115,7 +115,8 @@ fun BackupCloudView(
             } else {
                 lastCloudUpdate.value.YYMMDDHHMMSS()
             }
-            Text(lastUpdate)
+            Text(lastUpdate,
+                style = MaterialTheme.typography.bodyMedium)
         }
 
         Row(
