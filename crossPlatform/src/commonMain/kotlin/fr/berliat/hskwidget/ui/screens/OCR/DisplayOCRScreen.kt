@@ -2,17 +2,23 @@ package fr.berliat.hskwidget.ui.screens.OCR
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -23,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -33,7 +40,6 @@ import fr.berliat.hsktextviews.HSKTextSegmenter
 import fr.berliat.hsktextviews.views.HSKTextView
 import fr.berliat.hsktextviews.views.ShowPinyins
 import fr.berliat.hskwidget.core.Utils
-
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWord
@@ -43,7 +49,6 @@ import fr.berliat.hskwidget.ui.components.Error
 import fr.berliat.hskwidget.ui.components.ErrorView
 import fr.berliat.hskwidget.ui.components.LoadingView
 import fr.berliat.hskwidget.ui.screens.wordlist.WordListSelectionDialog
-
 import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.ocr_display_add
 import fr.berliat.hskwidget.ocr_display_conf_bigger
@@ -57,6 +62,7 @@ import fr.berliat.hskwidget.text_decrease_24px
 import fr.berliat.hskwidget.text_increase_24px
 import fr.berliat.hskwidget.ui.components.PrettyCardShapeModifier
 import fr.berliat.hskwidget.ui.theme.AppTypographies
+
 import io.github.vinceglb.filekit.PlatformFile
 
 import org.jetbrains.compose.resources.painterResource
@@ -165,82 +171,46 @@ private fun OcrDisplayConfig(
     modifier: Modifier = Modifier,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val scrollState = rememberScrollState()
 
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        tonalElevation = 4.dp
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .horizontalScroll(scrollState)
+            .padding(start = 10.dp, end = 10.dp, top = 0.dp, bottom = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 5.dp, vertical = 4.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            // Left switch + text
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.weight(1f, fill = false)
-            ) {
-                Switch(
-                    checked = uiState.separatorEnabled,
-                    onCheckedChange = { viewModel.toggleSeparator(it) },
-                    modifier = Modifier.padding(end = 5.dp)
-                )
+        TextSizeControl(
+            onDecrease = { viewModel.updateTextSize(-2f) },
+            onIncrease = { viewModel.updateTextSize(+2f) },
+            modifier = Modifier.padding(end = 8.dp)
+        )
+
+        FilterChip(
+            selected = uiState.separatorEnabled,
+            onClick = { viewModel.toggleSeparator(!uiState.separatorEnabled) },
+            shape = RoundedCornerShape(50),
+            modifier = Modifier.padding(end = 8.dp),
+            label = {
                 Text(
                     text = stringResource(Res.string.ocr_display_separator),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.outline
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
+        )
 
-            // Middle "font resize" control
-            Surface(modifier = Modifier) {
-                Row(
-                    verticalAlignment = Alignment.Bottom,
-                    modifier = Modifier
-                        .padding(horizontal = 10.dp)
-                        .background(MaterialTheme.colorScheme.background.copy(alpha = 0.7f))
-                        .padding(horizontal = 5.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(Res.drawable.text_decrease_24px),
-                        contentDescription = stringResource(Res.string.ocr_display_conf_smaller),
-                        tint = MaterialTheme.colorScheme.outline,
-                        modifier = Modifier
-                            .size(width = 35.dp, height = 30.dp)
-                            .clickable { viewModel.updateTextSize(-2f) }
-                            .padding(bottom = 2.6.dp)
-                    )
-                    Icon(
-                        painter = painterResource(Res.drawable.text_increase_24px),
-                        contentDescription = stringResource(Res.string.ocr_display_conf_bigger),
-                        tint = MaterialTheme.colorScheme.outline,
-                        modifier = Modifier
-                            .size(width = 45.dp, height = 40.dp)
-                            .clickable { viewModel.updateTextSize(2f) }
-                    )
-                }
-            }
-
-            // Right text + switch
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.weight(1f, fill = false),
-                horizontalArrangement = Arrangement.End
-            ) {
+        FilterChip(
+            selected = uiState.showPinyins,
+            onClick = { viewModel.toggleShowPinyins(!uiState.showPinyins) },
+            shape = RoundedCornerShape(50),
+            modifier = Modifier.padding(end = 8.dp),
+            label = {
                 Text(
                     text = stringResource(Res.string.ocr_display_pinyins),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.outline,
-                    modifier = Modifier.padding(end = 5.dp)
-                )
-                Switch(
-                    checked = uiState.showPinyins,
-                    onCheckedChange = { viewModel.toggleShowPinyins(it) }
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
-        }
+        )
     }
 }
 
@@ -268,5 +238,58 @@ private fun OcrDisplayAdd(
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center
         )
+    }
+}
+
+@Composable
+fun TextSizeControl(
+    modifier: Modifier = Modifier,
+    onDecrease: () -> Unit,
+    onIncrease: () -> Unit,
+) {
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(50),
+        tonalElevation = 2.dp,
+        color = MaterialTheme.colorScheme.surface,
+        shadowElevation = 1.dp
+    ) {
+        Row(
+            modifier = Modifier
+                .height(33.dp)
+                .wrapContentWidth()
+        ) {
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(topStart = 50.dp, bottomStart = 50.dp))
+                    .clickable { onDecrease() }
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .fillMaxHeight()
+                    .padding(horizontal = 16.dp, vertical = 5.dp),
+                contentAlignment = Alignment.BottomCenter
+            ) {
+                Icon(
+                    painter = painterResource(Res.drawable.text_decrease_24px),
+                    contentDescription = stringResource(Res.string.ocr_display_conf_smaller),
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(topEnd = 50.dp, bottomEnd = 50.dp))
+                    .clickable { onIncrease() }
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .fillMaxHeight()
+                    .padding(horizontal = 16.dp, vertical = 4.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(Res.drawable.text_increase_24px),
+                    contentDescription = stringResource(Res.string.ocr_display_conf_bigger),
+                    modifier = Modifier.size(30.dp)
+                )
+            }
+        }
     }
 }
