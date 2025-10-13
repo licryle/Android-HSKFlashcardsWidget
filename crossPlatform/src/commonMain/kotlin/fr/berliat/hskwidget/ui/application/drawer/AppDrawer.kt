@@ -1,10 +1,10 @@
 package fr.berliat.hskwidget.ui.application.drawer
 
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
@@ -24,13 +24,16 @@ fun AppDrawer(
     currentScreen: Screen,
     onNavigate: (Screen) -> Unit
 ) {
-    Text("test")
     ModalDrawerSheet(
-        modifier = Modifier.width(280.dp)
+        modifier = Modifier.width(280.dp).padding(top = 15.dp)
     ) {
         AppDrawerHeader()
 
-        Spacer(Modifier.height(16.dp))
+        HorizontalDivider(
+            modifier = Modifier.padding(vertical = 15.dp),
+            thickness = 0.5.dp,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.50f)
+        )
 
         menuItems.forEach { menuItem ->
             val title = stringResource(menuItem.title)
