@@ -2,11 +2,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 import fr.berliat.hsktextviews.PinyinUtils.isHanzi
@@ -44,9 +44,10 @@ fun HSKWordView(
     val pinyinList = pinyinText.split(" ")
     val extPinyinList = mutableListOf<String>()
 
-    Row(
+    FlowRow(
         modifier = modifier.clickable { onWordClick?.invoke(hanziText) },
-        verticalAlignment = Alignment.CenterVertically
+        horizontalArrangement = Arrangement.spacedBy(0.dp),
+        verticalArrangement = Arrangement.spacedBy(0.5.dp)
     ) {
         var pinyinIndex = -1
         hanziText.forEachIndexed { index, hanzi ->
