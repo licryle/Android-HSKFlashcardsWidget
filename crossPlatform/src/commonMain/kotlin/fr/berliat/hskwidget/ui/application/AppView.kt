@@ -6,8 +6,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -19,6 +21,7 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.unit.dp
 
 import fr.berliat.hskwidget.ui.application.content.AppBar
 import fr.berliat.hskwidget.ui.application.content.OCRReminder
@@ -86,7 +89,6 @@ fun AppView(
             Scaffold(
                 topBar = {
                     AppBar(
-                        title = stringResource(DecoratedScreen.fromScreen(currentScreen).title),
                         onOcrClick = { navigationManager.navigate(Screen.OCRCapture()) },
                         onSearch = { s -> navigationManager.navigate(Screen.Dictionary(s)) },
                         onMenuClick = { drawerIsOpen.value = !drawerIsOpen.value }
@@ -103,6 +105,12 @@ fun AppView(
                                 onClick = { navigationManager.navigate(Screen.OCRDisplay("")) }
                             )
                         }
+
+                        Text(
+                            text = stringResource(DecoratedScreen.fromScreen(currentScreen).title),
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.padding(15.dp)
+                        )
 
                         // Screen
                         AppNavHost(viewModel = viewModel)

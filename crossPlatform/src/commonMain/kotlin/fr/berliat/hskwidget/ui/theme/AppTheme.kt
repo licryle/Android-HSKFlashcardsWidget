@@ -38,7 +38,7 @@ private val LightColors = lightColorScheme(
     surface = Color(0xFFEFEFEF),
     onSurface = Color(0xFF2C1C1C),
     onSurfaceVariant = Color.DarkGray,
-    inverseOnSurface = Color.Yellow
+    inverseOnSurface = AppColors.Bronze
 )
 
 private val DarkColors = darkColorScheme(
@@ -52,7 +52,7 @@ private val DarkColors = darkColorScheme(
     surface = Color(0xFF2C1C1C),
     onSurface = Color(0xFFEFEFEF),
     onSurfaceVariant = Color.Gray,
-    inverseOnSurface = Color.Yellow
+    inverseOnSurface = AppColors.Bronze
 )
 
 

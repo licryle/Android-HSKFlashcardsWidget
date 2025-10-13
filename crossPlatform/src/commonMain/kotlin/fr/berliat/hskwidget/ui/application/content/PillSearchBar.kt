@@ -52,7 +52,7 @@ fun PillSearchBar(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(start = 10.dp, end = 5.dp),
+                .padding(start = 15.dp, end = 5.dp),
             contentAlignment = Alignment.CenterStart
         ) {
             val focusManager = LocalFocusManager.current
