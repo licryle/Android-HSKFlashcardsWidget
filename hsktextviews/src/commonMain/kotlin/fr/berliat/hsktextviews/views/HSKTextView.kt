@@ -7,6 +7,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -83,8 +84,8 @@ fun HSKTextView(
         else ->
             FlowRow(
                 modifier = modifier.fillMaxWidth().verticalScroll(scrollState),
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(0.dp),
+                verticalArrangement = Arrangement.spacedBy(0.5.dp)
             ) {
                 words.forEach { (word, pinyin) ->
                     if (word == "\n") {
@@ -118,7 +119,13 @@ fun HSKTextView(
 
                         // optional end separator
                         if (endSeparator.isNotEmpty()) {
-                            Text(text = endSeparator)
+                            Box(
+                                modifier = Modifier.fillMaxHeight().padding(horizontal = 2.dp)
+                                    .align(Alignment.CenterVertically),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(text = endSeparator)
+                            }
                         }
                     }
                 }
