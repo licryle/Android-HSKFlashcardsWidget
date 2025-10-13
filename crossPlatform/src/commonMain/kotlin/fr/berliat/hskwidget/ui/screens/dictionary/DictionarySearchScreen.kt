@@ -1,6 +1,7 @@
 package fr.berliat.hskwidget.ui.screens.dictionary
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,10 +14,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -146,49 +148,43 @@ private fun DictionarySearchFilters(
     hasAnnotation: Boolean,
     onHasAnnotationToggle: (Boolean) -> Unit,
     modifier: Modifier = Modifier) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        tonalElevation = 4.dp // this gives shadow / elevation
+    val scrollState = rememberScrollState()
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .horizontalScroll(scrollState)
+            .padding(start = 15.dp, end = 15.dp, top = 0.dp, bottom = 4.dp),
     ) {
-        Row(
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 4.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(horizontalAlignment = Alignment.Start) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Switch(
-                        checked = showHSK3,
-                        onCheckedChange = { onShowHSKToggle(it) },
-                        modifier = modifier.padding(end = 3.dp)
-                    )
-                    Text(
-                        text = stringResource(Res.string.dictionary_search_filter_hsk3definition_hint),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
+        FilterChip(
+            selected = showHSK3,
+            onClick = { onShowHSKToggle(!showHSK3) },
+            shape = RoundedCornerShape(50),
+            modifier = Modifier.padding(end = 8.dp),
+            label = {
+                Text(
+                    text = stringResource(Res.string.dictionary_search_filter_hsk3definition_hint),
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
-            Column(horizontalAlignment = Alignment.End) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        painter = painterResource(Res.drawable.bookmark_heart_24px),
-                        contentDescription = stringResource(Res.string.dictionary_search_filter_hasannotation_hint),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                    Text(
-                        text = stringResource(Res.string.dictionary_search_filter_hasannotation_hint),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Switch(
-                        checked = hasAnnotation,
-                        onCheckedChange = { onHasAnnotationToggle(it) },
-                        modifier = modifier.padding(start = 3.dp)
-                    )
-                }
+        )
+
+        FilterChip(
+            selected = hasAnnotation,
+            onClick = { onHasAnnotationToggle(!hasAnnotation) },
+            shape = RoundedCornerShape(50),
+            label = {
+                Icon(
+                    painter = painterResource(Res.drawable.bookmark_heart_24px),
+                    contentDescription = stringResource(Res.string.dictionary_search_filter_hasannotation_hint),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = stringResource(Res.string.dictionary_search_filter_hasannotation_hint),
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
-        }
+        )
     }
 }
 

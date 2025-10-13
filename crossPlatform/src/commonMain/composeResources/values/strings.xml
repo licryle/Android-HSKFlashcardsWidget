@@ -48,7 +48,7 @@ This project uses the awesome projects of:
     <string name="about_stats_text">%1$s words in dictionary.\n%2$s annotations.</string>
     <string name="about_email_noapp">No email client found. Address copied to clipboard.</string>
 
-    <string name="dictionary_search_filter_hsk3definition_hint">HSK3 Definition</string>
+    <string name="dictionary_search_filter_hsk3definition_hint">Show HSK3 Definition</string>
     <string name="dictionary_noresult_text">%1$s not in dictionary, add annotation?</string>
     <string name="dictionary_noresult_icon">No result!</string>
     <string name="dictionary_search_loading">Loading results</string>
