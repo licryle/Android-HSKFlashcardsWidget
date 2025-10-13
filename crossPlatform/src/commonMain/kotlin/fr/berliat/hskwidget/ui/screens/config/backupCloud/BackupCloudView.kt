@@ -96,7 +96,7 @@ fun BackupCloudView(
 
             Text(
                 stringResource(Res.string.config_backup_cloud_title),
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.titleMedium
             )
         }
 
@@ -105,7 +105,8 @@ fun BackupCloudView(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.padding(bottom = 8.dp)
         ) {
-            Text(stringResource(Res.string.config_backup_cloud_lastone))
+            Text(stringResource(Res.string.config_backup_cloud_lastone),
+                style = MaterialTheme.typography.bodyMedium)
 
             Spacer(modifier = Modifier.weight(1f))
 

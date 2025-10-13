@@ -5,6 +5,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import fr.berliat.hskwidget.core.HSKAppServices
+import fr.berliat.hskwidget.ui.components.AppDivider
 import fr.berliat.hskwidget.ui.screens.config.ankiSync.AnkiSyncView
 import fr.berliat.hskwidget.ui.screens.config.backupCloud.BackupCloudView
 import fr.berliat.hskwidget.ui.screens.config.backupDisk.BackupDiskView
@@ -21,12 +22,14 @@ fun ConfigScreen(
     Column(modifier = Modifier.padding(16.dp).fillMaxSize()) {
         BackupDiskView(modifier, viewModel = viewModel.backupDiskViewModel)
 
-        Spacer(modifier = modifier.height(16.dp))
+        AppDivider()
 
         BackupCloudView(modifier, viewModel = viewModel.backupCloudViewModel)
 
-        Spacer(modifier = modifier.height(16.dp))
+        if (viewModel.ankiSyncViewModel.isAvailableOnThisPlatform) {
+            AppDivider()
 
-        AnkiSyncView(modifier, viewModel = viewModel.ankiSyncViewModel)
+            AnkiSyncView(modifier, viewModel = viewModel.ankiSyncViewModel)
+        }
     }
 }

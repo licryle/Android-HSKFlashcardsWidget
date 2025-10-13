@@ -1,5 +1,6 @@
 package fr.berliat.hskwidget.ui.screens.support
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,8 +12,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -33,7 +32,6 @@ import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.bakery_dining_24px
 import fr.berliat.hskwidget.star_shine_24px
 import fr.berliat.hskwidget.support_devintro
-import fr.berliat.hskwidget.support_devintro_title
 import fr.berliat.hskwidget.support_purchase_tier1
 import fr.berliat.hskwidget.support_purchase_tier2
 import fr.berliat.hskwidget.support_purchase_tier3
@@ -48,6 +46,7 @@ import fr.berliat.hskwidget.support_status_tier4
 import fr.berliat.hskwidget.support_total_error
 import fr.berliat.hskwidget.support_total_support
 import fr.berliat.hskwidget.trophy_24px
+import fr.berliat.hskwidget.ui.components.IconButton
 import fr.berliat.hskwidget.ui.theme.AppColors
 
 import org.jetbrains.compose.resources.DrawableResource
@@ -99,12 +98,6 @@ private fun _SupportScreen(
             .verticalScroll(rememberScrollState())
             .padding(16.dp)
     ) {
-        Text(
-            text = stringResource(Res.string.support_devintro_title),
-            style = MaterialTheme.typography.titleLarge
-        )
-
-        Spacer(Modifier.height(8.dp))
 
         Text(
             text = stringResource(Res.string.support_devintro),
@@ -113,17 +106,12 @@ private fun _SupportScreen(
 
         Spacer(Modifier.height(8.dp))
 
-        Button(
-            onClick = { viewModel.triggerReview() },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Icon(
-                painter = painterResource(Res.drawable.star_shine_24px),
-                contentDescription = null
-            )
-            Spacer(Modifier.width(8.dp))
-            Text(stringResource(Res.string.support_review_btn))
-        }
+        IconButton(
+            text = stringResource(Res.string.support_review_btn),
+            onClick = viewModel::triggerReview,
+            modifier = Modifier.fillMaxWidth(),
+            drawable = Res.drawable.star_shine_24px
+        )
 
         Spacer(Modifier.height(26.dp))
 
@@ -135,7 +123,7 @@ private fun _SupportScreen(
 
         Text(
             text = stringResource(supportTpl).format(totalSpent.toDouble()),
-            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -204,20 +192,10 @@ private fun TieredPurchaseButton(
     modifier: Modifier = Modifier
 ) {
     Spacer(Modifier.height(8.dp))
-    Button(
+    IconButton(
+        text = stringResource(text),
         onClick = onClick,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = btnColor,
-            contentColor = Color.Black
-        ),
-        modifier = modifier.fillMaxWidth()
-    ) {
-        Icon(
-            painter = painterResource(icon),
-            contentDescription = null,
-            tint = Color.Black
-        )
-        Spacer(modifier.width(8.dp))
-        Text(stringResource(text))
-    }
+        modifier = modifier.fillMaxWidth().background(btnColor),
+        drawable = icon
+    )
 }

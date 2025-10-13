@@ -65,7 +65,7 @@ fun AnkiSyncView(
 
             Text(
                 stringResource(Res.string.config_anki_title),
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.titleMedium
             )
         }
 
@@ -80,7 +80,8 @@ fun AnkiSyncView(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(stringResource(Res.string.config_anki_activate))
+            Text(stringResource(Res.string.config_anki_activate),
+                style = MaterialTheme.typography.bodyMedium)
 
             Spacer(modifier = Modifier.weight(1f))
 

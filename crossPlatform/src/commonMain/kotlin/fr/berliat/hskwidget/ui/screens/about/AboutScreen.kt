@@ -36,6 +36,7 @@ import fr.berliat.hskwidget.about_intro3
 import fr.berliat.hskwidget.about_stats_text
 import fr.berliat.hskwidget.ic_email
 import fr.berliat.hskwidget.ic_github
+import fr.berliat.hskwidget.ui.components.AppDivider
 
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -102,10 +103,10 @@ fun AboutScreen(
                     drawable = Res.drawable.ic_email
                 )
 
-                Spacer()
+                AppDivider()
 
                 Text(stringResource(Res.string.about_stats_title),
-                    style = MaterialTheme.typography.titleLarge)
+                    style = MaterialTheme.typography.titleMedium)
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     stringResource(
@@ -116,10 +117,10 @@ fun AboutScreen(
                     style = MaterialTheme.typography.bodyMedium
                 )
 
-                Spacer()
+                AppDivider()
 
                 Text(stringResource(Res.string.about_terms_conditions_title),
-                    style = MaterialTheme.typography.titleLarge)
+                    style = MaterialTheme.typography.titleMedium)
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(stringResource(Res.string.about_intro3),
                     style = MaterialTheme.typography.bodyMedium)

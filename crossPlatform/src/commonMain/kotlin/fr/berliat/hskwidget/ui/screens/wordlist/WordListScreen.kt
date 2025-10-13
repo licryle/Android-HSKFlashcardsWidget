@@ -165,7 +165,7 @@ private fun WordListRow(
                 .padding(10.dp)) {
                 Text(
                     text = wordList.name,
-                    style = MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.titleMedium
                 )
                 Row(modifier = Modifier.fillMaxWidth().padding(top = 15.dp),
                     horizontalArrangement = Arrangement.SpaceBetween) {

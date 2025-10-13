@@ -1,5 +1,4 @@
 <resources>
-    <string name="support_devintro_title">🥐 Support the creator 🥐</string>
     <string name="support_devintro">Hello everyone, Cyrille here, I'm an indie developer originally from France.\n\nAs I learn Chinese, I realized I needed such app and none of the existing ones filled my needs.\n\nSo here we are, I'm happily sharing for free this creation with you.\n\nIf you also find it useful, please consider participating to my croissant fund, or review it for free!\n\nReviews, feedback, encouragement help tremendously!</string>
     <string name="support_purchase_tier1">Buy the Bronze 🥐 Support tier for US$1</string>
     <string name="support_purchase_tier2">Buy the Silver 🥐 Support tier for US$3</string>
