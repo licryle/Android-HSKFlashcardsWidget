@@ -1,4 +1,3 @@
-<!-- @Todo: find a way to implement androidx.constraintlayout.widget.ConstraintLayout... -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     style="@style/Widget.HSKFlashcardsWidget.AppWidget.Container"
