@@ -9,8 +9,8 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 
@@ -19,8 +19,8 @@ import fr.berliat.hsktextviews.Res
 import fr.berliat.hsktextviews.arrow_dropdown_noborder
 import fr.berliat.hsktextviews.pinyinselector_dropdown_icon
 
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import org.jetbrains.compose.resources.vectorResource
 
 @Composable
 fun HSKPinyinSelector(
@@ -55,14 +55,16 @@ fun HSKPinyinSelector(
 
     Box {
         Row(
-            modifier = Modifier.clickable { expanded = true }
+            modifier = Modifier.clickable { expanded = true },
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Text(text = selectedPinyin, style = textStyle)
 
             if (showDropdown) {
                 Icon(
-                    painter = rememberVectorPainter(vectorResource(Res.drawable.arrow_dropdown_noborder)),
+                    painter = painterResource(Res.drawable.arrow_dropdown_noborder),
                     contentDescription = stringResource(Res.string.pinyinselector_dropdown_icon),
+                    tint = textStyle.color,
                     modifier = Modifier.size(10.dp)
                 )
             }
