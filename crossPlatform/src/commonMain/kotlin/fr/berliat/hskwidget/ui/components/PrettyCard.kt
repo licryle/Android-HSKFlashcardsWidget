@@ -28,7 +28,7 @@ fun PrettyCard(
     modifier: Modifier = Modifier,
     elevation: Dp = 4.dp,
     borderColor: Color = MaterialTheme.colorScheme.background,
-    roundCornerRadius: Dp = 12.dp,
+    roundCornerRadius: Dp = 20.dp,
     shapeModifier: PrettyCardShapeModifier = PrettyCardShapeModifier.Single,
     onClick : () -> Unit = {},
     content: @Composable ColumnScope.() -> Unit
