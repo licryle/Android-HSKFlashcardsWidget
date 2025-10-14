@@ -43,7 +43,6 @@ class DictionarySearchViewModel(private val prefsStore: AppPreferencesStore = HS
 
     fun toggleHSK3(value: Boolean) {
         prefsStore.dictionaryShowHSK3Definition.value = value
-        performSearch()
 
         Utils.logAnalyticsEvent(if (value) Utils.ANALYTICS_EVENTS.DICT_HSK3_ON else Utils.ANALYTICS_EVENTS.DICT_HSK3_OFF)
     }
