@@ -27,7 +27,7 @@ sealed interface PrettyCardShapeModifier {
 fun PrettyCard(
     modifier: Modifier = Modifier,
     elevation: Dp = 4.dp,
-    borderColor: Color = MaterialTheme.colorScheme.background,
+    borderColor: Color = Color.Transparent,
     roundCornerRadius: Dp = 20.dp,
     shapeModifier: PrettyCardShapeModifier = PrettyCardShapeModifier.Single,
     onClick : () -> Unit = {},
@@ -48,7 +48,8 @@ fun PrettyCard(
                 width = 1.5.dp,
                 color = borderColor,
                 shape = modifiedShape
-            ),
+            )
+            .padding(vertical = 1.5.dp),
         shape = modifiedShape,
         elevation = CardDefaults.cardElevation(defaultElevation = elevation),
         colors = CardDefaults.cardColors(
