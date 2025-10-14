@@ -17,6 +17,8 @@ import fr.berliat.hskwidget.domain.HSKAnkiDelegate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
@@ -110,6 +112,7 @@ actual class AnkiSyncViewModel actual constructor(
 
     private fun importsAllNotesToAnkiDroid() {
         viewModelScope.launch {
+            appConfig.ankiSaveNotes.asStateFlow().filter { it }.first() // ensure the toggle is ON as we just saved it
             ankiDelegate.modifyAnkiViaService(HSKAppServices.wordListRepo.syncListsToAnki())
         }
     }
