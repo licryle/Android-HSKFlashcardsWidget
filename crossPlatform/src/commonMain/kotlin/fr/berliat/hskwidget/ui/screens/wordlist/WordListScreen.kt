@@ -5,8 +5,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -41,6 +43,7 @@ import fr.berliat.hskwidget.delete_24px
 import fr.berliat.hskwidget.edit_24px
 import fr.berliat.hskwidget.ic_add_24dp
 import fr.berliat.hskwidget.ui.components.PrettyCardShapeModifier
+import fr.berliat.hskwidget.ui.theme.AppSizes.screenWithFABBottomPadding
 import fr.berliat.hskwidget.wordlist_create_new_list_button
 import fr.berliat.hskwidget.wordlist_createddate
 import fr.berliat.hskwidget.wordlist_delete_button
@@ -103,7 +106,8 @@ fun WordListScreen(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(8.dp)) {
+        LazyColumn(modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(8.dp)) {
             itemsIndexed(wordLists) { index, wordList ->
                 WordListRow(
                     wordList = wordList,
@@ -197,5 +201,9 @@ private fun WordListRow(
                 modifier = modifier.alpha(if (hideBtn) 0f else 1f)
             )
         }
+    }
+
+    if (shapeModifier == PrettyCardShapeModifier.Last) {
+        Spacer(modifier = modifier.height(screenWithFABBottomPadding))
     }
 }

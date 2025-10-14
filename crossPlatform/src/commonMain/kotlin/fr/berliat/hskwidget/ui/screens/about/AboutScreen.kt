@@ -37,6 +37,7 @@ import fr.berliat.hskwidget.about_stats_text
 import fr.berliat.hskwidget.ic_email
 import fr.berliat.hskwidget.ic_github
 import fr.berliat.hskwidget.ui.components.AppDivider
+import fr.berliat.hskwidget.ui.theme.AppSizes.screenWithFABBottomPadding
 
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -124,6 +125,8 @@ fun AboutScreen(
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(stringResource(Res.string.about_intro3),
                     style = MaterialTheme.typography.bodyMedium)
+
+                Spacer(modifier = Modifier.height(screenWithFABBottomPadding))
             }
         }
     }
