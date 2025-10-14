@@ -1,6 +1,6 @@
 package fr.berliat.hskwidget.ui.screens.OCR
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,6 +21,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -180,7 +182,7 @@ private fun OcrDisplayConfig(
             .padding(start = 10.dp, end = 10.dp, top = 0.dp, bottom = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        TextSizeControl(
+        OcrTextSizeChip(
             onDecrease = { viewModel.updateTextSize(-2f) },
             onIncrease = { viewModel.updateTextSize(+2f) },
             modifier = Modifier.padding(end = 8.dp)
@@ -242,7 +244,7 @@ private fun OcrDisplayAdd(
 }
 
 @Composable
-fun TextSizeControl(
+private fun OcrTextSizeChip(
     modifier: Modifier = Modifier,
     onDecrease: () -> Unit,
     onIncrease: () -> Unit,
@@ -251,7 +253,8 @@ fun TextSizeControl(
         modifier = modifier,
         shape = RoundedCornerShape(50),
         tonalElevation = 2.dp,
-        color = MaterialTheme.colorScheme.surface,
+        color = MaterialTheme.colorScheme.background,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurfaceVariant),
         shadowElevation = 1.dp
     ) {
         Row(
@@ -263,31 +266,35 @@ fun TextSizeControl(
                 modifier = Modifier
                     .clip(RoundedCornerShape(topStart = 50.dp, bottomStart = 50.dp))
                     .clickable { onDecrease() }
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
                     .fillMaxHeight()
-                    .padding(horizontal = 16.dp, vertical = 5.dp),
+                    .width(54.dp)
+                    .padding(horizontal = 12.dp, vertical = 5.dp),
                 contentAlignment = Alignment.BottomCenter
             ) {
                 Icon(
                     painter = painterResource(Res.drawable.text_decrease_24px),
                     contentDescription = stringResource(Res.string.ocr_display_conf_smaller),
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(20.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
+
+            VerticalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.onSurfaceVariant)
 
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(topEnd = 50.dp, bottomEnd = 50.dp))
                     .clickable { onIncrease() }
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
                     .fillMaxHeight()
-                    .padding(horizontal = 16.dp, vertical = 4.dp),
+                    .width(54.dp)
+                    .padding(horizontal = 12.dp, vertical = 4.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     painter = painterResource(Res.drawable.text_increase_24px),
                     contentDescription = stringResource(Res.string.ocr_display_conf_bigger),
-                    modifier = Modifier.size(30.dp)
+                    modifier = Modifier.size(30.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
