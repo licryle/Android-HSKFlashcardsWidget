@@ -63,6 +63,7 @@ import org.jetbrains.compose.resources.stringResource
 fun DetailedWordView (
     word: AnnotatedChineseWord,
     showHSK3Definition: Boolean,
+    pinyinEditable: Boolean,
     shapeModifier: PrettyCardShapeModifier,
     onFavoriteClick: ((AnnotatedChineseWord) -> Unit)? = null,
     onSpeakClick: ((AnnotatedChineseWord) -> Unit)? = null,
@@ -139,7 +140,7 @@ fun DetailedWordView (
                     HSKWordView(
                         hanziText = word.simplified,
                         pinyinText = pinyins,
-                        pinyinEditable = ! word.hasWord(),
+                        pinyinEditable = pinyinEditable && !word.hasWord(),
                         onPinyinChange = {
                             if (pinyins != it) {
                                 pinyins = it

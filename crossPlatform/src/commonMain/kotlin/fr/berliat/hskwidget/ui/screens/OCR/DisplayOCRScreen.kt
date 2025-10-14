@@ -152,6 +152,7 @@ fun DisplayOCRScreen(
             DetailedWordView(
                 word = word,
                 showHSK3Definition = appConfig.dictionaryShowHSK3Definition.value,
+                pinyinEditable = false,
                 onFavoriteClick = onFavoriteClick,
                 onSpeakClick = viewModel::speakWord,
                 onCopyClick = viewModel::copyToClipboard,

@@ -117,6 +117,7 @@ fun DictionarySearchScreen(
                         DetailedWordView(
                             word = word,
                             showHSK3Definition = showHSK3,
+                            pinyinEditable = false,
                             onFavoriteClick = { onAnnotate(word.simplified) },
                             onSpeakClick = { viewModel.speakWord(word.simplified) },
                             onCopyClick = { viewModel.copyWord(word.simplified) },

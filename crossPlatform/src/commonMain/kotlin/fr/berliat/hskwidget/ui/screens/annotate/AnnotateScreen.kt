@@ -147,6 +147,7 @@ fun AnnotateScreen(
             onFavoriteClick = null,
             onListsClick = null,
             onPinyinChange = { pinyins = it },
+            pinyinEditable = true,
             shapeModifier = PrettyCardShapeModifier.Single
         )
 
