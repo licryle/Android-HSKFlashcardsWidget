@@ -1,6 +1,8 @@
 package fr.berliat.hskwidget.ui.navigation
 
 import androidx.navigation.NavController
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 import kotlin.reflect.KClass
 
 object NavigationManager {
@@ -9,10 +11,14 @@ object NavigationManager {
     const val STACK_SCREEN_DEPTH = 5
     val stackScreen = ArrayDeque<Screen>(listOf(Screen.Dictionary()))
 
-    fun currentScreen() = stackScreen.last()
+    val currentScreen = MutableStateFlow<Screen>(Screen.Dictionary())
 
     fun init(controller: NavController) {
         navController = controller
+    }
+
+    private fun updateCurrentScreen() {
+        currentScreen.update { stackScreen.last() }
     }
 
     fun navigate(screen: Screen) {
@@ -22,6 +28,7 @@ object NavigationManager {
             stackScreen.removeFirst() // remove oldest
         }
         stackScreen.add(screen)
+        updateCurrentScreen()
 
         logCurrentScreen()
     }
@@ -32,6 +39,8 @@ object NavigationManager {
             // Exit app fallback if stack is empty
             println("Backstack empty → quit app")
         } else {
+            updateCurrentScreen()
+
             logCurrentScreen()
         }
     }

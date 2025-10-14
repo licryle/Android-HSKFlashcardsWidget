@@ -106,6 +106,7 @@ fun AppNavHost(viewModel : AppViewModel) {
 
         composable<Screen.OCRCapture> { backStackEntry ->
             val args = backStackEntry.toRoute<Screen.OCRCapture>()
+
             CaptureImageScreen(onImageReady = { imageFile: PlatformFile ->
                 navController.navigate(Screen.OCRDisplay(
                     preText = args.preText,

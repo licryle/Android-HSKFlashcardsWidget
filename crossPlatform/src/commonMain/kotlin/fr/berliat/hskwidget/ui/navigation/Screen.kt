@@ -49,9 +49,16 @@ sealed class Screen() {
 
     @Serializable
     data class OCRDisplay(val preText: String = "", val imageFilePath: String? = null) : Screen()
+
+    fun decoratedScreen(): DecoratedScreen {
+        return DecoratedScreen.fromScreen(this)
+    }
 }
 
-sealed class DecoratedScreen(val screen: Screen, val title: StringResource, val icon: DrawableResource) {
+sealed class DecoratedScreen(val screen: Screen,
+                             val title: StringResource,
+                             val icon: DrawableResource,
+                             val disableDrawer: Boolean = false) {
     data object Dictionary: DecoratedScreen(
         Screen.Dictionary(),
         Res.string.menu_dictionary,
@@ -90,7 +97,8 @@ sealed class DecoratedScreen(val screen: Screen, val title: StringResource, val 
     data object OCRCapture : DecoratedScreen(
         Screen.OCRCapture(),
         Res.string.menu_ocr,
-        Res.drawable.photo_camera_24px)
+        Res.drawable.photo_camera_24px,
+        disableDrawer = true)
 
     data object OCRDisplay : DecoratedScreen(
         Screen.OCRDisplay(),

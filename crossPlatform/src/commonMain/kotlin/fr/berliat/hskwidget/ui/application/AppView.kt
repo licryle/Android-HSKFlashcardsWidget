@@ -14,6 +14,7 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -67,7 +68,7 @@ fun AppView(
         drawerIsOpen.value = (drawerState.currentValue == DrawerValue.Open)
     }
 
-    val currentScreen = navigationManager.currentScreen()
+    val currentScreen by navigationManager.currentScreen.collectAsState()
     AppTheme() {
         if (!isReady.value) {
             AppLoadingView()
@@ -78,12 +79,13 @@ fun AppView(
             drawerState = drawerState,
             drawerContent = {
                 AppDrawer(
-                    currentScreen = currentScreen
+                    currentScreen = currentScreen,
                 ) { selectedScreen ->
                     navigationManager.navigate(selectedScreen)
                     drawerIsOpen.value = false
                 }
             },
+            gesturesEnabled = ! currentScreen.decoratedScreen().disableDrawer,
             modifier = Modifier.clearFocusOnAnyOutsideTap()
         ) {
             Scaffold(
