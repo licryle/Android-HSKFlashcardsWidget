@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,13 +20,16 @@ import org.jetbrains.compose.resources.painterResource
 fun IconButton(text: String, onClick: () -> Unit,
                modifier: Modifier = Modifier,
                drawable: DrawableResource? = null,
-               enabled: Boolean = true) {
+               enabled: Boolean = true,
+               btnColor: ButtonColors = ButtonDefaults.buttonColors()
+) {
     Box(
         contentAlignment = Alignment.Center, // Centers content inside Box
         modifier = modifier
     ) {
         Button(onClick = onClick,
-            enabled = enabled
+            enabled = enabled,
+            colors = btnColor
         ) {
             drawable?.let {
                 Icon(
