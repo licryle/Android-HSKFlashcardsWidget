@@ -1,8 +1,5 @@
 package fr.berliat.hskwidget.core
 
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-
 import fr.berliat.hsktextviews.HSKTextSegmenter
 import fr.berliat.hskwidget.BuildKonfig
 import fr.berliat.hskwidget.data.dao.AnkiDAO
@@ -42,9 +39,6 @@ object Utils {
 
     fun logAnalyticsWidgetAction(event: ANALYTICS_EVENTS, widgetId: Int) =
         ExpectedUtils.logAnalyticsWidgetAction(event, widgetId)
-
-    fun getDataStore(file: String): DataStore<Preferences> =
-        ExpectedUtils.getDataStore(file)
 
     fun getAnkiDAO(): AnkiDAO = ExpectedUtils.getAnkiDAO()
 
@@ -136,8 +130,6 @@ expect object ExpectedUtils {
                           params: Map<String, String> = mapOf())
     fun logAnalyticsError(module: String, error: String, details: String)
     fun logAnalyticsWidgetAction(event: Utils.ANALYTICS_EVENTS, widgetId: Int)
-
-    fun getDataStore(file: String): DataStore<Preferences>
 
     fun getHSKSegmenter() : HSKTextSegmenter
 

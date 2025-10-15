@@ -1,6 +1,7 @@
 package fr.berliat.hskwidget.data.store
 
 import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
@@ -9,9 +10,14 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
+import io.github.vinceglb.filekit.FileKit
+import io.github.vinceglb.filekit.absolutePath
+import io.github.vinceglb.filekit.filesDir
+import io.github.vinceglb.filekit.resolve
 
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import okio.Path.Companion.toPath
 
 open class PrefixedPreferencesStore protected constructor(
     private val store: DataStore<Preferences>,
@@ -30,6 +36,12 @@ open class PrefixedPreferencesStore protected constructor(
                     instances[key] = instance
                 }
             }
+        }
+
+        fun getDataStore(file: String): DataStore<Preferences> {
+            return PreferenceDataStoreFactory.createWithPath(
+                produceFile = { FileKit.filesDir.resolve(file).absolutePath().toPath() }
+            )
         }
     }
 

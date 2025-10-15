@@ -17,9 +17,6 @@ import android.widget.Toast
 
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.PreferenceDataStoreFactory
-import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.Observer
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
@@ -48,8 +45,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-
-import okio.Path.Companion.toPath
 
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.getString
@@ -138,12 +133,6 @@ actual object ExpectedUtils {
                 "ERROR_ID" to error,
                 "DETAILS" to details
             )
-        )
-    }
-
-    actual fun getDataStore(file: String): DataStore<Preferences> {
-        return PreferenceDataStoreFactory.createWithPath(
-            produceFile = { context.filesDir.resolve(file).absolutePath.toPath() }
         )
     }
 

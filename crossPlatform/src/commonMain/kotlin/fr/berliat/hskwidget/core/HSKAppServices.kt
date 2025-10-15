@@ -6,6 +6,7 @@ import fr.berliat.hskwidget.data.store.AnkiStore
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.data.store.GoogleDriveBackup
+import fr.berliat.hskwidget.data.store.PrefixedPreferencesStore
 import fr.berliat.hskwidget.data.store.WidgetPreferencesStore
 import fr.berliat.hskwidget.data.store.WidgetPreferencesStoreProvider
 import fr.berliat.hskwidget.domain.DatabaseHelper
@@ -23,12 +24,11 @@ object HSKAppServices : AppServices() {
         register("appScope", 0) { scope }
         register("database", 0) { DatabaseHelper.getInstance().liveDatabase }
         register("appPreferences", 0) {
-            AppPreferencesStore.getInstance(Utils.getDataStore("app.preferences_pb"))
+            AppPreferencesStore.getInstance(PrefixedPreferencesStore.getDataStore("app.preferences_pb"))
         }
 
-        // TODO move getDataStore function to PrefixedDataPreferences
         // A unique datastore is needed, otherwise it fails silently (!) to write anything.
-        val widgetDataStore = Utils.getDataStore("widgets.preferences_pb")
+        val widgetDataStore = PrefixedPreferencesStore.getDataStore("widgets.preferences_pb")
         register("widgetsPreferencesProvider") {
             val provider : WidgetPreferencesStoreProvider = { widgetId: Int ->
                 WidgetPreferencesStore.getInstance(widgetDataStore, widgetId)
