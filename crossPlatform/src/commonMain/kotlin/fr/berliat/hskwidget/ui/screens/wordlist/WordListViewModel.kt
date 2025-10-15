@@ -134,6 +134,7 @@ class WordListViewModel(
         viewModelScope.launch(AppDispatchers.IO) {
             try {
                 block()
+                _status.emit(Status.SUCCESS)
             } catch (_: Exception) {
                 _status.emit(Status.ERROR)
             } finally {
