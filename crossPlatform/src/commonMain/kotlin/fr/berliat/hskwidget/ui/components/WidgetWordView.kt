@@ -58,7 +58,7 @@ fun WidgetWordView(
                     text = word.hskLevel.toString(),
                     fontSize = 11.sp,
                     modifier = Modifier.align(Alignment.CenterVertically)
-                        .background(MaterialTheme.colorScheme.onSurfaceVariant)
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
                         .padding(horizontal = 4.dp)
                 )
             }
