@@ -124,7 +124,7 @@ fun WidgetConfigScreen(
                     .padding(horizontal = 10.dp)
             ) {
                 items(allLists.value) { list ->
-                    FlashcardConfigListItem(
+                    WidgetConfigListItem(
                         list = list,
                         isSelected = localSelectedIds.contains(list.id),
                         onToggle = { included ->
@@ -160,7 +160,7 @@ fun WidgetConfigScreen(
 
 // Todo: solve that flicker
 @Composable
-private fun FlashcardConfigListItem(
+private fun WidgetConfigListItem(
     list: WordListWithCount,
     isSelected: Boolean,
     onToggle: (Boolean) -> Unit,
