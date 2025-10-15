@@ -56,7 +56,7 @@ actual class AppViewModel(val activity: () -> FragmentActivity)
         )
     }
 
-    override fun finishInitialization() {
+    override suspend fun finishInitialization() {
         super.finishInitialization()
 
         // Now we may be after onResume() and HSK AppServices is ready for consumption

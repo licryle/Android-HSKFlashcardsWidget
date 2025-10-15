@@ -9,7 +9,6 @@ import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.domain.DatabaseDiskBackup
 import fr.berliat.hskwidget.domain.DatabaseHelper
-import fr.berliat.hskwidget.domain.SearchQuery
 import fr.berliat.hskwidget.ui.navigation.Screen
 
 import fr.berliat.hskwidget.Res
@@ -33,7 +32,7 @@ import kotlinx.coroutines.launch
 expect class AppViewModel: CommonAppViewModel
 
 open class CommonAppViewModel(): ViewModel() {
-    private val _navigation = MutableSharedFlow<Screen>()
+    private val _navigation = MutableSharedFlow<Screen>(replay = 1)
     val navigation = _navigation.asSharedFlow()
 
     var _appConfig: AppPreferencesStore? = null
@@ -58,7 +57,7 @@ open class CommonAppViewModel(): ViewModel() {
         }
     }
 
-    protected open fun finishInitialization() {
+    protected open suspend fun finishInitialization() {
         _appConfig = HSKAppServices.appPreferences
         _isReady.value = true
 
@@ -145,17 +144,19 @@ open class CommonAppViewModel(): ViewModel() {
     }
 
     fun search(s: String) {
-        appConfig.searchQuery.value = SearchQuery.processSearchQuery(s)
+        viewModelScope.launch(AppDispatchers.Main) {
+            _navigation.emit(Screen.Dictionary(s))
+        }
     }
 
     fun configureWidget(widgetId: Int) {
-        viewModelScope.launch(AppDispatchers.IO) {
+        viewModelScope.launch(AppDispatchers.Main) {
             _navigation.emit(Screen.Widgets(widgetId))
         }
     }
 
     fun ocrImage(imageFile: PlatformFile) {
-        viewModelScope.launch(AppDispatchers.IO) {
+        viewModelScope.launch(AppDispatchers.Main) {
             _navigation.emit(Screen.OCRDisplay("", imageFile.path))
         }
     }
