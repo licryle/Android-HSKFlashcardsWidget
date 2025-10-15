@@ -25,6 +25,7 @@ import fr.berliat.hskwidget.ui.screens.wordlist.WordListScreen
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.exists
 import io.github.vinceglb.filekit.path
+import androidx.compose.runtime.collectAsState
 
 @Composable
 fun AppNavHost(viewModel : AppViewModel) {
@@ -44,9 +45,14 @@ fun AppNavHost(viewModel : AppViewModel) {
             val args = backStackEntry.toRoute<Screen.Dictionary>()
             var lastQuery by remember { mutableStateOf<String?>(null) }
 
-            if (args.search != lastQuery) {
-                lastQuery = args.search
-                viewModel.search(args.search)
+            var search = args.search
+            if (args.search == null) { // default is from the storage
+                search = viewModel.appConfig.searchQuery.asStateFlow().collectAsState().value.toString()
+            }
+
+            if (search != lastQuery) {
+                lastQuery = search
+                viewModel.search(search)
             }
 
             DictionarySearchScreen(

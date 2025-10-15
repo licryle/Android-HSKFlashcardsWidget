@@ -24,7 +24,7 @@ import org.jetbrains.compose.resources.StringResource
 @Serializable
 sealed class Screen() {
     @Serializable
-    data class Dictionary(val search: String = ""): Screen()
+    data class Dictionary(val search: String? = null): Screen()
 
     @Serializable
     data object Lists : Screen()
