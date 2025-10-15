@@ -52,7 +52,7 @@ actual class SupportViewModel(
         supportDevStore.connect()
     }
 
-    fun supportTier() = supportDevStore.getSupportTier(totalSpent.value)
+    fun supportTier() = SupportDevStore.getSupportTier(totalSpent.value)
 
     fun makePurchase(productId: String) {
         supportDevStore.makePurchase(activityProvider.invoke(), productId)

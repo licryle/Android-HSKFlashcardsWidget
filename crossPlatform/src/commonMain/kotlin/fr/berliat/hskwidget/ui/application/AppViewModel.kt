@@ -162,18 +162,12 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
     private fun setupSupporter() {
         /*supportDevStore = SupportDevStore.getInstance(applicationContext)
 
-        updateSupportMenuTitle(appConfig.supportTotalSpent.value)
-
         supportDevStore.addListener(object : SupportDevStore.SupportDevListener {
             override fun onTotalSpentChange(totalSpent: Float) {
                 updateSupportMenuTitle(totalSpent)
             }
 
-            override fun onQueryFailure(result: BillingResult) {
-                // TODO remove runBLocking
-                val txt = runBlocking { getString(Res.string.support_total_error) }
-                Toast.makeText(applicationContext, txt, Toast.LENGTH_LONG).show()
-            }
+            override fun onQueryFailure(result: BillingResult) { }
 
             override fun onPurchaseSuccess(purchase: Purchase) { }
 
@@ -184,24 +178,7 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
             override fun onPurchaseFailure(purchase: Purchase?, billingResponseCode: Int) { }
         })
 
-        supportDevStore.connect()
-    }
-
-    private fun updateSupportMenuTitle(totalSpent: Float) {
-        val tier = supportDevStore.getSupportTier(totalSpent)
-
-        var tpl = getString(R.string.menu_support)
-        if (totalSpent > 0) {
-            // TODO remove runBLocking
-            tpl = runBlocking { getString(Res.string.support_status_tpl) }
-        }
-
-        val supportMenu = binding.navView.menu.findItem(R.id.nav_support)
-
-        binding.navView.post {
-            // TODO properly pull string
-            supportMenu.title = tpl.format(tier.toString())
-        }*/
+        supportDevStore.connect()*/
     }
 
     companion object {

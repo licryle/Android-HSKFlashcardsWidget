@@ -17,7 +17,6 @@ import fr.berliat.hskwidget.ui.navigation.MenuItems
 import fr.berliat.hskwidget.ui.navigation.Screen
 
 import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun AppDrawer(
@@ -33,7 +32,7 @@ fun AppDrawer(
         AppDivider()
 
         menuItems.forEach { menuItem ->
-            val title = stringResource(menuItem.title)
+            val title = menuItem.title()
             NavigationDrawerItem(
                 label = { Text(title) },
                 icon = { Icon(

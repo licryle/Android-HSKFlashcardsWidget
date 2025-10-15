@@ -107,7 +107,7 @@ fun AppView(
                         }
 
                         Text(
-                            text = stringResource(DecoratedScreen.fromScreen(currentScreen).title),
+                            text = DecoratedScreen.fromScreen(currentScreen).title(),
                             style = MaterialTheme.typography.titleMedium,
                             modifier = Modifier.padding(start = 15.dp, top = 15.dp, bottom = 2.dp)
                         )

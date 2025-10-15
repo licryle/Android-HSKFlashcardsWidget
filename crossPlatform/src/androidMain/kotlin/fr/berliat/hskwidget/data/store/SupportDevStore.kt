@@ -87,15 +87,6 @@ class SupportDevStore private constructor(private val context: Context) : Purcha
         return purchases.contains(product)
     }
 
-    fun getSupportTier(totalSpent: Float): SupportTier {
-        val tiers = SupportTier.entries
-        for (i in tiers.size -1 downTo 0) {
-            if (totalSpent >= tiers[i].minSpend) return tiers[i]
-        }
-
-        return SupportTier.ERROR
-    }
-
     fun queryPurchaseHistory() {
         val params = QueryPurchasesParams.newBuilder()
             .setProductType(BillingClient.ProductType.INAPP)
@@ -296,6 +287,15 @@ class SupportDevStore private constructor(private val context: Context) : Purcha
             return instance ?: synchronized(this) {
                 instance ?: SupportDevStore(context.applicationContext).also { instance = it }
             }
+        }
+
+        fun getSupportTier(totalSpent: Float): SupportTier {
+            val tiers = SupportTier.entries
+            for (i in tiers.size -1 downTo 0) {
+                if (totalSpent >= tiers[i].minSpend) return tiers[i]
+            }
+
+            return SupportTier.ERROR
         }
     }
 }
