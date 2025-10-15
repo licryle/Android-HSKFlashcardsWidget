@@ -65,6 +65,8 @@ This project uses the awesome projects of:
     <string name="dictionary_item_modality">Usage</string>
     <string name="dictionary_item_type">Type</string>
 
+    <string name="widget_not_configured">No word.\nConfigure list(s)</string>
+
     <string name="widget_configure">Configure Widget</string>
     <string name="widget_configure_close">Configure Widget &amp; close app</string>
     <string name="widget_configure_new_back">Add new Widget &amp; go back</string>

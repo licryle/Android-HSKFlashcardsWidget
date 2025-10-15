@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.dp
 import fr.berliat.hskwidget.core.HSKAppServices
 
 import fr.berliat.hskwidget.ui.components.LoadingView
+import fr.berliat.hskwidget.ui.components.WidgetEmptyWordView
 import fr.berliat.hskwidget.ui.components.WidgetWordView
 
 @Composable
@@ -36,7 +37,7 @@ fun WidgetView(
 
         val word = wordHandle.value
         if (word == null) {
-            LoadingView(modifier = modifier)
+            WidgetEmptyWordView(modifier = modifier)
         } else {
             WidgetWordView(
                 word = word,
