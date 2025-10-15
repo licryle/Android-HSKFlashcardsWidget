@@ -96,7 +96,11 @@ fun WordListCreateRenameDialog(
                     viewModel.renameList(list, listName)
                 }
             }) {
-                Text(stringResource(Res.string.wordlist_create_button))
+                if (list == null) {
+                    Text(stringResource(Res.string.wordlist_create_button))
+                } else {
+                    Text(stringResource(Res.string.wordlist_rename_button))
+                }
             }
         },
         dismissButton = {
