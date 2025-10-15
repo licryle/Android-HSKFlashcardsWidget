@@ -30,13 +30,13 @@ fun WidgetView(
 
     val viewModel = _viewModel
     if (viewModel == null) {
-        LoadingView()
+        LoadingView(modifier = modifier)
     } else {
         val wordHandle = viewModel.word.collectAsState()
 
         val word = wordHandle.value
         if (word == null) {
-            LoadingView()
+            LoadingView(modifier = modifier)
         } else {
             WidgetWordView(
                 word = word,

@@ -36,7 +36,7 @@ fun LoadingView(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        LoadingProgressView(modifier)
+        LoadingProgressView()
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = stringResource(loadingText),
