@@ -1,7 +1,6 @@
 package fr.berliat.hskwidget.core
 
 import android.graphics.BitmapFactory
-
 import co.touchlab.kermit.Logger
 
 import com.google.mlkit.vision.common.InputImage
@@ -16,6 +15,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 import kotlin.text.StringBuilder
+import androidx.core.net.toUri
 
 actual class HSKOCR actual constructor() {
     actual fun init() {}
@@ -24,20 +24,30 @@ actual class HSKOCR actual constructor() {
                                successCallback: (String?) -> Unit,
                                failureCallBack: (Exception) -> Unit) {
         withContext(Dispatchers.Default) {
-            val bitmap = BitmapFactory.decodeFile(imagePath.path)
-            val image = InputImage.fromBitmap(bitmap, 0)
-            Logger.d(tag = TAG, messageString = "recognizeText starting")
+            try {
+                Logger.d(tag = TAG, messageString = "recognizeText starting")
+                val uri = imagePath.path.toUri()
+                val image = if (uri.scheme != null) {
+                    InputImage.fromFilePath(ExpectedUtils.context, imagePath.path.toUri())
+                } else {
+                    val bitmap = BitmapFactory.decodeFile(imagePath.path)
+                    InputImage.fromBitmap(bitmap, 0)
+                }
+                Logger.d(tag = TAG, messageString = "recognizeText loaded image")
 
-            val options = ChineseTextRecognizerOptions.Builder()
-                .build()
+                val options = ChineseTextRecognizerOptions.Builder()
+                    .build()
 
-            val recognizer: TextRecognizer = TextRecognition.getClient(options)
+                val recognizer: TextRecognizer = TextRecognition.getClient(options)
 
-            recognizer.process(image)
-                .addOnSuccessListener({ text ->
-                    googleTextToString(text, successCallback)
-                })
-                .addOnFailureListener(failureCallBack)
+                recognizer.process(image)
+                    .addOnSuccessListener({ text ->
+                        googleTextToString(text, successCallback)
+                    })
+                    .addOnFailureListener(failureCallBack)
+            } catch (e: Exception) {
+                failureCallBack.invoke(e)
+            }
         }
     }
 
