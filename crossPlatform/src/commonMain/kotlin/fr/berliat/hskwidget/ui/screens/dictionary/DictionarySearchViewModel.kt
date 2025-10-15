@@ -49,7 +49,6 @@ class DictionarySearchViewModel(private val prefsStore: AppPreferencesStore = HS
 
     fun toggleHasAnnotation(value: Boolean) {
         prefsStore.searchFilterHasAnnotation.value = value
-        performSearch()
 
         Utils.logAnalyticsEvent(if (value) Utils.ANALYTICS_EVENTS.DICT_ANNOTATION_ON else Utils.ANALYTICS_EVENTS.DICT_ANNOTATION_OFF)
     }
