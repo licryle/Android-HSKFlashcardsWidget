@@ -1,5 +1,6 @@
 package fr.berliat.hskwidget.ui.application
 
+import android.app.Activity
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetManager.ACTION_APPWIDGET_CONFIGURE
 import android.content.Intent
@@ -24,7 +25,7 @@ import io.github.vinceglb.filekit.dialogs.init
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
 
-actual class AppViewModel(navigationManager: NavigationManager, val activity: () -> FragmentActivity)
+actual class AppViewModel(navigationManager: NavigationManager, val activityProvider: () -> FragmentActivity)
     : CommonAppViewModel(navigationManager) {
 
     // Needs instantiation before onResume
@@ -36,13 +37,13 @@ actual class AppViewModel(navigationManager: NavigationManager, val activity: ()
             StrictModeManager.init()
         }
 
-        FileKit.init(activity.invoke())
-        ExpectedUtils.init(activity.invoke())
+        FileKit.init(activityProvider.invoke())
+        ExpectedUtils.init(activityProvider.invoke())
 
         // Todo remove run blocking
         HSKAppServices.registerGoogleBackup(
             GoogleDriveBackup(
-                activity.invoke(),
+                activityProvider.invoke(),
                 runBlocking { getString(Res.string.app_name)
                 }
             )
@@ -50,7 +51,7 @@ actual class AppViewModel(navigationManager: NavigationManager, val activity: ()
 
         // HSKAnkiDelegate must be init before onResume, yet HSKAppServices aren't ready
         ankiDelegate = HSKAnkiDelegate(
-            activity = activity.invoke(),
+            activity = activityProvider.invoke(),
             handler = null,
             appConfig = null,
             ankiStore = null
@@ -65,7 +66,7 @@ actual class AppViewModel(navigationManager: NavigationManager, val activity: ()
         ankiDelegate.appConfig = HSKAppServices.appPreferences
         HSKAppServices.registerAnkiDelegators(ankiDelegate)
 
-        WidgetProvider.init(activity) // Depends on HSKAppServices
+        WidgetProvider.init(activityProvider) // Depends on HSKAppServices
     }
 
     override fun handleAppUpdate() {
@@ -124,6 +125,13 @@ actual class AppViewModel(navigationManager: NavigationManager, val activity: ()
                 ocrImage(PlatformFile(imageUri))
             }
         }
+    }
+
+    override fun finalizeWidgetConfiguration(widgetId: Int) {
+        val resultIntent = Intent()
+        resultIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
+        activityProvider.invoke().setResult(Activity.RESULT_OK, resultIntent)
+        activityProvider.invoke().finish()
     }
 
     private fun <T : Parcelable> Intent.getParcelableExtraCompat(key: String, clazz: Class<T>): T? {

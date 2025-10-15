@@ -147,7 +147,7 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
 
     fun configureWidget(widgetId: Int) {
         viewModelScope.launch(AppDispatchers.Main) {
-            navigationManager.navigate(Screen.Widgets(widgetId))
+            navigationManager.navigate(Screen.Widgets(widgetId, true))
         }
     }
 
@@ -156,6 +156,8 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
             navigationManager.navigate(Screen.OCRDisplay("", imageFile.path))
         }
     }
+
+    open fun finalizeWidgetConfiguration(widgetId: Int) { }
 
     private fun setupSupporter() {
         /*supportDevStore = SupportDevStore.getInstance(applicationContext)

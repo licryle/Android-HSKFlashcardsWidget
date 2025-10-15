@@ -82,12 +82,8 @@ fun AppNavHost(viewModel : AppViewModel) {
             WidgetsListScreen(
                 selectedWidgetId = args.widgetId,
                 onWidgetPreferenceSaved = {
-                    if (args.expectsActivityResult) {
-                        // TODO Reconnect
-                        /*val resultIntent = Intent()
-                        resultIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
-                        activity.setResult(Activity.RESULT_OK, activity.intent)
-                        activity.finish()*/
+                    if (args.expectsActivityResult && args.widgetId != null) {
+                        viewModel.finalizeWidgetConfiguration(args.widgetId)
                     }
                 },
                 expectsActivityResult = args.expectsActivityResult
