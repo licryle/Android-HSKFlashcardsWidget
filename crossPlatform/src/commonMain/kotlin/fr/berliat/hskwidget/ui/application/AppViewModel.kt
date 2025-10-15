@@ -57,7 +57,6 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
         _appConfig = HSKAppServices.appPreferences
         _isReady.value = true
 
-        setupSupporter()
         handleDbOperations()
 
         if (didUpdateApp()) handleAppUpdate()
@@ -158,28 +157,6 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
     }
 
     open fun finalizeWidgetConfiguration(widgetId: Int) { }
-
-    private fun setupSupporter() {
-        /*supportDevStore = SupportDevStore.getInstance(applicationContext)
-
-        supportDevStore.addListener(object : SupportDevStore.SupportDevListener {
-            override fun onTotalSpentChange(totalSpent: Float) {
-                updateSupportMenuTitle(totalSpent)
-            }
-
-            override fun onQueryFailure(result: BillingResult) { }
-
-            override fun onPurchaseSuccess(purchase: Purchase) { }
-
-            override fun onPurchaseHistoryUpdate(purchases: Map<SupportDevStore.SupportProduct, Int>) { }
-
-            override fun onPurchaseAcknowledgedSuccess(purchase: Purchase) { }
-
-            override fun onPurchaseFailure(purchase: Purchase?, billingResponseCode: Int) { }
-        })
-
-        supportDevStore.connect()*/
-    }
 
     companion object {
         private const val TAG = "AppViewModel"

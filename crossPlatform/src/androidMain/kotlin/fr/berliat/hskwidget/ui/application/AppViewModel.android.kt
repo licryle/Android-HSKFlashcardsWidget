@@ -9,6 +9,8 @@ import android.os.Build
 import android.os.Parcelable
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
+import com.android.billingclient.api.BillingResult
+import com.android.billingclient.api.Purchase
 import fr.berliat.hskwidget.core.ExpectedUtils
 import fr.berliat.hskwidget.core.ExpectedUtils.INTENT_SEARCH_WORD
 import fr.berliat.hskwidget.core.HSKAppServices
@@ -18,6 +20,7 @@ import fr.berliat.hskwidget.domain.WidgetProvider
 import fr.berliat.hskwidget.domain.HSKAnkiDelegate
 import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.app_name
+import fr.berliat.hskwidget.data.store.SupportDevStore
 import fr.berliat.hskwidget.ui.navigation.NavigationManager
 import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.PlatformFile
@@ -44,8 +47,7 @@ actual class AppViewModel(navigationManager: NavigationManager, val activityProv
         HSKAppServices.registerGoogleBackup(
             GoogleDriveBackup(
                 activityProvider.invoke(),
-                runBlocking { getString(Res.string.app_name)
-                }
+                runBlocking { getString(Res.string.app_name) }
             )
         )
 
@@ -67,6 +69,35 @@ actual class AppViewModel(navigationManager: NavigationManager, val activityProv
         HSKAppServices.registerAnkiDelegators(ankiDelegate)
 
         WidgetProvider.init(activityProvider) // Depends on HSKAppServices
+
+        syncPlayPurchases()
+    }
+
+    fun syncPlayPurchases() {
+        val supportDevStore = SupportDevStore.getInstance(activityProvider.invoke())
+
+        lateinit var listener : SupportDevStore.SupportDevListener
+        listener = object : SupportDevStore.SupportDevListener {
+            override fun onTotalSpentChange(totalSpent: Float) {
+                appConfig.supportTotalSpent.value = totalSpent
+                // We're done, bye
+                supportDevStore.removeListener(listener = listener)
+            }
+
+            override fun onQueryFailure(result: BillingResult) { }
+
+            override fun onPurchaseSuccess(purchase: Purchase) { }
+
+            override fun onPurchaseHistoryUpdate(purchases: Map<SupportDevStore.SupportProduct, Int>) { }
+
+            override fun onPurchaseAcknowledgedSuccess(purchase: Purchase) { }
+
+            override fun onPurchaseFailure(purchase: Purchase?, billingResponseCode: Int) { }
+        }
+
+        supportDevStore.addListener(listener)
+
+        supportDevStore.connect()
     }
 
     override fun handleAppUpdate() {
