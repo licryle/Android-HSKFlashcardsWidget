@@ -250,17 +250,22 @@ private fun OcrTextSizeChip(
     onDecrease: () -> Unit,
     onIncrease: () -> Unit,
 ) {
+    val borderWidth = 0.6.dp
+    val horizontalPadding = 13.dp
+    val halfPillWidth = 60.dp
+    val pillHeight = 32.dp
+
     Surface(
         modifier = modifier,
         shape = RoundedCornerShape(50),
         tonalElevation = 2.dp,
         color = MaterialTheme.colorScheme.background,
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurfaceVariant),
+        border = BorderStroke(borderWidth, MaterialTheme.colorScheme.onSurfaceVariant),
         shadowElevation = 1.dp
     ) {
         Row(
             modifier = Modifier
-                .height(33.dp)
+                .height(pillHeight)
                 .wrapContentWidth()
         ) {
             Box(
@@ -268,8 +273,8 @@ private fun OcrTextSizeChip(
                     .clip(RoundedCornerShape(topStart = 50.dp, bottomStart = 50.dp))
                     .clickable { onDecrease() }
                     .fillMaxHeight()
-                    .width(54.dp)
-                    .padding(horizontal = 12.dp, vertical = 5.dp),
+                    .width(halfPillWidth)
+                    .padding(horizontal = horizontalPadding, vertical = 5.dp),
                 contentAlignment = Alignment.BottomCenter
             ) {
                 Icon(
@@ -280,15 +285,15 @@ private fun OcrTextSizeChip(
                 )
             }
 
-            VerticalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            VerticalDivider(thickness = borderWidth, color = MaterialTheme.colorScheme.onSurfaceVariant)
 
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(topEnd = 50.dp, bottomEnd = 50.dp))
                     .clickable { onIncrease() }
                     .fillMaxHeight()
-                    .width(54.dp)
-                    .padding(horizontal = 12.dp, vertical = 4.dp),
+                    .width(halfPillWidth)
+                    .padding(horizontal = horizontalPadding, vertical = 4.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
