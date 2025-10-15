@@ -18,6 +18,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import fr.berliat.hskwidget.MainActivity
 
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.core.Utils
@@ -109,6 +110,15 @@ class WidgetProvider
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         }
 
+        private fun startActivityToConfigure(context: Context, widgetId: Int) {
+            val confIntent = Intent(context, MainActivity::class.java).apply {
+                action = ACTION_APPWIDGET_CONFIGURE
+                putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+
+            context.startActivity(confIntent)
+        }
 
         private fun updateFlashCardWidget(
             appWidgetManager: AppWidgetManager,
@@ -255,22 +265,12 @@ class WidgetProvider
         scope.launch(Dispatchers.IO) {
             when (intent!!.action) {
                 ACTION_CONFIGURE_LATEST -> {
-                    val latestWidgetId = getWidgetIds().last()
-
-                    val confIntent = Intent(ACTION_APPWIDGET_CONFIGURE)
-                    confIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, latestWidgetId)
-                    confIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-
-                    context.startActivity(confIntent)
+                    startActivityToConfigure(context, getWidgetIds().last())
                 }
 
                 ACTION_APPWIDGET_CONFIGURE -> {
                     // TODO background activity bug
-                    val confIntent = Intent(ACTION_APPWIDGET_CONFIGURE)
-                    confIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
-                    confIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-
-                    context.startActivity(confIntent)
+                    startActivityToConfigure(context, widgetId)
                 }
 
                 ACTION_SPEAK -> {
