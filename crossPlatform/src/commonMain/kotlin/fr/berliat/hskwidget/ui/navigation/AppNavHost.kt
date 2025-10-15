@@ -18,6 +18,7 @@ import fr.berliat.hskwidget.ui.screens.dictionary.DictionarySearchScreen
 import fr.berliat.hskwidget.ui.screens.support.SupportScreen
 import fr.berliat.hskwidget.ui.screens.widget.WidgetsListScreen
 import fr.berliat.hskwidget.ui.screens.wordlist.WordListScreen
+
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.exists
 import io.github.vinceglb.filekit.path
@@ -26,11 +27,10 @@ import io.github.vinceglb.filekit.path
 fun AppNavHost(viewModel : AppViewModel) {
     val navController = rememberNavController()
     LaunchedEffect(navController) {
-        NavigationManager.init(navController)
+        viewModel.navigationManager.init(navController)
     }
-
     LaunchedEffect(Unit) {
-        viewModel.navigation.collect { route ->
+        viewModel.navigationManager.navigationEvents.collect { route ->
             navController.navigate(route)
         }
     }

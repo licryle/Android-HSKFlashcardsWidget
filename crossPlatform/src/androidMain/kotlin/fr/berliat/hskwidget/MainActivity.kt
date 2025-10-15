@@ -22,15 +22,13 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = AppViewModel { this }
+        viewModel = AppViewModel(NavigationManager) { this }
         viewModel.handleIntent(intent)
 
         setContent {
             configureSystemBars(isSystemInDarkTheme())
 
-            AppView(
-                navigationManager = NavigationManager,
-                viewModel = viewModel)
+            AppView(viewModel = viewModel)
         }
     }
 

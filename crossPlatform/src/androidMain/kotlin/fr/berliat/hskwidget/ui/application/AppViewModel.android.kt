@@ -17,14 +17,15 @@ import fr.berliat.hskwidget.domain.WidgetProvider
 import fr.berliat.hskwidget.domain.HSKAnkiDelegate
 import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.app_name
+import fr.berliat.hskwidget.ui.navigation.NavigationManager
 import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.dialogs.init
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
 
-actual class AppViewModel(val activity: () -> FragmentActivity)
-    : CommonAppViewModel() {
+actual class AppViewModel(navigationManager: NavigationManager, val activity: () -> FragmentActivity)
+    : CommonAppViewModel(navigationManager) {
 
     // Needs instantiation before onResume
     private var ankiDelegate : HSKAnkiDelegate

@@ -19,29 +19,25 @@ import fr.berliat.hskwidget.database_update_success
 import fr.berliat.hskwidget.dbbackup_failure_folderpermission
 import fr.berliat.hskwidget.dbbackup_failure_write
 import fr.berliat.hskwidget.dbbackup_success
+import fr.berliat.hskwidget.ui.navigation.NavigationManager
 
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.fromBookmarkData
 import io.github.vinceglb.filekit.path
 
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
 expect class AppViewModel: CommonAppViewModel
 
-open class CommonAppViewModel(): ViewModel() {
-    private val _navigation = MutableSharedFlow<Screen>(replay = 1)
-    val navigation = _navigation.asSharedFlow()
-
+open class CommonAppViewModel(val navigationManager: NavigationManager): ViewModel() {
     var _appConfig: AppPreferencesStore? = null
     val appConfig
         get() = _appConfig!!
 
     private val _isReady = MutableStateFlow<Boolean>(false)
     val isReady = _isReady.asSharedFlow()
-
 
     val isHSKAppServicesStatus = HSKAppServices.status
 
@@ -145,19 +141,19 @@ open class CommonAppViewModel(): ViewModel() {
 
     fun search(s: String) {
         viewModelScope.launch(AppDispatchers.Main) {
-            _navigation.emit(Screen.Dictionary(s))
+            navigationManager.navigate(Screen.Dictionary(s))
         }
     }
 
     fun configureWidget(widgetId: Int) {
         viewModelScope.launch(AppDispatchers.Main) {
-            _navigation.emit(Screen.Widgets(widgetId))
+            navigationManager.navigate(Screen.Widgets(widgetId))
         }
     }
 
     fun ocrImage(imageFile: PlatformFile) {
         viewModelScope.launch(AppDispatchers.Main) {
-            _navigation.emit(Screen.OCRDisplay("", imageFile.path))
+            navigationManager.navigate(Screen.OCRDisplay("", imageFile.path))
         }
     }
 

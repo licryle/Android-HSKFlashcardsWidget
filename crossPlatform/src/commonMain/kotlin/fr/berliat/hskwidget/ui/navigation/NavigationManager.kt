@@ -1,46 +1,59 @@
 package fr.berliat.hskwidget.ui.navigation
 
 import androidx.navigation.NavController
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
+
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+
 import kotlin.reflect.KClass
 
 object NavigationManager {
-    private lateinit var navController: NavController
+    private val scope = CoroutineScope(Dispatchers.Main.immediate)
+    private lateinit var navControllerProvider: () -> NavController
+    val navController
+        get() = { navControllerProvider.invoke() }
+
+    private val _navigationEvents = MutableSharedFlow<Screen>(replay = 0)
+    val navigationEvents: SharedFlow<Screen> = _navigationEvents.asSharedFlow()
+    val currentScreen: StateFlow<Screen> = _navigationEvents.stateIn(
+        scope = scope,
+        started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000),
+        initialValue = Screen.Dictionary())
 
     const val STACK_SCREEN_DEPTH = 5
     val stackScreen = ArrayDeque<Screen>(listOf(Screen.Dictionary()))
 
-    val currentScreen = MutableStateFlow<Screen>(Screen.Dictionary())
-
-    fun init(controller: NavController) {
-        navController = controller
+    fun init(navController: NavController) {
+        navControllerProvider = { navController }
     }
 
-    private fun updateCurrentScreen() {
-        currentScreen.update { stackScreen.last() }
-    }
 
     fun navigate(screen: Screen) {
-        navController.navigate(screen)
-
         if (stackScreen.size == STACK_SCREEN_DEPTH) {
             stackScreen.removeFirst() // remove oldest
         }
         stackScreen.add(screen)
-        updateCurrentScreen()
+
+        scope.launch(Dispatchers.Main) {
+            _navigationEvents.emit(screen)
+        }
 
         logCurrentScreen()
     }
 
     fun pop() {
         stackScreen.removeLastOrNull()
-        if (!navController.popBackStack()) {
+        if (!navController().popBackStack()) {
             // Exit app fallback if stack is empty
             println("Backstack empty → quit app")
         } else {
-            updateCurrentScreen()
-
             logCurrentScreen()
         }
     }
@@ -50,7 +63,6 @@ object NavigationManager {
     }
 
     private fun logCurrentScreen() {
-        val current = navController.currentBackStackEntry?.destination?.route
-        println("Current screen: $current")
+        println("Current screen: $currentScreen")
     }
 }

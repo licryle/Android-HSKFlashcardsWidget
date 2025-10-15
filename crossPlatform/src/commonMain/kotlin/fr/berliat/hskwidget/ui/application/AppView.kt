@@ -30,7 +30,6 @@ import fr.berliat.hskwidget.ui.application.drawer.AppDrawer
 import fr.berliat.hskwidget.ui.components.AppLoadingView
 import fr.berliat.hskwidget.ui.navigation.AppNavHost
 import fr.berliat.hskwidget.ui.navigation.DecoratedScreen
-import fr.berliat.hskwidget.ui.navigation.NavigationManager
 import fr.berliat.hskwidget.ui.navigation.Screen
 import fr.berliat.hskwidget.ui.theme.AppTheme
 
@@ -49,7 +48,6 @@ fun Modifier.clearFocusOnAnyOutsideTap() = composed {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppView(
-    navigationManager: NavigationManager,
     viewModel: AppViewModel
 ) {
     val isReady = viewModel.isReady.collectAsState(false)
@@ -57,7 +55,6 @@ fun AppView(
     val drawerState = rememberDrawerState(if (drawerIsOpen.value) DrawerValue.Open else DrawerValue.Closed)
 
     val showOCRReminder = remember { mutableStateOf(true) }
-
 
     LaunchedEffect(drawerIsOpen.value) {
         if (drawerIsOpen.value) drawerState.open() else drawerState.close()
@@ -68,8 +65,9 @@ fun AppView(
         drawerIsOpen.value = (drawerState.currentValue == DrawerValue.Open)
     }
 
-    val currentScreen by navigationManager.currentScreen.collectAsState()
-    AppTheme() {
+    val currentScreen by viewModel.navigationManager.currentScreen.collectAsState()
+
+    AppTheme {
         if (!isReady.value) {
             AppLoadingView()
             return@AppTheme
@@ -81,7 +79,7 @@ fun AppView(
                 AppDrawer(
                     currentScreen = currentScreen,
                 ) { selectedScreen ->
-                    navigationManager.navigate(selectedScreen)
+                    viewModel.navigationManager.navigate(selectedScreen)
                     drawerIsOpen.value = false
                 }
             },
@@ -91,8 +89,8 @@ fun AppView(
             Scaffold(
                 topBar = {
                     AppBar(
-                        onOcrClick = { navigationManager.navigate(Screen.OCRCapture()) },
-                        onSearch = { s -> navigationManager.navigate(Screen.Dictionary(s)) },
+                        onOcrClick = { viewModel.navigationManager.navigate(Screen.OCRCapture()) },
+                        onSearch = { s -> viewModel.navigationManager.navigate(Screen.Dictionary(s)) },
                         onMenuClick = { drawerIsOpen.value = !drawerIsOpen.value }
                     )
                 },
@@ -101,10 +99,10 @@ fun AppView(
                         // Show OCR Reminder overlay if COR in recent stack, didn't dismiss etc.
                         if (currentScreen !is Screen.OCRDisplay
                             && showOCRReminder.value
-                            && navigationManager.inBackStack(Screen.OCRDisplay::class)) {
+                            && viewModel.navigationManager.inBackStack(Screen.OCRDisplay::class)) {
                             OCRReminder(
                                 onClose = { showOCRReminder.value = false },
-                                onClick = { navigationManager.navigate(Screen.OCRDisplay("")) }
+                                onClick = { viewModel.navigationManager.navigate(Screen.OCRDisplay("")) }
                             )
                         }
 
