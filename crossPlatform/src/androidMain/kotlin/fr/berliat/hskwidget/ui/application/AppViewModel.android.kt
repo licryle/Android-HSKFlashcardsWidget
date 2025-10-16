@@ -9,8 +9,10 @@ import android.os.Build
 import android.os.Parcelable
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
+
 import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.Purchase
+
 import fr.berliat.hskwidget.core.ExpectedUtils
 import fr.berliat.hskwidget.core.ExpectedUtils.INTENT_SEARCH_WORD
 import fr.berliat.hskwidget.core.HSKAppServices
@@ -22,10 +24,13 @@ import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.app_name
 import fr.berliat.hskwidget.data.store.SupportDevStore
 import fr.berliat.hskwidget.ui.navigation.NavigationManager
+
 import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.dialogs.init
+
 import kotlinx.coroutines.runBlocking
+
 import org.jetbrains.compose.resources.getString
 
 actual class AppViewModel(navigationManager: NavigationManager, val activityProvider: () -> FragmentActivity)
