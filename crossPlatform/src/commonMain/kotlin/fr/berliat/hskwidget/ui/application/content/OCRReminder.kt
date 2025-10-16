@@ -53,7 +53,7 @@ fun OCRReminder(
         Text(
             text = stringResource(Res.string.nav_host_ocr_reminder_text),
             modifier = Modifier.weight(1f),
-            textAlign = TextAlign.Center,
+            textAlign = TextAlign.Start,
             fontWeight = FontWeight.Bold,
             fontSize = 15.sp,
             color = MaterialTheme.colorScheme.onSurface

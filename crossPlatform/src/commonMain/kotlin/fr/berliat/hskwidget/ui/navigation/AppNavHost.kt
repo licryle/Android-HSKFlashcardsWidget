@@ -26,9 +26,6 @@ import io.github.vinceglb.filekit.path
 @Composable
 fun AppNavHost(viewModel : AppViewModel) {
     val navController = rememberNavController()
-    LaunchedEffect(navController) {
-        viewModel.navigationManager.init(navController)
-    }
     LaunchedEffect(Unit) {
         viewModel.navigationManager.navigationEvents.collect { route ->
             navController.navigate(route)
@@ -43,6 +40,10 @@ fun AppNavHost(viewModel : AppViewModel) {
                 viewModel.appConfig.searchQuery.value = SearchQuery.processSearchQuery(args.search)
             }
 
+            LaunchedEffect(args) {
+                viewModel.navigationManager.registerScreenVisit(args)
+            }
+
             DictionarySearchScreen(
                 onAnnotate = { word ->
                     navController.navigate(Screen.Annotate(word))
@@ -52,6 +53,11 @@ fun AppNavHost(viewModel : AppViewModel) {
 
         composable<Screen.Annotate> { backStackEntry ->
             val args = backStackEntry.toRoute<Screen.Annotate>()
+
+            LaunchedEffect(args) {
+                viewModel.navigationManager.registerScreenVisit(args)
+            }
+
             AnnotateScreen(
                 word = args.simplifiedWord,
                 onSaveSuccess = { navController.popBackStack() },
@@ -59,7 +65,12 @@ fun AppNavHost(viewModel : AppViewModel) {
             )
         }
 
-        composable<Screen.Lists> {
+        composable<Screen.Lists> { backStackEntry ->
+            val args = backStackEntry.toRoute<Screen.Lists>()
+            LaunchedEffect(args) {
+                viewModel.navigationManager.registerScreenVisit(args)
+            }
+
             WordListScreen(
                 onClickList = { list ->
                     val sq = SearchQuery()
@@ -69,16 +80,30 @@ fun AppNavHost(viewModel : AppViewModel) {
             )
         }
 
-        composable<Screen.Support> {
+        composable<Screen.Support> { backStackEntry ->
+            val args = backStackEntry.toRoute<Screen.Support>()
+            LaunchedEffect(args) {
+                viewModel.navigationManager.registerScreenVisit(args)
+            }
+
             SupportScreen()
         }
 
-        composable<Screen.About> {
+        composable<Screen.About> { backStackEntry ->
+            val args = backStackEntry.toRoute<Screen.About>()
+            LaunchedEffect(args) {
+                viewModel.navigationManager.registerScreenVisit(args)
+            }
+
             AboutScreen()
         }
 
         composable<Screen.Widgets> { backStackEntry ->
             val args = backStackEntry.toRoute<Screen.Widgets>()
+            LaunchedEffect(args) {
+                viewModel.navigationManager.registerScreenVisit(args)
+            }
+
             WidgetsListScreen(
                 selectedWidgetId = args.widgetId,
                 onWidgetPreferenceSaved = {
@@ -90,12 +115,20 @@ fun AppNavHost(viewModel : AppViewModel) {
             )
         }
 
-        composable<Screen.Config> {
+        composable<Screen.Config> { backStackEntry ->
+            val args = backStackEntry.toRoute<Screen.Widgets>()
+            LaunchedEffect(args) {
+                viewModel.navigationManager.registerScreenVisit(args)
+            }
+
             ConfigScreen()
         }
 
         composable<Screen.OCRCapture> { backStackEntry ->
             val args = backStackEntry.toRoute<Screen.OCRCapture>()
+            LaunchedEffect(args) {
+                viewModel.navigationManager.registerScreenVisit(args)
+            }
 
             CaptureImageScreen(onImageReady = { imageFile: PlatformFile ->
                 navController.navigate(Screen.OCRDisplay(
@@ -107,6 +140,10 @@ fun AppNavHost(viewModel : AppViewModel) {
 
         composable<Screen.OCRDisplay> { backStackEntry ->
             val args = backStackEntry.toRoute<Screen.OCRDisplay>()
+            LaunchedEffect(args) {
+                viewModel.navigationManager.registerScreenVisit(args)
+            }
+
             val imageFile = args.imageFilePath?.let {
                 val f = PlatformFile(it)
                 if (f.exists()) {
@@ -115,6 +152,7 @@ fun AppNavHost(viewModel : AppViewModel) {
                     null
                 }
             }
+
             DisplayOCRScreen(
                 preText = args.preText,
                 imageFile = imageFile,

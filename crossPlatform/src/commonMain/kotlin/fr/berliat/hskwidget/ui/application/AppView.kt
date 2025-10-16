@@ -33,8 +33,6 @@ import fr.berliat.hskwidget.ui.navigation.DecoratedScreen
 import fr.berliat.hskwidget.ui.navigation.Screen
 import fr.berliat.hskwidget.ui.theme.AppTheme
 
-import org.jetbrains.compose.resources.stringResource
-
 fun Modifier.clearFocusOnAnyOutsideTap() = composed {
     val focusManager = LocalFocusManager.current
     Modifier.pointerInput(Unit) {
@@ -54,7 +52,7 @@ fun AppView(
     val drawerIsOpen = remember { mutableStateOf(false) }
     val drawerState = rememberDrawerState(if (drawerIsOpen.value) DrawerValue.Open else DrawerValue.Closed)
 
-    val showOCRReminder = remember { mutableStateOf(true) }
+    val mutedOCRReminders = remember { mutableStateOf(listOf<Screen>()) }
 
     LaunchedEffect(drawerIsOpen.value) {
         if (drawerIsOpen.value) drawerState.open() else drawerState.close()
@@ -96,13 +94,14 @@ fun AppView(
                 },
                 content = { innerPadding ->
                     Column(Modifier.padding(innerPadding)) {
-                        // Show OCR Reminder overlay if COR in recent stack, didn't dismiss etc.
+                        val ocrScreens = viewModel.navigationManager.getFromBackStack(Screen.OCRDisplay::class)
+                        // Show OCR Reminder overlay if OCR in recent stack, not in muted stack
                         if (currentScreen !is Screen.OCRDisplay
-                            && showOCRReminder.value
+                            && ocrScreens.any { !mutedOCRReminders.value.contains(it) }
                             && viewModel.navigationManager.inBackStack(Screen.OCRDisplay::class)) {
                             OCRReminder(
-                                onClose = { showOCRReminder.value = false },
-                                onClick = { viewModel.navigationManager.navigate(Screen.OCRDisplay("")) }
+                                onClose = { mutedOCRReminders.value = ocrScreens }, // Muting all OCR screens in backstack
+                                onClick = { viewModel.navigationManager.navigate(ocrScreens.last()) }
                             )
                         }
 
