@@ -123,7 +123,7 @@ fun WidgetConfigScreen(
                     .fillMaxWidth()
                     .padding(horizontal = 10.dp)
             ) {
-                items(allLists.value) { list ->
+                items(allLists.value, key = { it.id }) { list ->
                     WidgetConfigListItem(
                         list = list,
                         isSelected = localSelectedIds.contains(list.id),
