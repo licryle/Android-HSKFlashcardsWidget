@@ -7,7 +7,7 @@ import fr.berliat.hskwidget.ui.application.AppViewModel
 import fr.berliat.hskwidget.ui.navigation.NavigationManager
 import platform.UIKit.UIViewController
 
-private val viewModel = AppViewModel()
+private val viewModel = AppViewModel(NavigationManager)
 
 fun AppViewController(): UIViewController = ComposeUIViewController(
 		configure = {
@@ -17,7 +17,6 @@ fun AppViewController(): UIViewController = ComposeUIViewController(
 	) {
     // This is a composable context, so we can call our composable functions
     AppView(
-        viewModel = viewModel,
-        navigationManager = NavigationManager
+        viewModel = viewModel
     )
 }

@@ -10,6 +10,7 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
+
 import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.absolutePath
 import io.github.vinceglb.filekit.filesDir
@@ -17,6 +18,7 @@ import io.github.vinceglb.filekit.resolve
 
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+
 import okio.Path.Companion.toPath
 
 open class PrefixedPreferencesStore protected constructor(
@@ -39,8 +41,14 @@ open class PrefixedPreferencesStore protected constructor(
         }
 
         fun getDataStore(file: String): DataStore<Preferences> {
+			val fileAbsPath = FileKit.filesDir.resolve(file).absolutePath()
+				.removePrefix("file://") // Handles the case where it starts with file://
+				.removePrefix("file:")   // Handles the case where it starts with file:/ (your error)
+				.removePrefix("/")       // Ensures we don't double-slash
+				.removePrefix("//")      // Ensures we don't have multiple slashes at the start
+
             return PreferenceDataStoreFactory.createWithPath(
-                produceFile = { FileKit.filesDir.resolve(file).absolutePath().toPath() }
+                 produceFile = { "/$fileAbsPath".toPath() }
             )
         }
     }

@@ -2,10 +2,11 @@ package fr.berliat.hskwidget.ui.application
 
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.domain.HSKAnkiDelegate
+import fr.berliat.hskwidget.ui.navigation.NavigationManager
 
-actual class AppViewModel : CommonAppViewModel() {
+actual class AppViewModel(navigationManager: NavigationManager) : CommonAppViewModel(navigationManager) {
 
-    override fun finishInitialization() {
+    override suspend fun finishInitialization() {
         HSKAppServices.registerAnkiDelegators(HSKAnkiDelegate())
     }
 }
