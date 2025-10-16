@@ -17,6 +17,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,6 +26,10 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
+
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.menu
@@ -47,6 +52,8 @@ fun AppBar(
     val searchQuery = viewModel.searchQuery.collectAsState()
     var localText by remember { mutableStateOf(TextFieldValue(searchQuery.value.toString())) }
     var isSearchFocused by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
+    var debounceJob by remember { mutableStateOf<Job?>(null) }
 
     // Update localText only if different from current user input
     LaunchedEffect(searchQuery.value) {
@@ -56,10 +63,14 @@ fun AppBar(
     }
 
     fun onValueChange(newValue: TextFieldValue) {
-        if (localText.text != newValue.text)
-            onSearch(newValue.text)
-
         localText = newValue
+        debounceJob?.cancel()
+        debounceJob = coroutineScope.launch {
+            delay(100) // 300ms debounce
+            if (localText.text != searchQuery.value.toString()) {
+                onSearch(localText.text)
+            }
+        }
     }
 
     TopAppBar(
