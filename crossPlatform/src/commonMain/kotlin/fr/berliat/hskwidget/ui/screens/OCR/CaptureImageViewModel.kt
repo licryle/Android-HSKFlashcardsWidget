@@ -6,6 +6,7 @@ import co.touchlab.kermit.Logger
 
 import com.kashif.cameraK.controller.CameraController
 import com.kashif.cameraK.result.ImageCaptureResult
+import kotlinx.coroutines.launch
 
 import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.core.YYMMDDHHMMSS
@@ -25,7 +26,6 @@ import io.github.vinceglb.filekit.write
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 
@@ -83,8 +83,14 @@ class CaptureImageViewModel(
     }
 
     fun onCameraControllerReady(controller: CameraController) {
+        _cameraController.value?.cleanup()
         _cameraController.value = controller
         _isProcessing.value = false
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        _cameraController.value = null
     }
 
     companion object {
