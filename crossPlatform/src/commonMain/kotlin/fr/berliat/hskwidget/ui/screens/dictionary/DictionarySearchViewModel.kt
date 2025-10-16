@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
@@ -40,6 +41,7 @@ class DictionarySearchViewModel(private val prefsStore: AppPreferencesStore = HS
 
     private var currentPage = 0
     private val itemsPerPage = 30
+    private var currentSearchJob: Job? = null
 
     fun toggleHSK3(value: Boolean) {
         prefsStore.dictionaryShowHSK3Definition.value = value
@@ -54,7 +56,8 @@ class DictionarySearchViewModel(private val prefsStore: AppPreferencesStore = HS
     }
 
     fun performSearch() {
-        CoroutineScope(AppDispatchers.IO).launch {
+        currentSearchJob?.cancel()
+        currentSearchJob = CoroutineScope(AppDispatchers.IO).launch {
             _isLoading.value = true
             currentPage = 0
             val results = fetchResultsForPage()
