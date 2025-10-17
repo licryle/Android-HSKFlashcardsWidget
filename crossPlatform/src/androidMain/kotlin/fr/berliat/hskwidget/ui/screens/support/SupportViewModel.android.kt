@@ -1,6 +1,7 @@
 package fr.berliat.hskwidget.ui.screens.support
 
 import android.app.Activity
+import android.content.Context
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -32,7 +33,7 @@ import kotlinx.coroutines.launch
 
 actual class SupportViewModel(
     val supportDevStore : SupportDevStore = SupportDevStore.getInstance(ExpectedUtils.context),
-    val activityProvider: () -> Activity = { ExpectedUtils.activity },
+    val contextProvider: () -> Context = { ExpectedUtils.context },
     val reviewManager: ReviewManager = ReviewManagerFactory.create(ExpectedUtils.context),
     val appConfig : AppPreferencesStore = HSKAppServices.appPreferences,
 ) : ViewModel(),
@@ -54,8 +55,8 @@ actual class SupportViewModel(
 
     fun supportTier() = SupportDevStore.getSupportTier(totalSpent.value)
 
-    fun makePurchase(productId: String) {
-        supportDevStore.makePurchase(activityProvider.invoke(), productId)
+    fun makePurchase(activity: Activity, productId: String) {
+        supportDevStore.makePurchase(activity, productId)
         Utils.logAnalyticsEvent(
             Utils.ANALYTICS_EVENTS.PURCHASE_CLICK,
             mapOf("product_id" to productId)
@@ -94,12 +95,12 @@ actual class SupportViewModel(
         )
     }
 
-    fun triggerReview() {
+    fun triggerReview(activity: Activity) {
         val request = reviewManager.requestReviewFlow()
         request.addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 val reviewInfo = task.result
-                val flow = reviewManager.launchReviewFlow(activityProvider.invoke(), reviewInfo)
+                val flow = reviewManager.launchReviewFlow(activity, reviewInfo)
                 flow.addOnCompleteListener {
                     Utils.toast(Res.string.support_reviewed)
                 }

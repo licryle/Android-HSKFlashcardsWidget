@@ -22,6 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
@@ -30,6 +31,7 @@ import fr.berliat.hskwidget.data.store.SupportDevStore.SupportTier
 
 import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.bakery_dining_24px
+import fr.berliat.hskwidget.core.findActivity
 import fr.berliat.hskwidget.star_shine_24px
 import fr.berliat.hskwidget.support_devintro
 import fr.berliat.hskwidget.support_purchase_tier1
@@ -67,11 +69,14 @@ actual fun SupportScreen(
  * Breaking it down into 2 to add the vieModel that uses platform specific elements that wouldn't
  * make sense to expect/actual.
  */
+
 @Composable
 private fun _SupportScreen(
     modifier: Modifier,
     viewModel: SupportViewModel = SupportViewModel()
 ) {
+    val activity = LocalContext.current.findActivity()
+
     val totalSpent by viewModel.totalSpent.collectAsState(0f)
     val purchaseList by viewModel.purchaseList.collectAsState(emptyMap())
 
@@ -108,7 +113,7 @@ private fun _SupportScreen(
 
         IconButton(
             text = stringResource(Res.string.support_review_btn),
-            onClick = viewModel::triggerReview,
+            onClick = { viewModel.triggerReview(activity) },
             modifier = Modifier.fillMaxWidth(),
             drawable = Res.drawable.star_shine_24px
         )
@@ -151,7 +156,7 @@ private fun _SupportScreen(
         // Tier 1
         if (!purchaseList.containsKey(SupportDevStore.SupportProduct.TIER1)) {
             TieredPurchaseButton(
-                onClick = { viewModel.makePurchase("support_tier1") },
+                onClick = { viewModel.makePurchase(activity, "support_tier1") },
                 btnColor = AppColors.Bronze,
                 icon = Res.drawable.bakery_dining_24px,
                 text = Res.string.support_purchase_tier1,
@@ -162,7 +167,7 @@ private fun _SupportScreen(
         // Tier 2
         if (!purchaseList.containsKey(SupportDevStore.SupportProduct.TIER2)) {
             TieredPurchaseButton(
-                onClick = { viewModel.makePurchase("support_tier2") },
+                onClick = { viewModel.makePurchase(activity, "support_tier2") },
                 btnColor = AppColors.Silver,
                 icon = Res.drawable.bakery_dining_24px,
                 text = Res.string.support_purchase_tier2,
@@ -173,7 +178,7 @@ private fun _SupportScreen(
         // Tier 3
         if (!purchaseList.containsKey(SupportDevStore.SupportProduct.TIER3)) {
             TieredPurchaseButton(
-                onClick = { viewModel.makePurchase("support_tier3") },
+                onClick = { viewModel.makePurchase(activity, "support_tier3") },
                 btnColor = AppColors.Gold,
                 icon = Res.drawable.bakery_dining_24px,
                 text = Res.string.support_purchase_tier3,

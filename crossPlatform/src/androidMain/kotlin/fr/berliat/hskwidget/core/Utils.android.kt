@@ -7,6 +7,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Intent
 import android.content.Context
+import android.content.ContextWrapper
 import android.net.Uri
 import android.provider.Settings
 import android.speech.tts.TextToSpeech
@@ -44,21 +45,21 @@ import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.getString
 
-@SuppressLint("StaticFieldLeak") // Only Storing Application context. No memory leak.
-actual object ExpectedUtils {
+fun Context.findActivity(): Activity = when (this) {
+    is Activity -> this
+    is ContextWrapper -> baseContext.findActivity()
+    else -> throw Exception("No activity attached to context")
+}
 
+@SuppressLint("StaticFieldLeak")
+actual object ExpectedUtils {
     private var _context: Context? = null
     val context
         get() = _context!!
 
-    private var _activityProvider: (() -> Activity)? = null
-    val activity
-        get() = _activityProvider!!.invoke()
-
     // Initialize once from Compose or Activity
-    fun init(activity: Activity) {
-        _context = activity.applicationContext
-        _activityProvider = { activity }
+    fun init(context: Context) {
+        _context = context
     }
 
     actual fun openLink(url: String) {
