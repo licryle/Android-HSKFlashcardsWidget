@@ -35,8 +35,6 @@ import org.jetbrains.compose.resources.getString
 
 actual class AppViewModel(navigationManager: NavigationManager, val activityProvider: () -> FragmentActivity)
     : CommonAppViewModel(navigationManager) {
-
-    // Needs instantiation before onResume
     private var ankiDelegate : HSKAnkiDelegate
 
     init {
