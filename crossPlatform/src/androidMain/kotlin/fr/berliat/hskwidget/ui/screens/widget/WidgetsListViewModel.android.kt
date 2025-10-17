@@ -1,10 +1,7 @@
 package fr.berliat.hskwidget.ui.screens.widget
 
 import android.app.AlertDialog
-import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
-import android.content.ComponentName
-import android.content.Intent
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,6 +10,7 @@ import fr.berliat.hskwidget.core.ExpectedUtils
 import fr.berliat.hskwidget.domain.WidgetProvider
 
 import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.domain.WidgetController
 import fr.berliat.hskwidget.understood
 import fr.berliat.hskwidget.widgets_add_widget
 import fr.berliat.hskwidget.widgets_add_widget_instructions
@@ -43,19 +41,9 @@ actual class WidgetsListViewModel actual constructor(): ViewModel() {
     actual fun addNewWidget() {
         val context = ExpectedUtils.context
         val appWidgetManager = AppWidgetManager.getInstance(context)
-        val myProvider = ComponentName(context, WidgetProvider::class.java)
 
         if (appWidgetManager.isRequestPinAppWidgetSupported) {
-            val confIntent = Intent(context, WidgetProvider::class.java)
-            confIntent.action = WidgetProvider.ACTION_CONFIGURE_LATEST
-
-            val callbackIntent = PendingIntent.getBroadcast(
-                /* context = */ context,
-                /* requestCode = */ 0,
-                /* intent = */ confIntent,
-                /* flags = */ PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-
-            appWidgetManager.requestPinAppWidget(myProvider, null, callbackIntent)
+            WidgetController.requestAddDesktopWidget(context, appWidgetManager)
         } else {
             viewModelScope.launch {
                 AlertDialog.Builder(context)

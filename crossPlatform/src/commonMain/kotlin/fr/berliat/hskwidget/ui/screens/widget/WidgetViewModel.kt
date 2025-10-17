@@ -8,6 +8,7 @@ import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.data.store.WidgetPreferencesStore
 import fr.berliat.hskwidget.domain.WidgetController
+import fr.berliat.hskwidget.domain.getWidgetControllerInstance
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,7 +26,7 @@ class WidgetViewModel(
 
     init {
         viewModelScope.launch(AppDispatchers.IO) {
-            controller = WidgetController.getInstance(widgetStore, database)
+            controller = getWidgetControllerInstance(widgetStore, database)
             simplified.collect { s ->
                 if (s.isEmpty()) {
                     updateWord()

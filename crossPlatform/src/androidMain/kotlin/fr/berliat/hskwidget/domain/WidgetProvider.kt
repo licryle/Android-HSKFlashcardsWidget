@@ -1,6 +1,5 @@
 package fr.berliat.hskwidget.domain
 
-import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetManager.ACTION_APPWIDGET_CONFIGURE
 import android.appwidget.AppWidgetProvider
@@ -10,37 +9,37 @@ import android.content.Intent
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.os.Bundle
 import android.util.Log
-import android.view.View
-import android.widget.RemoteViews
+
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
-
 import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import fr.berliat.hskwidget.MainActivity
 
-import fr.berliat.hskwidget.R
+import fr.berliat.hskwidget.core.AppDispatchers
+import fr.berliat.hskwidget.core.AppServices
+import fr.berliat.hskwidget.core.ExpectedUtils
 import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.core.HSKAppServices
-import fr.berliat.hskwidget.core.Locale
-import fr.berliat.hskwidget.data.dao.AnnotatedChineseWordDAO
+import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.data.store.WidgetPreferencesStore
 import fr.berliat.hskwidget.data.store.WidgetPreferencesStoreProvider
-import fr.berliat.hskwidget.data.type.HSK_Level
+import fr.berliat.hskwidget.domain.WidgetController.Companion.ACTION_CONFIGURE_LATEST
+import fr.berliat.hskwidget.domain.WidgetController.Companion.ACTION_DICTIONARY
+import fr.berliat.hskwidget.domain.WidgetController.Companion.ACTION_SPEAK
+
+import io.github.vinceglb.filekit.FileKit
+import io.github.vinceglb.filekit.manualFileKitCoreInitialization
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 import java.util.concurrent.TimeUnit
-
-internal const val ACTION_SPEAK = "fr.berliat.hskwidget.ACTION_WIDGET_SPEAK"
-internal const val ACTION_DICTIONARY = "fr.berliat.hskwidget.ACTION_DICTIONARY"
 
 /**
  * Implementation of App Widget functionality.
@@ -49,149 +48,55 @@ internal const val ACTION_DICTIONARY = "fr.berliat.hskwidget.ACTION_DICTIONARY"
 class WidgetProvider
     : AppWidgetProvider() {
     companion object {
+        private const val TAG = "WidgetProvider"
         private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
         private val _widgetIds = MutableStateFlow(intArrayOf())
-        val widgetIds = _widgetIds.asStateFlow()
 
         private lateinit var contextProvider: () -> Context
         private lateinit var widgetPrefProvider: WidgetPreferencesStoreProvider
-        private lateinit var annotatedWordDAO: AnnotatedChineseWordDAO
+        private lateinit var database: ChineseWordsDatabase
         private var isInitialized = false
 
         suspend fun getWidgetPreferences(widgetId: Int): WidgetPreferencesStore {
             return widgetPrefProvider.invoke(widgetId)
         }
         suspend fun getWidgetController(widgetId: Int): WidgetController {
-            return WidgetController.getInstance(getWidgetPreferences(widgetId))
+            return getWidgetControllerInstance(
+                getWidgetPreferences(widgetId),
+                database)
+        }
+
+        suspend fun init(
+            contextProvider: () -> Context
+        ) = withContext(Dispatchers.IO) {
+            Log.d(TAG, "init ${HSKAppServices.status.value}")
+
+            FileKit.manualFileKitCoreInitialization(contextProvider.invoke())
+            ExpectedUtils.init(contextProvider.invoke())
+
+            if (HSKAppServices.status.value != AppServices.Status.Ready) {
+                HSKAppServices.init(scope)
+
+                HSKAppServices.status.first {
+                    it == AppServices.Status.Ready || it is AppServices.Status.Failed
+                }
+            }
+
+            init(contextProvider,
+                widgetPrefProvider = HSKAppServices.widgetsPreferencesProvider,
+                database = HSKAppServices.database)
         }
 
         fun init(
             contextProvider: () -> Context,
-            widgetPrefProvider: WidgetPreferencesStoreProvider
-                = HSKAppServices.widgetsPreferencesProvider,
-            annotatedWordDAO: AnnotatedChineseWordDAO
-                = HSKAppServices.database.annotatedChineseWordDAO()
+            widgetPrefProvider: WidgetPreferencesStoreProvider,
+            database: ChineseWordsDatabase
         ) {
             if (!isInitialized) {
                 this.contextProvider = contextProvider
                 this.widgetPrefProvider = widgetPrefProvider
-                this.annotatedWordDAO = annotatedWordDAO
+                this.database = database
                 isInitialized = true
-
-                // launch the coroutine once
-                scope.launch {
-                    widgetIds.collect { ids ->
-                        ids.forEach { widgetId ->
-                            val store = widgetPrefProvider(widgetId)
-                            scope.launch {
-                                store.currentWord.asStateFlow().collect {
-                                    updateFlashCardWidget(
-                                        AppWidgetManager.getInstance(Companion.contextProvider.invoke()),
-                                        widgetId)
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        private const val TAG = "WidgetProvider"
-        const val ACTION_CONFIGURE_LATEST = "fr.berliat.hskwidget.APPWIDGET_CONFIGURE_LATEST"
-
-        /** Thanks to https://gist.github.com/manishcm/bd05dff09b5b1640d25f **/
-        internal fun getPendingSelfIntent(context: Context?, action: String?, widgetId: Int)
-                : PendingIntent? {
-            val intent = Intent(context, WidgetProvider::class.java)
-            intent.action = action
-            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
-
-            return PendingIntent.getBroadcast(context, widgetId, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-        }
-
-        private fun startActivityToConfigure(context: Context, widgetId: Int) {
-            val confIntent = Intent(context, MainActivity::class.java).apply {
-                action = ACTION_APPWIDGET_CONFIGURE
-                putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            }
-
-            context.startActivity(confIntent)
-        }
-
-        private fun updateFlashCardWidget(
-            appWidgetManager: AppWidgetManager,
-            appWidgetId: Int
-        ) {
-            val context = contextProvider.invoke()
-            scope.launch(Dispatchers.IO) {
-                // Switch to the IO dispatcher to perform background work
-                val simplified = getWidgetPreferences(appWidgetId).currentWord.value
-                val word = annotatedWordDAO.getFromSimplified(simplified)
-
-                // Switch back to the main thread to update UI
-                withContext(Dispatchers.Main) {
-                    var views: RemoteViews?
-                    if (word == null || ! word.hasWord()) {
-                        Log.i(TAG, "updateFlashCardWidget ID $appWidgetId , but no word available")
-
-                        views = RemoteViews(
-                            context.packageName,
-                            R.layout.flashcard_widget_not_configured
-                        ).apply {
-                            setOnClickPendingIntent(
-                                R.id.flashcard_not_configured,
-                                getPendingSelfIntent(
-                                    context,
-                                    ACTION_APPWIDGET_CONFIGURE,
-                                    appWidgetId
-                                )
-                            )
-                        }
-                    } else {
-                        Log.i(TAG, "updateFlashCardWidget ID $appWidgetId with word $word")
-
-                        val searchWordIntent =
-                            getPendingSelfIntent(context, ACTION_DICTIONARY, appWidgetId)
-                        // Get the layout for the widget and attach an on-click listener
-                        // to the button.
-                        views = RemoteViews(
-                            context.packageName,
-                            R.layout.flashcard_widget
-                        ).apply {
-                            setOnClickPendingIntent(R.id.flashcard_chinese, searchWordIntent)
-                            setOnClickPendingIntent(R.id.flashcard_definition, searchWordIntent)
-                            setOnClickPendingIntent(R.id.flashcard_pinyin, searchWordIntent)
-
-                            setOnClickPendingIntent(
-                                R.id.flashcard_speak,
-                                getPendingSelfIntent(context, ACTION_SPEAK, appWidgetId)
-                            )
-                            setOnClickPendingIntent(
-                                R.id.flashcard_reload,
-                                getPendingSelfIntent(
-                                    context,
-                                    AppWidgetManager.ACTION_APPWIDGET_UPDATE,
-                                    appWidgetId
-                                )
-                            )
-
-                            setTextViewText(R.id.flashcard_chinese, word.simplified)
-                            setTextViewText(R.id.flashcard_definition, word.word?.definition[Locale.ENGLISH] ?: word.annotation?.notes)
-                            setTextViewText(R.id.flashcard_pinyin, word.word?.pinyins.toString())
-
-                            setTextViewText(R.id.flashcard_hsklevel, word.word?.hskLevel.toString())
-                            setViewVisibility(
-                                R.id.flashcard_hsklevel,
-                                if (word.word?.hskLevel == HSK_Level.NOT_HSK) View.GONE else View.VISIBLE
-                            )
-                        }
-                    }
-
-                    // Tell the AppWidgetManager to perform an update on the current widget.
-                    appWidgetManager.updateAppWidget(appWidgetId, views)
-                }
             }
         }
 
@@ -225,16 +130,13 @@ class WidgetProvider
     ) {
         Log.i(TAG, "onUpdate")
         // There may be multiple widgets active, so update all of them
-        for (appWidgetId in appWidgetIds) {
-            scope.launch {
+        scope.launch(AppDispatchers.IO) {
+            if (!isInitialized) init { context }
+
+            for (appWidgetId in appWidgetIds) {
                 // Switch to the IO dispatcher to perform background work
                 withContext(Dispatchers.IO) {
                     getWidgetController(appWidgetId).updateWord()
-                }
-
-                // Switch back to the main thread to update UI
-                withContext(Dispatchers.Main) {
-                    updateFlashCardWidget(appWidgetManager, appWidgetId)
                 }
             }
         }
@@ -244,15 +146,17 @@ class WidgetProvider
         Log.i(TAG, "onDeleted")
 
         // When the user deletes the widget, delete the preference associated with it.
-        for (widgetId in appWidgetIds) {
-            Utils.logAnalyticsWidgetAction(Utils.ANALYTICS_EVENTS.WIGDET_REMOVE, widgetId)
+        scope.launch(Dispatchers.IO) {
+            if (!isInitialized) init { context }
 
-            scope.launch(Dispatchers.IO) {
+            for (widgetId in appWidgetIds) {
+                Utils.logAnalyticsWidgetAction(Utils.ANALYTICS_EVENTS.WIGDET_REMOVE, widgetId)
+
                 getWidgetPreferences(widgetId).clear()
             }
-        }
 
-        getWidgetIds() // Update local value and listeners
+            getWidgetIds() // Update local value and listeners
+        }
     }
 
     override fun onReceive(context: Context?, intent: Intent?) {
@@ -263,14 +167,15 @@ class WidgetProvider
         val widgetId = intent?.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, -1) ?: -1
 
         scope.launch(Dispatchers.IO) {
+            if (!isInitialized) init { context }
+
             when (intent!!.action) {
                 ACTION_CONFIGURE_LATEST -> {
-                    startActivityToConfigure(context, getWidgetIds().last())
+                    getWidgetController(getWidgetIds().last()).startActivityToConfigure()
                 }
 
                 ACTION_APPWIDGET_CONFIGURE -> {
-                    // TODO background activity bug
-                    startActivityToConfigure(context, widgetId)
+                    getWidgetController(getWidgetIds().last()).startActivityToConfigure()
                 }
 
                 ACTION_SPEAK -> {

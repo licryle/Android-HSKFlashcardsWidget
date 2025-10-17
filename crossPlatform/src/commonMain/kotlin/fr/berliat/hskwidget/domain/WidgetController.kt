@@ -1,41 +1,35 @@
 package fr.berliat.hskwidget.domain
 
 import co.touchlab.kermit.Logger
+
 import fr.berliat.hskwidget.core.AppDispatchers
 import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.core.HSKAppServices
+import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.WordListWithCount
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.data.store.WidgetPreferencesStore
+
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
-class WidgetController private constructor(
+expect class WidgetController : CommonWidgetController
+
+expect suspend fun getWidgetControllerInstance(
+    widgetStore: WidgetPreferencesStore,
+    database: ChineseWordsDatabase
+): WidgetController
+
+open class CommonWidgetController(
     val widgetStore: WidgetPreferencesStore,
-    val database: ChineseWordsDatabase = HSKAppServices.database
+    val database: ChineseWordsDatabase
     ) {
     companion object {
-        private const val TAG = "WidgetViewModel"
-        private val mutex = Mutex()
-        private val instances = mutableMapOf<Int, WidgetController>()
-
-        suspend fun getInstance(widgetStore: WidgetPreferencesStore,
-                                database: ChineseWordsDatabase = HSKAppServices.database): WidgetController {
-            instances[widgetStore.widgetId]?.let { return it }
-
-            return mutex.withLock {
-                instances[widgetStore.widgetId] ?:
-                        WidgetController(widgetStore, database).also { instance ->
-                    instances[widgetStore.widgetId] = instance
-                }
-            }
-        }
+        private const val TAG = "CommonWidgetController"
     }
 
-    val widgetId = widgetStore.widgetId
-    val simplified: StateFlow<String> = widgetStore.currentWord.asStateFlow()
+    protected val widgetId = widgetStore.widgetId
+    protected val simplified: StateFlow<String> = widgetStore.currentWord.asStateFlow()
 
     val widgetListDAO = HSKAppServices.database.widgetListDAO()
     val wordListDAO = HSKAppServices.database.wordListDAO()
@@ -58,7 +52,10 @@ class WidgetController private constructor(
 
         // Persist it in preferences for cross-App convenience
         widgetStore.currentWord.value = newWord?.simplified ?: ""
+        updateDesktopWidget(newWord)
     }
+
+    protected open suspend fun updateDesktopWidget(word: AnnotatedChineseWord?) {}
 
     fun openDictionary() {
         val query = SearchQuery.fromString(simplified.value)

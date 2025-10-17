@@ -12,7 +12,7 @@ import fr.berliat.hskwidget.data.model.WidgetListEntry
 import fr.berliat.hskwidget.data.model.WordListWithCount
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.data.store.WidgetPreferencesStoreProvider
-import fr.berliat.hskwidget.domain.WidgetController
+import fr.berliat.hskwidget.domain.getWidgetControllerInstance
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -57,7 +57,7 @@ class WidgetConfigViewModel(
             widgetListDAO.insertListsToWidget(entriesToAdd)
             loadLists()
 
-            WidgetController.getInstance(widgetPrefProvider.invoke(widgetId), database)
+            getWidgetControllerInstance(widgetPrefProvider.invoke(widgetId), database)
                 .updateWord()
 
             onSuccessfulSave?.let {
