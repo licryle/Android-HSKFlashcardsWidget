@@ -1,5 +1,6 @@
 package fr.berliat.hskwidget.ui.screens.config.ankiSync
 
+import android.os.Build
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 
@@ -7,15 +8,17 @@ import co.touchlab.kermit.Logger
 
 import fr.berliat.ankidroidhelper.AnkiDelegate
 import fr.berliat.ankidroidhelper.AnkiSyncServiceDelegate
-import fr.berliat.hskwidget.core.ExpectedUtils.requestPermissionNotification
 import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.core.YYMMDDHHMMSS
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.domain.HSKAnkiDelegate
+import kotlinx.coroutines.flow.MutableSharedFlow
 
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
@@ -35,6 +38,9 @@ actual class AnkiSyncViewModel actual constructor(
     actual val syncProgress: StateFlow<SyncProgress> = _syncProgress.asStateFlow()
 
     var ankiSyncServiceDelegate: AnkiSyncServiceDelegate? = null
+
+    private val _requestNotificationPermission = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    val requestNotificationPermission: SharedFlow<Unit> = _requestNotificationPermission.asSharedFlow()
 
     init {
         ankiDelegate.replaceListener(this)
@@ -93,7 +99,7 @@ actual class AnkiSyncViewModel actual constructor(
     override fun onAnkiServiceStarting(serviceDelegate: AnkiSyncServiceDelegate) {
         ankiSyncServiceDelegate = serviceDelegate
 
-        requestPermissionNotification()
+        requestNotificationPermissionCheck()
 
         _syncProgress.value = SyncProgress(SyncState.STARTING, 0, 0, "")
     }
@@ -114,6 +120,13 @@ actual class AnkiSyncViewModel actual constructor(
         viewModelScope.launch {
             appConfig.ankiSaveNotes.asStateFlow().filter { it }.first() // ensure the toggle is ON as we just saved it
             ankiDelegate.modifyAnkiViaService(HSKAppServices.wordListRepo.syncListsToAnki())
+        }
+    }
+
+    private fun requestNotificationPermissionCheck() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            // Signal the UI to perform the check and possibly launch the dialog
+            _requestNotificationPermission.tryEmit(Unit)
         }
     }
 

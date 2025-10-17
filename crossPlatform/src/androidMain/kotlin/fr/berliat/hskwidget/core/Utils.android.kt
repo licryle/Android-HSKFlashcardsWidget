@@ -1,6 +1,5 @@
 package fr.berliat.hskwidget.core
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
@@ -8,15 +7,11 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Intent
 import android.content.Context
-import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.provider.Settings
 import android.speech.tts.TextToSpeech
 import android.widget.Toast
 
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
@@ -64,23 +59,6 @@ actual object ExpectedUtils {
     fun init(activity: Activity) {
         _context = activity.applicationContext
         _activityProvider = { activity }
-    }
-
-    fun requestPermissionNotification() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(
-                    context.applicationContext,
-                    Manifest.permission.POST_NOTIFICATIONS
-                )
-                != PackageManager.PERMISSION_GRANTED
-            ) {
-                ActivityCompat.requestPermissions(
-                    activity,
-                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-                    0
-                )
-            }
-        }
     }
 
     actual fun openLink(url: String) {
