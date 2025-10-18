@@ -8,16 +8,12 @@ import android.content.ClipboardManager
 import android.content.Intent
 import android.content.Context
 import android.content.ContextWrapper
+import android.media.AudioManager
 import android.net.Uri
 import android.provider.Settings
 import android.speech.tts.TextToSpeech
+import android.util.Log
 import android.widget.Toast
-
-import androidx.lifecycle.Observer
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkInfo
-import androidx.work.WorkManager
-import androidx.work.workDataOf
 
 import co.touchlab.kermit.Logger
 
@@ -30,6 +26,7 @@ import fr.berliat.hskwidget.domain.SearchQuery
 import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.cancel
 import fr.berliat.hskwidget.copied_to_clipboard
+import fr.berliat.hskwidget.core.Utils.logAnalyticsEvent
 import fr.berliat.hskwidget.dialog_tts_error
 import fr.berliat.hskwidget.fix_it
 import fr.berliat.hskwidget.speech_failure_toast_chinese_unsupported
@@ -44,6 +41,7 @@ import kotlinx.coroutines.withContext
 
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.getString
+import java.util.Locale
 
 fun Context.findActivity(): Activity = when (this) {
     is Activity -> this
@@ -139,85 +137,87 @@ actual object ExpectedUtils {
         incrementConsultedWord(s)
     }
 
+    private fun isMuted() : Boolean {
+        val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        val musicVolume: Int = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
+        return musicVolume == 0
+    }
+
     actual fun playWordInBackground(word: String) {
-        val context = context
-        val speechRequest = OneTimeWorkRequestBuilder<BackgroundSpeechService>()
-            .setInputData(workDataOf(Pair("word", word)))
-            .build()
+        data class SpeechError(val errStringId: StringResource, var errRemedyIntent: String? = null)
+        val TAG = TAG
 
-        val workMgr = WorkManager.getInstance(context)
-        val observer = object : Observer<WorkInfo?> {
-            override fun onChanged(value: WorkInfo?) {
-                if (value == null) {
-                    // Handle the case where workInfo is null
-                    return
-                }
+        var err : SpeechError? = null
 
-                if (value.state == WorkInfo.State.SUCCEEDED
-                    || value.state == WorkInfo.State.FAILED
-                ) {
+        if (isMuted()) {
+            err = SpeechError(Res.string.speech_failure_toast_muted)
+        } else {
+            var tts: TextToSpeech? = null
 
-                    val errStringId: StringResource
-                    var errRemedyIntent: String? = null
-                    if (value.state == WorkInfo.State.FAILED) {
-                        var errId =
-                            value.outputData.getString(BackgroundSpeechService.FAILURE_REASON)
-                        when (errId) {
-                            BackgroundSpeechService.FAILURE_MUTED
-                                -> errStringId = Res.string.speech_failure_toast_muted
+            try {
+                tts = TextToSpeech(context) { status ->
+                    if (status != TextToSpeech.SUCCESS) {
+                        err = SpeechError(
+                            Res.string.speech_failure_toast_init,
+                            Settings.ACTION_ACCESSIBILITY_SETTINGS
+                        )
+                    } else {
+                        val result = tts?.setLanguage(Locale.SIMPLIFIED_CHINESE)
 
-                            BackgroundSpeechService.FAILURE_INIT_FAILED -> {
-                                errStringId = Res.string.speech_failure_toast_init
-                                errRemedyIntent = Settings.ACTION_ACCESSIBILITY_SETTINGS
-                            }
+                        Log.i(TAG, "Setting language to play $word out loud.")
+                        if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                            err = SpeechError(Res.string.speech_failure_toast_chinese_unsupported)
+                            Log.e(TAG, "Simplified_chinese not supported on this phone.")
 
-                            BackgroundSpeechService.FAILURE_LANG_UNSUPPORTED -> {
-                                errStringId = Res.string.speech_failure_toast_chinese_unsupported
-                                errRemedyIntent = TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA
-                            }
-
-                            else -> {
-                                errStringId = Res.string.speech_failure_toast_unknown
-                                errId = BackgroundSpeechService.FAILURE_UNKNOWN
-                            }
-                        }
-
-                        logAnalyticsError("SPEECH", errId, "")
-
-                        CoroutineScope(Dispatchers.IO).launch {
-                            val errString = getString(errStringId)
-                            val titleString =getString(Res.string.dialog_tts_error)
-                            val yesButton = getString(Res.string.fix_it)
-                            val noButton = getString(Res.string.cancel)
-
-                            if (errRemedyIntent == null) {
-                                toast(errStringId)
-                            } else {
-                                withContext(Dispatchers.Main) {
-                                    AlertDialog.Builder(context)
-                                        .setTitle(titleString)
-                                        .setMessage(errString)
-                                        .setPositiveButton(yesButton) { _, _ ->
-                                            val intent = Intent(errRemedyIntent)
-                                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                                            context.startActivity(intent)
-                                        }
-                                        .setNegativeButton(noButton, null)
-                                        .show()
-                                }
-                            }
+                            val installIntent = Intent()
+                            installIntent.action = TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA
+                            installIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                            context.startActivity(installIntent)
+                        } else {
+                            Log.i(TAG, "Playing $word out loud.")
+                            tts?.speak(
+                                word,
+                                TextToSpeech.QUEUE_FLUSH,
+                                null,
+                                "tts-${word.hashCode()}"
+                            )
                         }
                     }
-
-                    workMgr.getWorkInfoByIdLiveData(speechRequest.id)
-                        .removeObserver(this)
                 }
+            } catch (_: Exception) {
+                err = SpeechError(Res.string.speech_failure_toast_unknown)
             }
         }
 
-        workMgr.getWorkInfoByIdLiveData(speechRequest.id).observeForever(observer)
+        err?.let {
+            CoroutineScope(Dispatchers.IO).launch {
+                val errString = getString(err.errStringId)
+                val titleString =getString(Res.string.dialog_tts_error)
+                val yesButton = getString(Res.string.fix_it)
+                val noButton = getString(Res.string.cancel)
 
-        workMgr.enqueue(speechRequest)
+                if (err.errRemedyIntent == null) {
+                    toast(err.errStringId)
+                } else {
+                    withContext(Dispatchers.Main) {
+                        AlertDialog.Builder(context)
+                            .setTitle(titleString)
+                            .setMessage(errString)
+                            .setPositiveButton(yesButton) { _, _ ->
+                                val intent = Intent(err.errRemedyIntent)
+                                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                                context.startActivity(intent)
+                            }
+                            .setNegativeButton(noButton, null)
+                            .show()
+                    }
+                }
+            }
+
+            CoroutineScope(Dispatchers.IO).launch {
+                logAnalyticsError("SPEECH", getString(err.errStringId), "")
+            }
+        }
 
         incrementConsultedWord(word)
 
