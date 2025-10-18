@@ -23,6 +23,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = AppViewModel(NavigationManager) { this }
+        viewModel.init()
         viewModel.handleIntent(intent)
 
         setContent {

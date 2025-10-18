@@ -13,6 +13,7 @@ import fr.berliat.hskwidget.ui.navigation.Screen
 
 import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.core.AppDispatchers
+import fr.berliat.hskwidget.core.HSKAppServicesPriority
 import fr.berliat.hskwidget.database_update_failure
 import fr.berliat.hskwidget.database_update_start
 import fr.berliat.hskwidget.database_update_success
@@ -27,6 +28,8 @@ import io.github.vinceglb.filekit.path
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 
 expect class AppViewModel: CommonAppViewModel
@@ -41,15 +44,16 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
 
     val isHSKAppServicesStatus = HSKAppServices.status
 
-    init {
-        HSKAppServices.init(viewModelScope)
+    open fun init() {
+        HSKAppServices.init(HSKAppServicesPriority.PartialApp)
         // Launch a coroutine that reacts to changes
         viewModelScope.launch {
-            isHSKAppServicesStatus.collect { status ->
-                if (status == AppServices.Status.Ready) {
+            isHSKAppServicesStatus
+                .filter { status -> status is AppServices.Status.Ready && status.upToPrio < HSKAppServicesPriority.FullApp }
+                .take(1)
+                .collect {
                     finishInitialization()
                 }
-            }
         }
     }
 

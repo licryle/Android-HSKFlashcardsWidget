@@ -35,9 +35,10 @@ import org.jetbrains.compose.resources.getString
 
 actual class AppViewModel(navigationManager: NavigationManager, val activityProvider: () -> FragmentActivity)
     : CommonAppViewModel(navigationManager) {
-    private var ankiDelegate : HSKAnkiDelegate
 
-    init {
+    private lateinit var ankiDelegate : HSKAnkiDelegate
+
+    override fun init() {
         // Enable StrictMode in Debug mode
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             StrictModeManager.init()
@@ -61,6 +62,8 @@ actual class AppViewModel(navigationManager: NavigationManager, val activityProv
             appConfig = null,
             ankiStore = null
         )
+
+        super.init()
     }
 
     override suspend fun finishInitialization() {

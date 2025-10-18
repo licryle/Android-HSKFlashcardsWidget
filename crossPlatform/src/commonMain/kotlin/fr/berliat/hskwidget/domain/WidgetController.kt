@@ -48,7 +48,7 @@ open class CommonWidgetController(
                 arrayOf(simplified.value)
             )
 
-        Logger.Companion.i(tag = TAG, messageString = "getNewWord: Got a new word, maybe: $newWord")
+        Logger.i(tag = TAG, messageString = "getNewWord: Got a new word, maybe: $newWord")
 
         // Persist it in preferences for cross-App convenience
         widgetStore.currentWord.value = newWord?.simplified ?: ""

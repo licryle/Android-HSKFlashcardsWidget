@@ -16,66 +16,34 @@ import fr.berliat.hskwidget.domain.KAnkiServiceDelegator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
+sealed class HSKAppServicesPriority(priority: UInt): AppServices.Priority(priority) {
+    constructor(prio : AppServices.Priority) : this(prio.priority)
+
+    object Widget: HSKAppServicesPriority(Highest)
+    object PartialApp: HSKAppServicesPriority(Standard)
+    object FullApp: HSKAppServicesPriority(Standard.priority + 1u)
+}
+
 // --- Singleton instance
 object HSKAppServices : AppServices() {
-    override fun init(scope: CoroutineScope) {
-        if (status.value == Status.Ready) return
-
-        register("appScope", 0) { scope }
-        register("database", 0) { DatabaseHelper.getInstance().liveDatabase }
-        register("appPreferences", 0) {
-            AppPreferencesStore.getInstance(PrefixedPreferencesStore.getDataStore("app.preferences_pb"))
-        }
-
-        // A unique datastore is needed, otherwise it fails silently (!) to write anything.
-        val widgetDataStore = PrefixedPreferencesStore.getDataStore("widgets.preferences_pb")
-        register("widgetsPreferencesProvider") {
-            val provider : WidgetPreferencesStoreProvider = { widgetId: Int ->
-                WidgetPreferencesStore.getInstance(widgetDataStore, widgetId)
-            }
-            provider
-        }
-        register("ankiStore") {
-            AnkiStore(
-                Utils.getAnkiDAO(),
-                getAnyway<ChineseWordsDatabase>("database").wordListDAO(),
-                getAnyway("appPreferences"))
-        }
-        register("wordListRepo") {
-            WordListRepository(
-                getAnyway("ankiStore"),
-                getAnyway<ChineseWordsDatabase>("database").wordListDAO(),
-                getAnyway<ChineseWordsDatabase>("database").annotatedChineseWordDAO()
-            )
-        }
-        register("HSKSegmenter") {
-            val segmenter = Utils.getHSKSegmenter()
-
-            getAnyway<CoroutineScope>("appScope").launch(AppDispatchers.IO) {
-                segmenter.preload()
-            }
-
-            segmenter
-        }
-
-        super.init(scope)
+    init {
+        registerMostServices()
     }
 
     fun registerAnkiDelegators(ankiDelegate: HSKAnkiDelegate) {
         if (isRegistered("ankiDelegate")) return
-        registerNow("ankiDelegate") { ankiDelegate }
-        registerNow("ankiDelegator") { ankiDelegate::modifyAnki }
-        registerNow("ankiServiceDelegator") { ankiDelegate::modifyAnkiViaService }
+        registerNow("ankiDelegate", HSKAppServicesPriority.FullApp) { ankiDelegate }
+        registerNow("ankiDelegator",HSKAppServicesPriority.FullApp) { ankiDelegate::modifyAnki }
+        registerNow("ankiServiceDelegator", HSKAppServicesPriority.FullApp) { ankiDelegate::modifyAnkiViaService }
     }
 
     fun registerGoogleBackup(gDrive: GoogleDriveBackup) {
         if (isRegistered("gDriveBackup")) return
-        registerNow("gDriveBackup") { gDrive }
+        registerNow("gDriveBackup", HSKAppServicesPriority.PartialApp) { gDrive }
     }
 
     // P0
     val database: ChineseWordsDatabase get() = get("database")
-    val appScope: CoroutineScope get() = get("appScope")
 
     // P2
     val appPreferences: AppPreferencesStore get() = get("appPreferences")
@@ -88,5 +56,46 @@ object HSKAppServices : AppServices() {
     val wordListRepo: WordListRepository get() = get("wordListRepo")
     val HSKSegmenter: HSKTextSegmenter get() = get("HSKSegmenter")
     val gDriveBackup: GoogleDriveBackup get() = get("gDriveBackup")
+
+    private fun registerMostServices() {
+        // Required for Widget -- Minimal Set
+        register("database", HSKAppServicesPriority.Widget) { DatabaseHelper.getInstance().liveDatabase }
+        register("appPreferences", HSKAppServicesPriority.Widget) {
+            AppPreferencesStore.getInstance(PrefixedPreferencesStore.getDataStore("app.preferences_pb"))
+        }
+
+        // A unique datastore is needed, otherwise it fails silently (!) to write anything.
+        val widgetDataStore = PrefixedPreferencesStore.getDataStore("widgets.preferences_pb")
+        register("widgetsPreferencesProvider", HSKAppServicesPriority.Widget) {
+            val provider : WidgetPreferencesStoreProvider = { widgetId: Int ->
+                WidgetPreferencesStore.getInstance(widgetDataStore, widgetId)
+            }
+            provider
+        }
+
+        // Required for fullApp -- but still partial set (missing Anki & GoogleDrive) Set
+        register("ankiStore", HSKAppServicesPriority.PartialApp) {
+            AnkiStore(
+                Utils.getAnkiDAO(),
+                get<ChineseWordsDatabase>("database").wordListDAO(),
+                get("appPreferences"))
+        }
+        register("wordListRepo", HSKAppServicesPriority.PartialApp) {
+            WordListRepository(
+                get("ankiStore"),
+                get<ChineseWordsDatabase>("database").wordListDAO(),
+                get<ChineseWordsDatabase>("database").annotatedChineseWordDAO()
+            )
+        }
+        register("HSKSegmenter", HSKAppServicesPriority.PartialApp) {
+            val segmenter = Utils.getHSKSegmenter()
+
+            get<CoroutineScope>("appScope").launch(AppDispatchers.IO) {
+                segmenter.preload()
+            }
+
+            segmenter
+        }
+    }
 }
 

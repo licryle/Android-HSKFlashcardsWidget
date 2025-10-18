@@ -21,6 +21,7 @@ import fr.berliat.hskwidget.core.AppServices
 import fr.berliat.hskwidget.core.ExpectedUtils
 import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.core.HSKAppServices
+import fr.berliat.hskwidget.core.HSKAppServicesPriority
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.data.store.WidgetPreferencesStore
 import fr.berliat.hskwidget.data.store.WidgetPreferencesStoreProvider
@@ -74,11 +75,17 @@ class WidgetProvider
             FileKit.manualFileKitCoreInitialization(contextProvider.invoke())
             ExpectedUtils.init(contextProvider.invoke())
 
-            if (HSKAppServices.status.value != AppServices.Status.Ready) {
-                HSKAppServices.init(scope)
+            val status = HSKAppServices.status.value
+            if (status !is AppServices.Status.Ready || status.upToPrio < HSKAppServicesPriority.Widget) {
+                HSKAppServices.init(HSKAppServicesPriority.Widget)
 
                 HSKAppServices.status.first {
-                    it == AppServices.Status.Ready || it is AppServices.Status.Failed
+                    it is AppServices.Status.Failed
+                            ||
+                            (it is AppServices.Status.Ready
+                                    && it.upToPrio >= HSKAppServicesPriority.Widget
+                                    )
+
                 }
             }
 
