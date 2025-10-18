@@ -1,8 +1,10 @@
 package fr.berliat.hskwidget.ui.theme
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
@@ -56,4 +58,10 @@ private val DarkColors = darkColorScheme(
 )
 
 
-val widgetDefaultBox = Modifier.size(185.dp).padding(5.dp)
+val widgetDefaultBox = Modifier
+    .size(185.dp)
+    .padding(5.dp)
+    .border(
+        width = 0.5.dp,
+        color = AppColors.Primary,
+        shape = RoundedCornerShape(20.dp))
