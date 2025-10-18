@@ -6,6 +6,9 @@ actual class WidgetsListViewModel actual constructor() {
     actual val widgetIds: StateFlow<List<Int>>
         get() = TODO("Not yet implemented")
 
-    actual fun addNewWidget() {
-    }
+    actual fun addNewWidget() { }
+
+    actual fun toast(s: String) { }
+
+    actual fun speakWord(word: String) { }
 }

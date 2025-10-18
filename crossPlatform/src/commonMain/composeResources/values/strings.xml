@@ -76,6 +76,9 @@ This project uses the awesome projects of:
     <string name="widget_configure_no_change">No change to save</string>
     <string name="widget_configure_saved">Widget configuration updated</string>
 
+    <string name="widget_demo_word_click">This is a demo widget, this would open the dictionary</string>
+    <string name="widget_demo_update_click">This is a demo widget, this would update the word</string>
+
     <string name="widget_btn_speak">Listen to this word</string>
     <string name="widget_btn_copy">Copy to clipboard</string>
 

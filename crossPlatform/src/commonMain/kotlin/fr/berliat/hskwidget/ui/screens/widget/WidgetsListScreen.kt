@@ -31,6 +31,8 @@ import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.ic_add_24dp
 import fr.berliat.hskwidget.ui.theme.widgetDefaultBox
 import fr.berliat.hskwidget.widget_configure_saved
+import fr.berliat.hskwidget.widget_demo_update_click
+import fr.berliat.hskwidget.widget_demo_word_click
 import fr.berliat.hskwidget.widgets_add_widget
 import fr.berliat.hskwidget.widgets_intro
 
@@ -71,6 +73,9 @@ fun WidgetsListScreen(
                 textAlign = TextAlign.Start
             )
 
+            val onClickWordToast = stringResource(Res.string.widget_demo_word_click)
+            val onClickUpdateToast = stringResource(Res.string.widget_demo_update_click)
+
             Box(
                 modifier = widgetDefaultBox.align(Alignment.CenterHorizontally)
             ) {
@@ -82,7 +87,10 @@ fun WidgetsListScreen(
                         pinyins = Pinyins.fromString("nǐ hǎo"),
                         traditional = "你好",
                         popularity = null
-                    )
+                    ),
+                    onClickWord = { viewModel.toast(onClickWordToast) },
+                    onClickSpeak = { viewModel.speakWord("你好") },
+                    onClickUpdate = { viewModel.toast(onClickUpdateToast) }
                 )
             }
         }
