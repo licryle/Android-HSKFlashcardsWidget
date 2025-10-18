@@ -143,21 +143,15 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
     }
 
     fun search(s: String) {
-        viewModelScope.launch(AppDispatchers.Main) {
-            navigationManager.navigate(Screen.Dictionary(s))
-        }
+        navigationManager.navigate(Screen.Dictionary(s))
     }
 
     fun configureWidget(widgetId: Int) {
-        viewModelScope.launch(AppDispatchers.Main) {
-            navigationManager.navigate(Screen.Widgets(widgetId, true))
-        }
+        navigationManager.navigate(Screen.Widgets(widgetId, true))
     }
 
     fun ocrImage(imageFile: PlatformFile) {
-        viewModelScope.launch(AppDispatchers.Main) {
-            navigationManager.navigate(Screen.OCRDisplay("", imageFile.path))
-        }
+        navigationManager.navigate(Screen.OCRDisplay("", imageFile.path))
     }
 
     open fun finalizeWidgetConfiguration(widgetId: Int) { }
