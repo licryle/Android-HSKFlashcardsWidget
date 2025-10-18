@@ -64,14 +64,15 @@ actual class AppViewModel(navigationManager: NavigationManager, val activityProv
     }
 
     override suspend fun finishInitialization() {
-        super.finishInitialization()
-
         // Now we may be after onResume() and HSK AppServices is ready for consumption
         ankiDelegate.ankiStore = HSKAppServices.ankiStore
         ankiDelegate.appConfig = HSKAppServices.appPreferences
         HSKAppServices.registerAnkiDelegators(ankiDelegate)
 
         WidgetProvider.init(activityProvider) // Depends on HSKAppServices
+
+        // Init done
+        super.finishInitialization()
 
         syncPlayPurchases()
     }
