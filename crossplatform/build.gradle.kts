@@ -4,7 +4,7 @@ import org.gradle.internal.os.OperatingSystem
 
 var os: OperatingSystem? = OperatingSystem.current()
 
-val versionCodeValue = 40
+val versionCodeValue = 44
 val versionCodeName = "4.0.0"
 
 plugins {
@@ -85,6 +85,8 @@ kotlin {
                 implementation(project(":googledrivebackup"))
                 implementation(libs.androidx.constraintlayout)
                 implementation(libs.material)
+                implementation(libs.firebase.analytics)
+                implementation(libs.firebase.crashlytics)
             }
             resources.srcDirs("src/commonMain/composeResources")
         }
