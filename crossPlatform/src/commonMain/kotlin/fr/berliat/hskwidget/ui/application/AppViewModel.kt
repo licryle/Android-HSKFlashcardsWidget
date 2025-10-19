@@ -42,17 +42,21 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
     private val _isReady = MutableStateFlow<Boolean>(false)
     val isReady = _isReady.asSharedFlow()
 
-    val isHSKAppServicesStatus = HSKAppServices.status
-
     open fun init() {
         HSKAppServices.init(HSKAppServicesPriority.PartialApp)
         // Launch a coroutine that reacts to changes
-        viewModelScope.launch {
-            isHSKAppServicesStatus
-                .filter { status -> status is AppServices.Status.Ready && status.upToPrio < HSKAppServicesPriority.FullApp }
+        viewModelScope.launch(AppDispatchers.IO) {
+            HSKAppServices.status
+                .filter  { status -> status is AppServices.Status.Ready }
                 .take(1)
-                .collect {
-                    finishInitialization()
+                .collect{ status ->
+                    val readyStatus = status as AppServices.Status.Ready
+                    if (readyStatus.upToPrio >= HSKAppServicesPriority.FullApp) {
+                        // Already ready from a previous launch still in memory
+                        _isReady.value = true
+                    } else {
+                        finishInitialization()
+                    }
                 }
         }
     }
