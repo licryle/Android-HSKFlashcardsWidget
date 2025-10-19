@@ -41,7 +41,7 @@ class PreferenceState<S, T>(
         set(v) {
             if (_flow.value != v) {         // prevent unnecessary writes
                 // Save asynchronously
-                scope.launch {
+                scope.launch(AppDispatchers.IO) {
                     store.edit { it[key] = conv.toStore(v) }
                 }
             }
