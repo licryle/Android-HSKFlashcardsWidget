@@ -14,7 +14,29 @@ data class AnnotatedChineseWord (
 
     val simplified: String
         get() {
-            return word?.simplified ?: annotation?.simplified!!
+            return if (hasWord()) {
+                word?.simplified!!
+            } else {
+                annotation?.simplified!!
+            }
+        }
+
+    val pinyins: Pinyins
+        get() {
+            return if (hasWord()) {
+                word?.pinyins!!
+            } else {
+                annotation?.pinyins!!
+            }
+        }
+
+    val hskLevel: HSK_Level
+        get() {
+            return if (hasWord()) {
+                word?.hskLevel!!
+            } else {
+                HSK_Level.NOT_HSK
+            }
         }
 
     companion object {

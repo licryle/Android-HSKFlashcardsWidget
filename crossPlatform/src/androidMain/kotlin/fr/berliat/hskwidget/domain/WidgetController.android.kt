@@ -150,15 +150,10 @@ actual class WidgetController(
                             word.word?.definition[Locale.ENGLISH] ?: word.annotation?.notes
                         )
 
-                        if (word.hasWord()) {
-                            setTextViewText(R.id.flashcard_pinyin, word.word?.pinyins.toString())
-                            setTextViewText(R.id.flashcard_hsklevel, word.word?.hskLevel.toString())
-                            setViewVisibility(R.id.flashcard_hsklevel,
-                                if (word.word?.hskLevel == HSK_Level.NOT_HSK) View.GONE else View.VISIBLE)
-                        } else {
-                            setTextViewText(R.id.flashcard_pinyin, word.annotation?.pinyins.toString())
-                            setViewVisibility(R.id.flashcard_hsklevel, View.GONE)
-                        }
+                        setTextViewText(R.id.flashcard_pinyin, word.pinyins.toString())
+                        setTextViewText(R.id.flashcard_hsklevel, word.hskLevel.toString())
+                        setViewVisibility(R.id.flashcard_hsklevel,
+                            if (word.hskLevel == HSK_Level.NOT_HSK) View.GONE else View.VISIBLE)
                     }
                 }
 
