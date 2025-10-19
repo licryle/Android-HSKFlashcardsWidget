@@ -116,7 +116,7 @@ fun AppNavHost(viewModel : AppViewModel) {
         }
 
         composable<Screen.Config> { backStackEntry ->
-            val args = backStackEntry.toRoute<Screen.Widgets>()
+            val args = backStackEntry.toRoute<Screen.Config>()
             LaunchedEffect(args) {
                 viewModel.navigationManager.registerScreenVisit(args)
             }
