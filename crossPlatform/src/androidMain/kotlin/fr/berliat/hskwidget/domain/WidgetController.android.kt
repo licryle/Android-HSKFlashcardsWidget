@@ -18,6 +18,7 @@ import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.data.store.WidgetPreferencesStore
 import fr.berliat.hskwidget.data.type.HSK_Level
+import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
@@ -43,7 +44,6 @@ actual suspend fun getWidgetControllerInstance(widgetStore: WidgetPreferencesSto
     }
 }
 
-
 actual class WidgetController(
     widgetStore: WidgetPreferencesStore,
     database: ChineseWordsDatabase,
@@ -56,8 +56,8 @@ actual class WidgetController(
         const val ACTION_CONFIGURE_LATEST = "fr.berliat.hskwidget.APPWIDGET_CONFIGURE_LATEST"
 
         fun requestAddDesktopWidget(context: Context, appWidgetManager: AppWidgetManager) {
-            val myProvider = ComponentName(context, WidgetProvider::class.java)
-            val confIntent = Intent(context, WidgetProvider::class.java)
+            val myProvider = ComponentName(context, FlashcardWidgetProvider::class.java)
+            val confIntent = Intent(context, FlashcardWidgetProvider::class.java)
             confIntent.action = ACTION_CONFIGURE_LATEST
 
             val callbackIntent = PendingIntent.getBroadcast(
@@ -72,7 +72,7 @@ actual class WidgetController(
         /** Thanks to https://gist.github.com/manishcm/bd05dff09b5b1640d25f **/
         internal fun getPendingSelfIntent(context: Context?, action: String?, widgetId: Int)
                 : PendingIntent? {
-            val intent = Intent(context, WidgetProvider::class.java)
+            val intent = Intent(context, FlashcardWidgetProvider::class.java)
             intent.action = action
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
 

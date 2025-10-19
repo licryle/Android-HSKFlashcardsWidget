@@ -1,37 +1,31 @@
-package fr.berliat.hskwidget.domain
+package fr.berliat.hskwidget.ui.widget
 
 import android.appwidget.AppWidgetManager
-import android.appwidget.AppWidgetManager.ACTION_APPWIDGET_CONFIGURE
 import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.res.Configuration.ORIENTATION_PORTRAIT
+import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
-
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-
 import fr.berliat.hskwidget.core.AppDispatchers
 import fr.berliat.hskwidget.core.AppServices
 import fr.berliat.hskwidget.core.ExpectedUtils
-import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.core.HSKAppServicesPriority
+import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.data.store.WidgetPreferencesStore
 import fr.berliat.hskwidget.data.store.WidgetPreferencesStoreProvider
-import fr.berliat.hskwidget.domain.WidgetController.Companion.ACTION_CONFIGURE_LATEST
-import fr.berliat.hskwidget.domain.WidgetController.Companion.ACTION_DICTIONARY
-import fr.berliat.hskwidget.domain.WidgetController.Companion.ACTION_SPEAK
-
+import fr.berliat.hskwidget.domain.WidgetController
+import fr.berliat.hskwidget.domain.getWidgetControllerInstance
 import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.manualFileKitCoreInitialization
-
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -39,14 +33,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-
 import java.util.concurrent.TimeUnit
 
-/**
- * Implementation of App Widget functionality.
- * App Widget Configuration implemented in [WidgetConfigFragment]
- */
-class WidgetProvider
+class FlashcardWidgetProvider
     : AppWidgetProvider() {
     companion object {
         private const val TAG = "WidgetProvider"
@@ -58,10 +47,11 @@ class WidgetProvider
         private lateinit var database: ChineseWordsDatabase
         private var isInitialized = false
 
-        suspend fun getWidgetPreferences(widgetId: Int): WidgetPreferencesStore {
+        private suspend fun getWidgetPreferences(widgetId: Int): WidgetPreferencesStore {
             return widgetPrefProvider.invoke(widgetId)
         }
-        suspend fun getWidgetController(widgetId: Int): WidgetController {
+
+        private suspend fun getWidgetController(widgetId: Int): WidgetController {
             return getWidgetControllerInstance(
                 getWidgetPreferences(widgetId),
                 database)
@@ -89,9 +79,11 @@ class WidgetProvider
                 }
             }
 
-            init(contextProvider,
+            init(
+                contextProvider,
                 widgetPrefProvider = HSKAppServices.widgetsPreferencesProvider,
-                database = HSKAppServices.database)
+                database = HSKAppServices.database
+            )
         }
 
         fun init(
@@ -112,7 +104,8 @@ class WidgetProvider
             val appWidgetMgr = AppWidgetManager.getInstance(context)
 
             val widgetIds = appWidgetMgr.getAppWidgetIds(
-                ComponentName(context, WidgetProvider::class.java))
+                ComponentName(context, FlashcardWidgetProvider::class.java)
+            )
 
             if (!_widgetIds.value.contentEquals(widgetIds)) {
                 _widgetIds.value = widgetIds
@@ -177,20 +170,20 @@ class WidgetProvider
             if (!isInitialized) init { context }
 
             when (intent!!.action) {
-                ACTION_CONFIGURE_LATEST -> {
+                WidgetController.Companion.ACTION_CONFIGURE_LATEST -> {
                     getWidgetController(getWidgetIds().last()).startActivityToConfigure()
                     Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.WIGDET_ADD)
                 }
 
-                ACTION_APPWIDGET_CONFIGURE -> {
+                AppWidgetManager.ACTION_APPWIDGET_CONFIGURE -> {
                     getWidgetController(getWidgetIds().last()).startActivityToConfigure()
                 }
 
-                ACTION_SPEAK -> {
+                WidgetController.Companion.ACTION_SPEAK -> {
                     getWidgetController(widgetId).speakWord()
                 }
 
-                ACTION_DICTIONARY -> {
+                WidgetController.Companion.ACTION_DICTIONARY -> {
                     getWidgetController(widgetId).openDictionary()
                 }
 
@@ -249,7 +242,7 @@ class WidgetProvider
         // Enter relevant functionality for when the last widget is disabled
         super.onDisabled(context)
 
-        WorkManager.getInstance(context).cancelUniqueWork("always_pending_work")
+        WorkManager.Companion.getInstance(context).cancelUniqueWork("always_pending_work")
     }
 
     override fun onRestored(context: Context?, oldWidgetIds: IntArray?, newWidgetIds: IntArray?) {
@@ -270,7 +263,7 @@ class WidgetProvider
      * Read more at: https://www.reddit.com/r/android_devs/comments/llq2mw/question_why_should_it_be_expected_that/
      */
     private fun preventUnnecessaryAppWidgetUpdates(context: Context): Boolean {
-        val workInfos = WorkManager.getInstance(context).getWorkInfosByTag("always_pending_work")
+        val workInfos = WorkManager.Companion.getInstance(context).getWorkInfosByTag("always_pending_work")
         if (workInfos.get().size > 0) return false
 
         val alwaysPendingWork = OneTimeWorkRequestBuilder<DummyWorker>()
@@ -278,7 +271,7 @@ class WidgetProvider
             .addTag("always_pending_work")
             .build()
 
-        WorkManager.getInstance(context).enqueueUniqueWork(
+        WorkManager.Companion.getInstance(context).enqueueUniqueWork(
             "always_pending_work",
             ExistingWorkPolicy.KEEP,
             alwaysPendingWork
@@ -295,7 +288,7 @@ class WidgetProvider
         private val appWidgetManager = AppWidgetManager.getInstance(context)
 
         fun getWidgetsSize(widgetId: Int): Pair<Int, Int> {
-            val isPortrait = context.resources.configuration.orientation == ORIENTATION_PORTRAIT
+            val isPortrait = context.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
             val width = getWidgetWidth(isPortrait, widgetId)
             val height = getWidgetHeight(isPortrait, widgetId)
             val widthInPx = context.dip(width)

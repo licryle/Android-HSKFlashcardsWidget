@@ -87,6 +87,9 @@ kotlin {
                 implementation(libs.material)
                 implementation(libs.firebase.analytics)
                 implementation(libs.firebase.crashlytics)
+
+                // To remove with PrefCompat
+                implementation("androidx.preference:preference-ktx:1.2.1")
             }
             resources.srcDirs("src/commonMain/composeResources")
         }

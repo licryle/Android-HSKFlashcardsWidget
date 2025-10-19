@@ -18,10 +18,12 @@ import fr.berliat.hskwidget.core.ExpectedUtils.INTENT_SEARCH_WORD
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.core.StrictModeManager
 import fr.berliat.hskwidget.data.store.GoogleDriveBackup
-import fr.berliat.hskwidget.domain.WidgetProvider
+import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
 import fr.berliat.hskwidget.domain.HSKAnkiDelegate
 import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.app_name
+import fr.berliat.hskwidget.core.Utils
+import fr.berliat.hskwidget.data.store.PrefCompat.PrefCompatMigration
 import fr.berliat.hskwidget.data.store.SupportDevStore
 import fr.berliat.hskwidget.ui.navigation.NavigationManager
 
@@ -72,7 +74,7 @@ actual class AppViewModel(navigationManager: NavigationManager, val activityProv
         ankiDelegate.appConfig = HSKAppServices.appPreferences
         HSKAppServices.registerAnkiDelegators(ankiDelegate)
 
-        WidgetProvider.init(activityProvider) // Depends on HSKAppServices
+        FlashcardWidgetProvider.init(activityProvider) // Depends on HSKAppServices
 
         // Init done
         super.finishInitialization()
@@ -108,10 +110,13 @@ actual class AppViewModel(navigationManager: NavigationManager, val activityProv
     }
 
     override fun handleAppUpdate() {
+        if (PrefCompatMigration.shouldMigrate(ExpectedUtils.context, Utils.getAppVersion()))
+            PrefCompatMigration.migrate(ExpectedUtils.context)
+
         super.handleAppUpdate()
 
         // Hack to fix an Android bug
-        WidgetProvider().updateAllFlashCardWidgets()
+        FlashcardWidgetProvider().updateAllFlashCardWidgets()
     }
 
     fun handleIntent(intent: Intent) {

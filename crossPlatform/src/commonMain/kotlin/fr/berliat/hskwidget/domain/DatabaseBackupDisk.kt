@@ -102,11 +102,15 @@ object DatabaseDiskBackup {
     fun getPlatformFileFromBookmarkOrNull(bookmark: BookmarkData?): PlatformFile? {
         if (bookmark == null) return null
 
-        val file = PlatformFile.fromBookmarkData(bookmark)
-        return if (isDirectoryAccessible(file)) {
-            file
-        } else {
-            null
+        try {
+            val file = PlatformFile.fromBookmarkData(bookmark)
+            return if (isDirectoryAccessible(file)) {
+                file
+            } else {
+                null
+            }
+        } catch (_: Exception) {
+            return null
         }
     }
 

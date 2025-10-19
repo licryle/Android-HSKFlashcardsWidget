@@ -23,7 +23,9 @@ import io.github.vinceglb.filekit.cacheDir
 import io.github.vinceglb.filekit.copyTo
 import io.github.vinceglb.filekit.delete
 import io.github.vinceglb.filekit.div
+import io.github.vinceglb.filekit.fromBookmarkData
 import io.github.vinceglb.filekit.name
+import io.github.vinceglb.filekit.releaseBookmark
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
@@ -127,7 +129,14 @@ class BackupDiskViewModel(
                 onSuccess = { folder ->
                     // persist permissions in Platform && DataStore
                     viewModelScope.launch {
-                        // ToDo : unbookmark previous folder
+                        val oldBookmark = appConfig.dbBackUpDiskDirectory.value
+                        if (oldBookmark != null) {
+                            try {
+                                PlatformFile.fromBookmarkData(oldBookmark).releaseBookmark()
+                            } catch (_: Exception) {
+
+                            }
+                        }
                         appConfig.dbBackUpDiskDirectory.value = folder.bookmarkData()
                     }
                     appConfig.dbBackUpDiskActive.value = true

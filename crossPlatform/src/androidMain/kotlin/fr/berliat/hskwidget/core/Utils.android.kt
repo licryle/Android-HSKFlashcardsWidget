@@ -31,7 +31,7 @@ import fr.berliat.hskwidget.cancel
 import fr.berliat.hskwidget.copied_to_clipboard
 import fr.berliat.hskwidget.core.Utils.logAnalyticsError
 import fr.berliat.hskwidget.dialog_tts_error
-import fr.berliat.hskwidget.domain.WidgetProvider
+import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
 import fr.berliat.hskwidget.fix_it
 import fr.berliat.hskwidget.speech_failure_toast_chinese_unsupported
 import fr.berliat.hskwidget.speech_failure_toast_init
@@ -104,7 +104,7 @@ actual object ExpectedUtils {
             bundle.putString(it.key, it.value)
         }
 
-        val widgets = WidgetProvider.getWidgetIds()
+        val widgets = FlashcardWidgetProvider.getWidgetIds()
         bundle.putString("WIDGET_TOTAL_NUMBER", widgets.size.toString())
 
         if (widgets.isEmpty()) {
@@ -119,8 +119,8 @@ actual object ExpectedUtils {
     }
 
     actual fun logAnalyticsWidgetAction(event: Utils.ANALYTICS_EVENTS, widgetId: Int) {
-        val widgets = WidgetProvider.getWidgetIds()
-        val size = WidgetProvider.WidgetSizeProvider(context).getWidgetsSize(widgetId)
+        val widgets = FlashcardWidgetProvider.getWidgetIds()
+        val size = FlashcardWidgetProvider.WidgetSizeProvider(context).getWidgetsSize(widgetId)
 
         logAnalyticsEvent(
             event,

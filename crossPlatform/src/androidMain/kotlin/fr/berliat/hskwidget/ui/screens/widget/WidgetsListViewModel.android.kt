@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 
 import fr.berliat.hskwidget.core.ExpectedUtils
-import fr.berliat.hskwidget.domain.WidgetProvider
+import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
 
 import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.domain.WidgetController
@@ -31,7 +31,7 @@ actual class WidgetsListViewModel actual constructor(): ViewModel() {
     init {
         viewModelScope.launch {
             while (true) {
-                val ids = WidgetProvider.getWidgetIds()
+                val ids = FlashcardWidgetProvider.getWidgetIds()
                 _widgetIds.value = ids.toList()
                 delay(500.milliseconds)
             }

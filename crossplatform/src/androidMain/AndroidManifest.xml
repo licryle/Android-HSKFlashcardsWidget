@@ -34,7 +34,7 @@
             android:value="false" />
 
         <receiver
-            android:name=".domain.WidgetProvider"
+            android:name=".ui.widget.FlashcardWidgetProvider"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -51,7 +51,6 @@
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|uiMode"
             android:windowSoftInputMode="adjustResize">
 
-            <!-- android:theme="@style/Theme.HSKFlashcardsWidget.NoActionBar"-->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

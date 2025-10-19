@@ -162,7 +162,12 @@ fun BackupDiskView(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            val dirText = backupDiskFolder?.name ?: stringResource(Res.string.config_backup_directory_choose)
+            val defaultText = stringResource(Res.string.config_backup_directory_choose)
+            val dirText = try {
+                backupDiskFolder?.name ?: defaultText
+            } catch (_: Exception) {
+                defaultText
+            }
             IconButton(
                 onClick = viewModel::selectBackupFolder,
                 text = dirText,

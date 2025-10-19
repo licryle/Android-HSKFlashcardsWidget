@@ -10,7 +10,6 @@ import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.domain.DatabaseDiskBackup
 import fr.berliat.hskwidget.domain.DatabaseHelper
 import fr.berliat.hskwidget.ui.navigation.Screen
-
 import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.core.AppDispatchers
 import fr.berliat.hskwidget.core.HSKAppServicesPriority
@@ -71,6 +70,20 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
     }
 
     protected open fun handleAppUpdate() {
+        if (shouldUpdateDatabaseFromAsset()) {
+            Utils.toast(Res.string.database_update_start)
+
+            viewModelScope.launch(AppDispatchers.IO) {
+                DatabaseHelper.getInstance().updateLiveDatabaseFromAsset({
+                    Utils.toast(Res.string.database_update_success)
+                }, { e ->
+                    Utils.toast(Res.string.database_update_failure, listOf(e.message ?: ""))
+
+                    Utils.logAnalyticsError(TAG, "UpdateDatabaseFromAssetFailure", e.message ?: "")
+                })
+            }
+        }
+
         appConfig.appVersionCode.value = Utils.getAppVersion()
     }
 
@@ -83,25 +96,7 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
             DatabaseHelper.cleanTempDatabaseFiles()
         }
 
-        if (shouldUpdateDatabaseFromAsset()) {
-            Utils.toast(Res.string.database_update_start)
-
-            viewModelScope.launch(AppDispatchers.IO) {
-                DatabaseHelper.getInstance().updateLiveDatabaseFromAsset({
-                    Utils.toast(Res.string.database_update_success)
-
-                    handleBackupDisk()
-                }, { e ->
-                    Utils.toast(Res.string.database_update_failure, listOf(e.message ?: ""))
-
-                    Utils.logAnalyticsError(TAG, "UpdateDatabaseFromAssetFailure", e.message ?: "")
-
-                    handleBackupDisk()
-                })
-            }
-        } else {
-            handleBackupDisk()
-        }
+        handleBackupDisk()
     }
 
     fun shouldUpdateDatabaseFromAsset(): Boolean {
