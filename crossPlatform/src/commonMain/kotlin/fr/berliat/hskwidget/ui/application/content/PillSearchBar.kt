@@ -46,7 +46,7 @@ fun PillSearchBar(
             .height(56.dp)
             .fillMaxWidth(),
         shape = CircleShape,
-        color = MaterialTheme.colorScheme.surfaceVariant,
+        color = MaterialTheme.colorScheme.secondaryContainer,
         tonalElevation = 2.dp
     ) {
         Box(
@@ -72,7 +72,7 @@ fun PillSearchBar(
                 }),
                 singleLine = true,
                 textStyle = MaterialTheme.typography.bodyMedium.copy(
-                    color = MaterialTheme.colorScheme.onSurface,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer,
                     textAlign = TextAlign.Start,
                 ),
                 cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
@@ -87,7 +87,7 @@ fun PillSearchBar(
                             Text(
                                 text = hint,
                                 style = MaterialTheme.typography.bodyMedium.copy(
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer,
                                     textAlign = TextAlign.Start
                                 )
                             )
