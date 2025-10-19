@@ -83,7 +83,7 @@ class CaptureImageViewModel(
     }
 
     fun onCameraControllerReady(controller: CameraController) {
-        _cameraController.value?.cleanup()
+        _cameraController.value?.stopSession()
         _cameraController.value = controller
         _isProcessing.value = false
     }
