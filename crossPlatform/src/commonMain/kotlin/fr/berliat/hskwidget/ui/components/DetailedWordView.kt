@@ -1,7 +1,5 @@
 package fr.berliat.hskwidget.ui.components
 
-import org.jetbrains.compose.resources.painterResource
-
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,6 +22,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.font.FontStyle.Companion.Italic
 
 import fr.berliat.hskwidget.core.Locale
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
@@ -32,10 +31,6 @@ import fr.berliat.hskwidget.data.type.WordType
 import fr.berliat.hskwidget.core.capitalize
 import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.data.type.HSK_Level
-
-import HSKWordView
-import androidx.compose.ui.text.font.FontStyle.Companion.Italic
-
 import fr.berliat.hskwidget.ui.theme.AppTypographies
 import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.baseline_volume_up_24
@@ -57,6 +52,9 @@ import fr.berliat.hskwidget.keyboard_arrow_up_24px
 import fr.berliat.hskwidget.widget_btn_copy
 import fr.berliat.hskwidget.widget_btn_speak
 
+import HSKWordView
+
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -65,12 +63,12 @@ fun DetailedWordView (
     showHSK3Definition: Boolean,
     pinyinEditable: Boolean,
     shapeModifier: PrettyCardShapeModifier,
+    modifier: Modifier = Modifier,
     onFavoriteClick: ((AnnotatedChineseWord) -> Unit)? = null,
     onSpeakClick: ((AnnotatedChineseWord) -> Unit)? = null,
     onCopyClick: ((AnnotatedChineseWord) -> Unit)? = null,
     onListsClick: ((AnnotatedChineseWord) -> Unit)? = null,
-    onPinyinChange: (String) -> Unit = {},
-    modifier: Modifier = Modifier
+    onPinyinChange: (String) -> Unit = {}
 ) {
     // Compute definition / annotation / alt definition
     var definition = word.word?.definition?.get(Locale.ENGLISH) ?: ""
@@ -135,8 +133,9 @@ fun DetailedWordView (
                     }
                 }
 
+                val vSpacing = if (nothingMore) Arrangement.Top else Arrangement.SpaceBetween
                 Column(modifier = modifier.weight(1f).fillMaxHeight(),
-                    verticalArrangement = Arrangement.SpaceBetween) {
+                    verticalArrangement = vSpacing) {
                     HSKWordView(
                         hanziText = word.simplified,
                         pinyinText = pinyins,
