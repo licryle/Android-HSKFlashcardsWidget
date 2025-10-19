@@ -39,8 +39,6 @@ class CaptureImageViewModel(
     val cameraController = _cameraController.asStateFlow()
 
     fun takePhoto() {
-        Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.OCR_CAPTURE)
-
         cameraController.value?.let {
             _isProcessing.value = true
             viewModelScope.launch(AppDispatchers.IO) {
@@ -80,6 +78,8 @@ class CaptureImageViewModel(
                 }
             }
         }
+
+        Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.OCR_CAPTURE)
     }
 
     fun onCameraControllerReady(controller: CameraController) {

@@ -10,6 +10,7 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.media.AudioManager
 import android.net.Uri
+import android.os.Bundle
 import android.provider.Settings
 import android.speech.tts.TextToSpeech
 import android.util.Log
@@ -17,17 +18,20 @@ import android.widget.Toast
 
 import co.touchlab.kermit.Logger
 
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.analytics
+
 import fr.berliat.hsktextviews.HSKTextSegmenter
 import fr.berliat.hskwidget.core.Utils.incrementConsultedWord
 import fr.berliat.hskwidget.core.Utils.toast
 import fr.berliat.hskwidget.data.dao.AnkiDAO
 import fr.berliat.hskwidget.domain.SearchQuery
-
 import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.cancel
 import fr.berliat.hskwidget.copied_to_clipboard
-import fr.berliat.hskwidget.core.Utils.logAnalyticsEvent
+import fr.berliat.hskwidget.core.Utils.logAnalyticsError
 import fr.berliat.hskwidget.dialog_tts_error
+import fr.berliat.hskwidget.domain.WidgetProvider
 import fr.berliat.hskwidget.fix_it
 import fr.berliat.hskwidget.speech_failure_toast_chinese_unsupported
 import fr.berliat.hskwidget.speech_failure_toast_init
@@ -41,6 +45,7 @@ import kotlinx.coroutines.withContext
 
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.getString
+
 import java.util.Locale
 
 fun Context.findActivity(): Activity = when (this) {
@@ -92,23 +97,36 @@ actual object ExpectedUtils {
         return true
     }
 
-    actual fun logAnalyticsScreenView(screen: String) {
-    }
-
     actual fun logAnalyticsEvent(event: Utils.ANALYTICS_EVENTS,
                                  params: Map<String, String>) {
+        val bundle = Bundle()
+        params.forEach {
+            bundle.putString(it.key, it.value)
+        }
+
+        val widgets = WidgetProvider.getWidgetIds()
+        bundle.putString("WIDGET_TOTAL_NUMBER", widgets.size.toString())
+
+        if (widgets.isEmpty()) {
+            bundle.putString("MAX_WIDGET_ID", "0")
+        } else {
+            bundle.putString("MAX_WIDGET_ID", widgets.last().toString())
+        }
+
+        HSKAppServices.appScope.launch(Dispatchers.IO) {
+            Firebase.analytics.logEvent(event.name, bundle)
+        }
     }
 
     actual fun logAnalyticsWidgetAction(event: Utils.ANALYTICS_EVENTS, widgetId: Int) {
-    }
+        val widgets = WidgetProvider.getWidgetIds()
+        val size = WidgetProvider.WidgetSizeProvider(context).getWidgetsSize(widgetId)
 
-    actual fun logAnalyticsError(module: String, error: String, details: String) {
         logAnalyticsEvent(
-            Utils.ANALYTICS_EVENTS.ERROR,
+            event,
             mapOf(
-                "MODULE" to module,
-                "ERROR_ID" to error,
-                "DETAILS" to details
+                "WIDGET_NUMBER" to widgets.indexOf(widgetId).toString(),
+                "WIDGET_SIZE" to "${size.first}x${size.second}"
             )
         )
     }
@@ -212,9 +230,7 @@ actual object ExpectedUtils {
                             .show()
                     }
                 }
-            }
 
-            CoroutineScope(Dispatchers.IO).launch {
                 logAnalyticsError("SPEECH", getString(err.errStringId), "")
             }
         }

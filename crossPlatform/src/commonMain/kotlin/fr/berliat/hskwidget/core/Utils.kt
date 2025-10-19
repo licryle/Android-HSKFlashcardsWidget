@@ -26,16 +26,26 @@ object Utils {
 
     fun getAppVersion(): Int = BuildKonfig.VERSION_CODE
 
-    fun logAnalyticsScreenView(screen: String) = ExpectedUtils.logAnalyticsScreenView(screen)
+    fun logAnalyticsScreenView(screenName: String) {
+        logAnalyticsEvent(
+            ANALYTICS_EVENTS.SCREEN_VIEW,
+            mapOf("SCREEN_NAME" to screenName)
+        )
+    }
 
     fun logAnalyticsEvent(event: ANALYTICS_EVENTS, params: Map<String, String> = emptyMap()) =
         ExpectedUtils.logAnalyticsEvent(event, params)
 
-    fun logAnalyticsError(module: String, error: String, details: String) =
-        ExpectedUtils.logAnalyticsError(module, error, details)
-
-    fun logAnalyticsError(module: String, error: String, e: Exception) =
-        ExpectedUtils.logAnalyticsError(module, error, e.message ?: "")
+    fun logAnalyticsError(module: String, error: String, details: String) {
+        logAnalyticsEvent(
+            ANALYTICS_EVENTS.ERROR,
+            mapOf(
+                "MODULE" to module,
+                "ERROR_ID" to error,
+                "DETAILS" to details
+            )
+        )
+    }
 
     fun logAnalyticsWidgetAction(event: ANALYTICS_EVENTS, widgetId: Int) =
         ExpectedUtils.logAnalyticsWidgetAction(event, widgetId)
@@ -86,7 +96,7 @@ object Utils {
         WIDGET_RECONFIGURE,
         WIDGET_CONFIG_VIEW,
         WIGDET_RESIZE,
-        WIGDET_ADD, // Would be great to add
+        WIGDET_ADD,
         WIDGET_EXPAND,
         WIDGET_COLLAPSE,
         WIGDET_REMOVE,
@@ -125,10 +135,8 @@ expect object ExpectedUtils {
     fun openLink(url: String)
     fun sendEmail(email: String, subject: String = "", body: String = "") : Boolean
 
-    fun logAnalyticsScreenView(screen: String)
     fun logAnalyticsEvent(event: Utils.ANALYTICS_EVENTS,
                           params: Map<String, String> = mapOf())
-    fun logAnalyticsError(module: String, error: String, details: String)
     fun logAnalyticsWidgetAction(event: Utils.ANALYTICS_EVENTS, widgetId: Int)
 
     fun getHSKSegmenter() : HSKTextSegmenter

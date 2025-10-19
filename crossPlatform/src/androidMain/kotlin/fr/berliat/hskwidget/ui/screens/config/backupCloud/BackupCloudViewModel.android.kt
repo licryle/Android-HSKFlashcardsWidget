@@ -106,6 +106,8 @@ actual class BackupCloudViewModel actual constructor(
                 }
             }
         }
+
+        Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.CONFIG_BACKUPCLOUD_BACKUP)
     }
 
     actual fun restore() {
@@ -166,14 +168,14 @@ actual class BackupCloudViewModel actual constructor(
                 Utils.logAnalyticsError(
                     "BACKUP_RESTORE",
                     getString(Res.string.dbrestore_failure_fileformat),
-                    e
+                    e.toString()
                 )
             } catch (e: Exception) {
                 Utils.toast(Res.string.dbrestore_failure_import)
                 Utils.logAnalyticsError(
                     "BACKUP_RESTORE",
                     getString(Res.string.dbrestore_failure_import),
-                    e
+                    e.toString()
                 )
             }
         }

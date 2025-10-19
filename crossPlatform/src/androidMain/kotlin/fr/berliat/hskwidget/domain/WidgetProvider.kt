@@ -179,6 +179,7 @@ class WidgetProvider
             when (intent!!.action) {
                 ACTION_CONFIGURE_LATEST -> {
                     getWidgetController(getWidgetIds().last()).startActivityToConfigure()
+                    Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.WIGDET_ADD)
                 }
 
                 ACTION_APPWIDGET_CONFIGURE -> {

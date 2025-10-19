@@ -37,6 +37,10 @@ class WidgetConfigViewModel(
 
     init {
         loadLists()
+        Utils.logAnalyticsWidgetAction(
+            event = Utils.ANALYTICS_EVENTS.WIDGET_CONFIG_VIEW,
+            widgetId = widgetId
+        )
     }
 
     fun loadLists() {

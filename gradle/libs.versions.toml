@@ -6,6 +6,8 @@ core = "1.7.0"
 coreKtx = "1.17.0"
 datastorePreferences = "1.1.7"
 filekitCore = "0.12.0"
+firebaseAnalytics = "23.0.0"
+firebaseCrashlytics = "20.0.3"
 googleApiServicesDrive = "v3-rev20250829-2.0.0"
 jiebaAnalysis = "1.0.3"
 junit = "1.3.0"
@@ -55,6 +57,8 @@ anki-android = { module = "com.github.ankidroid:Anki-Android", version.ref = "an
 filekit-core = { module = "io.github.vinceglb:filekit-core", version.ref = "filekitCore" }
 filekit-dialogs = { module = "io.github.vinceglb:filekit-dialogs", version.ref = "filekitCore" }
 filekit-dialogs-compose = { module = "io.github.vinceglb:filekit-dialogs-compose", version.ref = "filekitCore" }
+firebase-analytics = { module = "com.google.firebase:firebase-analytics", version.ref = "firebaseAnalytics" }
+firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics", version.ref = "firebaseCrashlytics" }
 google-api-services-drive = { module = "com.google.apis:google-api-services-drive", version.ref = "googleApiServicesDrive" }
 jieba-analysis = { module = "io.github.yrjyrj123:jieba-analysis", version.ref = "jiebaAnalysis" }
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }

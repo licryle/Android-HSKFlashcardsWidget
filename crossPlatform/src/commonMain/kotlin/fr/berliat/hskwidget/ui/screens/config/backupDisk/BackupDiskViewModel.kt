@@ -59,6 +59,8 @@ class BackupDiskViewModel(
     fun toggleBackupDiskActive(active: Boolean) {
         if (!active) {
             appConfig.dbBackUpDiskActive.value = false
+
+            Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.CONFIG_BACKUP_OFF)
             return
         }
 
@@ -66,6 +68,8 @@ class BackupDiskViewModel(
             selectBackupFolder()
         } else {
             appConfig.dbBackUpDiskActive.value = true
+
+            Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.CONFIG_BACKUP_ON)
         }
     }
 

@@ -24,8 +24,11 @@ actual object ExpectedUtils {
         openLink(urlString)
         return true
     }
-    
-    actual fun logAnalyticsScreenView(screen: String) {
+
+    actual fun logAnalyticsEvent(event: Utils.ANALYTICS_EVENTS, params: Map<String, String>) {
+    }
+
+    actual fun logAnalyticsWidgetAction(event: Utils.ANALYTICS_EVENTS, widgetId: Int) {
     }
 
     @OptIn(ExperimentalForeignApi::class)
@@ -42,12 +45,6 @@ actual object ExpectedUtils {
 
     const val DATABASE_FILENAME = "Mandarin_Assistant.db"
 
-    actual fun logAnalyticsEvent(event: Utils.ANALYTICS_EVENTS, params: Map<String, String>) {
-    }
-
-    actual fun logAnalyticsError(module: String, error: String, details: String) {
-    }
-
     actual fun getHSKSegmenter(): HSKTextSegmenter = object : HSKTextSegmenter {
 		override var listener: HSKTextSegmenterListener? = null
 		override suspend fun preload() {}
@@ -63,9 +60,6 @@ actual object ExpectedUtils {
     }
 
     actual fun playWordInBackground(word: String) {
-    }
-
-    actual fun logAnalyticsWidgetAction(event: Utils.ANALYTICS_EVENTS, widgetId: Int) {
     }
 
     actual fun toast(s: String) {
