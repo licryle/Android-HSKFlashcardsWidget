@@ -17,7 +17,7 @@ import kotlin.reflect.KClass
 object NavigationManager {
     private val scope = CoroutineScope(Dispatchers.Main.immediate)
 
-    private val _navigationEvents = MutableSharedFlow<Screen>(replay = 0)
+    private val _navigationEvents = MutableSharedFlow<Screen>(replay = 1)
     val navigationEvents: SharedFlow<Screen> = _navigationEvents.asSharedFlow()
 
     const val STACK_SCREEN_DEPTH = 20
