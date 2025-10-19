@@ -88,7 +88,7 @@ fun WidgetConfigScreen(
     val selectedIds = viewModel.selectedListIds.collectAsState()
     val localSelectedIds = remember(selectedIds) { mutableStateSetOf<Long>() }
 
-    LaunchedEffect(selectedIds) {
+    LaunchedEffect(selectedIds.value) {
         // Clear and update the local state only when the ViewModel state changes
         localSelectedIds.clear()
         localSelectedIds.addAll(selectedIds.value)
