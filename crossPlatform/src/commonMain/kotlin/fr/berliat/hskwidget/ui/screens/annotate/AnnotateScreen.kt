@@ -23,16 +23,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+
 import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.core.HSKAppServices
-
 import fr.berliat.hskwidget.data.type.ClassLevel
 import fr.berliat.hskwidget.data.type.ClassType
 import fr.berliat.hskwidget.ui.components.ConfirmDialog
 import fr.berliat.hskwidget.ui.components.DetailedWordView
 import fr.berliat.hskwidget.ui.components.DropdownSelector
 import fr.berliat.hskwidget.ui.components.LoadingView
-
 import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.annotation_edit_class_level_hint
 import fr.berliat.hskwidget.annotation_edit_class_type_hint
@@ -45,6 +44,7 @@ import fr.berliat.hskwidget.annotation_edit_notes_hint
 import fr.berliat.hskwidget.annotation_edit_save_failure
 import fr.berliat.hskwidget.annotation_edit_save_success
 import fr.berliat.hskwidget.annotation_edit_themes_hint
+import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.delete
 import fr.berliat.hskwidget.save
 import fr.berliat.hskwidget.ui.components.PrettyCardShapeModifier
@@ -64,7 +64,7 @@ fun AnnotateScreen(
         ankiCaller = HSKAppServices.ankiDelegator
     ) }
 ) {
-    val annotatedWord by viewModel.annotatedWord.collectAsState()
+    var annotatedWord by remember { mutableStateOf<AnnotatedChineseWord?>(null) }
 
     var pinyins by remember { mutableStateOf("") }
     var notes by remember { mutableStateOf("") }
@@ -78,16 +78,19 @@ fun AnnotateScreen(
     var confirmDeleteDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(word) {
-        viewModel.fetchAnnotatedWord(word) { word ->
-            notes = word.annotation?.notes.orEmpty()
-            themes = word.annotation?.themes.orEmpty()
-            isExam = word.annotation?.isExam ?: false
-            selectedClassType = if (word.hasAnnotation()) {
+        annotatedWord = viewModel.fetchAnnotatedWord(word)
+
+        annotatedWord.let { word ->
+            pinyins = word?.pinyins.toString()
+            notes = word?.annotation?.notes.orEmpty()
+            themes = word?.annotation?.themes.orEmpty()
+            isExam = word?.annotation?.isExam ?: false
+            selectedClassType = if (word?.hasAnnotation() ?: false) {
                 word.annotation!!.classType!!
             } else {
                 viewModel.lastAnnotatedClassType.value
             }
-            selectedClassLevel = if (word.hasAnnotation()) {
+            selectedClassLevel = if (word?.hasAnnotation() ?: false) {
                 word.annotation!!.level!!
             } else {
                 viewModel.lastAnnotatedClassLevel.value
@@ -113,7 +116,8 @@ fun AnnotateScreen(
         }
     }
 
-    if (annotatedWord == null) {
+    val fixedAnnotatedWord = annotatedWord
+    if (fixedAnnotatedWord == null) {
         LoadingView()
         return
     }
@@ -159,8 +163,6 @@ fun AnnotateScreen(
         )
 
         Spacer(Modifier.height(12.dp))
-
-
 
         Row(modifier = modifier.fillMaxWidth()) {
             val labelProvider: (ClassType) -> String = if (showHSK3Definition) {
@@ -214,15 +216,16 @@ fun AnnotateScreen(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
-            if (annotatedWord!!.hasAnnotation()) {
+            if (fixedAnnotatedWord.hasAnnotation()) {
                 OutlinedButton(onClick = { confirmDeleteDialog = true }) { Text(stringResource(Res.string.delete)) }
             }
 
             Button(
                 onClick = { viewModel.saveWord(
-                    annotatedWord = viewModel.annotatedWord.value!!,
+                    annotatedWord = fixedAnnotatedWord,
                     pinyins,
-                    notes, themes,
+                    notes,
+                    themes,
                     isExam,
                     cType = selectedClassType,
                     cLevel = selectedClassLevel) { word, e ->

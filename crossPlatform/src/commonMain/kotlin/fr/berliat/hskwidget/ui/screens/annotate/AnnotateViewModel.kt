@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import fr.berliat.hskwidget.core.AppDispatchers
 import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.core.Utils.incrementConsultedWord
-
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
@@ -19,7 +18,6 @@ import fr.berliat.hskwidget.data.type.Pinyins
 import fr.berliat.hskwidget.domain.KAnkiDelegator
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -31,20 +29,15 @@ class AnnotateViewModel(
     private val wordListRepo: WordListRepository = HSKAppServices.wordListRepo,
     private val ankiCaller : KAnkiDelegator
 ) : ViewModel() {
-    private val _annotatedWord = MutableStateFlow<AnnotatedChineseWord?>(null)
-    val annotatedWord: StateFlow<AnnotatedChineseWord?> get() = _annotatedWord
-
     val showHSK3Definition: StateFlow<Boolean> = prefsStore.dictionaryShowHSK3Definition.asStateFlow()
     val lastAnnotatedClassType: StateFlow<ClassType> = prefsStore.lastAnnotatedClassType.asStateFlow()
     val lastAnnotatedClassLevel: StateFlow<ClassLevel> = prefsStore.lastAnnotatedClassLevel.asStateFlow()
 
-    suspend fun fetchAnnotatedWord(word: String, callBack: ((AnnotatedChineseWord) -> Unit)?) {
-        if (word == "") {
-            _annotatedWord.value = AnnotatedChineseWord.getBlank()
+    suspend fun fetchAnnotatedWord(word: String): AnnotatedChineseWord {
+        return if (word == "") {
+            AnnotatedChineseWord.getBlank()
         } else {
-            _annotatedWord.value = getAnnotatedChineseWord(word)
-
-            callBack?.invoke(annotatedWord.value!!)
+            getAnnotatedChineseWord(word)
         }
     }
     suspend fun getAnnotatedChineseWord(simplifiedWord: String): AnnotatedChineseWord
