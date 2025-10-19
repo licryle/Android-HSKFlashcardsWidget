@@ -28,6 +28,7 @@ import fr.berliat.hskwidget.ui.components.IconButton
 import fr.berliat.hskwidget.ui.components.WidgetWordView
 import fr.berliat.hskwidget.ui.screens.widgetConfigure.WidgetConfigWithPreviewScreen
 import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.ic_add_24dp
 import fr.berliat.hskwidget.ui.theme.widgetDefaultBox
 import fr.berliat.hskwidget.widget_configure_saved
@@ -70,13 +71,16 @@ fun WidgetsListScreen(
                 modifier = widgetDefaultBox.align(Alignment.CenterHorizontally)
             ) {
                 WidgetWordView(
-                    ChineseWord(
-                        simplified = "你好",
-                        definition = mapOf(Locale.ENGLISH to "Hello"),
-                        hskLevel = HSK_Level.HSK1,
-                        pinyins = Pinyins.fromString("nǐ hǎo"),
-                        traditional = "你好",
-                        popularity = null
+                    AnnotatedChineseWord(
+                        word = ChineseWord(
+                            simplified = "你好",
+                            definition = mapOf(Locale.ENGLISH to "Hello"),
+                            hskLevel = HSK_Level.HSK1,
+                            pinyins = Pinyins.fromString("nǐ hǎo"),
+                            traditional = "你好",
+                            popularity = null
+                        ),
+                        annotation = null,
                     ),
                     onClickWord = { viewModel.toast(onClickWordToast) },
                     onClickSpeak = { viewModel.speakWord("你好") },

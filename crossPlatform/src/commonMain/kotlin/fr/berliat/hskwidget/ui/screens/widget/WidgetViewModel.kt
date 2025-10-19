@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import fr.berliat.hskwidget.core.AppDispatchers
 import fr.berliat.hskwidget.core.HSKAppServices
-import fr.berliat.hskwidget.data.model.ChineseWord
+import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.data.store.WidgetPreferencesStore
 import fr.berliat.hskwidget.domain.WidgetController
@@ -19,9 +19,9 @@ class WidgetViewModel(
     val database: ChineseWordsDatabase = HSKAppServices.database
 ) : ViewModel() {
     private var controller : WidgetController? = null
-    val wordDAO = HSKAppServices.database.chineseWordDAO()
+    val wordDAO = HSKAppServices.database.annotatedChineseWordDAO()
     val simplified: StateFlow<String> = widgetStore.currentWord.asStateFlow()
-    private val _word = MutableStateFlow<ChineseWord?>(null)
+    private val _word = MutableStateFlow<AnnotatedChineseWord?>(null)
     val word = _word.asStateFlow()
 
     init {
@@ -32,7 +32,7 @@ class WidgetViewModel(
                     updateWord()
                 } else {
                     _word.value =
-                        wordDAO.findWordFromSimplified(s)
+                        wordDAO.getFromSimplified(s)
                 }
             }
         }

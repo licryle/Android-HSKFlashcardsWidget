@@ -19,17 +19,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 import fr.berliat.hskwidget.core.Locale
-import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.baseline_refresh_24
 import fr.berliat.hskwidget.baseline_volume_up_24
+import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.type.HSK_Level
 import fr.berliat.hskwidget.dictionary_item_reload
 import fr.berliat.hskwidget.widget_btn_speak
 
 @Composable
 fun WidgetWordView(
-    word: ChineseWord,
+    word: AnnotatedChineseWord,
     modifier: Modifier = Modifier,
     onClickUpdate: () -> Unit = {},
     onClickSpeak: () -> Unit = {},
@@ -55,7 +55,7 @@ fun WidgetWordView(
 
             if (word.hskLevel != HSK_Level.NOT_HSK) {
                 Text(
-                    text = word.hskLevel.toString(),
+                    text = word.word?.hskLevel.toString(),
                     fontSize = 11.sp,
                     modifier = Modifier.align(Alignment.CenterVertically)
                         .background(MaterialTheme.colorScheme.surfaceVariant)
@@ -99,7 +99,7 @@ fun WidgetWordView(
             )
 
             Text(
-                text = word.definition[Locale.ENGLISH].toString(),
+                text = word.word?.definition[Locale.ENGLISH] ?: word.annotation?.notes ?: "",
                 fontSize = 15.sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(0.dp)
