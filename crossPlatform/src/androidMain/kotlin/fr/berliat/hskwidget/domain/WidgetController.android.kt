@@ -92,7 +92,7 @@ actual class WidgetController(
         context.startActivity(confIntent)
     }
 
-    protected override suspend fun updateDesktopWidget(word: AnnotatedChineseWord?) {
+    override suspend fun updateDesktopWidget(word: AnnotatedChineseWord?) {
         withContext(Dispatchers.IO) {
             val context = contextProvider.invoke()
             val appWidgetManager = AppWidgetManager.getInstance(context)
@@ -100,7 +100,7 @@ actual class WidgetController(
             // Switch back to the main thread to update UI
             withContext(Dispatchers.Main) {
                 var views: RemoteViews?
-                if (word == null || !word.hasWord()) {
+                if (word == null) {
                     Log.i(TAG, "updateFlashCardWidget ID $widgetId , but no word available")
 
                     views = RemoteViews(
@@ -149,13 +149,16 @@ actual class WidgetController(
                             R.id.flashcard_definition,
                             word.word?.definition[Locale.ENGLISH] ?: word.annotation?.notes
                         )
-                        setTextViewText(R.id.flashcard_pinyin, word.word?.pinyins.toString())
 
-                        setTextViewText(R.id.flashcard_hsklevel, word.word?.hskLevel.toString())
-                        setViewVisibility(
-                            R.id.flashcard_hsklevel,
-                            if (word.word?.hskLevel == HSK_Level.NOT_HSK) View.GONE else View.VISIBLE
-                        )
+                        if (word.hasWord()) {
+                            setTextViewText(R.id.flashcard_pinyin, word.word?.pinyins.toString())
+                            setTextViewText(R.id.flashcard_hsklevel, word.word?.hskLevel.toString())
+                            setViewVisibility(R.id.flashcard_hsklevel,
+                                if (word.word?.hskLevel == HSK_Level.NOT_HSK) View.GONE else View.VISIBLE)
+                        } else {
+                            setTextViewText(R.id.flashcard_pinyin, word.annotation?.pinyins.toString())
+                            setViewVisibility(R.id.flashcard_hsklevel, View.GONE)
+                        }
                     }
                 }
 
