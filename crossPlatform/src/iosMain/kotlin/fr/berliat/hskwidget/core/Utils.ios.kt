@@ -5,13 +5,8 @@ import fr.berliat.hsktextviews.HSKTextSegmenterListener
 import fr.berliat.hskwidget.data.dao.AnkiDAO
 import fr.berliat.hskwidget.domain.SearchQuery
 
-import kotlinx.cinterop.ExperimentalForeignApi
-
 import platform.Foundation.NSURL
 import platform.UIKit.UIApplication
-import platform.Foundation.NSDocumentDirectory
-import platform.Foundation.NSFileManager
-import platform.Foundation.NSUserDomainMask
 
 actual object ExpectedUtils {
     actual fun openLink(url: String) {
@@ -30,20 +25,6 @@ actual object ExpectedUtils {
 
     actual fun logAnalyticsWidgetAction(event: Utils.ANALYTICS_EVENTS, widgetId: Int) {
     }
-
-    @OptIn(ExperimentalForeignApi::class)
-    private fun documentDirectory(): String {
-        val documentDirectory = NSFileManager.defaultManager.URLForDirectory(
-            directory = NSDocumentDirectory,
-            inDomain = NSUserDomainMask,
-            appropriateForURL = null,
-            create = false,
-            error = null,
-        )
-        return requireNotNull(documentDirectory?.path)
-    }
-
-    const val DATABASE_FILENAME = "Mandarin_Assistant.db"
 
     actual fun getHSKSegmenter(): HSKTextSegmenter = object : HSKTextSegmenter {
 		override var listener: HSKTextSegmenterListener? = null
