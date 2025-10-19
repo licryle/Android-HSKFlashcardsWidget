@@ -1,5 +1,6 @@
 package fr.berliat.hskwidget.ui.components
 
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.runtime.Composable
@@ -18,14 +19,14 @@ fun SmartLinearProgressIndicator(
     if (progress in 0f..1f) {
         LinearProgressIndicator(
             progress = { progress },
-            modifier = modifier,
+            modifier = modifier.fillMaxWidth(),
             color = color,
             trackColor = trackColor,
             strokeCap = strokeCap
         )
     } else {
         LinearProgressIndicator(
-            modifier = modifier,
+            modifier = modifier.fillMaxWidth(),
             color = color,
             trackColor = trackColor,
             strokeCap = strokeCap
