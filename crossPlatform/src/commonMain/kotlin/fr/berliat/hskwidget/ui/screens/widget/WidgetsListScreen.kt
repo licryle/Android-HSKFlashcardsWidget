@@ -52,20 +52,10 @@ fun WidgetsListScreen(
 ) {
     val widgetIds = viewModel.widgetIds.collectAsState()
     val scope = rememberCoroutineScope()
-    val pagerState = rememberPagerState(
-        initialPage = max(widgetIds.value.indexOf(selectedWidgetId), 0),
-        pageCount = { widgetIds.value.size }
-    )
 
-    LaunchedEffect(widgetIds, selectedWidgetId) { // Updates page if either changes
-        val targetPage = max(widgetIds.value.indexOf(selectedWidgetId), 0)
-        if (targetPage != pagerState.currentPage) {
-            pagerState.scrollToPage(targetPage)
-        }
-    }
-
+    val ids = widgetIds.value
     Column(modifier = modifier.fillMaxSize()) {
-        if (widgetIds.value.isEmpty()) {
+        if (ids.isEmpty()) {
             // Intro + demo flashcard
             Text(
                 text = stringResource(Res.string.widgets_intro),
@@ -102,10 +92,22 @@ fun WidgetsListScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
-        if (!widgetIds.value.isEmpty()) {
+        if (!ids.isEmpty()) {
+            val pagerState = rememberPagerState(
+                initialPage = max(ids.indexOf(selectedWidgetId), 0),
+                pageCount = { ids.size }
+            )
+
+            LaunchedEffect(ids, selectedWidgetId) { // Updates page if either changes
+                val targetPage = max(ids.indexOf(selectedWidgetId), 0).coerceAtMost(ids.size - 1)
+                if (targetPage != pagerState.currentPage) {
+                    pagerState.scrollToPage(targetPage)
+                }
+            }
+
             // Tabs
             TabRow(selectedTabIndex = pagerState.currentPage) {
-                widgetIds.value.forEachIndexed { index, _ ->
+                ids.forEachIndexed { index, _ ->
                     Tab(
                         selected = pagerState.currentPage == index,
                         onClick = {
@@ -122,11 +124,11 @@ fun WidgetsListScreen(
                 modifier = Modifier.weight(1f)
             ) { page ->
                 WidgetConfigWithPreviewScreen(
-                    widgetId = widgetIds.value[page],
+                    widgetId = ids[page],
                     expectsActivityResult = expectsActivityResult,
                     onSuccessfulSave = {
                         Utils.toast(Res.string.widget_configure_saved)
-                        onWidgetPreferenceSaved(widgetIds.value[page])
+                        onWidgetPreferenceSaved(ids[page])
                     },
                     modifier = modifier
                 )
