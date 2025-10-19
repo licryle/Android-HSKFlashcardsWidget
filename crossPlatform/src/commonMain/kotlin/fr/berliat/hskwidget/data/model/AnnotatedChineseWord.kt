@@ -26,7 +26,7 @@ data class AnnotatedChineseWord (
             return if (hasWord()) {
                 word?.pinyins!!
             } else {
-                annotation?.pinyins!!
+                annotation?.pinyins ?: Pinyins()
             }
         }
 
