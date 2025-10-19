@@ -1,5 +1,6 @@
 package fr.berliat.hskwidget.ui.navigation
 
+import fr.berliat.hskwidget.core.AppDispatchers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -38,7 +39,7 @@ object NavigationManager {
     }
 
     fun navigate(screen: Screen) {
-        scope.launch(Dispatchers.Main) {
+        scope.launch(AppDispatchers.IO) {
             _navigationEvents.emit(screen)
         }
     }
