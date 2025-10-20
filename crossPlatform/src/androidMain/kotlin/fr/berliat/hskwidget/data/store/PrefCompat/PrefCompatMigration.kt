@@ -2,6 +2,7 @@ package fr.berliat.hskwidget.data.store.PrefCompat
 
 import android.content.Context
 import android.provider.DocumentsContract
+import android.util.Log
 
 import androidx.compose.ui.unit.sp
 
@@ -66,8 +67,11 @@ object PrefCompatMigration {
             oldAppPrefs.dbBackupCloudLastSuccess.toEpochMilli()
         )
 
-        // Transform the old Uri dir into compatible Uri for FileKit.
         try {
+            /**
+             * Convert my treeURI to documentURI because of this FileKit bug:
+             * https://github.com/vinceglb/FileKit/issues/418
+             */
             val treeUri = oldAppPrefs.dbBackUpDirectory
             val platformDirectory = treeUri.let {
                 // Transform the treeUri to a documentUri
@@ -80,7 +84,7 @@ object PrefCompatMigration {
 
             newAppPrefs.dbBackUpDiskDirectory.value = platformDirectory.bookmarkData()
         } catch (_ : Exception) {
-
+            Log.e(TAG, "Couldn't migrate folder permission to FileKit ${oldAppPrefs.dbBackUpDirectory}")
         }
         newAppPrefs.dbBackUpDiskActive.value = oldAppPrefs.dbBackUpActive
         newAppPrefs.dbBackUpDiskMaxFiles.value = oldAppPrefs.dbBackUpMaxLocalFiles
