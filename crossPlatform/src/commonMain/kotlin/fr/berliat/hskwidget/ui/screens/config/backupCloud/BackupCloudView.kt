@@ -144,8 +144,8 @@ fun BackupCloudView(
         val tState = transferState.value
         tState?.let {
             var title: StringResource
-            var message = ""
-            var click : (() -> Unit)? = { viewModel.cancel() }
+            var message: String
+            var click: (() -> Unit)? = { viewModel.cancel() }
             var progress: Float? = -1f
 
             when (tState) {
