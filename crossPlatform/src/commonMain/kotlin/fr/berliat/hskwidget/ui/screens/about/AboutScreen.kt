@@ -51,7 +51,6 @@ fun AboutScreen(
     val scrollState = rememberScrollState()
 
     LaunchedEffect(Unit) {
-        viewModel.registerVisit()
         viewModel.fetchStats()
     }
 

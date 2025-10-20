@@ -1,6 +1,8 @@
 package fr.berliat.hskwidget.ui.navigation
 
 import fr.berliat.hskwidget.core.AppDispatchers
+import fr.berliat.hskwidget.core.Logging.logAnalyticsScreenView
+
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -28,6 +30,7 @@ object NavigationManager {
 
     fun registerScreenVisit(screen: Screen) {
         _currentScreen.update { screen }
+        logCurrentScreen()
 
         if (stackScreen.lastOrNull() != screen) {
             if (stackScreen.size == STACK_SCREEN_DEPTH) {
@@ -35,7 +38,6 @@ object NavigationManager {
             }
             stackScreen.add(screen)
         }
-        logCurrentScreen()
     }
 
     fun navigate(screen: Screen) {
@@ -53,6 +55,6 @@ object NavigationManager {
     }
 
     private fun logCurrentScreen() {
-        println("Current screen: $currentScreen") // TODo
+        logAnalyticsScreenView(_currentScreen.value::class.simpleName ?: "UNKNOWN_SCREEN")
     }
 }
