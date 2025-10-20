@@ -21,7 +21,7 @@ import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.core.fromKBToMB
 import fr.berliat.hskwidget.ui.components.ConfirmDialog
 import fr.berliat.hskwidget.ui.components.IconButton
-import fr.berliat.hskwidget.ui.components.ProgressView
+import fr.berliat.hskwidget.ui.components.ProgressCard
 
 import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.cloud_download_24px
@@ -212,7 +212,7 @@ fun BackupCloudView(
                 }
             }
 
-            ProgressView(
+            ProgressCard(
                 title = title,
                 message = message,
                 progress = progress,

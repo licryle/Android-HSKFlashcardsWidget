@@ -18,7 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
-import fr.berliat.hskwidget.ui.components.ProgressView
+import fr.berliat.hskwidget.ui.components.ProgressCard
 
 import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.anki_icon
@@ -154,7 +154,7 @@ internal fun AnkiSyncProgress(
         }
 
     uiStateData?.let {
-        ProgressView(
+        ProgressCard(
             title = uiStateData.titleRes,
             message = uiStateData.message,
             progress = uiStateData.progress,

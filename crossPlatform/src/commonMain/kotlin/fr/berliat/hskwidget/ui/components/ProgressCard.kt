@@ -20,7 +20,7 @@ import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun ProgressView(
+fun ProgressCard(
     title: StringResource,
     message: String,
     progress: Float?,
@@ -28,7 +28,7 @@ fun ProgressView(
     modifier: Modifier = Modifier
 ) {
     PrettyCard {
-        Column(modifier = modifier.padding(8.dp)) {
+        Column(modifier = modifier.padding(15.dp)) {
             Row(modifier) {
                 Text(
                     stringResource(title),
