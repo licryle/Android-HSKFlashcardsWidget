@@ -1,8 +1,6 @@
 package fr.berliat.hskwidget.core
 
 import co.touchlab.kermit.Logger
-import com.google.firebase.Firebase
-import com.google.firebase.crashlytics.crashlytics
 import kotlinx.coroutines.CoroutineExceptionHandler
 
 object Logging {
@@ -14,7 +12,7 @@ object Logging {
                 throwable = exception,
             )
 
-            Firebase.crashlytics.recordException(exception)
+            ExpectedLogging.logCrashalytics(exception)
         }
 
     fun logAnalyticsScreenView(screenName: String) {
@@ -86,6 +84,7 @@ object Logging {
 }
 
 expect object ExpectedLogging {
+    internal fun logCrashalytics(e: Throwable)
     internal fun logAnalyticsEvent(event: Logging.ANALYTICS_EVENTS,
                           params: Map<String, String> = mapOf())
     internal fun logAnalyticsWidgetAction(event: Logging.ANALYTICS_EVENTS, widgetId: Int)

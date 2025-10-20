@@ -39,4 +39,7 @@ actual object ExpectedUtils {
 
     internal actual fun toast(s: String) {
     }
+
+    internal actual fun openAppForSearchQuery(query: SearchQuery) {
+    }
 }
