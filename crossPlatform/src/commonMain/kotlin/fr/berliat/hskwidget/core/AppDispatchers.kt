@@ -1,11 +1,11 @@
 package fr.berliat.hskwidget.core
 
-import kotlinx.coroutines.CoroutineDispatcher
+import kotlin.coroutines.CoroutineContext
 
 interface CoroutineDispatchers {
-    val Main: CoroutineDispatcher
-    val IO: CoroutineDispatcher
-    val Default: CoroutineDispatcher
+    val Main: CoroutineContext
+    val IO: CoroutineContext
+    val Default: CoroutineContext
 }
 
 expect val AppDispatchers: CoroutineDispatchers

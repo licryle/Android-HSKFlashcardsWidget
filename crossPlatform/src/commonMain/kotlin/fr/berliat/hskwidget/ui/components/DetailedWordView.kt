@@ -25,11 +25,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.font.FontStyle.Companion.Italic
 
 import fr.berliat.hskwidget.core.Locale
+import fr.berliat.hskwidget.core.Logging
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.type.Modality
 import fr.berliat.hskwidget.data.type.WordType
 import fr.berliat.hskwidget.core.capitalize
-import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.data.type.HSK_Level
 import fr.berliat.hskwidget.ui.theme.AppTypographies
 import fr.berliat.hskwidget.Res
@@ -101,9 +101,9 @@ fun DetailedWordView (
 
             isMoreVisible = !isMoreVisible
             if (isMoreVisible)
-                Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.WIDGET_EXPAND)
+                Logging.logAnalyticsEvent(Logging.ANALYTICS_EVENTS.WIDGET_EXPAND)
             else
-                Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.WIDGET_COLLAPSE)
+                Logging.logAnalyticsEvent(Logging.ANALYTICS_EVENTS.WIDGET_COLLAPSE)
         },
         shapeModifier = shapeModifier
     ) {

@@ -12,6 +12,7 @@ import fr.berliat.hskwidget.domain.DatabaseHelper
 import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.config_backup_directory_failed_selection
 import fr.berliat.hskwidget.core.AppDispatchers
+import fr.berliat.hskwidget.core.Logging
 import fr.berliat.hskwidget.dbrestore_failure_nofileselected
 import fr.berliat.hskwidget.dbrestore_start
 import fr.berliat.hskwidget.dbrestore_success
@@ -62,7 +63,7 @@ class BackupDiskViewModel(
         if (!active) {
             appConfig.dbBackUpDiskActive.value = false
 
-            Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.CONFIG_BACKUP_OFF)
+            Logging.logAnalyticsEvent(Logging.ANALYTICS_EVENTS.CONFIG_BACKUP_OFF)
             return
         }
 
@@ -71,7 +72,7 @@ class BackupDiskViewModel(
         } else {
             appConfig.dbBackUpDiskActive.value = true
 
-            Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.CONFIG_BACKUP_ON)
+            Logging.logAnalyticsEvent(Logging.ANALYTICS_EVENTS.CONFIG_BACKUP_ON)
         }
     }
 
@@ -105,14 +106,14 @@ class BackupDiskViewModel(
                         //WidgetController.().updateAllFlashCardWidgets()
 
 
-                        Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.CONFIG_BACKUP_RESTORE)
+                        Logging.logAnalyticsEvent(Logging.ANALYTICS_EVENTS.CONFIG_BACKUP_RESTORE)
                     }
                 },
                 onFail = { e ->
                     viewModelScope.launch(Dispatchers.Main) {
                         Utils.toast(Res.string.dbrestore_failure_nofileselected)
 
-                        Utils.logAnalyticsError(
+                        Logging.logAnalyticsError(
                             "BACKUP_RESTORE",
                             getString(Res.string.dbrestore_failure_nofileselected),
                             e.message ?: ""
@@ -140,7 +141,7 @@ class BackupDiskViewModel(
                         appConfig.dbBackUpDiskDirectory.value = folder.bookmarkData()
                     }
                     appConfig.dbBackUpDiskActive.value = true
-                    Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.CONFIG_BACKUP_ON)
+                    Logging.logAnalyticsEvent(Logging.ANALYTICS_EVENTS.CONFIG_BACKUP_ON)
                 },
                 onFail = {
                     Utils.toast(Res.string.config_backup_directory_failed_selection)

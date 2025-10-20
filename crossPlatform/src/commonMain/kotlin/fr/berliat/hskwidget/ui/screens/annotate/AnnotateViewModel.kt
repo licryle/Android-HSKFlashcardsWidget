@@ -6,6 +6,7 @@ import fr.berliat.hskwidget.core.AppDispatchers
 import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.core.Utils.incrementConsultedWord
 import fr.berliat.hskwidget.core.HSKAppServices
+import fr.berliat.hskwidget.core.Logging
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWord
@@ -85,7 +86,7 @@ class AnnotateViewModel(
             try {
                 database.chineseWordAnnotationDAO().insertOrUpdate(annotatedWord.annotation!!)
 
-                Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.ANNOTATION_SAVE)
+                Logging.logAnalyticsEvent(Logging.ANALYTICS_EVENTS.ANNOTATION_SAVE)
 
                 ankiCaller(wordListRepo.addWordToSysAnnotatedList(annotatedWord))
                 ankiCaller(wordListRepo.updateInAllLists(annotatedWord.simplified))
@@ -106,7 +107,7 @@ class AnnotateViewModel(
                 val nbRowAffected = database.chineseWordAnnotationDAO().deleteBySimplified(simplified)
                 if (nbRowAffected == 0) throw Exception("No records deleted")
 
-                Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.ANNOTATION_DELETE)
+                Logging.logAnalyticsEvent(Logging.ANALYTICS_EVENTS.ANNOTATION_DELETE)
 
                 wordListRepo.touchAnnotatedList()
                 ankiCaller(wordListRepo.removeWordFromAllLists(simplified))

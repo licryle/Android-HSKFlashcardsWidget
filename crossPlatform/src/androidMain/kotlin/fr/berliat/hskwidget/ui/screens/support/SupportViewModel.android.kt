@@ -21,6 +21,7 @@ import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.data.store.SupportDevStore
 
 import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.core.Logging
 import fr.berliat.hskwidget.support_payment_failed
 import fr.berliat.hskwidget.support_payment_success
 import fr.berliat.hskwidget.support_review_failed
@@ -57,8 +58,8 @@ actual class SupportViewModel(
 
     fun makePurchase(activity: Activity, productId: String) {
         supportDevStore.makePurchase(activity, productId)
-        Utils.logAnalyticsEvent(
-            Utils.ANALYTICS_EVENTS.PURCHASE_CLICK,
+        Logging.logAnalyticsEvent(
+            Logging.ANALYTICS_EVENTS.PURCHASE_CLICK,
             mapOf("product_id" to productId)
         )
     }
@@ -73,8 +74,8 @@ actual class SupportViewModel(
 
     override fun onPurchaseSuccess(purchase: Purchase) {
         Utils.toast(Res.string.support_payment_success)
-        Utils.logAnalyticsEvent(
-            Utils.ANALYTICS_EVENTS.PURCHASE_SUCCESS,
+        Logging.logAnalyticsEvent(
+            Logging.ANALYTICS_EVENTS.PURCHASE_SUCCESS,
             mapOf("product_id" to getFirstProductId(purchase))
         )
     }
@@ -89,8 +90,8 @@ actual class SupportViewModel(
 
     override fun onPurchaseFailure(purchase: Purchase?, billingResponseCode: Int) {
         Utils.toast(Res.string.support_payment_failed)
-        Utils.logAnalyticsEvent(
-            Utils.ANALYTICS_EVENTS.PURCHASE_FAILED,
+        Logging.logAnalyticsEvent(
+            Logging.ANALYTICS_EVENTS.PURCHASE_FAILED,
             mapOf("product_id" to getFirstProductId(purchase))
         )
     }
@@ -107,7 +108,7 @@ actual class SupportViewModel(
             } else {
                 Utils.toast(Res.string.support_review_failed)
                 @ReviewErrorCode val reviewErrorCode = (task.exception as ReviewException).errorCode
-                Utils.logAnalyticsError(TAG, "RequestReviewFlow_SetupFailed", reviewErrorCode.toString())
+                Logging.logAnalyticsError(TAG, "RequestReviewFlow_SetupFailed", reviewErrorCode.toString())
             }
         }
     }

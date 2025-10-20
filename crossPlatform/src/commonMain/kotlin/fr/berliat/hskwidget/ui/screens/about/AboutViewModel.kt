@@ -7,6 +7,7 @@ import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.about_email_noapp
 import fr.berliat.hskwidget.core.AppDispatchers
+import fr.berliat.hskwidget.core.Logging
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,19 +29,15 @@ class AboutViewModel {
     // Actions
     fun onClickWebsite() {
         Utils.openLink("https://github.com/licryle/Android-HSKFlashcardsWidget")
-        Utils.logAnalyticsScreenView("Github")
+        Logging.logAnalyticsScreenView("Github")
     }
 
     fun openEmail() {
-        Utils.logAnalyticsScreenView("Email")
+        Logging.logAnalyticsScreenView("Email")
 
         if (!Utils.sendEmail("cyrille.berliat+hsk@gmail.com", "About Mandarin Assistant App", "")) {
             Utils.toast(Res.string.about_email_noapp)
         }
-    }
-
-    fun registerVisit() {
-        Utils.logAnalyticsScreenView("About")
     }
 
     fun fetchStats() {

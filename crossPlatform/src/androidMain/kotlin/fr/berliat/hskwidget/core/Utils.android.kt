@@ -10,16 +10,12 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.media.AudioManager
 import android.net.Uri
-import android.os.Bundle
 import android.provider.Settings
 import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.widget.Toast
 
 import co.touchlab.kermit.Logger
-
-import com.google.firebase.Firebase
-import com.google.firebase.analytics.analytics
 
 import fr.berliat.hsktextviews.HSKTextSegmenter
 import fr.berliat.hskwidget.core.Utils.incrementConsultedWord
@@ -29,9 +25,9 @@ import fr.berliat.hskwidget.domain.SearchQuery
 import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.cancel
 import fr.berliat.hskwidget.copied_to_clipboard
-import fr.berliat.hskwidget.core.Utils.logAnalyticsError
+import fr.berliat.hskwidget.core.Logging.logAnalyticsError
+import fr.berliat.hskwidget.core.Logging.logAnalyticsEvent
 import fr.berliat.hskwidget.dialog_tts_error
-import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
 import fr.berliat.hskwidget.fix_it
 import fr.berliat.hskwidget.speech_failure_toast_chinese_unsupported
 import fr.berliat.hskwidget.speech_failure_toast_init
@@ -97,40 +93,6 @@ actual object ExpectedUtils {
         return true
     }
 
-    actual fun logAnalyticsEvent(event: Utils.ANALYTICS_EVENTS,
-                                 params: Map<String, String>) {
-        val bundle = Bundle()
-        params.forEach {
-            bundle.putString(it.key, it.value)
-        }
-
-        val widgets = FlashcardWidgetProvider.getWidgetIds()
-        bundle.putString("WIDGET_TOTAL_NUMBER", widgets.size.toString())
-
-        if (widgets.isEmpty()) {
-            bundle.putString("MAX_WIDGET_ID", "0")
-        } else {
-            bundle.putString("MAX_WIDGET_ID", widgets.last().toString())
-        }
-
-        HSKAppServices.appScope.launch(Dispatchers.IO) {
-            Firebase.analytics.logEvent(event.name, bundle)
-        }
-    }
-
-    actual fun logAnalyticsWidgetAction(event: Utils.ANALYTICS_EVENTS, widgetId: Int) {
-        val widgets = FlashcardWidgetProvider.getWidgetIds()
-        val size = FlashcardWidgetProvider.WidgetSizeProvider(context).getWidgetsSize(widgetId)
-
-        logAnalyticsEvent(
-            event,
-            mapOf(
-                "WIDGET_NUMBER" to widgets.indexOf(widgetId).toString(),
-                "WIDGET_SIZE" to "${size.first}x${size.second}"
-            )
-        )
-    }
-
     actual fun getAnkiDAO(): AnkiDAO {
         return AnkiDAO(context)
     }
@@ -150,7 +112,7 @@ actual object ExpectedUtils {
 
         toast(Res.string.copied_to_clipboard, listOf(s))
 
-        logAnalyticsEvent(Utils.ANALYTICS_EVENTS.WIDGET_COPY_WORD)
+        logAnalyticsEvent(Logging.ANALYTICS_EVENTS.WIDGET_COPY_WORD)
 
         incrementConsultedWord(s)
     }
@@ -237,7 +199,7 @@ actual object ExpectedUtils {
 
         incrementConsultedWord(word)
 
-        logAnalyticsEvent(Utils.ANALYTICS_EVENTS.WIDGET_PLAY_WORD)
+        logAnalyticsEvent(Logging.ANALYTICS_EVENTS.WIDGET_PLAY_WORD)
     }
 
     actual fun toast(s: String) {
@@ -255,7 +217,7 @@ actual object ExpectedUtils {
         }
 
         if (launchIntent != null) {
-            Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.WIDGET_OPEN_DICTIONARY)
+            Logging.logAnalyticsEvent(Logging.ANALYTICS_EVENTS.WIDGET_OPEN_DICTIONARY)
             context.startActivity(launchIntent)
         } else {
             // fallback: app has no launch intent?

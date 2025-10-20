@@ -20,10 +20,10 @@ actual object ExpectedUtils {
         return true
     }
 
-    actual fun logAnalyticsEvent(event: Utils.ANALYTICS_EVENTS, params: Map<String, String>) {
+    actual fun logAnalyticsEvent(event: Logging.ANALYTICS_EVENTS, params: Map<String, String>) {
     }
 
-    actual fun logAnalyticsWidgetAction(event: Utils.ANALYTICS_EVENTS, widgetId: Int) {
+    actual fun logAnalyticsWidgetAction(event: Logging.ANALYTICS_EVENTS, widgetId: Int) {
     }
 
     actual fun getHSKSegmenter(): HSKTextSegmenter = object : HSKTextSegmenter {

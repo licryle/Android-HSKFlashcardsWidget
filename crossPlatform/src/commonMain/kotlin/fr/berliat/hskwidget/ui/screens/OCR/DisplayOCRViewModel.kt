@@ -22,6 +22,7 @@ import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.core.AppDispatchers
 import fr.berliat.hskwidget.core.HSKAppServices
+import fr.berliat.hskwidget.core.Logging
 import fr.berliat.hskwidget.ocr_display_no_text_found
 import fr.berliat.hskwidget.ocr_display_ocr_failed
 import fr.berliat.hskwidget.ocr_display_smallest_text
@@ -167,7 +168,7 @@ class DisplayOCRViewModel(
                     Utils.copyToClipBoard(simplified)
                 }
 
-                Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.OCR_WORD_NOTFOUND)
+                Logging.logAnalyticsEvent(Logging.ANALYTICS_EVENTS.OCR_WORD_NOTFOUND)
             } else {
                 _uiState.update { it.copy(selectedWord = annotatedWord) }
                 val pinyin = ((annotatedWord.word?.pinyins ?: annotatedWord.annotation?.pinyins) ?: "").toString()
@@ -175,7 +176,7 @@ class DisplayOCRViewModel(
                 _uiState.update { it.copy(clickedWords = it.clickedWords + (annotatedWord.simplified to pinyin)) }
 
                 augmentWordFrequencyConsulted(annotatedWord.simplified)
-                Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.OCR_WORD_FOUND)
+                Logging.logAnalyticsEvent(Logging.ANALYTICS_EVENTS.OCR_WORD_FOUND)
             }
         }
     }
@@ -231,7 +232,7 @@ class DisplayOCRViewModel(
 
                 Logger.e(tag = TAG, messageString = "Text recognition failed: " + e.message)
 
-                Utils.logAnalyticsError(
+                Logging.logAnalyticsError(
                     "OCR_DISPLAY",
                     "TextRecognitionFailed",
                     e.message ?: ""

@@ -2,10 +2,10 @@ package fr.berliat.hskwidget.ui.screens.wordlist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import fr.berliat.hskwidget.core.AppDispatchers
 
-import fr.berliat.hskwidget.core.Utils
+import fr.berliat.hskwidget.core.AppDispatchers
 import fr.berliat.hskwidget.core.HSKAppServices
+import fr.berliat.hskwidget.core.Logging
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.model.WordList
 import fr.berliat.hskwidget.data.model.WordListWithCount
@@ -89,14 +89,14 @@ class WordListViewModel(
             loadAllLists() // refresh lists after creating
         }
 
-        Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.LIST_CREATE)
+        Logging.logAnalyticsEvent(Logging.ANALYTICS_EVENTS.LIST_CREATE)
     }
 
     fun deleteList(list: WordList) {
         launchSafe {
             ankiCaller(repo.deleteList(list))
             loadAllLists() // refresh lists
-            Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.LIST_DELETE)
+            Logging.logAnalyticsEvent(Logging.ANALYTICS_EVENTS.LIST_DELETE)
         }
     }
 
@@ -104,7 +104,7 @@ class WordListViewModel(
         launchSafe {
             repo.renameList(wordList.id, newName)
             loadAllLists() // refresh lists
-            Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.LIST_RENAME)
+            Logging.logAnalyticsEvent(Logging.ANALYTICS_EVENTS.LIST_RENAME)
         }
     }
 
@@ -118,7 +118,7 @@ class WordListViewModel(
                     )
                 }
 
-                Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.LIST_MODIFY_WORD)
+                Logging.logAnalyticsEvent(Logging.ANALYTICS_EVENTS.LIST_MODIFY_WORD)
 
                 _dismiss.value = true
                 _status.emit(Status.SUCCESS)

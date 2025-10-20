@@ -8,13 +8,13 @@ import co.touchlab.kermit.Logger
 
 import fr.berliat.ankidroidhelper.AnkiDelegate
 import fr.berliat.ankidroidhelper.AnkiSyncServiceDelegate
-import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.core.YYMMDDHHMMSS
 import fr.berliat.hskwidget.core.HSKAppServices
+import fr.berliat.hskwidget.core.Logging
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.domain.HSKAnkiDelegate
-import kotlinx.coroutines.flow.MutableSharedFlow
 
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,7 +22,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
-
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 
@@ -64,7 +63,7 @@ actual class AnkiSyncViewModel actual constructor(
 
         _syncProgress.value = SyncProgress(SyncState.FAILED, 0, 0, e.message ?: "")
 
-        Utils.logAnalyticsError(
+        Logging.logAnalyticsError(
             "ANKI_SYNC",
             "FullAnkiImportFailed",
             e.message ?: ""
@@ -109,10 +108,10 @@ actual class AnkiSyncViewModel actual constructor(
 
         if (enabled) {
             importsAllNotesToAnkiDroid()
-            Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.CONFIG_ANKI_SYNC_ON)
+            Logging.logAnalyticsEvent(Logging.ANALYTICS_EVENTS.CONFIG_ANKI_SYNC_ON)
         } else {
             cancelSync()
-            Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.CONFIG_ANKI_SYNC_OFF)
+            Logging.logAnalyticsEvent(Logging.ANALYTICS_EVENTS.CONFIG_ANKI_SYNC_OFF)
         }
     }
 

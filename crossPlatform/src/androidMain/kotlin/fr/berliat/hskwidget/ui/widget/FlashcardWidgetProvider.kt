@@ -8,17 +8,19 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
+
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+
 import fr.berliat.hskwidget.core.AppDispatchers
 import fr.berliat.hskwidget.core.AppServices
 import fr.berliat.hskwidget.core.ExpectedUtils
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.core.HSKAppServicesPriority
-import fr.berliat.hskwidget.core.Utils
+import fr.berliat.hskwidget.core.Logging
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.data.store.WidgetPreferencesStore
 import fr.berliat.hskwidget.data.store.WidgetPreferencesStoreProvider
@@ -26,6 +28,7 @@ import fr.berliat.hskwidget.domain.WidgetController
 import fr.berliat.hskwidget.domain.getWidgetControllerInstance
 import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.manualFileKitCoreInitialization
+
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -33,6 +36,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+
 import java.util.concurrent.TimeUnit
 
 class FlashcardWidgetProvider
@@ -150,7 +154,7 @@ class FlashcardWidgetProvider
             if (!isInitialized) init { context }
 
             for (widgetId in appWidgetIds) {
-                Utils.logAnalyticsWidgetAction(Utils.ANALYTICS_EVENTS.WIGDET_REMOVE, widgetId)
+                Logging.logAnalyticsWidgetAction(Logging.ANALYTICS_EVENTS.WIGDET_REMOVE, widgetId)
 
                 getWidgetPreferences(widgetId).clear()
             }
@@ -172,7 +176,7 @@ class FlashcardWidgetProvider
             when (intent!!.action) {
                 WidgetController.Companion.ACTION_CONFIGURE_LATEST -> {
                     getWidgetController(getWidgetIds().last()).startActivityToConfigure()
-                    Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.WIGDET_ADD)
+                    Logging.logAnalyticsEvent(Logging.ANALYTICS_EVENTS.WIGDET_ADD)
                 }
 
                 AppWidgetManager.ACTION_APPWIDGET_CONFIGURE -> {
@@ -194,12 +198,12 @@ class FlashcardWidgetProvider
                     if (widgetId == -1) {
                         widgetIds = getWidgetIds()
 
-                        Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.AUTO_WORD_CHANGE)
+                        Logging.logAnalyticsEvent(Logging.ANALYTICS_EVENTS.AUTO_WORD_CHANGE)
                     } else {
                         widgetIds[0] = widgetId
 
-                        Utils.logAnalyticsWidgetAction(
-                            Utils.ANALYTICS_EVENTS.WIDGET_MANUAL_WORD_CHANGE, widgetId
+                        Logging.logAnalyticsWidgetAction(
+                            Logging.ANALYTICS_EVENTS.WIDGET_MANUAL_WORD_CHANGE, widgetId
                         )
                     }
 
@@ -223,7 +227,7 @@ class FlashcardWidgetProvider
     ) {
         Log.i(TAG, "onAppWidgetOptionsChanged")
         super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions)
-        Utils.logAnalyticsWidgetAction(Utils.ANALYTICS_EVENTS.WIGDET_RESIZE, appWidgetId)
+        Logging.logAnalyticsWidgetAction(Logging.ANALYTICS_EVENTS.WIGDET_RESIZE, appWidgetId)
     }
 
     override fun onEnabled(context: Context) {

@@ -14,6 +14,7 @@ import fr.berliat.hskwidget.core.toSafeFileName
 
 import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.core.AppDispatchers
+import fr.berliat.hskwidget.core.Logging
 import fr.berliat.hskwidget.ocr_capture_error_processed
 import fr.berliat.hskwidget.ocr_capture_error_save
 
@@ -68,7 +69,7 @@ class CaptureImageViewModel(
                         )
                         Utils.toast(Res.string.ocr_capture_error_processed)
 
-                        Utils.logAnalyticsError(
+                        Logging.logAnalyticsError(
                             "OCR_CAPTURE",
                             "ProcessingPictureFailed",
                             result.exception.message ?: ""
@@ -79,7 +80,7 @@ class CaptureImageViewModel(
             }
         }
 
-        Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.OCR_CAPTURE)
+        Logging.logAnalyticsEvent(Logging.ANALYTICS_EVENTS.OCR_CAPTURE)
     }
 
     fun onCameraControllerReady(controller: CameraController) {

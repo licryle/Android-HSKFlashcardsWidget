@@ -13,6 +13,7 @@ import fr.berliat.hskwidget.ui.navigation.Screen
 import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.core.AppDispatchers
 import fr.berliat.hskwidget.core.HSKAppServicesPriority
+import fr.berliat.hskwidget.core.Logging
 import fr.berliat.hskwidget.database_update_failure
 import fr.berliat.hskwidget.database_update_start
 import fr.berliat.hskwidget.database_update_success
@@ -79,7 +80,7 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
                 }, { e ->
                     Utils.toast(Res.string.database_update_failure, listOf(e.message ?: ""))
 
-                    Utils.logAnalyticsError(TAG, "UpdateDatabaseFromAssetFailure", e.message ?: "")
+                    Logging.logAnalyticsError(TAG, "UpdateDatabaseFromAssetFailure", e.message ?: "")
                 })
             }
         }

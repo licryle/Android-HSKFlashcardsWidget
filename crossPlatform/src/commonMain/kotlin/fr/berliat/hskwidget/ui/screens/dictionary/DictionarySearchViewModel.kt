@@ -3,6 +3,7 @@ package fr.berliat.hskwidget.ui.screens.dictionary
 import fr.berliat.hskwidget.core.AppDispatchers
 import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.core.HSKAppServices
+import fr.berliat.hskwidget.core.Logging
 import fr.berliat.hskwidget.data.dao.AnnotatedChineseWordDAO
 
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,13 +47,13 @@ class DictionarySearchViewModel(private val prefsStore: AppPreferencesStore = HS
     fun toggleHSK3(value: Boolean) {
         prefsStore.dictionaryShowHSK3Definition.value = value
 
-        Utils.logAnalyticsEvent(if (value) Utils.ANALYTICS_EVENTS.DICT_HSK3_ON else Utils.ANALYTICS_EVENTS.DICT_HSK3_OFF)
+        Logging.logAnalyticsEvent(if (value) Logging.ANALYTICS_EVENTS.DICT_HSK3_ON else Logging.ANALYTICS_EVENTS.DICT_HSK3_OFF)
     }
 
     fun toggleHasAnnotation(value: Boolean) {
         prefsStore.searchFilterHasAnnotation.value = value
 
-        Utils.logAnalyticsEvent(if (value) Utils.ANALYTICS_EVENTS.DICT_ANNOTATION_ON else Utils.ANALYTICS_EVENTS.DICT_ANNOTATION_OFF)
+        Logging.logAnalyticsEvent(if (value) Logging.ANALYTICS_EVENTS.DICT_ANNOTATION_ON else Logging.ANALYTICS_EVENTS.DICT_ANNOTATION_OFF)
     }
 
     fun performSearch() {
@@ -69,7 +70,7 @@ class DictionarySearchViewModel(private val prefsStore: AppPreferencesStore = HS
             }
         }
 
-        Utils.logAnalyticsEvent(Utils.ANALYTICS_EVENTS.DICT_SEARCH)
+        Logging.logAnalyticsEvent(Logging.ANALYTICS_EVENTS.DICT_SEARCH)
     }
 
     fun loadMore() {

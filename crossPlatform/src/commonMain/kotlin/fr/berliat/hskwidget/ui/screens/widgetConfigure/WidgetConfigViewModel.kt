@@ -2,10 +2,10 @@ package fr.berliat.hskwidget.ui.screens.widgetConfigure
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import fr.berliat.hskwidget.core.AppDispatchers
 
-import fr.berliat.hskwidget.core.Utils
+import fr.berliat.hskwidget.core.AppDispatchers
 import fr.berliat.hskwidget.core.HSKAppServices
+import fr.berliat.hskwidget.core.Logging
 import fr.berliat.hskwidget.data.dao.WidgetListDAO
 import fr.berliat.hskwidget.data.dao.WordListDAO
 import fr.berliat.hskwidget.data.model.WidgetListEntry
@@ -37,8 +37,8 @@ class WidgetConfigViewModel(
 
     init {
         loadLists()
-        Utils.logAnalyticsWidgetAction(
-            event = Utils.ANALYTICS_EVENTS.WIDGET_CONFIG_VIEW,
+        Logging.logAnalyticsWidgetAction(
+            event = Logging.ANALYTICS_EVENTS.WIDGET_CONFIG_VIEW,
             widgetId = widgetId
         )
     }
@@ -69,7 +69,7 @@ class WidgetConfigViewModel(
                     it.invoke()
                 }
 
-                Utils.logAnalyticsWidgetAction(Utils.ANALYTICS_EVENTS.WIDGET_RECONFIGURE, widgetId)
+                Logging.logAnalyticsWidgetAction(Logging.ANALYTICS_EVENTS.WIDGET_RECONFIGURE, widgetId)
             }
         }
     }
