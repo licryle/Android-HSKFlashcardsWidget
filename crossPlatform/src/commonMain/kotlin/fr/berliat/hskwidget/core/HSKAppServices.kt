@@ -64,10 +64,9 @@ object HSKAppServices : AppServices() {
             AppPreferencesStore.getInstance(PrefixedPreferencesStore.getDataStore("app.preferences_pb"))
         }
 
-        // A unique datastore is needed, otherwise it fails silently (!) to write anything.
-        val widgetDataStore = PrefixedPreferencesStore.getDataStore("widgets.preferences_pb")
         register("widgetsPreferencesProvider", HSKAppServicesPriority.Widget) {
             val provider : WidgetPreferencesStoreProvider = { widgetId: Int ->
+                val widgetDataStore = PrefixedPreferencesStore.getDataStore("widgets.preferences_pb")
                 WidgetPreferencesStore.getInstance(widgetDataStore, widgetId)
             }
             provider

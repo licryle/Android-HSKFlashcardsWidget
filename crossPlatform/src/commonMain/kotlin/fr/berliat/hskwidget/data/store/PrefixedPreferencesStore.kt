@@ -40,16 +40,24 @@ open class PrefixedPreferencesStore protected constructor(
             }
         }
 
-        fun getDataStore(file: String): DataStore<Preferences> {
+        private val dataStoreMutex = Mutex()
+        private val dataStoreInstances = mutableMapOf<String, DataStore<Preferences>>()
+        suspend fun getDataStore(file: String): DataStore<Preferences> {
 			val fileAbsPath = FileKit.filesDir.resolve(file).absolutePath()
 				.removePrefix("file://") // Handles the case where it starts with file://
 				.removePrefix("file:")   // Handles the case where it starts with file:/ (your error)
 				.removePrefix("/")       // Ensures we don't double-slash
 				.removePrefix("//")      // Ensures we don't have multiple slashes at the start
 
-            return PreferenceDataStoreFactory.createWithPath(
-                 produceFile = { "/$fileAbsPath".toPath() }
-            )
+            dataStoreInstances[fileAbsPath]?.let { return it }
+
+            return dataStoreMutex.withLock {
+                dataStoreInstances[fileAbsPath] ?: PreferenceDataStoreFactory.createWithPath(
+                    produceFile = { "/$fileAbsPath".toPath() }
+                ).also { instance ->
+                    dataStoreInstances[fileAbsPath] = instance
+                }
+            }
         }
     }
 
