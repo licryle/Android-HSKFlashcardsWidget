@@ -16,6 +16,8 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
     alias(libs.plugins.buildKonfig)
+    alias(libs.plugins.googleServices)
+    alias(libs.plugins.crashlytics)
     id("co.touchlab.skie") version "0.10.6"
 }
 
@@ -85,6 +87,8 @@ kotlin {
                 implementation(project(":googledrivebackup"))
                 implementation(libs.androidx.constraintlayout)
                 implementation(libs.material)
+
+                implementation(project.dependencies.platform(libs.firebase.bom))
                 implementation(libs.firebase.analytics)
                 implementation(libs.firebase.crashlytics)
 
