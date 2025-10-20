@@ -65,20 +65,20 @@ object Utils {
 }
 
 expect object ExpectedUtils {
-    fun openLink(url: String)
-    fun sendEmail(email: String, subject: String = "", body: String = "") : Boolean
+    internal fun openLink(url: String)
+    internal fun sendEmail(email: String, subject: String = "", body: String = "") : Boolean
 
-    fun getHSKSegmenter() : HSKTextSegmenter
+    internal fun getHSKSegmenter() : HSKTextSegmenter
 
     internal fun getAnkiDAO(): AnkiDAO
 
 
-    fun copyToClipBoard(s: String)
-    fun playWordInBackground(word: String)
+    internal fun copyToClipBoard(s: String)
+    internal fun playWordInBackground(word: String)
 
-    fun toast(s: String)
+    internal fun toast(s: String)
 
-    fun openAppForSearchQuery(query: SearchQuery)
+    internal fun openAppForSearchQuery(query: SearchQuery)
 }
 
 fun String.capitalize() =

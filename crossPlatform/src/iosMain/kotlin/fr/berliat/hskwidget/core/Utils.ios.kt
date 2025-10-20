@@ -9,24 +9,18 @@ import platform.Foundation.NSURL
 import platform.UIKit.UIApplication
 
 actual object ExpectedUtils {
-    actual fun openLink(url: String) {
+    internal actual fun openLink(url: String) {
         val nsUrl = NSURL.URLWithString(url) ?: return
         UIApplication.sharedApplication.openURL(nsUrl)
     }
 
-    actual fun sendEmail(email: String, subject: String, body: String) : Boolean {
+    internal actual fun sendEmail(email: String, subject: String, body: String) : Boolean {
         val urlString = "mailto:$email?subject=${subject}&body=${body}"
         openLink(urlString)
         return true
     }
 
-    actual fun logAnalyticsEvent(event: Logging.ANALYTICS_EVENTS, params: Map<String, String>) {
-    }
-
-    actual fun logAnalyticsWidgetAction(event: Logging.ANALYTICS_EVENTS, widgetId: Int) {
-    }
-
-    actual fun getHSKSegmenter(): HSKTextSegmenter = object : HSKTextSegmenter {
+    internal actual fun getHSKSegmenter(): HSKTextSegmenter = object : HSKTextSegmenter {
 		override var listener: HSKTextSegmenterListener? = null
 		override suspend fun preload() {}
 		override fun segment(text: String): Array<String>? { return null }
@@ -37,15 +31,12 @@ actual object ExpectedUtils {
         return AnkiDAO()
     }
 
-    actual fun copyToClipBoard(s: String) {
+    internal actual fun copyToClipBoard(s: String) {
     }
 
-    actual fun playWordInBackground(word: String) {
+    internal actual fun playWordInBackground(word: String) {
     }
 
-    actual fun toast(s: String) {
-    }
-
-    actual fun openAppForSearchQuery(query: SearchQuery) {
+    internal actual fun toast(s: String) {
     }
 }

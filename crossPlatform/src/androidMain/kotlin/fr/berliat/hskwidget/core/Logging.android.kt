@@ -8,8 +8,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 actual object ExpectedLogging {
-    actual fun logAnalyticsEvent(event: Logging.ANALYTICS_EVENTS,
-                                 params: Map<String, String>) {
+    internal actual fun logAnalyticsEvent(event: Logging.ANALYTICS_EVENTS,
+                                          params: Map<String, String>) {
         val bundle = Bundle()
         params.forEach {
             bundle.putString(it.key, it.value)
@@ -29,7 +29,7 @@ actual object ExpectedLogging {
         }
     }
 
-    actual fun logAnalyticsWidgetAction(event: Logging.ANALYTICS_EVENTS, widgetId: Int) {
+    internal actual fun logAnalyticsWidgetAction(event: Logging.ANALYTICS_EVENTS, widgetId: Int) {
         val widgets = FlashcardWidgetProvider.getWidgetIds()
         val size = FlashcardWidgetProvider.WidgetSizeProvider(ExpectedUtils.context).getWidgetsSize(widgetId)
 

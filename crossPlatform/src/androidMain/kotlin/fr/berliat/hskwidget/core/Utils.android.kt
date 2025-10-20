@@ -61,7 +61,7 @@ actual object ExpectedUtils {
         _context = context
     }
 
-    actual fun openLink(url: String) {
+    internal actual fun openLink(url: String) {
         val intent = Intent(
             Intent.ACTION_VIEW,
             Uri.parse(url)
@@ -70,7 +70,7 @@ actual object ExpectedUtils {
         context.startActivity(intent)
     }
 
-    actual fun sendEmail(email: String, subject: String, body: String) : Boolean {
+    internal actual fun sendEmail(email: String, subject: String, body: String) : Boolean {
         val intent = Intent(Intent.ACTION_SENDTO).apply {
             data = Uri.parse("mailto:") // use only "mailto:", don't put address here
             putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
@@ -93,15 +93,15 @@ actual object ExpectedUtils {
         return true
     }
 
-    actual fun getAnkiDAO(): AnkiDAO {
+    internal actual fun getAnkiDAO(): AnkiDAO {
         return AnkiDAO(context)
     }
 
-    actual fun getHSKSegmenter() : HSKTextSegmenter {
+    internal actual fun getHSKSegmenter() : HSKTextSegmenter {
         return JiebaHSKTextSegmenter()
     }
 
-    actual fun copyToClipBoard(s: String) {
+    internal actual fun copyToClipBoard(s: String) {
         // https://stackoverflow.com/a/28780585/3059536
         val context = context
 
@@ -123,7 +123,7 @@ actual object ExpectedUtils {
         return musicVolume == 0
     }
 
-    actual fun playWordInBackground(word: String) {
+    internal actual fun playWordInBackground(word: String) {
         data class SpeechError(val errStringId: StringResource, var errRemedyIntent: String? = null)
         val TAG = TAG
 
@@ -202,13 +202,13 @@ actual object ExpectedUtils {
         logAnalyticsEvent(Logging.ANALYTICS_EVENTS.WIDGET_PLAY_WORD)
     }
 
-    actual fun toast(s: String) {
+    internal actual fun toast(s: String) {
         CoroutineScope(Dispatchers.Main).launch {
             Toast.makeText(context, s, Toast.LENGTH_LONG).show()
         }
     }
 
-    actual fun openAppForSearchQuery(query: SearchQuery) {
+    internal actual fun openAppForSearchQuery(query: SearchQuery) {
         val context = context
         val pm = context.packageManager
         val launchIntent = pm.getLaunchIntentForPackage(context.packageName)?.apply {

@@ -86,7 +86,7 @@ object Logging {
 }
 
 expect object ExpectedLogging {
-    fun logAnalyticsEvent(event: Logging.ANALYTICS_EVENTS,
+    internal fun logAnalyticsEvent(event: Logging.ANALYTICS_EVENTS,
                           params: Map<String, String> = mapOf())
-    fun logAnalyticsWidgetAction(event: Logging.ANALYTICS_EVENTS, widgetId: Int)
+    internal fun logAnalyticsWidgetAction(event: Logging.ANALYTICS_EVENTS, widgetId: Int)
 }
