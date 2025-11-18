@@ -473,7 +473,7 @@
 				"EXCLUDED_ARCHS[sdk=*]" = x86_64;
 				"FRAMEWORK_SEARCH_PATHS[arch=*]" = "$(SRCROOT)/../crossPlatform/build/bin";
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Mandaring Assistant HSK Widget";
+				INFOPLIST_KEY_CFBundleDisplayName = "Mandarin Assistant HSK Widget";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -520,7 +520,7 @@
 				"EXCLUDED_ARCHS[sdk=*]" = x86_64;
 				"FRAMEWORK_SEARCH_PATHS[arch=*]" = "$(SRCROOT)/../crossPlatform/build/bin/";
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Mandaring Assistant HSK Widget";
+				INFOPLIST_KEY_CFBundleDisplayName = "Mandarin Assistant HSK Widget";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
