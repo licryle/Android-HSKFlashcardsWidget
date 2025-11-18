@@ -6,7 +6,7 @@ import androidx.room.RoomDatabase
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 
 import io.github.vinceglb.filekit.PlatformFile
-import io.github.vinceglb.filekit.absolutePath
+import io.github.vinceglb.filekit.path
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -68,18 +68,12 @@ actual suspend fun copyDatabaseAssetFile() {
     }
 }
 
-// You'll likely need this K/N function, often used in bridging with Objective-C APIs
 @OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
-private fun NSSearchPathForDirectoriesInDomains(
-    directory: platform.Foundation.NSSearchPathDirectory,
-    domainMask: platform.Foundation.NSSearchPathDomainMask,
-    expandTilde: Boolean
-) = platform.Foundation.NSSearchPathForDirectoriesInDomains(directory, domainMask, expandTilde)
 actual suspend fun createRoomDatabaseBuilderFromFile(file: PlatformFile): RoomDatabase.Builder<ChineseWordsDatabase> {
     NSLog("INFO: createRoomDatabaseBuilderFromFile $file")
 
     return Room.databaseBuilder(
-        name = file.absolutePath()
+        name = file.path
     )
     // Because of the SQLDriver in KMP, can't use createFromXXX()
 }
