@@ -15,6 +15,8 @@ fun AppViewController(): UIViewController = ComposeUIViewController(
 			enforceStrictPlistSanityCheck = false
 		}
 	) {
+
+	viewModel.init() // Force init of viewModel
     // This is a composable context, so we can call our composable functions
     AppView(
         viewModel = viewModel

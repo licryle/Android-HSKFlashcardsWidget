@@ -3,7 +3,8 @@ import crossPlatformKit
 
 struct ComposeView: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIViewController {
-        crossPlatformKit.AppViewControllerKt.AppViewController() // Call the Kotlin ViewController
+        let _ = crossPlatformKit.HSKAppServices.shared
+        return crossPlatformKit.AppViewControllerKt.AppViewController() // Call the Kotlin ViewController
     }
 
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}

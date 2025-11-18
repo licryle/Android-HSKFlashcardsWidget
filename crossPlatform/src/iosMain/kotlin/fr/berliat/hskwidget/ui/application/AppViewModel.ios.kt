@@ -8,5 +8,6 @@ actual class AppViewModel(navigationManager: NavigationManager) : CommonAppViewM
 
     override suspend fun finishInitialization() {
         HSKAppServices.registerAnkiDelegators(HSKAnkiDelegate())
+		super.init()
     }
 }

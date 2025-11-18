@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1C8A8BF82E733E1B00B8E39B /* crossPlatformKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C8A8BF72E733E1B00B8E39B /* crossPlatformKit.framework */; };
-		1C8A8BF92E733E1B00B8E39B /* crossPlatformKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1C8A8BF72E733E1B00B8E39B /* crossPlatformKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		1C200D132EB64F7900615172 /* crossPlatformKit in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C200D122EB64F7900615172 /* crossPlatformKit */; };
+		1C200D142EB64F7900615172 /* crossPlatformKit in Embed Libraries */ = {isa = PBXBuildFile; fileRef = 1C200D122EB64F7900615172 /* crossPlatformKit */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -29,24 +29,24 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		1C8A8BFA2E733E1B00B8E39B /* Embed Frameworks */ = {
+		1C200D152EB64F7900615172 /* Embed Libraries */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				1C8A8BF92E733E1B00B8E39B /* crossPlatformKit.framework in Embed Frameworks */,
+				1C200D142EB64F7900615172 /* crossPlatformKit in Embed Libraries */,
 			);
-			name = "Embed Frameworks";
+			name = "Embed Libraries";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1C200D122EB64F7900615172 /* crossPlatformKit */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = crossPlatformKit; path = "../crossPlatform/build/XCFrameworks/debug/crossPlatform.xcframework/ios-arm64/crossPlatformKit.framework/crossPlatformKit"; sourceTree = "<group>"; };
 		1C7166D52E71E186000B4154 /* hskwidget.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = hskwidget.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1C7166E32E71E189000B4154 /* hskwidgetTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = hskwidgetTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1C7166ED2E71E189000B4154 /* hskwidgetUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = hskwidgetUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		1C8A8BF72E733E1B00B8E39B /* crossPlatformKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = crossPlatformKit.framework; path = "../crossPlatform/build/xcode-frameworks/Debug/iphonesimulator/crossPlatformKit.framework"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -84,7 +84,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1C8A8BF82E733E1B00B8E39B /* crossPlatformKit.framework in Frameworks */,
+				1C200D132EB64F7900615172 /* crossPlatformKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -130,7 +130,7 @@
 		1C8A8BF62E733E1B00B8E39B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				1C8A8BF72E733E1B00B8E39B /* crossPlatformKit.framework */,
+				1C200D122EB64F7900615172 /* crossPlatformKit */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -155,7 +155,7 @@
 				1C7166D12E71E186000B4154 /* Sources */,
 				1C7166D22E71E186000B4154 /* Frameworks */,
 				1C7166D32E71E186000B4154 /* Resources */,
-				1C8A8BFA2E733E1B00B8E39B /* Embed Frameworks */,
+				1C200D152EB64F7900615172 /* Embed Libraries */,
 			);
 			buildRules = (
 			);
@@ -302,7 +302,8 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "#!/bin/sh\ncd \"$SRCROOT/..\"\n\n# Let Gradle pick up Xcode's environment variables\n#CONFIGURATION=Debug TARGET_BUILD_DIR=some_dir FRAMEWORKS_FOLDER_PATH=other_dir SDK_NAME=iphonesimulator ARCHS=x86_64 ./gradlew :crossPlatform:embedAndSignAppleFrameworkForXcode\nCONFIGURATION=Debug TARGET_BUILD_DIR=some_dir FRAMEWORKS_FOLDER_PATH=other_dir ./gradlew :crossPlatform:embedAndSignAppleFrameworkForXcode\n";
+			shellScript = "#!/bin/sh\ncd \"$SRCROOT/..\"\n\n# Let Gradle pick up Xcode's environment variables\n#CONFIGURATION=Debug TARGET_BUILD_DIR=some_dir FRAMEWORKS_FOLDER_PATH=other_dir SDK_NAME=iphonesimulator ARCHS=x86_64 ./gradlew :crossPlatform:embedAndSignAppleFrameworkForXcode\n#CONFIGURATION=Debug TARGET_BUILD_DIR=some_dir FRAMEWORKS_FOLDER_PATH=other_dir ARCHS=arm64 ./gradlew :crossPlatform:embedAndSignAppleFrameworkForXcode\n\n$SRCROOT/../gradlew :crossPlatform:embedAndSignAppleFrameworkForXcode \\\n    -PCONFIGURATION=$CONFIGURATION \\\n    -PTARGET_BUILD_DIR=$TARGET_BUILD_DIR \\\n    -PFRAMEWORKS_FOLDER_PATH=$FRAMEWORKS_FOLDER_PATH \\\n    -PARCHS=\"$ARCHS\" \\\n    -PPLATFORM_NAME=$PLATFORM_NAME \\\n    -PSDK_NAME=$SDK_NAME\n";
+			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -469,6 +470,8 @@
 				DEVELOPMENT_TEAM = V7M52D35G4;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				"EXCLUDED_ARCHS[sdk=*]" = x86_64;
+				"FRAMEWORK_SEARCH_PATHS[arch=*]" = "$(SRCROOT)/../crossPlatform/build/bin";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Mandaring Assistant HSK Widget";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
@@ -482,8 +485,11 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
-				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/Frameworks",
+					"$(inherited)",
+				);
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.5;
 				MARKETING_VERSION = 1.0;
@@ -511,6 +517,8 @@
 				DEVELOPMENT_TEAM = V7M52D35G4;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				"EXCLUDED_ARCHS[sdk=*]" = x86_64;
+				"FRAMEWORK_SEARCH_PATHS[arch=*]" = "$(SRCROOT)/../crossPlatform/build/bin/";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Mandaring Assistant HSK Widget";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
@@ -524,8 +532,11 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
-				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/Frameworks",
+					"$(inherited)",
+				);
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.5;
 				MARKETING_VERSION = 1.0;
