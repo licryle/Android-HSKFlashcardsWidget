@@ -58,6 +58,7 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
                     if (readyStatus.upToPrio >= HSKAppServicesPriority.FullApp) {
                         // Already ready from a previous launch still in memory
                         _isReady.value = true
+                        executePendingActions()
                     } else {
                         finishInitialization()
                     }
@@ -73,6 +74,10 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
 
         if (didUpdateApp()) handleAppUpdate()
 
+        executePendingActions()
+    }
+
+    protected open suspend fun executePendingActions() {
         // Mark as initialized and process any pending actions
         synchronized(pendingActions) {
             isInitialized = true
