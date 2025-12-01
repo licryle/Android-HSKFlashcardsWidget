@@ -85,6 +85,10 @@ fun DisplayOCRScreen(
 
     LaunchedEffect(preText) {
         viewModel.setText(preText)
+
+        val word = uiState.selectedWord?.simplified ?: ""
+        if (word != "")
+            viewModel.fetchWordForDisplay(word)
     }
 
     LaunchedEffect(uiState.isSegmenterReady, imageFile) {
