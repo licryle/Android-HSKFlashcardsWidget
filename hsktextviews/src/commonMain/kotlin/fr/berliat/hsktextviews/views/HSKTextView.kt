@@ -46,6 +46,7 @@ fun HSKTextView(
     loadingComposable: @Composable () -> Unit,
     emptyComposable: @Composable () -> Unit,
     onWordClick: ((String) -> Unit)? = null,
+    onTextAnalysisSuccess: ((List<Pair<String, String>>) -> Unit)? = null,
     onTextAnalysisFailure: ((e: Exception) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
@@ -74,6 +75,8 @@ fun HSKTextView(
 
             if (words.isEmpty()) {
                 onTextAnalysisFailure?.invoke(Exception("Segmenter returned no words"))
+            } else {
+                onTextAnalysisSuccess?.invoke(words)
             }
         }
     }

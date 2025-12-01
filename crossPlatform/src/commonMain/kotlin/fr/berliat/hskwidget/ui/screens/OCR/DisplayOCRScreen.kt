@@ -131,6 +131,7 @@ fun DisplayOCRScreen(
                             showPinyins = if (uiState.showPinyins) ShowPinyins.ALL else ShowPinyins.CLICKED,
                             endSeparator = if (uiState.separatorEnabled) viewModel.wordSeparator else "",
                             clickedWords = uiState.clickedWords,
+                            onTextAnalysisSuccess = { words -> viewModel.augmentWordFrequencyAppeared(words) },
                             onTextAnalysisFailure = { e -> viewModel.setError(Res.string.ocr_display_text_segmentation_failed) }
                         )
 

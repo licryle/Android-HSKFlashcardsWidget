@@ -128,9 +128,9 @@ class DisplayOCRViewModel(
     }
 
     // TODO reconnect
-    fun augmentWordFrequencyAppeared(words: Map<String, Int>) {
+    fun augmentWordFrequencyAppeared(words: List<Pair<String, String>>) {
         viewModelScope.launch(AppDispatchers.IO) {
-            frequencyWordsRepo.incrementAppeared(words)
+            frequencyWordsRepo.incrementAppeared(words.groupingBy { it.first }.eachCount())
         }
     }
 
