@@ -39,7 +39,7 @@ import kotlinx.coroutines.withContext
 
 import java.util.concurrent.TimeUnit
 
-class FlashcardWidgetProvider
+actual class FlashcardWidgetProvider actual constructor()
     : AppWidgetProvider() {
     companion object {
         private const val TAG = "WidgetProvider"
@@ -119,7 +119,7 @@ class FlashcardWidgetProvider
         }
     }
 
-    fun updateAllFlashCardWidgets() {
+    actual fun updateAllFlashCardWidgets() {
         val context = contextProvider.invoke()
         val widgetIds = getWidgetIds()
         onUpdate(context,

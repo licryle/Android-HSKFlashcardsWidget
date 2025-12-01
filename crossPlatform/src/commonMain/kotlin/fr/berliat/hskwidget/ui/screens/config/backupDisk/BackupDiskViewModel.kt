@@ -19,6 +19,7 @@ import fr.berliat.hskwidget.dbrestore_start
 import fr.berliat.hskwidget.dbrestore_success
 import fr.berliat.hskwidget.ui.navigation.NavigationManager
 import fr.berliat.hskwidget.ui.navigation.Screen
+import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
 
 import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.PlatformFile
@@ -105,7 +106,7 @@ class BackupDiskViewModel(
                             }
 
                             // Backup was successful, let's trigger widget updates, hoping any matches
-                            //FlashcardWidgetProvider().updateAllFlashCardWidgets()
+                            FlashcardWidgetProvider().updateAllFlashCardWidgets()
 
                             Logging.logAnalyticsEvent(Logging.ANALYTICS_EVENTS.CONFIG_BACKUP_RESTORE)
                         } catch (e: Exception) {

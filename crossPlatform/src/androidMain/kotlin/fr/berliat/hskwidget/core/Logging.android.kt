@@ -1,10 +1,13 @@
 package fr.berliat.hskwidget.core
 
 import android.os.Bundle
+
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.analytics
 import com.google.firebase.crashlytics.crashlytics
+
 import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
+
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
