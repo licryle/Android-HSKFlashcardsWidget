@@ -42,6 +42,10 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
     private val _isReady = MutableStateFlow<Boolean>(false)
     val isReady = _isReady.asSharedFlow()
 
+    // Queue for actions that need to be executed after initialization
+    private val pendingActions = mutableListOf<() -> Unit>()
+    private var isInitialized = false
+
     open fun init() {
         HSKAppServices.init(HSKAppServicesPriority.PartialApp)
         // Launch a coroutine that reacts to changes
@@ -68,6 +72,13 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
         handleDbOperations()
 
         if (didUpdateApp()) handleAppUpdate()
+
+        // Mark as initialized and process any pending actions
+        synchronized(pendingActions) {
+            isInitialized = true
+            pendingActions.forEach { it.invoke() }
+            pendingActions.clear()
+        }
     }
 
     protected open fun handleAppUpdate() {
@@ -155,6 +166,20 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
     }
 
     open fun finalizeWidgetConfiguration(widgetId: Int) { }
+
+    /**
+     * Execute an action either immediately (if initialized) or queue it for later execution.
+     * This prevents race conditions when handling intents before services are ready.
+     */
+    protected fun executeWhenReady(action: () -> Unit) {
+        synchronized(pendingActions) {
+            if (isInitialized) {
+                action.invoke()
+            } else {
+                pendingActions.add(action)
+            }
+        }
+    }
 
     companion object {
         private const val TAG = "AppViewModel"

@@ -120,10 +120,13 @@ actual class AppViewModel(navigationManager: NavigationManager, val activityProv
     }
 
     fun handleIntent(intent: Intent) {
-        handleWidgetConfigIntent(intent)
-        handleSearchIntent(intent)
-        handleTextSearchIntent(intent)
-        handleImageOCRIntent(intent)
+        // Defer intent handling until services are ready to prevent race conditions
+        executeWhenReady {
+            handleWidgetConfigIntent(intent)
+            handleSearchIntent(intent)
+            handleTextSearchIntent(intent)
+            handleImageOCRIntent(intent)
+        }
     }
 
     private fun handleWidgetConfigIntent(intent: Intent?) {
