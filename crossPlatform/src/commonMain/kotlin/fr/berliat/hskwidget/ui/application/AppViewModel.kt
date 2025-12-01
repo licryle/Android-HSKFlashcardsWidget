@@ -31,6 +31,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 expect class AppViewModel: CommonAppViewModel
 
@@ -44,6 +46,7 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
 
     // Queue for actions that need to be executed after initialization
     private val pendingActions = mutableListOf<() -> Unit>()
+	private val pendingActionsMutex = Mutex()
     private var isInitialized = false
 
     open fun init() {
@@ -79,7 +82,7 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
 
     protected open suspend fun executePendingActions() {
         // Mark as initialized and process any pending actions
-        synchronized(pendingActions) {
+		pendingActionsMutex.withLock {
             isInitialized = true
             pendingActions.forEach { it.invoke() }
             pendingActions.clear()
@@ -177,13 +180,15 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
      * This prevents race conditions when handling intents before services are ready.
      */
     protected fun executeWhenReady(action: () -> Unit) {
-        synchronized(pendingActions) {
-            if (isInitialized) {
-                action.invoke()
-            } else {
-                pendingActions.add(action)
-            }
-        }
+		viewModelScope.launch(AppDispatchers.IO) {
+			pendingActionsMutex.withLock {
+				if (isInitialized) {
+					action.invoke()
+				} else {
+					pendingActions.add(action)
+				}
+			}
+		}
     }
 
     companion object {
