@@ -66,7 +66,7 @@ fun AppBar(
         localText = newValue
         debounceJob?.cancel()
         debounceJob = coroutineScope.launch {
-            delay(100) // 300ms debounce
+            delay(300) // 300ms debounce
             if (localText.text != searchQuery.value.toString()) {
                 onSearch(localText.text)
             }
