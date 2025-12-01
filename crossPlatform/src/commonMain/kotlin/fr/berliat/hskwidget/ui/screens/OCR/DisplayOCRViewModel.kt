@@ -90,7 +90,6 @@ class DisplayOCRViewModel(
     init {
         viewModelScope.launch(AppDispatchers.IO) {
             while (!segmenter.isReady()) {
-                // Do something repeatedly
                 println("Still waiting for segmenter to come online")
 
                 // Wait before checking again (important — don’t busy loop!)
