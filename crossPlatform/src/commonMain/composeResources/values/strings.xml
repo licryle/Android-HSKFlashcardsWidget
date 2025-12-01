@@ -145,6 +145,7 @@ You can come back to this screen at any time to set up a new widget, or reconfig
     <string name="config_backup_activate">Activate backup</string>
     <string name="config_backup_frequency">Backup frequency</string>
     <string name="config_backup_frequency_options">When app starts</string>
+    <string name="config_backup_frequency_manual">Manual</string>
     <string name="config_backup_location">Backup directory</string>
     <string name="config_backup_directory_choose">Choose directory</string>
     <string name="config_backup_directory_failed_selection">No folder allowed to perform local backup, cancelling</string>

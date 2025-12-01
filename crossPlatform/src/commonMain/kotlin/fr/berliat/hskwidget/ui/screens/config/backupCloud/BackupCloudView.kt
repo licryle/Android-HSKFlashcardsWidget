@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
@@ -31,6 +32,8 @@ import fr.berliat.hskwidget.config_backup_cloud_lastone
 import fr.berliat.hskwidget.config_backup_cloud_lastone_never
 import fr.berliat.hskwidget.config_backup_cloud_restorenow
 import fr.berliat.hskwidget.config_backup_cloud_title
+import fr.berliat.hskwidget.config_backup_frequency
+import fr.berliat.hskwidget.config_backup_frequency_manual
 import fr.berliat.hskwidget.googledrive_backup_cancel_message
 import fr.berliat.hskwidget.googledrive_backup_cancel_title
 import fr.berliat.hskwidget.googledrive_backup_failed_message
@@ -118,6 +121,19 @@ fun BackupCloudView(
             Text(lastUpdate,
                 style = MaterialTheme.typography.bodyMedium)
         }
+
+        Row(verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween) {
+            Text(stringResource(Res.string.config_backup_frequency),
+                style = MaterialTheme.typography.bodyMedium)
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            Text(stringResource(Res.string.config_backup_frequency_manual),
+                style = MaterialTheme.typography.bodyMedium)
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
