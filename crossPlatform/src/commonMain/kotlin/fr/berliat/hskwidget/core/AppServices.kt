@@ -70,14 +70,21 @@ open class AppServices {
      * Initialize all services concurrently.
      */
     open fun init(upToLevel: HSKAppServicesPriority) {
-        _status.value = Status.Initialized
+        val currStatus = _status.value
+        _status.value = when {
+            currStatus is Status.NotInitialized -> Status.Initialized
+            currStatus is Status.Ready && currStatus.upToPrio < upToLevel
+                -> Status.Initialized
+
+            else -> currStatus
+        }
 
         appScope.launch(AppDispatchers.IO) {
             try {
                 services.entries
                     .filter { it.value.priority <= upToLevel && !it.value.isReady() }
                     .sortedBy { it.value.priority.priority } // highest first
-                    .forEach { (name, entry) ->
+                    .forEach { (_, entry) ->
                         entry.instance = entry.factory()
                     }
                 _status.value = evaluateStatus()
