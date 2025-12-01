@@ -13,9 +13,12 @@ import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.config_backup_directory_failed_selection
 import fr.berliat.hskwidget.core.AppDispatchers
 import fr.berliat.hskwidget.core.Logging
+import fr.berliat.hskwidget.dbrestore_failure_import
 import fr.berliat.hskwidget.dbrestore_failure_nofileselected
 import fr.berliat.hskwidget.dbrestore_start
 import fr.berliat.hskwidget.dbrestore_success
+import fr.berliat.hskwidget.ui.navigation.NavigationManager
+import fr.berliat.hskwidget.ui.navigation.Screen
 
 import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.PlatformFile
@@ -88,25 +91,32 @@ class BackupDiskViewModel(
                     viewModelScope.launch(AppDispatchers.IO) {
                         val dbHelper = DatabaseHelper.getInstance()
                         val copiedFile = FileKit.cacheDir / file.name
-                        file.copyTo(FileKit.cacheDir / file.name)
-                        // TODO handle copy fail?
-                        val sourceDb = DatabaseHelper.loadExternalDatabase(copiedFile)
-                        DatabaseHelper.replaceUserDataInDB(dbHelper.liveDatabase, sourceDb)
-                        copiedFile.delete()
 
-                        withContext(Dispatchers.Main) {
-                            Utils.toast(Res.string.dbrestore_success)
+                        try {
+                            file.copyTo(FileKit.cacheDir / file.name)
+                            val sourceDb = DatabaseHelper.loadExternalDatabase(copiedFile)
+                            DatabaseHelper.replaceUserDataInDB(dbHelper.liveDatabase, sourceDb)
+                            copiedFile.delete()
 
-                            // TODO reconnect navigation
-                            /*val action = ConfigFragmentDirections.search()
-                            findNavController().navigate(action)*/
+                            withContext(Dispatchers.Main) {
+                                Utils.toast(Res.string.dbrestore_success)
+
+                                NavigationManager.navigate(Screen.Dictionary())
+                            }
+
+                            // Backup was successful, let's trigger widget updates, hoping any matches
+                            //FlashcardWidgetProvider().updateAllFlashCardWidgets()
+
+                            Logging.logAnalyticsEvent(Logging.ANALYTICS_EVENTS.CONFIG_BACKUP_RESTORE)
+                        } catch (e: Exception) {
+                            withContext(Dispatchers.Main) {
+                                Utils.toast(Res.string.dbrestore_failure_import)
+                            }
+                            Logging.logAnalyticsError(
+                                TAG,
+                                "BackupDiskRestorationFailed",
+                                e.message ?: "")
                         }
-
-                        // Backup was successful, let's trigger widget updates, hoping any matches
-                        //WidgetController.().updateAllFlashCardWidgets()
-
-
-                        Logging.logAnalyticsEvent(Logging.ANALYTICS_EVENTS.CONFIG_BACKUP_RESTORE)
                     }
                 },
                 onFail = { e ->
@@ -148,5 +158,9 @@ class BackupDiskViewModel(
                 }
             )
         }
+    }
+
+    companion object {
+        private const val TAG = "BackupDiskViewModel"
     }
 }
