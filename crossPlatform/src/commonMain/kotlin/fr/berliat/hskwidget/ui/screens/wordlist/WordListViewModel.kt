@@ -44,7 +44,6 @@ class WordListViewModel(
     val dismiss: StateFlow<Boolean> = _dismiss
 
     init {
-        viewModelScope.launch { _status.emit(Status.STARTING) }
         loadAllLists()
     }
 
@@ -61,6 +60,7 @@ class WordListViewModel(
     }
 
     fun loadAllLists() {
+        viewModelScope.launch { _status.emit(Status.STARTING) }
         viewModelScope.launch(Dispatchers.Main) {
             try {
                 _allLists.value = withContext(AppDispatchers.IO) { repo.getAllLists() }
