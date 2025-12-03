@@ -106,7 +106,10 @@ actual class AnkiDAO(context: Context) {
     }
 
     actual suspend fun getNote(noteId: Long): AnkiNoteInfo? =
-        withContext(Dispatchers.IO) { AnkiNoteInfo(api.getNote(noteId)) }
+        withContext(Dispatchers.IO) {
+            // Even if Kotlin recognize as NoteInfo!, it's not correct, should be NoteInfo?
+            api.getNote(noteId)?.let { AnkiNoteInfo(it) }
+        }
     actual suspend fun addNote(modelId: Long, deckId: Long, fields: Array<String>, tags: Set<String>?): Long?
             = withContext(Dispatchers.IO) { api.addNote(modelId, deckId, fields, tags) }
     actual suspend fun updateNoteTags(noteId: Long, tags: Set<String>): Boolean
