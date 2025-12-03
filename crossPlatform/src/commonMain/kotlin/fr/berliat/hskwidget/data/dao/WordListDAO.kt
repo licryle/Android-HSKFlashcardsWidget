@@ -26,10 +26,10 @@ interface WordListDAO {
     @Query("SELECT * FROM word_list_entry")
     suspend fun getAllListEntries(): List<WordListEntry>
 
-    @Query("$wordlist_with_count WHERE list_type = 'SYSTEM' $wordlist_with_count_groupby")
+    @Query("$wordlist_with_count WHERE list_type = 'SYSTEM' $wordlist_with_count_groupby ORDER BY last_modified DESC")
     suspend fun getSystemLists(): List<WordListWithCount>
 
-    @Query("$wordlist_with_count WHERE list_type = 'USER' $wordlist_with_count_groupby")
+    @Query("$wordlist_with_count WHERE list_type = 'USER' $wordlist_with_count_groupby ORDER BY last_modified DESC")
     suspend fun getUserLists(): List<WordListWithCount>
 
     @Query("$wordlist_with_count $wordlist_with_count_groupby ORDER BY last_modified DESC")
