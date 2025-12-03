@@ -49,9 +49,22 @@
 		1C7166ED2E71E189000B4154 /* hskwidgetUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = hskwidgetUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		1CD8DF4E2EDDF04B00AB930B /* Exceptions for "hskwidget" folder in "hskwidget" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 1C7166D42E71E186000B4154 /* hskwidget */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		1C7166D72E71E186000B4154 /* hskwidget */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				1CD8DF4E2EDDF04B00AB930B /* Exceptions for "hskwidget" folder in "hskwidget" target */,
+			);
 			path = hskwidget;
 			sourceTree = "<group>";
 		};
@@ -473,8 +486,11 @@
 				"EXCLUDED_ARCHS[sdk=*]" = x86_64;
 				"FRAMEWORK_SEARCH_PATHS[arch=*]" = "$(SRCROOT)/../crossPlatform/build/bin";
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = hskwidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Mandarin Assistant HSK Widget";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
+				INFOPLIST_KEY_NSCameraUsageDescription = "To perform OCR, we need to take a picture.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "To perform OCR, we need to store photos on the device.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -520,8 +536,11 @@
 				"EXCLUDED_ARCHS[sdk=*]" = x86_64;
 				"FRAMEWORK_SEARCH_PATHS[arch=*]" = "$(SRCROOT)/../crossPlatform/build/bin/";
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = hskwidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Mandarin Assistant HSK Widget";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
+				INFOPLIST_KEY_NSCameraUsageDescription = "To perform OCR, we need to take a picture.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "To perform OCR, we need to store photos on the device.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
