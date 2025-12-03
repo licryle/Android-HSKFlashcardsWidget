@@ -73,10 +73,7 @@ actual class HSKAnkiDelegate(val activity: FragmentActivity,
             || e is AnkiOperationsFailures.AnkiFailure_Off
             || context == null
         )) {
-            // Todo remove runBlocking
-            var message = runBlocking { getString(Res.string.anki_operation_failed) }
-            message = message.format(e.message)
-            Utils.toast(message)
+            Utils.toast(Res.string.anki_operation_failed, listOf(e.message ?: ""))
         }
 
         super.onAnkiOperationFailed(context, e)
