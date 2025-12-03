@@ -1,8 +1,6 @@
 package fr.berliat.hskwidget.ui.application.content
 
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -83,9 +81,12 @@ fun AppBar(
         title = {
             Row(verticalAlignment = Alignment.CenterVertically, // center children vertically
                 horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.animateContentSize()
             ) {
                 val focusRequester = remember { FocusRequester() }
+
+                LaunchedEffect(Unit) {
+                    focusRequester.requestFocus()
+                }
 
                 PillSearchBar(
                     query = localText,
@@ -106,12 +107,6 @@ fun AppBar(
                         onValueChange(localText.copy(""))
                     }
                 )
-
-                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterEnd) {
-                    LaunchedEffect(Unit) {
-                        focusRequester.requestFocus()
-                    }
-                }
             }
         },
         navigationIcon = {
