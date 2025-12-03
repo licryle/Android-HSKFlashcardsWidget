@@ -1,7 +1,9 @@
 package fr.berliat.hskwidget.domain
 
 import android.content.Context
+
 import androidx.fragment.app.FragmentActivity
+
 import fr.berliat.ankidroidhelper.AnkiDelegate
 import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.anki_must_start
@@ -16,10 +18,7 @@ import fr.berliat.hskwidget.data.store.AnkiStore
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-
-import org.jetbrains.compose.resources.getString
 
 import kotlin.reflect.KClass
 
