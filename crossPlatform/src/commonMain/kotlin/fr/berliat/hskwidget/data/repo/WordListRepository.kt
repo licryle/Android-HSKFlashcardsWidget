@@ -321,7 +321,11 @@ class WordListRepository(
                     ?: throw IllegalStateException("Couldn't fetch or create Deck in Anki."))
 
             if (deck.ankiDeckId != ankiDeckId) {
-                wordListDAO.updateAnkiDeckId(deck.id, deck.ankiDeckId)
+                wordListDAO.updateAnkiDeckId(deck.id, ankiDeckId)
+
+                // Return an updated item with the right id
+                return@withContext WordList(deck.name, deck.id, deck.creationDate,
+                    deck.lastModified, ankiDeckId, deck.listType)
             }
         }
 

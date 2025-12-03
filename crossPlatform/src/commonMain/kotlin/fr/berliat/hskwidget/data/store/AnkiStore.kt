@@ -95,7 +95,8 @@ class AnkiStore(
             = withContext(AppDispatchers.IO) {
         Logger.d(tag = TAG, messageString = "importOrUpdateCard: ${word.simplified} to Anki")
         val modelId = getOrCreateModelId() ?: return@withContext null
-        if (deck.ankiDeckId == WordList.Companion.ANKI_ID_EMPTY) throw IllegalStateException("Couldn't create a new Deck in Anki")
+        if (deck.ankiDeckId == WordList.Companion.ANKI_ID_EMPTY)
+            throw IllegalStateException("Couldn't create a new Deck in Anki")
 
         with (word.annotation) {
             val fields = arrayOf(
