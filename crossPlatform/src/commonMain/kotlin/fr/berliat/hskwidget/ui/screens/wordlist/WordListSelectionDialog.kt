@@ -76,8 +76,11 @@ fun WordListSelectionDialog(
 
     if (showCreateDialog) {
         WordListCreateRenameDialog(
-            viewModel = viewModel,
-            onSuccess = { showCreateDialog = false },
+            // Intentionally not putting viewModel to create a new one and not conflate the statuses of both list create and list associate actions
+            onSuccess = {
+                showCreateDialog = false
+                viewModel.loadAllLists() // reload list && ensure state is not success as it'd be caught in the loop above and close the dialog.
+            },
             onCancel = { showCreateDialog = false }
         )
     }
