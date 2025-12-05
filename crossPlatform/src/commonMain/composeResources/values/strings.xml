@@ -140,6 +140,7 @@ You can come back to this screen at any time to set up a new widget, or reconfig
     <string name="ocr_display_no_text_found">No text found</string>
     <string name="ocr_display_text_segmentation_failed">Text segmentation failed</string>
     <string name="ocr_display_ocr_failed">Text recognition failed</string>
+    <string name="ocr_display_ocr_no_text">No text to display</string>
 
     <string name="config_backup_title">Backup/Restore from local file</string>
     <string name="config_backup_activate">Activate backup</string>

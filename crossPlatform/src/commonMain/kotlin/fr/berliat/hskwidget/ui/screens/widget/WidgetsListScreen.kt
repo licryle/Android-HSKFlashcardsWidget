@@ -19,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
-import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.core.Locale
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.type.HSK_Level
@@ -28,6 +27,7 @@ import fr.berliat.hskwidget.ui.components.IconButton
 import fr.berliat.hskwidget.ui.components.WidgetWordView
 import fr.berliat.hskwidget.ui.screens.widgetConfigure.WidgetConfigWithPreviewScreen
 import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.ic_add_24dp
 import fr.berliat.hskwidget.ui.theme.widgetDefaultBox
@@ -64,9 +64,6 @@ fun WidgetsListScreen(
                 textAlign = TextAlign.Start
             )
 
-            val onClickWordToast = stringResource(Res.string.widget_demo_word_click)
-            val onClickUpdateToast = stringResource(Res.string.widget_demo_update_click)
-
             Box(
                 modifier = widgetDefaultBox.align(Alignment.CenterHorizontally)
             ) {
@@ -82,9 +79,9 @@ fun WidgetsListScreen(
                         ),
                         annotation = null,
                     ),
-                    onClickWord = { viewModel.toast(onClickWordToast) },
+                    onClickWord = { HSKAppServices.snackbar.show(Res.string.widget_demo_word_click) },
                     onClickSpeak = { viewModel.speakWord("你好") },
-                    onClickUpdate = { viewModel.toast(onClickUpdateToast) }
+                    onClickUpdate = { HSKAppServices.snackbar.show(Res.string.widget_demo_update_click) }
                 )
             }
         }
@@ -131,7 +128,7 @@ fun WidgetsListScreen(
                     widgetId = ids[page],
                     expectsActivityResult = expectsActivityResult,
                     onSuccessfulSave = {
-                        Utils.toast(Res.string.widget_configure_saved)
+                        HSKAppServices.snackbar.show(Res.string.widget_configure_saved)
                         onWidgetPreferenceSaved(ids[page])
                     },
                     modifier = modifier

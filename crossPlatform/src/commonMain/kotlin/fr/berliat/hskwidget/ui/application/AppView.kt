@@ -3,12 +3,17 @@ package fr.berliat.hskwidget.ui.application
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -24,6 +29,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 
+import fr.berliat.hskwidget.core.SnackbarManager
 import fr.berliat.hskwidget.ui.application.content.AppBar
 import fr.berliat.hskwidget.ui.application.content.OCRReminder
 import fr.berliat.hskwidget.ui.application.drawer.AppDrawer
@@ -51,6 +57,7 @@ fun AppView(
     val isReady = viewModel.isReady.collectAsState(false)
     val drawerIsOpen = remember { mutableStateOf(false) }
     val drawerState = rememberDrawerState(if (drawerIsOpen.value) DrawerValue.Open else DrawerValue.Closed)
+    val snackbarHostState = remember { SnackbarHostState() }
 
     val mutedOCRReminders = remember { mutableStateOf(listOf<Screen>()) }
 
@@ -64,6 +71,30 @@ fun AppView(
     }
 
     val currentScreen by viewModel.navigationManager.currentScreen.collectAsState()
+
+    // Collect snackbar messages and display them
+    LaunchedEffect(snackbarHostState) {
+        SnackbarManager.messages.collect { message ->
+            val messageText = org.jetbrains.compose.resources.getString(
+                message.messageRes,
+                *message.messageArgs.toTypedArray()
+            )
+            val actionLabelText = message.actionLabelRes?.let { 
+                org.jetbrains.compose.resources.getString(it) 
+            }
+            
+            val result = snackbarHostState.showSnackbar(
+                message = messageText,
+                actionLabel = actionLabelText,
+                duration = message.duration
+            )
+            
+            when (result) {
+                SnackbarResult.ActionPerformed -> message.onAction?.invoke()
+                SnackbarResult.Dismissed -> message.onDismiss?.invoke()
+            }
+        }
+    }
 
     AppTheme {
         if (!isReady.value) {
@@ -85,6 +116,8 @@ fun AppView(
             modifier = Modifier.clearFocusOnAnyOutsideTap()
         ) {
             Scaffold(
+                snackbarHost = { SnackbarHost(snackbarHostState) },
+                contentWindowInsets = WindowInsets.ime, // Respect keyboard insets
                 topBar = {
                     AppBar(
                         onOcrClick = { viewModel.navigationManager.navigate(Screen.OCRCapture()) },

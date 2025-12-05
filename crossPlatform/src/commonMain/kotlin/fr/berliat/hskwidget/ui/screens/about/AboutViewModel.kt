@@ -36,7 +36,7 @@ class AboutViewModel {
         Logging.logAnalyticsScreenView("Email")
 
         if (!Utils.sendEmail("cyrille.berliat+hsk@gmail.com", "About Mandarin Assistant App", "")) {
-            Utils.toast(Res.string.about_email_noapp)
+            HSKAppServices.snackbar.show(Res.string.about_email_noapp)
         }
     }
 

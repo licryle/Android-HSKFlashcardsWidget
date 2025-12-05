@@ -18,7 +18,6 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
-import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.getString
 import kotlin.math.pow
 import kotlin.math.round
@@ -38,7 +37,7 @@ object Utils {
     fun copyToClipBoard(s: String) {
         ExpectedUtils.copyToClipBoard(s)
 
-        toast(Res.string.copied_to_clipboard, listOf(s))
+        HSKAppServices.snackbar.show(Res.string.copied_to_clipboard, listOf(s))
 
         logAnalyticsEvent(Logging.ANALYTICS_EVENTS.WIDGET_COPY_WORD)
 
@@ -49,7 +48,7 @@ object Utils {
 
     fun playWordInBackground(word: String) {
         if (isMuted()) {
-            toast(Res.string.speech_failure_toast_muted)
+            HSKAppServices.snackbar.show(Res.string.speech_failure_toast_muted)
 
             CoroutineScope(AppDispatchers.IO).launch {
                 logAnalyticsError("SPEECH", getString(Res.string.speech_failure_toast_muted), "")
@@ -62,14 +61,6 @@ object Utils {
 
         logAnalyticsEvent(Logging.ANALYTICS_EVENTS.WIDGET_PLAY_WORD)
     }
-
-    fun toast(stringRes: StringResource, args: List<String> = emptyList()) {
-        CoroutineScope(AppDispatchers.IO).launch {
-            toast(getString(stringRes, *args.toTypedArray()))
-        }
-    }
-
-    fun toast(s: String) = ExpectedUtils.toast(s)
 
     fun openAppForSearchQuery(query: SearchQuery) = ExpectedUtils.openAppForSearchQuery(query)
 
@@ -105,8 +96,6 @@ expect object ExpectedUtils {
 
     internal fun isMuted() : Boolean
     internal fun playWordInBackground(word: String)
-
-    internal fun toast(s: String)
 
     internal fun openAppForSearchQuery(query: SearchQuery)
 }

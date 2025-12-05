@@ -7,7 +7,5 @@ expect class WidgetsListViewModel() {
 
     fun addNewWidget()
 
-    fun toast(s: String)
-
     fun speakWord(word: String)
 }

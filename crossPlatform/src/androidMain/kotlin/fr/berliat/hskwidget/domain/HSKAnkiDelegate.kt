@@ -13,7 +13,6 @@ import fr.berliat.hskwidget.anki_operation_failed
 import fr.berliat.hskwidget.anki_operation_success
 import fr.berliat.hskwidget.anki_permission_denied
 import fr.berliat.hskwidget.core.HSKAppServices
-import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.data.store.AnkiStore
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 
@@ -37,16 +36,16 @@ actual class HSKAnkiDelegate(val activity: FragmentActivity,
         appConfig?.ankiSaveNotes?.value = granted
         super.onAnkiRequestPermissionsResult(granted)
         if (!granted) {
-            Utils.toast(Res.string.anki_permission_denied)
+            HSKAppServices.snackbar.show(Res.string.anki_permission_denied)
         }
     }
 
     override fun startAnkiDroid(): Boolean {
-        Utils.toast(Res.string.anki_must_start)
+        HSKAppServices.snackbar.show(Res.string.anki_must_start)
 
         val result = super.startAnkiDroid()
         if (!result) {
-            Utils.toast(Res.string.anki_not_installed)
+            HSKAppServices.snackbar.show(Res.string.anki_not_installed)
         }
 
         return result
@@ -72,26 +71,26 @@ actual class HSKAnkiDelegate(val activity: FragmentActivity,
             || e is AnkiOperationsFailures.AnkiFailure_Off
             || context == null
         )) {
-            Utils.toast(Res.string.anki_operation_failed, listOf(e.message ?: ""))
+            HSKAppServices.snackbar.show(Res.string.anki_operation_failed, listOf(e.message ?: ""))
         }
 
         super.onAnkiOperationFailed(context, e)
     }
 
     override fun onAnkiOperationSuccess(context: Context?) {
-        Utils.toast(Res.string.anki_operation_success)
+        HSKAppServices.snackbar.show(Res.string.anki_operation_success)
 
         super.onAnkiOperationSuccess(context)
     }
 
     override fun onAnkiOperationCancelled(context: Context?) {
-        Utils.toast(Res.string.anki_operation_cancelled)
+        HSKAppServices.snackbar.show(Res.string.anki_operation_cancelled)
 
         super.onAnkiOperationCancelled(context)
     }
 
     override fun onAnkiNotInstalled() {
-        Utils.toast(Res.string.anki_not_installed)
+        HSKAppServices.snackbar.show(Res.string.anki_not_installed)
         appConfig?.ankiSaveNotes?.value = false
 
         super.onAnkiNotInstalled()

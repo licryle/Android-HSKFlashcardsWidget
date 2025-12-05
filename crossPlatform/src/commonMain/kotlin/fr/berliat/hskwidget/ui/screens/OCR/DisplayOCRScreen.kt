@@ -41,7 +41,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.berliat.hsktextviews.HSKTextSegmenter
 import fr.berliat.hsktextviews.views.HSKTextView
 import fr.berliat.hsktextviews.views.ShowPinyins
-import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWord
@@ -56,6 +55,7 @@ import fr.berliat.hskwidget.ocr_display_add
 import fr.berliat.hskwidget.ocr_display_conf_bigger
 import fr.berliat.hskwidget.ocr_display_conf_smaller
 import fr.berliat.hskwidget.ocr_display_loading
+import fr.berliat.hskwidget.ocr_display_ocr_no_text
 import fr.berliat.hskwidget.ocr_display_pinyins
 import fr.berliat.hskwidget.ocr_display_separator
 import fr.berliat.hskwidget.ocr_display_text_segmentation_failed
@@ -98,7 +98,7 @@ fun DisplayOCRScreen(
     }
 
     if (uiState.isSegmenterReady && imageFile == null && preText == "") {
-        Utils.toast("Oops - nothing to display")
+        HSKAppServices.snackbar.show(Res.string.ocr_display_ocr_no_text)
     }
 
     Column (modifier = modifier) {

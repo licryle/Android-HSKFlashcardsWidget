@@ -8,7 +8,5 @@ actual class WidgetsListViewModel actual constructor() {
 
     actual fun addNewWidget() { }
 
-    actual fun toast(s: String) { }
-
     actual fun speakWord(word: String) { }
 }

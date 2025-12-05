@@ -55,10 +55,6 @@ actual class WidgetsListViewModel actual constructor(): ViewModel() {
         }
     }
 
-    actual fun toast(s: String) {
-        ExpectedUtils.toast(s)
-    }
-
     actual fun speakWord(word: String) {
         ExpectedUtils.playWordInBackground(word)
     }

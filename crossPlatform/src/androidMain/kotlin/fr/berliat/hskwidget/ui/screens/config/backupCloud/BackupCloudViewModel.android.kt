@@ -14,6 +14,7 @@ import fr.berliat.hskwidget.data.store.GoogleDriveBackup
 import fr.berliat.hskwidget.ui.screens.config.backupCloud.BackupCloudTransferEvent.*
 
 import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.core.Logging
 import fr.berliat.hskwidget.data.store.snapshotToFile
 import fr.berliat.hskwidget.dbrestore_failure_fileformat
@@ -157,22 +158,22 @@ actual class BackupCloudViewModel actual constructor(
     }
 
     actual fun confirmRestoration() {
-        Utils.toast(Res.string.dbrestore_start)
+        HSKAppServices.snackbar.show(Res.string.dbrestore_start)
 
         Logging.logAnalyticsEvent(Logging.ANALYTICS_EVENTS.CONFIG_BACKUPCLOUD_RESTORE)
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 DatabaseHelper.getInstance().replaceLiveUserDataFromFile(cloudRestoreFile)
-                Utils.toast(Res.string.dbrestore_success)
+                HSKAppServices.snackbar.show(Res.string.dbrestore_success)
             } catch (e: IllegalStateException) {
-                Utils.toast(Res.string.dbrestore_failure_fileformat)
+                HSKAppServices.snackbar.show(Res.string.dbrestore_failure_fileformat)
                 Logging.logAnalyticsError(
                     "BACKUP_RESTORE",
                     getString(Res.string.dbrestore_failure_fileformat),
                     e.toString()
                 )
             } catch (e: Exception) {
-                Utils.toast(Res.string.dbrestore_failure_import)
+                HSKAppServices.snackbar.show(Res.string.dbrestore_failure_import)
                 Logging.logAnalyticsError(
                     "BACKUP_RESTORE",
                     getString(Res.string.dbrestore_failure_import),

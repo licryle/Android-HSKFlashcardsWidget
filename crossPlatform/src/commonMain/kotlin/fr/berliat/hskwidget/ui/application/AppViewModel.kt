@@ -91,13 +91,13 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
 
     protected open fun handleAppUpdate() {
         if (shouldUpdateDatabaseFromAsset()) {
-            Utils.toast(Res.string.database_update_start)
+            HSKAppServices.snackbar.show(Res.string.database_update_start)
 
             viewModelScope.launch(AppDispatchers.IO) {
                 DatabaseHelper.getInstance().updateLiveDatabaseFromAsset({
-                    Utils.toast(Res.string.database_update_success)
+                    HSKAppServices.snackbar.show(Res.string.database_update_success)
                 }, { e ->
-                    Utils.toast(Res.string.database_update_failure, listOf(e.message ?: ""))
+                    HSKAppServices.snackbar.show(Res.string.database_update_failure, listOf(e.message ?: ""))
 
                     Logging.logAnalyticsError(TAG, "UpdateDatabaseFromAssetFailure", e.message ?: "")
                 })
@@ -141,7 +141,7 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
                             DatabaseDiskBackup.backUp(
                                 bookMark,
                                 onSuccess = {
-                                    Utils.toast(Res.string.dbbackup_success)
+                                    HSKAppServices.snackbar.show(Res.string.dbbackup_success)
                                     viewModelScope.launch(AppDispatchers.IO) {
                                         DatabaseDiskBackup.cleanOldBackups(
                                             backupFolder,
@@ -149,12 +149,12 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
                                         )
                                     }
                                 },
-                                onFail = { Utils.toast(Res.string.dbbackup_failure_write) }
+                                onFail = { HSKAppServices.snackbar.show(Res.string.dbbackup_failure_write) }
                             )
                         }
                     },
                     onFail = {
-                        Utils.toast(Res.string.dbbackup_failure_folderpermission)
+                        HSKAppServices.snackbar.show(Res.string.dbbackup_failure_folderpermission)
                     }
                 )
             }

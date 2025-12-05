@@ -15,7 +15,6 @@ import com.google.android.play.core.review.ReviewManagerFactory
 import com.google.android.play.core.review.model.ReviewErrorCode
 
 import fr.berliat.hskwidget.core.ExpectedUtils
-import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.data.store.SupportDevStore
@@ -69,11 +68,11 @@ actual class SupportViewModel(
     }
 
     override fun onQueryFailure(result: BillingResult) {
-        Utils.toast(Res.string.support_total_error)
+        HSKAppServices.snackbar.show(Res.string.support_total_error)
     }
 
     override fun onPurchaseSuccess(purchase: Purchase) {
-        Utils.toast(Res.string.support_payment_success)
+        HSKAppServices.snackbar.show(Res.string.support_payment_success)
         Logging.logAnalyticsEvent(
             Logging.ANALYTICS_EVENTS.PURCHASE_SUCCESS,
             mapOf("product_id" to getFirstProductId(purchase))
@@ -89,7 +88,7 @@ actual class SupportViewModel(
     override fun onPurchaseAcknowledgedSuccess(purchase: Purchase) { }
 
     override fun onPurchaseFailure(purchase: Purchase?, billingResponseCode: Int) {
-        Utils.toast(Res.string.support_payment_failed)
+        HSKAppServices.snackbar.show(Res.string.support_payment_failed)
         Logging.logAnalyticsEvent(
             Logging.ANALYTICS_EVENTS.PURCHASE_FAILED,
             mapOf("product_id" to getFirstProductId(purchase))
@@ -103,10 +102,10 @@ actual class SupportViewModel(
                 val reviewInfo = task.result
                 val flow = reviewManager.launchReviewFlow(activity, reviewInfo)
                 flow.addOnCompleteListener {
-                    Utils.toast(Res.string.support_reviewed)
+                    HSKAppServices.snackbar.show(Res.string.support_reviewed)
                 }
             } else {
-                Utils.toast(Res.string.support_review_failed)
+                HSKAppServices.snackbar.show(Res.string.support_review_failed)
                 @ReviewErrorCode val reviewErrorCode = (task.exception as ReviewException).errorCode
                 Logging.logAnalyticsError(TAG, "RequestReviewFlow_SetupFailed", reviewErrorCode.toString())
             }

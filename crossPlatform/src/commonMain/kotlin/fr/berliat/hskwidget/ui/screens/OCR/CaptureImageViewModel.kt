@@ -8,12 +8,12 @@ import com.kashif.cameraK.controller.CameraController
 import com.kashif.cameraK.result.ImageCaptureResult
 import kotlinx.coroutines.launch
 
-import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.core.YYMMDDHHMMSS
 import fr.berliat.hskwidget.core.toSafeFileName
 
 import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.core.AppDispatchers
+import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.core.Logging
 import fr.berliat.hskwidget.ocr_capture_error_processed
 import fr.berliat.hskwidget.ocr_capture_error_save
@@ -52,7 +52,7 @@ class CaptureImageViewModel(
                         try {
                             file.write(result.byteArray)
                         } catch (_: Exception) {
-                            Utils.toast(Res.string.ocr_capture_error_save)
+                            HSKAppServices.snackbar.show(Res.string.ocr_capture_error_save)
                         } finally {
                             _isProcessing.value = false
                         }
@@ -67,7 +67,7 @@ class CaptureImageViewModel(
                             tag = TAG,
                             messageString = "Image Capture Error: ${result.exception.message}"
                         )
-                        Utils.toast(Res.string.ocr_capture_error_processed)
+                        HSKAppServices.snackbar.show(Res.string.ocr_capture_error_processed)
 
                         Logging.logAnalyticsError(
                             "OCR_CAPTURE",

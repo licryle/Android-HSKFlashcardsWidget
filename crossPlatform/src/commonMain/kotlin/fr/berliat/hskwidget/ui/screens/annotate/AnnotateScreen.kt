@@ -24,7 +24,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
-import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.type.ClassLevel
 import fr.berliat.hskwidget.data.type.ClassType
@@ -108,10 +107,10 @@ fun AnnotateScreen(
         }
 
         if (e == null) {
-            Utils.toast(msgRes, listOf(word))
+            HSKAppServices.snackbar.show(msgRes, listOf(word))
             return true
         } else {
-            Utils.toast(msgRes, listOf(word, e.message ?: ""))
+            HSKAppServices.snackbar.show(msgRes, listOf(word, e.message ?: ""))
             return false
         }
     }

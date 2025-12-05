@@ -160,7 +160,7 @@ class DisplayOCRViewModel(
             val annotatedWord = fetchWord(simplified)
 
             if (annotatedWord == null) {
-                Utils.toast(Res.string.ocr_display_word_not_found)
+                HSKAppServices.snackbar.show(Res.string.ocr_display_word_not_found)
 
                 withContext(Dispatchers.Main) {
                     Utils.copyToClipBoard(simplified)
@@ -185,7 +185,7 @@ class DisplayOCRViewModel(
 
         if (textSize == AppTypographies.smallestHanziFontSize.value) {
             viewModelScope.launch {
-                Utils.toast(Res.string.ocr_display_smallest_text)
+                HSKAppServices.snackbar.show(Res.string.ocr_display_smallest_text)
             }
         }
 

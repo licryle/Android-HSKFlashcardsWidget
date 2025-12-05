@@ -43,6 +43,9 @@ object HSKAppServices : AppServices() {
     }
 
     // P0
+    val snackbar: SnackbarManager get() = get("snackbar")
+
+    // P0
     val database: ChineseWordsDatabase get() = get("database")
 
     // P2
@@ -59,6 +62,7 @@ object HSKAppServices : AppServices() {
 
     private fun registerMostServices() {
         // Required for Widget -- Minimal Set
+        register("snackbar", HSKAppServicesPriority.Widget) { SnackbarManager }
         register("database", HSKAppServicesPriority.Widget) { DatabaseHelper.getInstance().liveDatabase }
         register("appPreferences", HSKAppServicesPriority.Widget) {
             AppPreferencesStore.getInstance(PrefixedPreferencesStore.getDataStore("app.preferences_pb"))

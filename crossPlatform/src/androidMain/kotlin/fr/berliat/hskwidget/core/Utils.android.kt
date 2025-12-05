@@ -13,12 +13,10 @@ import android.net.Uri
 import android.provider.Settings
 import android.speech.tts.TextToSpeech
 import android.util.Log
-import android.widget.Toast
 
 import co.touchlab.kermit.Logger
 
 import fr.berliat.hsktextviews.HSKTextSegmenter
-import fr.berliat.hskwidget.core.Utils.toast
 import fr.berliat.hskwidget.data.dao.AnkiDAO
 import fr.berliat.hskwidget.domain.SearchQuery
 import fr.berliat.hskwidget.Res
@@ -160,7 +158,7 @@ actual object ExpectedUtils {
                 val noButton = getString(Res.string.cancel)
 
                 if (err.errRemedyIntent == null) {
-                    toast(err.errStringId)
+                    HSKAppServices.snackbar.show(err.errStringId)
                 } else {
                     withContext(Dispatchers.Main) {
                         AlertDialog.Builder(context)
@@ -178,12 +176,6 @@ actual object ExpectedUtils {
 
                 logAnalyticsError("SPEECH", getString(err.errStringId), "")
             }
-        }
-    }
-
-    internal actual fun toast(s: String) {
-        CoroutineScope(Dispatchers.Main).launch {
-            Toast.makeText(context, s, Toast.LENGTH_LONG).show()
         }
     }
 
