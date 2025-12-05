@@ -34,6 +34,10 @@ actual object ExpectedUtils {
     internal actual fun copyToClipBoard(s: String) {
     }
 
+    internal actual fun isMuted() : Boolean {
+
+    }
+
     internal actual fun playWordInBackground(word: String) {
     }
 

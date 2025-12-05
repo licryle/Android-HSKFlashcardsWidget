@@ -18,20 +18,16 @@ import android.widget.Toast
 import co.touchlab.kermit.Logger
 
 import fr.berliat.hsktextviews.HSKTextSegmenter
-import fr.berliat.hskwidget.core.Utils.incrementConsultedWord
 import fr.berliat.hskwidget.core.Utils.toast
 import fr.berliat.hskwidget.data.dao.AnkiDAO
 import fr.berliat.hskwidget.domain.SearchQuery
 import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.cancel
-import fr.berliat.hskwidget.copied_to_clipboard
 import fr.berliat.hskwidget.core.Logging.logAnalyticsError
-import fr.berliat.hskwidget.core.Logging.logAnalyticsEvent
 import fr.berliat.hskwidget.dialog_tts_error
 import fr.berliat.hskwidget.fix_it
 import fr.berliat.hskwidget.speech_failure_toast_chinese_unsupported
 import fr.berliat.hskwidget.speech_failure_toast_init
-import fr.berliat.hskwidget.speech_failure_toast_muted
 import fr.berliat.hskwidget.speech_failure_toast_unknown
 
 import kotlinx.coroutines.CoroutineScope
@@ -103,21 +99,13 @@ actual object ExpectedUtils {
 
     internal actual fun copyToClipBoard(s: String) {
         // https://stackoverflow.com/a/28780585/3059536
-        val context = context
-
         val clipboard =
             context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("Copied Text", s)
         clipboard.setPrimaryClip(clip)
-
-        toast(Res.string.copied_to_clipboard, listOf(s))
-
-        logAnalyticsEvent(Logging.ANALYTICS_EVENTS.WIDGET_COPY_WORD)
-
-        incrementConsultedWord(s)
     }
 
-    private fun isMuted() : Boolean {
+    internal actual fun isMuted() : Boolean {
         val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         val musicVolume: Int = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
         return musicVolume == 0
@@ -128,45 +116,40 @@ actual object ExpectedUtils {
         val TAG = TAG
 
         var err : SpeechError? = null
+        var tts: TextToSpeech? = null
 
-        if (isMuted()) {
-            err = SpeechError(Res.string.speech_failure_toast_muted)
-        } else {
-            var tts: TextToSpeech? = null
+        try {
+            tts = TextToSpeech(context) { status ->
+                if (status != TextToSpeech.SUCCESS) {
+                    err = SpeechError(
+                        Res.string.speech_failure_toast_init,
+                        Settings.ACTION_ACCESSIBILITY_SETTINGS
+                    )
+                } else {
+                    val result = tts?.setLanguage(Locale.SIMPLIFIED_CHINESE)
 
-            try {
-                tts = TextToSpeech(context) { status ->
-                    if (status != TextToSpeech.SUCCESS) {
-                        err = SpeechError(
-                            Res.string.speech_failure_toast_init,
-                            Settings.ACTION_ACCESSIBILITY_SETTINGS
-                        )
+                    Log.i(TAG, "Setting language to play $word out loud.")
+                    if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                        err = SpeechError(Res.string.speech_failure_toast_chinese_unsupported)
+                        Log.e(TAG, "Simplified_chinese not supported on this phone.")
+
+                        val installIntent = Intent()
+                        installIntent.action = TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA
+                        installIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        context.startActivity(installIntent)
                     } else {
-                        val result = tts?.setLanguage(Locale.SIMPLIFIED_CHINESE)
-
-                        Log.i(TAG, "Setting language to play $word out loud.")
-                        if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                            err = SpeechError(Res.string.speech_failure_toast_chinese_unsupported)
-                            Log.e(TAG, "Simplified_chinese not supported on this phone.")
-
-                            val installIntent = Intent()
-                            installIntent.action = TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA
-                            installIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                            context.startActivity(installIntent)
-                        } else {
-                            Log.i(TAG, "Playing $word out loud.")
-                            tts?.speak(
-                                word,
-                                TextToSpeech.QUEUE_FLUSH,
-                                null,
-                                "tts-${word.hashCode()}"
-                            )
-                        }
+                        Log.i(TAG, "Playing $word out loud.")
+                        tts?.speak(
+                            word,
+                            TextToSpeech.QUEUE_FLUSH,
+                            null,
+                            "tts-${word.hashCode()}"
+                        )
                     }
                 }
-            } catch (_: Exception) {
-                err = SpeechError(Res.string.speech_failure_toast_unknown)
             }
+        } catch (_: Exception) {
+            err = SpeechError(Res.string.speech_failure_toast_unknown)
         }
 
         err?.let {
@@ -196,10 +179,6 @@ actual object ExpectedUtils {
                 logAnalyticsError("SPEECH", getString(err.errStringId), "")
             }
         }
-
-        incrementConsultedWord(word)
-
-        logAnalyticsEvent(Logging.ANALYTICS_EVENTS.WIDGET_PLAY_WORD)
     }
 
     internal actual fun toast(s: String) {

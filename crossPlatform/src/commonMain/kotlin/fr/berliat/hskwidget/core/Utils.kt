@@ -2,9 +2,14 @@ package fr.berliat.hskwidget.core
 
 import fr.berliat.hsktextviews.HSKTextSegmenter
 import fr.berliat.hskwidget.BuildKonfig
+import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.copied_to_clipboard
+import fr.berliat.hskwidget.core.Logging.logAnalyticsError
+import fr.berliat.hskwidget.core.Logging.logAnalyticsEvent
 import fr.berliat.hskwidget.data.dao.AnkiDAO
 import fr.berliat.hskwidget.data.repo.ChineseWordFrequencyRepo
 import fr.berliat.hskwidget.domain.SearchQuery
+import fr.berliat.hskwidget.speech_failure_toast_muted
 
 import kotlinx.coroutines.CoroutineScope
 
@@ -30,9 +35,33 @@ object Utils {
 
     fun getHSKSegmenter(): HSKTextSegmenter = ExpectedUtils.getHSKSegmenter()
 
-    fun copyToClipBoard(s: String) = ExpectedUtils.copyToClipBoard(s)
+    fun copyToClipBoard(s: String) {
+        ExpectedUtils.copyToClipBoard(s)
 
-    fun playWordInBackground(word: String) = ExpectedUtils.playWordInBackground(word)
+        toast(Res.string.copied_to_clipboard, listOf(s))
+
+        logAnalyticsEvent(Logging.ANALYTICS_EVENTS.WIDGET_COPY_WORD)
+
+        incrementConsultedWord(s)
+    }
+
+    fun isMuted() : Boolean = ExpectedUtils.isMuted()
+
+    fun playWordInBackground(word: String) {
+        if (isMuted()) {
+            toast(Res.string.speech_failure_toast_muted)
+
+            CoroutineScope(AppDispatchers.IO).launch {
+                logAnalyticsError("SPEECH", getString(Res.string.speech_failure_toast_muted), "")
+            }
+        } else {
+            ExpectedUtils.playWordInBackground(word)
+        }
+
+        incrementConsultedWord(word)
+
+        logAnalyticsEvent(Logging.ANALYTICS_EVENTS.WIDGET_PLAY_WORD)
+    }
 
     fun toast(stringRes: StringResource, args: List<String> = emptyList()) {
         CoroutineScope(AppDispatchers.IO).launch {
@@ -72,8 +101,9 @@ expect object ExpectedUtils {
 
     internal fun getAnkiDAO(): AnkiDAO
 
-
     internal fun copyToClipBoard(s: String)
+
+    internal fun isMuted() : Boolean
     internal fun playWordInBackground(word: String)
 
     internal fun toast(s: String)
