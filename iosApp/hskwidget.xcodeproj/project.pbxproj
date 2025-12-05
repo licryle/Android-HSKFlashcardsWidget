@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		1C200D132EB64F7900615172 /* crossPlatformKit in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C200D122EB64F7900615172 /* crossPlatformKit */; };
 		1C200D142EB64F7900615172 /* crossPlatformKit in Embed Libraries */ = {isa = PBXBuildFile; fileRef = 1C200D122EB64F7900615172 /* crossPlatformKit */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		1CD8DF532EDE03DE00AB930B /* Vision.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CD8DF522EDE03DE00AB930B /* Vision.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,6 +48,7 @@
 		1C7166D52E71E186000B4154 /* hskwidget.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = hskwidget.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1C7166E32E71E189000B4154 /* hskwidgetTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = hskwidgetTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1C7166ED2E71E189000B4154 /* hskwidgetUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = hskwidgetUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		1CD8DF522EDE03DE00AB930B /* Vision.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Vision.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.5.sdk/System/Library/Frameworks/Vision.framework; sourceTree = DEVELOPER_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -97,6 +99,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1CD8DF532EDE03DE00AB930B /* Vision.framework in Frameworks */,
 				1C200D132EB64F7900615172 /* crossPlatformKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -143,6 +146,7 @@
 		1C8A8BF62E733E1B00B8E39B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				1CD8DF522EDE03DE00AB930B /* Vision.framework */,
 				1C200D122EB64F7900615172 /* crossPlatformKit */,
 			);
 			name = Frameworks;
@@ -262,6 +266,8 @@
 			);
 			mainGroup = 1C7166CC2E71E186000B4154;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 1C7166D62E71E186000B4154 /* Products */;
 			projectDirPath = "";
@@ -393,6 +399,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEFINES_MODULE = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -454,6 +461,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEFINES_MODULE = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
