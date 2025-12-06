@@ -41,7 +41,7 @@ actual class HSKAnkiDelegate(val activity: FragmentActivity,
         }
     }
 
-    override fun startAnkiDroid(): Boolean {
+    override suspend fun startAnkiDroid(): Boolean {
         HSKAppServices.snackbar.show(SnackbarType.INFO, Res.string.anki_must_start)
 
         val result = super.startAnkiDroid()

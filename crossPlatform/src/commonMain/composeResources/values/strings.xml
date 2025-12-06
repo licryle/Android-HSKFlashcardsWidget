@@ -215,7 +215,7 @@ Upon toggling on, operates a full sync from scratch.</string>
 
     <string name="anki_not_installed"><![CDATA[AnkiDroid is not installed, or runs a very old version (<2.5)]]></string>
     <string name="anki_permission_denied">Permission to call AnkiDroid API denied.</string>
-    <string name="anki_must_start">To save to Anki, Anki must be started. Starting Anki. Feel free to go back.</string>
+    <string name="anki_must_start">Attempting to start Anki in the background</string>
     <string name="anki_operation_success">Successfully applied changes to Anki</string>
     <string name="anki_operation_failed">Failed to apply changes to Anki: %s</string>
     <string name="anki_operation_cancelled">You cancelled the sync to Anki</string>
