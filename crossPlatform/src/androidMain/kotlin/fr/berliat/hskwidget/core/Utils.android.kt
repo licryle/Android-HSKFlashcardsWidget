@@ -158,7 +158,7 @@ actual object ExpectedUtils {
                 val noButton = getString(Res.string.cancel)
 
                 if (err.errRemedyIntent == null) {
-                    HSKAppServices.snackbar.show(err.errStringId)
+                    HSKAppServices.snackbar.show(SnackbarType.ERROR, err.errStringId)
                 } else {
                     withContext(Dispatchers.Main) {
                         AlertDialog.Builder(context)

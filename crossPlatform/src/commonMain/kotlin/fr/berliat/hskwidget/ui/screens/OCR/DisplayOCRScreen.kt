@@ -51,6 +51,7 @@ import fr.berliat.hskwidget.ui.components.ErrorView
 import fr.berliat.hskwidget.ui.components.LoadingView
 import fr.berliat.hskwidget.ui.screens.wordlist.WordListSelectionDialog
 import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.core.SnackbarType
 import fr.berliat.hskwidget.ocr_display_add
 import fr.berliat.hskwidget.ocr_display_conf_bigger
 import fr.berliat.hskwidget.ocr_display_conf_smaller
@@ -98,7 +99,7 @@ fun DisplayOCRScreen(
     }
 
     if (uiState.isSegmenterReady && imageFile == null && preText == "") {
-        HSKAppServices.snackbar.show(Res.string.ocr_display_ocr_no_text)
+        HSKAppServices.snackbar.show(SnackbarType.WARNING,Res.string.ocr_display_ocr_no_text)
     }
 
     Column (modifier = modifier) {

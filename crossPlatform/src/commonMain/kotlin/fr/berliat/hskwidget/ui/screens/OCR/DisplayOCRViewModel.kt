@@ -23,6 +23,7 @@ import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.core.AppDispatchers
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.core.Logging
+import fr.berliat.hskwidget.core.SnackbarType
 import fr.berliat.hskwidget.ocr_display_no_text_found
 import fr.berliat.hskwidget.ocr_display_ocr_failed
 import fr.berliat.hskwidget.ocr_display_smallest_text
@@ -160,7 +161,7 @@ class DisplayOCRViewModel(
             val annotatedWord = fetchWord(simplified)
 
             if (annotatedWord == null) {
-                HSKAppServices.snackbar.show(Res.string.ocr_display_word_not_found)
+                HSKAppServices.snackbar.show(SnackbarType.WARNING, Res.string.ocr_display_word_not_found)
 
                 withContext(Dispatchers.Main) {
                     Utils.copyToClipBoard(simplified)
@@ -185,7 +186,7 @@ class DisplayOCRViewModel(
 
         if (textSize == AppTypographies.smallestHanziFontSize.value) {
             viewModelScope.launch {
-                HSKAppServices.snackbar.show(Res.string.ocr_display_smallest_text)
+                HSKAppServices.snackbar.show(SnackbarType.WARNING, Res.string.ocr_display_smallest_text)
             }
         }
 

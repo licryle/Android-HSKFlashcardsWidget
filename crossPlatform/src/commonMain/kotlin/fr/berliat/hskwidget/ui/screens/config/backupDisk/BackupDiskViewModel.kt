@@ -12,6 +12,7 @@ import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.config_backup_directory_failed_selection
 import fr.berliat.hskwidget.core.AppDispatchers
 import fr.berliat.hskwidget.core.Logging
+import fr.berliat.hskwidget.core.SnackbarType
 import fr.berliat.hskwidget.dbrestore_failure_import
 import fr.berliat.hskwidget.dbrestore_failure_nofileselected
 import fr.berliat.hskwidget.dbrestore_start
@@ -87,7 +88,7 @@ class BackupDiskViewModel(
         viewModelScope.launch(Dispatchers.Main) {
             DatabaseDiskBackup.selectBackupFile(
                 onSuccess = { file ->
-                    HSKAppServices.snackbar.show(Res.string.dbrestore_start)
+                    HSKAppServices.snackbar.show(SnackbarType.INFO, Res.string.dbrestore_start)
                     viewModelScope.launch(AppDispatchers.IO) {
                         val dbHelper = DatabaseHelper.getInstance()
                         val copiedFile = FileKit.cacheDir / file.name
@@ -99,7 +100,7 @@ class BackupDiskViewModel(
                             copiedFile.delete()
 
                             withContext(Dispatchers.Main) {
-                                HSKAppServices.snackbar.show(Res.string.dbrestore_success)
+                                HSKAppServices.snackbar.show(SnackbarType.SUCCESS, Res.string.dbrestore_success)
 
                                 NavigationManager.navigate(Screen.Dictionary())
                             }
@@ -110,7 +111,7 @@ class BackupDiskViewModel(
                             Logging.logAnalyticsEvent(Logging.ANALYTICS_EVENTS.CONFIG_BACKUP_RESTORE)
                         } catch (e: Exception) {
                             withContext(Dispatchers.Main) {
-                                HSKAppServices.snackbar.show(Res.string.dbrestore_failure_import)
+                                HSKAppServices.snackbar.show(SnackbarType.ERROR, Res.string.dbrestore_failure_import)
                             }
                             Logging.logAnalyticsError(
                                 TAG,
@@ -121,7 +122,7 @@ class BackupDiskViewModel(
                 },
                 onFail = { e ->
                     viewModelScope.launch(Dispatchers.Main) {
-                        HSKAppServices.snackbar.show(Res.string.dbrestore_failure_nofileselected)
+                        HSKAppServices.snackbar.show(SnackbarType.WARNING, Res.string.dbrestore_failure_nofileselected)
 
                         Logging.logAnalyticsError(
                             "BACKUP_RESTORE",
@@ -154,7 +155,7 @@ class BackupDiskViewModel(
                     Logging.logAnalyticsEvent(Logging.ANALYTICS_EVENTS.CONFIG_BACKUP_ON)
                 },
                 onFail = {
-                    HSKAppServices.snackbar.show(Res.string.config_backup_directory_failed_selection)
+                    HSKAppServices.snackbar.show(SnackbarType.WARNING, Res.string.config_backup_directory_failed_selection)
                 }
             )
         }

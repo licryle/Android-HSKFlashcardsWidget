@@ -11,9 +11,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -33,6 +31,7 @@ import fr.berliat.hskwidget.core.SnackbarManager
 import fr.berliat.hskwidget.ui.application.content.AppBar
 import fr.berliat.hskwidget.ui.application.content.OCRReminder
 import fr.berliat.hskwidget.ui.application.drawer.AppDrawer
+import fr.berliat.hskwidget.ui.application.snackbar.AppSnackbarHost
 import fr.berliat.hskwidget.ui.components.AppLoadingView
 import fr.berliat.hskwidget.ui.navigation.AppNavHost
 import fr.berliat.hskwidget.ui.navigation.DecoratedScreen
@@ -72,30 +71,6 @@ fun AppView(
 
     val currentScreen by viewModel.navigationManager.currentScreen.collectAsState()
 
-    // Collect snackbar messages and display them
-    LaunchedEffect(snackbarHostState) {
-        SnackbarManager.messages.collect { message ->
-            val messageText = org.jetbrains.compose.resources.getString(
-                message.messageRes,
-                *message.messageArgs.toTypedArray()
-            )
-            val actionLabelText = message.actionLabelRes?.let { 
-                org.jetbrains.compose.resources.getString(it) 
-            }
-            
-            val result = snackbarHostState.showSnackbar(
-                message = messageText,
-                actionLabel = actionLabelText,
-                duration = message.duration
-            )
-            
-            when (result) {
-                SnackbarResult.ActionPerformed -> message.onAction?.invoke()
-                SnackbarResult.Dismissed -> message.onDismiss?.invoke()
-            }
-        }
-    }
-
     AppTheme {
         if (!isReady.value) {
             AppLoadingView()
@@ -116,7 +91,12 @@ fun AppView(
             modifier = Modifier.clearFocusOnAnyOutsideTap()
         ) {
             Scaffold(
-                snackbarHost = { SnackbarHost(snackbarHostState) },
+                snackbarHost = {
+                    AppSnackbarHost(
+                        snackbarHostState = snackbarHostState,
+                        snackbarManager = SnackbarManager
+                    )
+                },
                 contentWindowInsets = WindowInsets.ime, // Respect keyboard insets
                 topBar = {
                     AppBar(

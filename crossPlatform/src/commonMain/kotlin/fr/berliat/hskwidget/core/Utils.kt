@@ -37,7 +37,7 @@ object Utils {
     fun copyToClipBoard(s: String) {
         ExpectedUtils.copyToClipBoard(s)
 
-        HSKAppServices.snackbar.show(Res.string.copied_to_clipboard, listOf(s))
+        HSKAppServices.snackbar.show(SnackbarType.INFO, Res.string.copied_to_clipboard, listOf(s))
 
         logAnalyticsEvent(Logging.ANALYTICS_EVENTS.WIDGET_COPY_WORD)
 
@@ -48,7 +48,7 @@ object Utils {
 
     fun playWordInBackground(word: String) {
         if (isMuted()) {
-            HSKAppServices.snackbar.show(Res.string.speech_failure_toast_muted)
+            HSKAppServices.snackbar.show(SnackbarType.WARNING, Res.string.speech_failure_toast_muted)
 
             CoroutineScope(AppDispatchers.IO).launch {
                 logAnalyticsError("SPEECH", getString(Res.string.speech_failure_toast_muted), "")

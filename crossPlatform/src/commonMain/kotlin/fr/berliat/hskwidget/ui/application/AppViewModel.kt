@@ -14,6 +14,7 @@ import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.core.AppDispatchers
 import fr.berliat.hskwidget.core.HSKAppServicesPriority
 import fr.berliat.hskwidget.core.Logging
+import fr.berliat.hskwidget.core.SnackbarType
 import fr.berliat.hskwidget.database_update_failure
 import fr.berliat.hskwidget.database_update_start
 import fr.berliat.hskwidget.database_update_success
@@ -91,13 +92,13 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
 
     protected open fun handleAppUpdate() {
         if (shouldUpdateDatabaseFromAsset()) {
-            HSKAppServices.snackbar.show(Res.string.database_update_start)
+            HSKAppServices.snackbar.show(SnackbarType.INFO, Res.string.database_update_start)
 
             viewModelScope.launch(AppDispatchers.IO) {
                 DatabaseHelper.getInstance().updateLiveDatabaseFromAsset({
-                    HSKAppServices.snackbar.show(Res.string.database_update_success)
+                    HSKAppServices.snackbar.show(SnackbarType.SUCCESS, Res.string.database_update_success)
                 }, { e ->
-                    HSKAppServices.snackbar.show(Res.string.database_update_failure, listOf(e.message ?: ""))
+                    HSKAppServices.snackbar.show(SnackbarType.ERROR, Res.string.database_update_failure, listOf(e.message ?: ""))
 
                     Logging.logAnalyticsError(TAG, "UpdateDatabaseFromAssetFailure", e.message ?: "")
                 })
@@ -141,7 +142,7 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
                             DatabaseDiskBackup.backUp(
                                 bookMark,
                                 onSuccess = {
-                                    HSKAppServices.snackbar.show(Res.string.dbbackup_success)
+                                    HSKAppServices.snackbar.show(SnackbarType.SUCCESS, Res.string.dbbackup_success)
                                     viewModelScope.launch(AppDispatchers.IO) {
                                         DatabaseDiskBackup.cleanOldBackups(
                                             backupFolder,
@@ -149,12 +150,12 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
                                         )
                                     }
                                 },
-                                onFail = { HSKAppServices.snackbar.show(Res.string.dbbackup_failure_write) }
+                                onFail = { HSKAppServices.snackbar.show(SnackbarType.ERROR, Res.string.dbbackup_failure_write) }
                             )
                         }
                     },
                     onFail = {
-                        HSKAppServices.snackbar.show(Res.string.dbbackup_failure_folderpermission)
+                        HSKAppServices.snackbar.show(SnackbarType.WARNING, Res.string.dbbackup_failure_folderpermission)
                     }
                 )
             }

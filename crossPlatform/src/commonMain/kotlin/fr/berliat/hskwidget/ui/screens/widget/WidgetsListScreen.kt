@@ -28,6 +28,7 @@ import fr.berliat.hskwidget.ui.components.WidgetWordView
 import fr.berliat.hskwidget.ui.screens.widgetConfigure.WidgetConfigWithPreviewScreen
 import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.core.HSKAppServices
+import fr.berliat.hskwidget.core.SnackbarType
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.ic_add_24dp
 import fr.berliat.hskwidget.ui.theme.widgetDefaultBox
@@ -79,9 +80,9 @@ fun WidgetsListScreen(
                         ),
                         annotation = null,
                     ),
-                    onClickWord = { HSKAppServices.snackbar.show(Res.string.widget_demo_word_click) },
+                    onClickWord = { HSKAppServices.snackbar.show(SnackbarType.INFO, Res.string.widget_demo_word_click) },
                     onClickSpeak = { viewModel.speakWord("你好") },
-                    onClickUpdate = { HSKAppServices.snackbar.show(Res.string.widget_demo_update_click) }
+                    onClickUpdate = { HSKAppServices.snackbar.show(SnackbarType.INFO, Res.string.widget_demo_update_click) }
                 )
             }
         }
@@ -128,7 +129,7 @@ fun WidgetsListScreen(
                     widgetId = ids[page],
                     expectsActivityResult = expectsActivityResult,
                     onSuccessfulSave = {
-                        HSKAppServices.snackbar.show(Res.string.widget_configure_saved)
+                        HSKAppServices.snackbar.show(SnackbarType.SUCCESS, Res.string.widget_configure_saved)
                         onWidgetPreferenceSaved(ids[page])
                     },
                     modifier = modifier

@@ -21,6 +21,7 @@ import fr.berliat.hskwidget.data.store.SupportDevStore
 
 import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.core.Logging
+import fr.berliat.hskwidget.core.SnackbarType
 import fr.berliat.hskwidget.support_payment_failed
 import fr.berliat.hskwidget.support_payment_success
 import fr.berliat.hskwidget.support_review_failed
@@ -68,11 +69,11 @@ actual class SupportViewModel(
     }
 
     override fun onQueryFailure(result: BillingResult) {
-        HSKAppServices.snackbar.show(Res.string.support_total_error)
+        HSKAppServices.snackbar.show(SnackbarType.ERROR, Res.string.support_total_error)
     }
 
     override fun onPurchaseSuccess(purchase: Purchase) {
-        HSKAppServices.snackbar.show(Res.string.support_payment_success)
+        HSKAppServices.snackbar.show(SnackbarType.SUCCESS, Res.string.support_payment_success)
         Logging.logAnalyticsEvent(
             Logging.ANALYTICS_EVENTS.PURCHASE_SUCCESS,
             mapOf("product_id" to getFirstProductId(purchase))
@@ -88,7 +89,7 @@ actual class SupportViewModel(
     override fun onPurchaseAcknowledgedSuccess(purchase: Purchase) { }
 
     override fun onPurchaseFailure(purchase: Purchase?, billingResponseCode: Int) {
-        HSKAppServices.snackbar.show(Res.string.support_payment_failed)
+        HSKAppServices.snackbar.show(SnackbarType.ERROR, Res.string.support_payment_failed)
         Logging.logAnalyticsEvent(
             Logging.ANALYTICS_EVENTS.PURCHASE_FAILED,
             mapOf("product_id" to getFirstProductId(purchase))
@@ -102,10 +103,10 @@ actual class SupportViewModel(
                 val reviewInfo = task.result
                 val flow = reviewManager.launchReviewFlow(activity, reviewInfo)
                 flow.addOnCompleteListener {
-                    HSKAppServices.snackbar.show(Res.string.support_reviewed)
+                    HSKAppServices.snackbar.show(SnackbarType.INFO, Res.string.support_reviewed)
                 }
             } else {
-                HSKAppServices.snackbar.show(Res.string.support_review_failed)
+                HSKAppServices.snackbar.show(SnackbarType.ERROR, Res.string.support_review_failed)
                 @ReviewErrorCode val reviewErrorCode = (task.exception as ReviewException).errorCode
                 Logging.logAnalyticsError(TAG, "RequestReviewFlow_SetupFailed", reviewErrorCode.toString())
             }

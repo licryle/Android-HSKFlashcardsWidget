@@ -8,6 +8,7 @@ import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.about_email_noapp
 import fr.berliat.hskwidget.core.AppDispatchers
 import fr.berliat.hskwidget.core.Logging
+import fr.berliat.hskwidget.core.SnackbarType
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -36,7 +37,7 @@ class AboutViewModel {
         Logging.logAnalyticsScreenView("Email")
 
         if (!Utils.sendEmail("cyrille.berliat+hsk@gmail.com", "About Mandarin Assistant App", "")) {
-            HSKAppServices.snackbar.show(Res.string.about_email_noapp)
+            HSKAppServices.snackbar.show(SnackbarType.ERROR, Res.string.about_email_noapp)
         }
     }
 

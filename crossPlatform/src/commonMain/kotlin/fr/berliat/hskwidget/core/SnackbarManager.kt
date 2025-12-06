@@ -8,10 +8,29 @@ import kotlinx.coroutines.flow.asSharedFlow
 import org.jetbrains.compose.resources.StringResource
 
 /**
+ * Defines the types of snackbar messages.
+ * Each type will have different styling (colors, icons, etc.)
+ */
+enum class SnackbarType {
+    /** Informational message (default) */
+    INFO,
+
+    /** Warning message */
+    WARNING,
+
+    /** Error message */
+    ERROR,
+
+    /** Success message */
+    SUCCESS
+}
+
+/**
  * Data class representing a snackbar message with optional action and callbacks.
  *
  * @param messageRes The string resource for the message to display
  * @param messageArgs Arguments to format the message string resource
+ * @param type The type of snackbar (INFO, WARNING, ERROR) which determines styling
  * @param duration How long to show the snackbar
  * @param actionLabelRes Optional string resource for an action button label
  * @param onAction Optional callback invoked when the action is clicked
@@ -20,7 +39,8 @@ import org.jetbrains.compose.resources.StringResource
 data class SnackbarMessage(
     val messageRes: StringResource,
     val messageArgs: List<String> = emptyList(),
-    val duration: SnackbarDuration = SnackbarDuration.Short,
+    val type: SnackbarType = SnackbarType.INFO,
+    val duration: SnackbarDuration = SnackbarDuration.Long,
     val actionLabelRes: StringResource? = null,
     val onAction: (() -> Unit)? = null,
     val onDismiss: (() -> Unit)? = null
@@ -51,15 +71,17 @@ object SnackbarManager {
      *
      * @param messageRes The string resource for the message to display
      * @param messageArgs Arguments to format the message (default: empty)
-     * @param duration How long to show the snackbar (default: Short)
+     * @param type The type of snackbar (INFO, WARNING, ERROR) - determines styling
+     * @param duration How long to show the snackbar (default: Long)
      * @param actionLabelRes Optional string resource for an action button label
      * @param onAction Optional callback invoked when the action is clicked
      * @param onDismiss Optional callback invoked when the snackbar is dismissed
      */
     fun show(
+        type: SnackbarType,
         messageRes: StringResource,
         messageArgs: List<String> = emptyList(),
-        duration: SnackbarDuration = SnackbarDuration.Long,
+        duration: SnackbarDuration = SnackbarDuration.Short,
         actionLabelRes: StringResource? = null,
         onAction: (() -> Unit)? = null,
         onDismiss: (() -> Unit)? = null
@@ -68,6 +90,7 @@ object SnackbarManager {
             SnackbarMessage(
                 messageRes = messageRes,
                 messageArgs = messageArgs,
+                type = type,
                 duration = duration,
                 actionLabelRes = actionLabelRes,
                 onAction = onAction,

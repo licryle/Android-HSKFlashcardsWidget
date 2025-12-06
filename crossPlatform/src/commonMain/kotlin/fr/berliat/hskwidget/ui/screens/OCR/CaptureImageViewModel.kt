@@ -15,6 +15,7 @@ import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.core.AppDispatchers
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.core.Logging
+import fr.berliat.hskwidget.core.SnackbarType
 import fr.berliat.hskwidget.ocr_capture_error_processed
 import fr.berliat.hskwidget.ocr_capture_error_save
 
@@ -52,7 +53,7 @@ class CaptureImageViewModel(
                         try {
                             file.write(result.byteArray)
                         } catch (_: Exception) {
-                            HSKAppServices.snackbar.show(Res.string.ocr_capture_error_save)
+                            HSKAppServices.snackbar.show(SnackbarType.ERROR, Res.string.ocr_capture_error_save)
                         } finally {
                             _isProcessing.value = false
                         }
@@ -67,7 +68,7 @@ class CaptureImageViewModel(
                             tag = TAG,
                             messageString = "Image Capture Error: ${result.exception.message}"
                         )
-                        HSKAppServices.snackbar.show(Res.string.ocr_capture_error_processed)
+                        HSKAppServices.snackbar.show(SnackbarType.ERROR, Res.string.ocr_capture_error_processed)
 
                         Logging.logAnalyticsError(
                             "OCR_CAPTURE",

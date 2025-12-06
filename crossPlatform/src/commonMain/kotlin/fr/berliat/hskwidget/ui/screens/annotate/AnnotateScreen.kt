@@ -43,6 +43,7 @@ import fr.berliat.hskwidget.annotation_edit_notes_hint
 import fr.berliat.hskwidget.annotation_edit_save_failure
 import fr.berliat.hskwidget.annotation_edit_save_success
 import fr.berliat.hskwidget.annotation_edit_themes_hint
+import fr.berliat.hskwidget.core.SnackbarType
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.delete
 import fr.berliat.hskwidget.save
@@ -107,10 +108,10 @@ fun AnnotateScreen(
         }
 
         if (e == null) {
-            HSKAppServices.snackbar.show(msgRes, listOf(word))
+            HSKAppServices.snackbar.show(SnackbarType.SUCCESS, msgRes, listOf(word))
             return true
         } else {
-            HSKAppServices.snackbar.show(msgRes, listOf(word, e.message ?: ""))
+            HSKAppServices.snackbar.show(SnackbarType.ERROR, msgRes, listOf(word, e.message ?: ""))
             return false
         }
     }
