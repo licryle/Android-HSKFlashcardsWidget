@@ -87,13 +87,13 @@ actual class HSKAnkiDelegate(val activity: FragmentActivity,
     }
 
     override fun onAnkiOperationCancelled(context: Context?) {
-        HSKAppServices.snackbar.show(SnackbarType.INFO, Res.string.anki_operation_cancelled)
+        HSKAppServices.snackbar.show(SnackbarType.WARNING, Res.string.anki_operation_cancelled)
 
         super.onAnkiOperationCancelled(context)
     }
 
     override fun onAnkiNotInstalled() {
-        HSKAppServices.snackbar.show(SnackbarType.WARNING, Res.string.anki_not_installed)
+        HSKAppServices.snackbar.show(SnackbarType.ERROR, Res.string.anki_not_installed)
         appConfig?.ankiSaveNotes?.value = false
 
         super.onAnkiNotInstalled()
