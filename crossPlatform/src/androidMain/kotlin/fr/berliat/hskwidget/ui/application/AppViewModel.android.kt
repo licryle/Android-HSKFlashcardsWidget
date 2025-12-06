@@ -12,6 +12,7 @@ import androidx.fragment.app.FragmentActivity
 
 import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.Purchase
+import com.google.api.client.googleapis.media.MediaHttpUploader
 
 import fr.berliat.hskwidget.core.ExpectedUtils
 import fr.berliat.hskwidget.core.ExpectedUtils.INTENT_SEARCH_WORD
@@ -50,12 +51,12 @@ actual class AppViewModel(navigationManager: NavigationManager, val activityProv
         ExpectedUtils.init(activityProvider.invoke())
 
         // Todo remove run blocking
-        HSKAppServices.registerGoogleBackup(
-            GoogleDriveBackup(
-                activityProvider.invoke(),
-                runBlocking { getString(Res.string.app_name) }
-            )
+        val gDrive = GoogleDriveBackup(
+            activityProvider.invoke(),
+            runBlocking { getString(Res.string.app_name) }
         )
+        gDrive.transferChunkSize = MediaHttpUploader.MINIMUM_CHUNK_SIZE * 2
+        HSKAppServices.registerGoogleBackup(gDrive)
 
         // HSKAnkiDelegate must be init before onResume, yet HSKAppServices aren't ready
         ankiDelegate = HSKAnkiDelegate(

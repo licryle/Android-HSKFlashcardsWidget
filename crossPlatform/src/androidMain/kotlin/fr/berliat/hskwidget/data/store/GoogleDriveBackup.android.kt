@@ -22,6 +22,9 @@ actual class GoogleDriveBackup(val activity: FragmentActivity, val appName: Stri
     )
 
     actual val state: StateFlow<GoogleDriveState> get() = gDriveBackup.state
+    actual var transferChunkSize: Int
+        get() = gDriveBackup.transferChunkSize
+        set(value) { gDriveBackup.transferChunkSize = value }
 
     actual fun cancel() = gDriveBackup.cancel()
     actual fun login(onlyFromCache: Boolean, successCallback: (() -> Unit)?) = gDriveBackup.login(onlyFromCache, successCallback)

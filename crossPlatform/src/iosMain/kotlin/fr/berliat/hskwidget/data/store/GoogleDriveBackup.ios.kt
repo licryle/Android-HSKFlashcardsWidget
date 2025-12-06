@@ -14,6 +14,10 @@ actual class GoogleDriveBackup {
     actual val state: StateFlow<GoogleDriveState>
         get() = TODO("Not yet implemented")
 
+    actual var transferChunkSize: Int
+        get() = TODO("Not yet implemented")
+        set(value) { TODO("Not yet implemented") }
+
     actual fun cancel() {
     }
 

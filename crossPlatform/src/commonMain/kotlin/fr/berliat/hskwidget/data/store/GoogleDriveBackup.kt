@@ -13,6 +13,7 @@ expect class Account
 
 expect class GoogleDriveBackup {
     val state: StateFlow<GoogleDriveState>
+    var transferChunkSize: Int
 
     fun cancel()
 
