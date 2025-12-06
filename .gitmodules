@@ -7,9 +7,12 @@
 [submodule "googledrivebackup"]
 	path = googledrivebackup
 	url = https://github.com/licryle/GoogleDriveBackUp.git
+    branch = master
 [submodule "pinyin4kot"]
 	path = pinyin4kot
 	url = https://github.com/licryle/Pinyin4Kot.git
+    branch = master
 [submodule "AnkiDroidAPIHelper"]
 	path = AnkiDroidAPIHelper
 	url = https://github.com/licryle/AnkiDroidAPIHelper.git
+    branch = master
