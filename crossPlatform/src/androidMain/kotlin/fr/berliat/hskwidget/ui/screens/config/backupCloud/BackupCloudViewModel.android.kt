@@ -43,6 +43,7 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import org.jetbrains.compose.resources.getString
 
+import java.io.BufferedOutputStream
 import java.io.FileInputStream
 import java.io.FileOutputStream
 
@@ -120,7 +121,7 @@ actual class BackupCloudViewModel actual constructor(
                     listOf(
                         GoogleDriveBackupFile.DownloadFile(
                             "database.sqlite",
-                            FileOutputStream(cloudRestoreFile.path)
+                            BufferedOutputStream(FileOutputStream(cloudRestoreFile.path))
                         )
                     )
                 )
