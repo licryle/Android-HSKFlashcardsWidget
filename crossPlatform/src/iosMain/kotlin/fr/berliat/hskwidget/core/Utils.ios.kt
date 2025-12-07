@@ -9,16 +9,26 @@ import kotlinx.coroutines.withContext
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.useContents
 
+import platform.AVFAudio.AVAudioSession
+import platform.AVFAudio.AVSpeechUtterance
+import platform.AVFAudio.outputVolume
+import platform.AVFAudio.*
+
 import platform.Foundation.NSURL
 import platform.Foundation.NSMakeRange
 import platform.Foundation.NSNotFound
-import platform.NaturalLanguage.NLTokenUnit
-import platform.NaturalLanguage.*
-import platform.UIKit.UIApplication
-import platform.UIKit.UIPasteboard
 import platform.Foundation.NSRange
 
+import platform.NaturalLanguage.NLTokenUnit
+import platform.NaturalLanguage.*
+
+import platform.UIKit.UIApplication
+import platform.UIKit.UIApplicationOpenSettingsURLString
+import platform.UIKit.UIPasteboard
+
 actual object ExpectedUtils {
+	val TTSynthesizer = AVSpeechSynthesizer()
+
     internal actual fun openLink(url: String) {
         val nsUrl = NSURL.URLWithString(url) ?: return
         UIApplication.sharedApplication.openURL(nsUrl)
@@ -70,14 +80,51 @@ actual object ExpectedUtils {
         UIPasteboard.generalPasteboard.string = s
     }
 
-    internal actual fun isMuted() : Boolean { return false
+	@OptIn(ExperimentalForeignApi::class)
+	internal fun ensureTTSSetup() {
+		val audioSession = AVAudioSession.sharedInstance()
+		try {
+			// Set category to .playback to bypass the silent switch
+			audioSession.setCategory(
+				AVAudioSessionCategoryPlayback,
+				error = null
+			)
+			audioSession.setActive(true, error = null)
+		} catch (e: Exception) {
+			println("Audio session setup failed: $e")
+		}
+
+		// 2. Check for voices (Option 2)
+		val availableVoices = AVSpeechSynthesisVoice.speechVoices() as List<AVSpeechSynthesisVoice>
+		if (!availableVoices.any { it.language == "zh-CN" }) {
+			println("Error: No voices installed. Cannot speak.")
+			// ToDo add dialog
+			openSettings()
+		}
+	}
+
+    internal actual fun isMuted() : Boolean {
+		val vol = AVAudioSession.sharedInstance().outputVolume
+        return vol == 0.0F
     }
 
     internal actual fun playWordInBackground(word: String) {
+		ensureTTSSetup()
+        val utterance = AVSpeechUtterance.speechUtteranceWithString(string = word)
+
+        utterance.voice = AVSpeechSynthesisVoice.voiceWithLanguage("zh-CN")
+
+		TTSynthesizer.speakUtterance(utterance)
     }
 
     internal actual fun openAppForSearchQuery(query: SearchQuery) {
+
     }
+
+	internal fun openSettings() {
+		val settingsUrl = NSURL(string = UIApplicationOpenSettingsURLString )
+		UIApplication.sharedApplication.openURL(settingsUrl)
+	}
 }
 
 fun NSRange.toKmpIntRange(string: String): IntRange? {
