@@ -5,6 +5,7 @@ import fr.berliat.hsktextviews.HSKTextSegmenterListener
 import fr.berliat.hskwidget.data.dao.AnkiDAO
 import fr.berliat.hskwidget.domain.SearchQuery
 
+import kotlinx.coroutines.withContext
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.useContents
 
@@ -14,8 +15,7 @@ import platform.Foundation.NSNotFound
 import platform.NaturalLanguage.NLTokenUnit
 import platform.NaturalLanguage.*
 import platform.UIKit.UIApplication
-
-import kotlinx.coroutines.withContext
+import platform.UIKit.UIPasteboard
 import platform.Foundation.NSRange
 
 actual object ExpectedUtils {
@@ -67,16 +67,13 @@ actual object ExpectedUtils {
     }
 
     internal actual fun copyToClipBoard(s: String) {
+        UIPasteboard.generalPasteboard.string = s
     }
 
-    internal actual fun isMuted() : Boolean {
-
+    internal actual fun isMuted() : Boolean { return false
     }
 
     internal actual fun playWordInBackground(word: String) {
-    }
-
-    internal actual fun toast(s: String) {
     }
 
     internal actual fun openAppForSearchQuery(query: SearchQuery) {
