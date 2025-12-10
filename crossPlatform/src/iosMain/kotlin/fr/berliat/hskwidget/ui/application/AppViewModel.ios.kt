@@ -19,6 +19,7 @@ actual class AppViewModel(navigationManager: NavigationManager) : CommonAppViewM
 		val gDrive = GoogleDriveBackup(
             runBlocking { getString(Res.string.app_name) } )
 		HSKAppServices.registerGoogleBackup(gDrive)
-		super.init()
+
+		super.finishInitialization()
     }
 }
