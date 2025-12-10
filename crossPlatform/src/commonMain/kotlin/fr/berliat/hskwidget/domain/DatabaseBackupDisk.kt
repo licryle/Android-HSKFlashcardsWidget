@@ -3,7 +3,6 @@ package fr.berliat.hskwidget.domain
 import fr.berliat.hskwidget.core.AppDispatchers
 import fr.berliat.hskwidget.core.YYMMDDHHMMSS
 import fr.berliat.hskwidget.core.toSafeFileName
-import fr.berliat.hskwidget.data.store.snapshotToFile
 
 import io.github.vinceglb.filekit.BookmarkData
 import io.github.vinceglb.filekit.FileKit

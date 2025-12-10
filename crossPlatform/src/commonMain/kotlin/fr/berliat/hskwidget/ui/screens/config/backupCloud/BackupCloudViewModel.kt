@@ -19,7 +19,6 @@ import fr.berliat.hskwidget.core.AppDispatchers
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.core.Logging
 import fr.berliat.hskwidget.core.SnackbarType
-import fr.berliat.hskwidget.data.store.snapshotToFile
 import fr.berliat.hskwidget.dbrestore_failure_fileformat
 import fr.berliat.hskwidget.dbrestore_failure_import
 import fr.berliat.hskwidget.dbrestore_start
