@@ -1,14 +1,17 @@
 package fr.berliat.hskwidget.ui.application.snackbar
 
+import org.jetbrains.compose.resources.getString
+import org.jetbrains.compose.resources.painterResource
+
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarDefaults
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
@@ -23,11 +26,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+
 import fr.berliat.hskwidget.core.SnackbarManager
 import fr.berliat.hskwidget.core.SnackbarType
 import fr.berliat.hskwidget.ui.theme.snackbarStyleFor
-import org.jetbrains.compose.resources.getString
-import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun AppSnackbarHost(
@@ -68,13 +70,13 @@ fun AppSnackbarHost(
         val style = MaterialTheme.colorScheme.snackbarStyleFor(currentMessageType.value)
 
         Surface(
-            shape = SnackbarDefaults.shape,
+            shape = RoundedCornerShape(16.dp),
             color = style.containerColor,
             contentColor = style.contentColor,
             tonalElevation = 6.dp,
             modifier = Modifier.fillMaxWidth()
-                .padding(bottom = 24.dp)
-                .padding(horizontal = 24.dp)
+                .padding(bottom = 75.dp)
+                .padding(horizontal = 25.dp)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
