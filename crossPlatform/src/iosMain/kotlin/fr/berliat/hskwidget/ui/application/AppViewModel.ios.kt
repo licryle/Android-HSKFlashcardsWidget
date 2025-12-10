@@ -8,6 +8,9 @@ actual class AppViewModel(navigationManager: NavigationManager) : CommonAppViewM
 
     override suspend fun finishInitialization() {
         HSKAppServices.registerAnkiDelegators(HSKAnkiDelegate())
+
+        val gDrive = GoogleDriveBackup()
+        HSKAppServices.registerGoogleBackup(gDrive)
 		super.init()
     }
 }
