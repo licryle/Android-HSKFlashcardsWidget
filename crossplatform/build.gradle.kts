@@ -63,6 +63,7 @@ kotlin {
                 implementation("com.kashif.cameraK_fork:camerak:0.0.13")
                 implementation(libs.navigation.compose)
                 implementation(project(":hsktextviews"))
+                implementation(project(":googledrivebackup"))
             }
         }
 
@@ -84,7 +85,6 @@ kotlin {
                 implementation(libs.androidx.documentfile)
                 implementation(libs.play.services.auth)
                 implementation(libs.google.api.services.drive)
-                implementation(project(":googledrivebackup"))
                 implementation(libs.androidx.constraintlayout)
                 implementation(libs.material)
 

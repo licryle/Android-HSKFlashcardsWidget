@@ -15,6 +15,7 @@ import fr.berliat.hskwidget.domain.DatabaseHelper
 import fr.berliat.hskwidget.ui.screens.config.backupCloud.BackupCloudTransferEvent.*
 
 import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.core.AppDispatchers
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.core.Logging
 import fr.berliat.hskwidget.core.SnackbarType
@@ -66,7 +67,7 @@ class BackupCloudViewModel (
 
     fun backup() {
         gDriveBackup.login {
-            viewModelScope.launch(Dispatchers.IO) {
+            viewModelScope.launch(AppDispatchers.IO) {
                 val gDriveBackupSnapshot = DatabaseHelper.getInstance().liveDatabase.snapshotToFile()
 
                 if (gDriveBackupSnapshot == null) {
@@ -116,7 +117,7 @@ class BackupCloudViewModel (
 
     fun restore() {
         gDriveBackup.login {
-            viewModelScope.launch(Dispatchers.IO) {
+            viewModelScope.launch(AppDispatchers.IO) {
                 val flow = gDriveBackup.restore(
                     listOf(
                         GoogleDriveBackupFile.DownloadFile(
@@ -164,7 +165,7 @@ class BackupCloudViewModel (
         HSKAppServices.snackbar.show(SnackbarType.INFO, Res.string.dbrestore_start)
 
         Logging.logAnalyticsEvent(Logging.ANALYTICS_EVENTS.CONFIG_BACKUPCLOUD_RESTORE)
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(AppDispatchers.IO) {
             try {
                 DatabaseHelper.getInstance().replaceLiveUserDataFromFile(cloudRestoreFile)
                 HSKAppServices.snackbar.show(SnackbarType.SUCCESS, Res.string.dbrestore_success)
