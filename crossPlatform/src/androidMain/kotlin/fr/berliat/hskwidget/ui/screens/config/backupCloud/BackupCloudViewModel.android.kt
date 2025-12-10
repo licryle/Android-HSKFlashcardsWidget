@@ -4,13 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 
 import fr.berliat.googledrivebackup.BackupEvent
+import fr.berliat.googledrivebackup.GoogleDriveBackup
 import fr.berliat.googledrivebackup.GoogleDriveBackupFile
 import fr.berliat.googledrivebackup.GoogleDriveState
 import fr.berliat.googledrivebackup.RestoreEvent
+
 import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.domain.DatabaseHelper
-import fr.berliat.hskwidget.data.store.GoogleDriveBackup
 import fr.berliat.hskwidget.ui.screens.config.backupCloud.BackupCloudTransferEvent.*
 
 import fr.berliat.hskwidget.Res
@@ -28,6 +29,7 @@ import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.cacheDir
 import io.github.vinceglb.filekit.path
 import io.github.vinceglb.filekit.size
+import io.github.vinceglb.filekit.toKotlinxIoPath
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -41,11 +43,9 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import kotlinx.io.buffered
+import kotlinx.io.files.SystemFileSystem
 import org.jetbrains.compose.resources.getString
-
-import java.io.BufferedOutputStream
-import java.io.FileInputStream
-import java.io.FileOutputStream
 
 actual class BackupCloudViewModel actual constructor(
     val appConfig: AppPreferencesStore, val gDriveBackup: GoogleDriveBackup) :
@@ -77,7 +77,7 @@ actual class BackupCloudViewModel actual constructor(
                     listOf(
                         GoogleDriveBackupFile.UploadFile(
                             "database.sqlite",
-                            FileInputStream(gDriveBackupSnapshot.path),
+                            SystemFileSystem.source(gDriveBackupSnapshot.toKotlinxIoPath()).buffered(),
                             "application/octet-stream",
                             gDriveBackupSnapshot.size()
                         )
@@ -121,9 +121,10 @@ actual class BackupCloudViewModel actual constructor(
                     listOf(
                         GoogleDriveBackupFile.DownloadFile(
                             "database.sqlite",
-                            BufferedOutputStream(FileOutputStream(cloudRestoreFile.path))
+                            SystemFileSystem.sink(cloudRestoreFile.toKotlinxIoPath()).buffered()
                         )
-                    )
+                    ),
+                    onlyMostRecent = true
                 )
 
                 flow.takeUntilInclusive { event ->
@@ -150,7 +151,7 @@ actual class BackupCloudViewModel actual constructor(
                                 throw Exception("ConfigFragement.onRestoreSuccess: Something went really wrong in GoogleDriveBackUp lib, wrong backup file")
                             }
 
-                            restoreFileFrom.value = Instant.fromEpochSeconds(event.files[0].modifiedTime?.epochSecond ?: 0)
+                            restoreFileFrom.value = event.files[0].modifiedTime ?: Instant.fromEpochSeconds(0)
                         }
                         is RestoreEvent.Empty -> _transferState.emit(RestorationFailed(Exception("No Backup File")))
                     }

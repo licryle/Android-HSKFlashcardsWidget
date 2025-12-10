@@ -13,12 +13,12 @@ import androidx.fragment.app.FragmentActivity
 import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.Purchase
 import com.google.api.client.googleapis.media.MediaHttpUploader
+import fr.berliat.googledrivebackup.GoogleDriveBackup
 
 import fr.berliat.hskwidget.core.ExpectedUtils
 import fr.berliat.hskwidget.core.ExpectedUtils.INTENT_SEARCH_WORD
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.core.StrictModeManager
-import fr.berliat.hskwidget.data.store.GoogleDriveBackup
 import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
 import fr.berliat.hskwidget.domain.HSKAnkiDelegate
 import fr.berliat.hskwidget.Res

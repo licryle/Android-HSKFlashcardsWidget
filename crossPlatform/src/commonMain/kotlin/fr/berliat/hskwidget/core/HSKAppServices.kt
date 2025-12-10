@@ -1,11 +1,14 @@
 package fr.berliat.hskwidget.core
 
+import fr.berliat.googledrivebackup.GoogleDriveBackup
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+
 import fr.berliat.hsktextviews.HSKTextSegmenter
 import fr.berliat.hskwidget.data.repo.WordListRepository
 import fr.berliat.hskwidget.data.store.AnkiStore
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
-import fr.berliat.hskwidget.data.store.GoogleDriveBackup
 import fr.berliat.hskwidget.data.store.PrefixedPreferencesStore
 import fr.berliat.hskwidget.data.store.WidgetPreferencesStore
 import fr.berliat.hskwidget.data.store.WidgetPreferencesStoreProvider
@@ -13,8 +16,6 @@ import fr.berliat.hskwidget.domain.DatabaseHelper
 import fr.berliat.hskwidget.domain.HSKAnkiDelegate
 import fr.berliat.hskwidget.domain.KAnkiDelegator
 import fr.berliat.hskwidget.domain.KAnkiServiceDelegator
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 sealed class HSKAppServicesPriority(priority: UInt): AppServices.Priority(priority) {
     constructor(prio : AppServices.Priority) : this(prio.priority)

@@ -1,8 +1,8 @@
 package fr.berliat.hskwidget.ui.screens.config.backupCloud
 
+import fr.berliat.googledrivebackup.GoogleDriveBackup
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
-import fr.berliat.hskwidget.data.store.GoogleDriveBackup
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
