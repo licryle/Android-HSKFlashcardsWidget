@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1C200D132EB64F7900615172 /* crossPlatformKit in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C200D122EB64F7900615172 /* crossPlatformKit */; };
-		1C200D142EB64F7900615172 /* crossPlatformKit in Embed Libraries */ = {isa = PBXBuildFile; fileRef = 1C200D122EB64F7900615172 /* crossPlatformKit */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		1CD8A4282EE99796009F8CC4 /* crossPlatformKit in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CD8A4252EE9976C009F8CC4 /* crossPlatformKit */; };
+		1CD8A4292EE99796009F8CC4 /* crossPlatformKit in Embed Libraries */ = {isa = PBXBuildFile; fileRef = 1CD8A4252EE9976C009F8CC4 /* crossPlatformKit */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		1CD8DF532EDE03DE00AB930B /* Vision.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CD8DF522EDE03DE00AB930B /* Vision.framework */; };
 		1CDFB1232EE2FB89001B8494 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CDFB1222EE2FB89001B8494 /* AVFoundation.framework */; };
 /* End PBXBuildFile section */
@@ -31,13 +31,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		1C200D152EB64F7900615172 /* Embed Libraries */ = {
+		1CD8A42A2EE99796009F8CC4 /* Embed Libraries */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				1C200D142EB64F7900615172 /* crossPlatformKit in Embed Libraries */,
+				1CD8A4292EE99796009F8CC4 /* crossPlatformKit in Embed Libraries */,
 			);
 			name = "Embed Libraries";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -49,6 +49,7 @@
 		1C7166D52E71E186000B4154 /* hskwidget.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = hskwidget.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1C7166E32E71E189000B4154 /* hskwidgetTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = hskwidgetTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1C7166ED2E71E189000B4154 /* hskwidgetUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = hskwidgetUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		1CD8A4252EE9976C009F8CC4 /* crossPlatformKit */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = crossPlatformKit; path = "../crossPlatform/build/xcode-frameworks/Debug/iphoneos18.5/crossPlatformKit.framework/crossPlatformKit"; sourceTree = "<group>"; };
 		1CD8DF522EDE03DE00AB930B /* Vision.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Vision.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.5.sdk/System/Library/Frameworks/Vision.framework; sourceTree = DEVELOPER_DIR; };
 		1CDFB1222EE2FB89001B8494 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.5.sdk/System/Library/Frameworks/AVFoundation.framework; sourceTree = DEVELOPER_DIR; };
 /* End PBXFileReference section */
@@ -102,8 +103,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				1CDFB1232EE2FB89001B8494 /* AVFoundation.framework in Frameworks */,
+				1CD8A4282EE99796009F8CC4 /* crossPlatformKit in Frameworks */,
 				1CD8DF532EDE03DE00AB930B /* Vision.framework in Frameworks */,
-				1C200D132EB64F7900615172 /* crossPlatformKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -149,6 +150,7 @@
 		1C8A8BF62E733E1B00B8E39B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				1CD8A4252EE9976C009F8CC4 /* crossPlatformKit */,
 				1CDFB1222EE2FB89001B8494 /* AVFoundation.framework */,
 				1CD8DF522EDE03DE00AB930B /* Vision.framework */,
 				1C200D122EB64F7900615172 /* crossPlatformKit */,
@@ -176,7 +178,7 @@
 				1C7166D12E71E186000B4154 /* Sources */,
 				1C7166D22E71E186000B4154 /* Frameworks */,
 				1C7166D32E71E186000B4154 /* Resources */,
-				1C200D152EB64F7900615172 /* Embed Libraries */,
+				1CD8A42A2EE99796009F8CC4 /* Embed Libraries */,
 			);
 			buildRules = (
 			);
