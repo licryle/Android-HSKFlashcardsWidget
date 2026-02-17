@@ -69,7 +69,7 @@ open class AppServices {
     /**
      * Initialize all services concurrently.
      */
-    open fun init(upToLevel: HSKAppServicesPriority) {
+    open fun init(upToLevel: Priority) {
         val currStatus = _status.value
         _status.value = when {
             currStatus is Status.NotInitialized -> Status.Initialized
