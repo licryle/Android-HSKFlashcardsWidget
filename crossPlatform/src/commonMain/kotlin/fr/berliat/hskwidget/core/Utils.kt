@@ -105,7 +105,7 @@ fun String.capitalize() =
 
 fun String.toSafeFileName(): String {
     // Keep letters, digits, underscore, dash, and dot
-    return this.replace(Regex("[^A-Za-z0-9._-]"), "_")
+    return this.replace(Regex("[^A-Za-z0-9\\._\\-]"), "_")
 }
 
 fun Long.fromKBToMB(decimals: Int = 2): String {
