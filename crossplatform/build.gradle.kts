@@ -183,11 +183,6 @@ android {
     }
 }
 
-// Corrected way to disable all test tasks
-tasks.withType<Test>().configureEach {
-    enabled = false
-}
-
 dependencies {
     add("kspAndroid", libs.room.compiler)
     if (System.getProperty("os.name").contains("Mac")) {
