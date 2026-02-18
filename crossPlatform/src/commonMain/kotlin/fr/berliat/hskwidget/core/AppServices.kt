@@ -32,7 +32,7 @@ open class AppServices {
     data class FactoryEntry(
         val priority: Priority,
         val factory: suspend () -> Any,
-        var instance: Any? = null
+        @Volatile var instance: Any? = null
     ) { fun isReady(): Boolean = instance != null }
 
     open class Priority(val priority: UInt) : Comparable<Priority> {
@@ -52,7 +52,8 @@ open class AppServices {
      * Register a service factory.
      */
     fun <T : Any> register(name: String, priority: Priority = Priority.Standard, factory: suspend () -> T) {
-        if (services.containsKey(name)) throw Exception("Service $name Already registered")
+        if (isRegistered(name))
+            throw Exception("Service $name Already registered")
 
         services[name] = FactoryEntry(priority, factory)
         _status.value = evaluateStatus()
@@ -62,8 +63,10 @@ open class AppServices {
      * Register & Init blocking a service factory.
      */
     fun <T : Any> registerNow(name: String, priority: Priority = Priority.Standard, factory: () -> T) {
-        if (services.containsKey(name)) throw Exception("Service $name Already registered")
+        if (isRegistered(name))
+            throw Exception("Service $name Already registered")
         services[name] = FactoryEntry(priority, factory, factory())
+        _status.value = evaluateStatus()
     }
 
     /**
@@ -71,13 +74,14 @@ open class AppServices {
      */
     open fun init(upToLevel: Priority) {
         val currStatus = _status.value
-        _status.value = when {
-            currStatus is Status.NotInitialized -> Status.Initialized
-            currStatus is Status.Ready && currStatus.upToPrio < upToLevel
-                -> Status.Initialized
 
-            else -> currStatus
+        // If we are already ready for this level, don't restart everything
+        if (currStatus is Status.Ready && currStatus.upToPrio >= upToLevel && !currStatus.partially) {
+            return
         }
+
+        // Force transition to Initialized to notify observers something is happening
+        _status.value = Status.Initialized
 
         appScope.launch(AppDispatchers.IO) {
             try {
@@ -87,10 +91,10 @@ open class AppServices {
                     .forEach { (_, entry) ->
                         entry.instance = entry.factory()
                     }
+
                 _status.value = evaluateStatus()
             } catch (t: Throwable) {
                 _status.value = Status.Failed(t)
-                throw t
             }
         }
     }
@@ -101,7 +105,7 @@ open class AppServices {
 
     @Suppress("UNCHECKED_CAST")
     fun <T: Any> get(name: String): T {
-        if (!services.containsKey(name))
+        if (!isRegistered(name))
             throw IllegalArgumentException("No service registered with name $name")
 
         if (!services[name]!!.isReady())
@@ -121,15 +125,20 @@ open class AppServices {
         // Extract max level and readiness level
         val maxPrio = levels.keys.maxOrNull()
         var minReady: UInt? = null
-        levels.entries.sortedBy { it.key }.forEach {
-            if (!it.value) return@forEach
-            minReady = it.key
+
+        val sortedLevels = levels.entries.sortedBy { it.key }
+        for (entry in sortedLevels) {
+            if (entry.value) {
+                minReady = entry.key
+            } else {
+                break // Stop at the first "gap"
+            }
         }
 
         return if (minReady == null) {
             Status.Initialized
         } else {
-            Status.Ready(minReady == maxPrio, Priority(minReady))
+            Status.Ready(minReady != maxPrio, Priority(minReady))
         }
     }
 }
