@@ -108,19 +108,9 @@ class AnnotatedChineseWordTest {
     }
 
     @Test
-    fun testSimplifiedProperty_crashesWhenNoSimplifiedAvailable() {
-        // Case where word exists but has no HSK level, and annotation is null
-        val emptyWord = ChineseWord.getBlank("")
-        val annotatedWithNoSimplified = AnnotatedChineseWord(emptyWord, null)
-        assertFailsWith<NullPointerException> {
-            // hasWord() is false, falls back to annotation which is null, causing NPE
-            annotatedWithNoSimplified.simplified
-        }
-
-        // Case where both are null
+    fun testSimplifiedProperty_throwsWhenNoSimplifiedAvailable() {
         val annotatedWithBothNull = AnnotatedChineseWord(null, null)
-        assertFailsWith<NullPointerException> {
-            // hasWord() is false, falls back to annotation which is null, causing NPE
+        assertFailsWith<WordMissingSimplifiedException> {
             annotatedWithBothNull.simplified
         }
     }

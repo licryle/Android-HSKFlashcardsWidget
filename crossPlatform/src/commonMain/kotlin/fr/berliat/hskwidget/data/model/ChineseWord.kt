@@ -15,6 +15,8 @@ import fr.berliat.hskwidget.data.type.Pinyins
 import fr.berliat.hskwidget.data.type.WordType
 import kotlinx.serialization.Serializable
 
+class WordMissingSimplifiedException(message: String = "Word must have a non null or empty simplified") : Exception(message)
+
 @Serializable
 @Entity(
     tableName = "chinese_word",
@@ -34,6 +36,12 @@ data class ChineseWord(
     @ColumnInfo(name = "antonym", defaultValue = "") val antonym: String? = "",
     @ColumnInfo(name = "searchable_text", defaultValue = "") var searchable_text: String = ""
 ) {
+    init {
+        if (simplified.isBlank()) {
+            throw WordMissingSimplifiedException()
+        }
+    }
+
     fun updateSearchable() {
         val cleanPinyins = Pinyins.toString(pinyins).replace(" ", "")
         searchable_text = "$cleanPinyins $definition $traditional $simplified"

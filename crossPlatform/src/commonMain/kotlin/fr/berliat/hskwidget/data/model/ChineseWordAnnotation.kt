@@ -30,6 +30,12 @@ data class ChineseWordAnnotation (
 ) {
     @ColumnInfo(name = "a_searchable_text", defaultValue = "") var a_searchable_text: String = ""
 
+    init {
+        if (simplified.isBlank()) {
+            throw WordMissingSimplifiedException()
+        }
+    }
+
     fun updateSearchable() {
         val cleanPinyins = Pinyins.toString(pinyins).replace(" ", "")
         a_searchable_text = "$cleanPinyins $notes $themes $simplified".normalize(Form.NFD)

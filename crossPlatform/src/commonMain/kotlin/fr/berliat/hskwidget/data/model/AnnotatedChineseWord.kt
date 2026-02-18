@@ -14,11 +14,10 @@ data class AnnotatedChineseWord (
 
     val simplified: String
         get() {
-            return if (hasWord()) {
-                word?.simplified!!
-            } else {
-                annotation?.simplified!!
+            if (hasWord()) {
+                return word?.simplified ?: throw WordMissingSimplifiedException()
             }
+            return annotation?.simplified ?: throw WordMissingSimplifiedException()
         }
 
     val pinyins: Pinyins

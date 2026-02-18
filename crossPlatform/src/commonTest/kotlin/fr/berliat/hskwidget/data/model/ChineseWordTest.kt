@@ -7,6 +7,7 @@ import fr.berliat.hskwidget.data.type.Pinyins
 import fr.berliat.hskwidget.data.type.WordType
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -44,6 +45,24 @@ class ChineseWordTest {
         assertEquals("您好", word.synonyms)
         assertEquals("再见", word.antonym)
         assertEquals("nihao hello", word.searchable_text)
+    }
+
+    @Test
+    fun testConstructorThrowsOnEmptySimplified() {
+        assertFailsWith<WordMissingSimplifiedException> {
+            ChineseWord(
+                simplified = "",
+                traditional = null,
+                definition = emptyMap(),
+                hskLevel = null,
+                pinyins = null,
+                popularity = null
+            )
+        }
+        
+        assertFailsWith<WordMissingSimplifiedException> {
+            ChineseWord.getBlank("")
+        }
     }
 
     @Test

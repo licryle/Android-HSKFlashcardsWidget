@@ -6,6 +6,7 @@ import fr.berliat.hskwidget.data.type.Pinyins
 import kotlinx.datetime.Instant
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -37,6 +38,26 @@ class ChineseWordAnnotationTest {
         assertEquals(firstSeen, annotation.firstSeen)
         assertEquals(true, annotation.isExam)
         assertEquals("nihao greeting", annotation.a_searchable_text)
+    }
+
+    @Test
+    fun testConstructorThrowsOnEmptySimplified() {
+        assertFailsWith<WordMissingSimplifiedException> {
+            ChineseWordAnnotation(
+                simplified = "",
+                pinyins = null,
+                notes = null,
+                classType = null,
+                level = null,
+                themes = null,
+                firstSeen = null,
+                isExam = null
+            )
+        }
+        
+        assertFailsWith<WordMissingSimplifiedException> {
+            ChineseWordAnnotation.getBlank("")
+        }
     }
 
     @Test
