@@ -35,7 +35,7 @@ data class ChineseWord(
     @ColumnInfo(name = "searchable_text", defaultValue = "") var searchable_text: String = ""
 ) {
     fun updateSearchable() {
-        val cleanPinyins = pinyins.toString().replace(" ", "")
+        val cleanPinyins = Pinyins.toString(pinyins).replace(" ", "")
         searchable_text = "$cleanPinyins $definition $traditional $simplified"
             .normalize(Form.NFD).replace("\\p{Mn}+".toRegex(), "")
     }

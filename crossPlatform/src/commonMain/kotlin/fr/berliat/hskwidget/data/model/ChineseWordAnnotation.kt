@@ -31,7 +31,7 @@ data class ChineseWordAnnotation (
     @ColumnInfo(name = "a_searchable_text", defaultValue = "") var a_searchable_text: String = ""
 
     fun updateSearchable() {
-        val cleanPinyins = pinyins.toString().replace(" ", "")
+        val cleanPinyins = Pinyins.toString(pinyins).replace(" ", "")
         a_searchable_text = "$cleanPinyins $notes $themes $simplified".normalize(Form.NFD)
             .replace("\\p{Mn}+".toRegex(), "")
     }
