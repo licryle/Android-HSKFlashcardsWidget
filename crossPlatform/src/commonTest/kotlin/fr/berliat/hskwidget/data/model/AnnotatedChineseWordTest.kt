@@ -20,8 +20,8 @@ class AnnotatedChineseWordTest {
         assertEquals("测试", annotated.simplified)
         assertNotNull(annotated.word)
         assertNotNull(annotated.annotation)
-        assertEquals("测试", annotated.word!!.simplified)
-        assertEquals("测试", annotated.annotation!!.simplified)
+        assertEquals("测试", annotated.word.simplified)
+        assertEquals("测试", annotated.annotation.simplified)
     }
 
     @Test

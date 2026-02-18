@@ -1,11 +1,8 @@
 package fr.berliat.hskwidget.data.model
 
 import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNotEquals
-import kotlin.test.assertTrue
 
 class WordListTest {
 
