@@ -26,9 +26,9 @@ import fr.berliat.hskwidget.ui.navigation.NavigationManager
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.fromBookmarkData
 import io.github.vinceglb.filekit.path
-
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
+
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
@@ -42,26 +42,29 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
     val appConfig
         get() = _appConfig!!
 
-    private val _isReady = MutableStateFlow<Boolean>(false)
-    val isReady = _isReady.asSharedFlow()
+    private val _isReady = MutableStateFlow(false)
+    val isReady: StateFlow<Boolean> = _isReady
 
     // Queue for actions that need to be executed after initialization
     private val pendingActions = mutableListOf<() -> Unit>()
 	private val pendingActionsMutex = Mutex()
-    private var isInitialized = false
 
     open fun init() {
         HSKAppServices.init(HSKAppServicesPriority.PartialApp)
         // Launch a coroutine that reacts to changes
         viewModelScope.launch(AppDispatchers.IO) {
             HSKAppServices.status
-                .filter  { status -> status is AppServices.Status.Ready }
+                .filter  {
+                    status -> status is AppServices.Status.Ready
+                        && status.upToPrio >= HSKAppServicesPriority.PartialApp
+                }
                 .take(1)
                 .collect{ status ->
                     val readyStatus = status as AppServices.Status.Ready
+
+                    readyUp()
                     if (readyStatus.upToPrio >= HSKAppServicesPriority.FullApp) {
                         // Already ready from a previous launch still in memory
-                        _isReady.value = true
                         executePendingActions()
                     } else {
                         finishInitialization()
@@ -70,9 +73,13 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
         }
     }
 
-    protected open suspend fun finishInitialization() {
+    private fun readyUp() {
         _appConfig = HSKAppServices.appPreferences
         _isReady.value = true
+    }
+
+    protected open suspend fun finishInitialization() {
+        HSKAppServices.init(HSKAppServicesPriority.FullApp)
 
         handleDbOperations()
 
@@ -82,9 +89,8 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
     }
 
     protected open suspend fun executePendingActions() {
-        // Mark as initialized and process any pending actions
+        // Process any pending actions
 		pendingActionsMutex.withLock {
-            isInitialized = true
             pendingActions.forEach { it.invoke() }
             pendingActions.clear()
         }
@@ -182,12 +188,12 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
      */
     protected fun executeWhenReady(action: () -> Unit) {
 		viewModelScope.launch(AppDispatchers.IO) {
-			pendingActionsMutex.withLock {
-				if (isInitialized) {
-					action.invoke()
-				} else {
-					pendingActions.add(action)
-				}
+            if (isReady.value) {
+                action.invoke()
+            } else {
+                pendingActionsMutex.withLock {
+                    pendingActions.add(action)
+                }
 			}
 		}
     }

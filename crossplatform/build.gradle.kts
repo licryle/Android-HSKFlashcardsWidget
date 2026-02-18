@@ -4,8 +4,8 @@ import org.gradle.internal.os.OperatingSystem
 
 var os: OperatingSystem? = OperatingSystem.current()
 
-val versionCodeValue = 45
-val versionCodeName = "4.0.1"
+val versionCodeValue = 46
+val versionCodeName = "4.0.2"
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)

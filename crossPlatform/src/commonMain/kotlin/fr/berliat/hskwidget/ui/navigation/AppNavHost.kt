@@ -2,6 +2,8 @@ package fr.berliat.hskwidget.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -26,7 +28,9 @@ import io.github.vinceglb.filekit.path
 @Composable
 fun AppNavHost(viewModel : AppViewModel) {
     val navController = rememberNavController()
-    LaunchedEffect(Unit) {
+    val isViewModelReady by viewModel.isReady.collectAsState()
+
+    LaunchedEffect(navController) {
         viewModel.navigationManager.navigationEvents.collect { route ->
             navController.navigate(route)
         }
@@ -36,8 +40,15 @@ fun AppNavHost(viewModel : AppViewModel) {
         composable<Screen.Dictionary> { backStackEntry ->
             val args = backStackEntry.toRoute<Screen.Dictionary>()
 
-            if (args.search != null && args.search != viewModel.appConfig.searchQuery.value.toString()) { // default is from the storage
-                viewModel.appConfig.searchQuery.value = SearchQuery.processSearchQuery(args.search)
+            // Queue the search update until the viewModel is ready
+            LaunchedEffect(args.search) {
+                if (isViewModelReady && args.search != null) {
+                    val currentSearch = viewModel.appConfig.searchQuery.value.toString()
+                    if (args.search != currentSearch) {
+                         viewModel.appConfig.searchQuery.value =
+                            SearchQuery.processSearchQuery(args.search)
+                    }
+                }
             }
 
             LaunchedEffect(args) {
