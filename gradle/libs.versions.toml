@@ -1,6 +1,7 @@
 [versions]
 ankiAndroid = "api-v1.1.0"
 appcompat = "1.7.1"
+camerak = "0.2.0"
 constraintlayout = "2.2.1"
 core = "1.7.0"
 coreKtx = "1.17.0"
@@ -41,6 +42,8 @@ buildKonfig = "0.17.1"
 runtime = "1.9.3"
 turbine = "1.2.1"
 kotlinxCoroutinesTest = "1.10.2"
+skie = "0.10.10"
+foundationLayout = "1.10.3"
 
 [libraries]
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
@@ -56,6 +59,7 @@ androidx-lifecycle-service = { module = "androidx.lifecycle:lifecycle-service", 
 androidx-runner = { module = "androidx.test:runner", version.ref = "core" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtxVersion" }
 anki-android = { module = "com.github.ankidroid:Anki-Android", version.ref = "ankiAndroid" }
+camerak = { module = "io.github.kashif-mehmood-km:camerak", version.ref = "camerak" }
 filekit-core = { module = "io.github.vinceglb:filekit-core", version.ref = "filekitCore" }
 filekit-dialogs = { module = "io.github.vinceglb:filekit-dialogs", version.ref = "filekitCore" }
 filekit-dialogs-compose = { module = "io.github.vinceglb:filekit-dialogs-compose", version.ref = "filekitCore" }
@@ -92,6 +96,7 @@ androidx-documentfile = { group = "androidx.documentfile", name = "documentfile"
 androidx-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "runtime" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
+androidx-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "foundationLayout" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "androidGradlePlugin" }
@@ -109,3 +114,4 @@ room = { id = "androidx.room", version.ref = "room" }
 serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinxSerialization" }
 buildKonfig = { id = "com.codingfeline.buildkonfig", version.ref = "buildKonfig" }
 androidKMP = { id = "com.android.kotlin.multiplatform.library", version.ref = "androidGradlePlugin" }
+skie = { id = "co.touchlab.skie", version.ref = "skie" }

@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -12,8 +11,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -24,14 +21,11 @@ import androidx.compose.ui.unit.dp
 
 import co.touchlab.kermit.Logger
 
-import com.kashif.cameraK.enums.CameraLens
-import com.kashif.cameraK.enums.Directory
-import com.kashif.cameraK.enums.FlashMode
-import com.kashif.cameraK.enums.ImageFormat
-import com.kashif.cameraK.enums.PinchToZoom
-import com.kashif.cameraK.enums.QualityPrioritization
+import com.kashif.cameraK.compose.CameraKScreen
+import com.kashif.cameraK.compose.rememberCameraKState
 import com.kashif.cameraK.permissions.providePermissions
-import com.kashif.cameraK.ui.CameraPreview
+import com.kashif.cameraK.state.CameraConfiguration
+import com.kashif.cameraK.enums.*
 
 import fr.berliat.hskwidget.ui.components.Error
 import fr.berliat.hskwidget.ui.components.ErrorView
@@ -41,6 +35,7 @@ import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.ic_launcher
 import fr.berliat.hskwidget.ocr_capture_btn
 import fr.berliat.hskwidget.ocr_capture_permission_denied
+
 import io.github.vinceglb.filekit.PlatformFile
 
 import org.jetbrains.compose.resources.painterResource
@@ -54,8 +49,6 @@ fun CaptureImageScreen(
     onImageReady: (PlatformFile) -> Unit,
     viewModel: CaptureImageViewModel = remember { CaptureImageViewModel(onImageReady) }
 ) {
-    val isProcessing by viewModel.isProcessing.collectAsState()
-
     val permissions = providePermissions()
     val cameraPermissionState = remember { mutableStateOf(permissions.hasCameraPermission()) }
     val storagePermissionState = remember { mutableStateOf(permissions.hasStoragePermission()) }
@@ -88,37 +81,53 @@ fun CaptureImageScreen(
             onRetryClick = { retryPermissions.value = true }
         ))
     } else {
-        Column(modifier = modifier.fillMaxSize()) {
-            Box(modifier = Modifier.weight(1f)) {
-                CameraPreview(
-                    modifier = Modifier.fillMaxSize(),
-                    cameraConfiguration = {
-                        setCameraLens(CameraLens.BACK)
-                        setFlashMode(FlashMode.OFF)
-                        setImageFormat(ImageFormat.PNG)
-                        setDirectory(Directory.PICTURES)
-                        setPinchToZoom(PinchToZoom.ON)
-                        setQualityPrioritization(QualityPrioritization.BALANCED)
-                    },
-                    onCameraControllerReady = viewModel::onCameraControllerReady
-                )
+        val cameraKState = rememberCameraKState(
+            config = CameraConfiguration(
+                cameraLens = CameraLens.BACK,
+                flashMode = FlashMode.OFF,
 
-                if (isProcessing) {
+                // Image output
+                imageFormat = ImageFormat.PNG,
+                directory = Directory.PICTURES,
+                qualityPrioritization = QualityPrioritization.BALANCED,
+
+                // iOS only: Advanced camera device types
+                cameraDeviceType = CameraDeviceType.DEFAULT,
+                aspectRatio = AspectRatio.RATIO_16_9
+            )
+        )
+
+        CameraKScreen(
+            cameraState = cameraKState.value,
+            showPreview = true,
+            modifier = Modifier.fillMaxSize(),
+            loadingContent = {
+                Box(modifier = Modifier.fillMaxSize()) {
                     Box(
-                        modifier = modifier
+                        modifier = Modifier
                             .align(Alignment.BottomCenter)
                             .padding(bottom = 50.dp)
                             .size(110.dp)
                             .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.background) // or launcher background
+                            .background(MaterialTheme.colorScheme.background)
                             .border(3.dp, Color.White, CircleShape),
                         contentAlignment = Alignment.Center,
                     ) {
                         LoadingProgressView()
                     }
-                } else {
+                }
+            },
+            errorContent = {
+                ErrorView(error = Error(
+                    errorText = Res.string.ocr_capture_permission_denied,
+                    onRetryClick = { retryPermissions.value = true }
+                ))
+            }
+        ) { readyState ->
+            Box(modifier = Modifier.fillMaxSize()) {
+                Box(modifier = Modifier.align(Alignment.BottomCenter)) {
                     CaptureButton(
-                        onClick = { viewModel.takePhoto() },
+                        onClick = { viewModel.takePhoto(readyState.controller) },
                         modifier = Modifier
                             .align(Alignment.BottomCenter)
                             .padding(bottom = 50.dp)
@@ -138,7 +147,7 @@ private fun CaptureButton(
         modifier = modifier
             .size(110.dp)
             .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.background) // or launcher background
+            .background(MaterialTheme.colorScheme.background)
             .border(3.dp, Color.White, CircleShape)
             .clickable { onClick() },
         contentAlignment = Alignment.Center
@@ -147,7 +156,7 @@ private fun CaptureButton(
             painter = painterResource(Res.drawable.ic_launcher),
             contentDescription = stringResource(Res.string.ocr_capture_btn),
             modifier = Modifier.size(130.dp),
-            tint = Color.Unspecified // keep raw drawable colors
+            tint = Color.Unspecified
         )
     }
 }

@@ -127,7 +127,6 @@ You can come back to this screen at any time to set up a new widget, or reconfig
     <string name="ocr_capture_btn">Capture a picture for OCR</string>
     <string name="ocr_capture_permission_denied">Please allow Camera &amp; files access</string>
     <string name="ocr_capture_error_processed">An error occurred when capturing the image</string>
-    <string name="ocr_capture_error_save">An error occurred when saving the image</string>
 
     <string name="ocr_display_loading">Processing your image</string>
     <string name="ocr_display_add">Analyze more text and add below</string>

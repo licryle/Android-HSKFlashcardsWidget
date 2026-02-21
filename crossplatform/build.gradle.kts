@@ -18,7 +18,7 @@ plugins {
     alias(libs.plugins.buildKonfig)
     alias(libs.plugins.googleServices)
     alias(libs.plugins.crashlytics)
-    id("co.touchlab.skie") version "0.10.6"
+    alias(libs.plugins.skie)
 }
 
 buildkonfig {
@@ -59,8 +59,7 @@ kotlin {
                 implementation(libs.filekit.core)
                 implementation(libs.filekit.dialogs)
                 implementation(libs.filekit.dialogs.compose)
-                // ./gradlew :cameraK:publishToMavenLocal
-                implementation("com.kashif.cameraK_fork:camerak:0.0.13")
+                implementation(libs.camerak)
                 implementation(libs.navigation.compose)
                 implementation(project(":hsktextviews"))
                 implementation(project(":googledrivebackup"))
