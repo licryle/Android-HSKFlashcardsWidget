@@ -9,6 +9,7 @@ import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.atomicMove
 import io.github.vinceglb.filekit.delete
+import io.github.vinceglb.filekit.div
 import io.github.vinceglb.filekit.createdAt
 import io.github.vinceglb.filekit.lastModified
 import io.github.vinceglb.filekit.dialogs.openDirectoryPicker
@@ -67,10 +68,16 @@ object DatabaseDiskBackup {
             val snapshot = DatabaseHelper.getInstance().liveDatabase.snapshotToFile()
             val timestamp = Clock.System.now()
             val filename = "${timestamp.YYMMDDHHMMSS()}_${DatabaseHelper.DATABASE_FILENAME}".toSafeFileName()
-            val newCacheFile = PlatformFile("${snapshot!!.parent()!!.path}/${filename}")
+			try { // Android
+				val newCacheFile = PlatformFile("${snapshot!!.parent()!!.path}/${filename}")
 
-            snapshot!!.atomicMove(newCacheFile)
-            newCacheFile.atomicMove(PlatformFile.fromBookmarkData(destinationFolder))
+				snapshot!!.atomicMove(newCacheFile)
+				newCacheFile.atomicMove(PlatformFile.fromBookmarkData(destinationFolder))
+			} catch (_: Throwable) { // iOS
+				val backupFile = PlatformFile.fromBookmarkData(destinationFolder) / "${filename}"
+
+				snapshot!!.atomicMove(backupFile)
+			}
 
             withContext(Dispatchers.Main) {
                 onSuccess()
