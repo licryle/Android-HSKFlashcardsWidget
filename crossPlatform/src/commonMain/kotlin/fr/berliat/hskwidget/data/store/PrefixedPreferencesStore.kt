@@ -18,6 +18,9 @@ import io.github.vinceglb.filekit.resolve
 
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 
 import okio.Path.Companion.toPath
 
@@ -25,6 +28,8 @@ open class PrefixedPreferencesStore protected constructor(
     private val store: DataStore<Preferences>,
     private val prefix: String
 ) {
+    private val registeredPreferences = mutableListOf<PreferenceState<*, *>>()
+
     companion object {
         private val mutex = Mutex()
         private val instances = mutableMapOf<Pair<DataStore<Preferences>, String>, PrefixedPreferencesStore>()
@@ -75,6 +80,13 @@ open class PrefixedPreferencesStore protected constructor(
         return if (prefix.isEmpty()) key else "${prefix}_$key"
     }
 
+    /**
+     * Waits for all registered preferences to be loaded from the DataStore.
+     */
+    suspend fun ensureAllLoaded() = coroutineScope {
+        registeredPreferences.map { async { it.ensureLoaded() } }.awaitAll()
+    }
+
     fun <S, T> registerPreference(
         factory: (String) -> Preferences.Key<S>,
         name: String,
@@ -82,7 +94,9 @@ open class PrefixedPreferencesStore protected constructor(
         converter: PreferenceConverter<S, T>? = null
     ): PreferenceState<S, T> {
         val key = prefixKey(name)
-        return PreferenceState(store, factory(key), default, converter)
+        return PreferenceState(store, factory(key), default, converter).also {
+            registeredPreferences.add(it)
+        }
     }
 
     fun <T> registerBooleanPref(name: String, default: T, converter: PreferenceConverter<Boolean, T>? = null) =

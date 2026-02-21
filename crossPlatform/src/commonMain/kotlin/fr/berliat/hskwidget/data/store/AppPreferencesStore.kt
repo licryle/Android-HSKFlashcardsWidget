@@ -53,6 +53,7 @@ class AppPreferencesStore private constructor(store: DataStore<Preferences>):
 
             return mutex.withLock {
                 instances[store] ?: AppPreferencesStore(store).also { instance ->
+                    instance.ensureAllLoaded()
                     instances[store] = instance
                 }
             }
