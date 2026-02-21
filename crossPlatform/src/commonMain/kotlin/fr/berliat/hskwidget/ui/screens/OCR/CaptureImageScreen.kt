@@ -3,6 +3,7 @@ package fr.berliat.hskwidget.ui.screens.OCR
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -17,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 
 import co.touchlab.kermit.Logger
@@ -97,6 +99,8 @@ fun CaptureImageScreen(
             )
         )
 
+        val zoomLevel = remember { mutableStateOf(1f) }
+
         CameraKScreen(
             cameraState = cameraKState.value,
             showPreview = true,
@@ -124,15 +128,23 @@ fun CaptureImageScreen(
                 ))
             }
         ) { readyState ->
-            Box(modifier = Modifier.fillMaxSize()) {
-                Box(modifier = Modifier.align(Alignment.BottomCenter)) {
-                    CaptureButton(
-                        onClick = { viewModel.takePhoto(readyState.controller) },
-                        modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .padding(bottom = 50.dp)
-                    )
-                }
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .pointerInput(Unit) {
+                        detectTransformGestures { _, _, zoomChange, _ ->
+                            zoomLevel.value *= zoomChange
+                            zoomLevel.value = zoomLevel.value.coerceIn(1f, 10f)
+                            readyState.controller.setZoom(zoomLevel.value)
+                        }
+                    }
+            ) {
+                CaptureButton(
+                    onClick = { viewModel.takePhoto(readyState.controller) },
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 50.dp)
+                )
             }
         }
     }
