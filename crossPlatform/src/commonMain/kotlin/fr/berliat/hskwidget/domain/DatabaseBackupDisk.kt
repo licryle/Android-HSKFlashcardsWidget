@@ -68,15 +68,15 @@ object DatabaseDiskBackup {
             val snapshot = DatabaseHelper.getInstance().liveDatabase.snapshotToFile()
             val timestamp = Clock.System.now()
             val filename = "${timestamp.YYMMDDHHMMSS()}_${DatabaseHelper.DATABASE_FILENAME}".toSafeFileName()
-			try { // Android
-				val newCacheFile = PlatformFile("${snapshot!!.parent()!!.path}/${filename}")
+			val newCacheFile = PlatformFile(snapshot!!.parent()!!.path) / filename
 
-				snapshot!!.atomicMove(newCacheFile)
+			snapshot.atomicMove(newCacheFile)
+
+			try { // Android
 				newCacheFile.atomicMove(PlatformFile.fromBookmarkData(destinationFolder))
 			} catch (_: Throwable) { // iOS
-				val backupFile = PlatformFile.fromBookmarkData(destinationFolder) / "${filename}"
-
-				snapshot!!.atomicMove(backupFile)
+				val backupFile = PlatformFile.fromBookmarkData(destinationFolder) / filename
+				newCacheFile.atomicMove(backupFile)
 			}
 
             withContext(Dispatchers.Main) {
