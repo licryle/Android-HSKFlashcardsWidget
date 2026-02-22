@@ -133,9 +133,11 @@ fun CaptureImageScreen(
                     .fillMaxSize()
                     .pointerInput(Unit) {
                         detectTransformGestures { _, _, zoomChange, _ ->
-                            zoomLevel.value *= zoomChange
-                            zoomLevel.value = zoomLevel.value.coerceIn(1f, 10f)
-                            readyState.controller.setZoom(zoomLevel.value)
+                            if (zoomChange != 1f) {
+                                zoomLevel.value *= zoomChange
+                                zoomLevel.value = zoomLevel.value.coerceIn(1f, 10f)
+                                readyState.controller.setZoom(zoomLevel.value)
+                            }
                         }
                     }
             ) {
