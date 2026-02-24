@@ -4,60 +4,61 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import fr.berliat.hskwidget.core.AppDispatchers
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 
 /**
- * Two-way bound preference state: updates to `.value` automatically persist to DataStore
+ * Two-way bound preference state: updates to `.value` automatically persist to DataStore but makes
+ * the value available to listeners instantly.
  */
 class PreferenceState<S, T>(
     private val store: DataStore<Preferences>,
     private val key: Preferences.Key<S>,
     private val initialValue: T,
-    converter: PreferenceConverter<S, T>? = null
+    converter: PreferenceConverter<S, T>? = null,
+    coroutineScope: CoroutineScope? = null
 ) {
     private val conv = converter ?: PreferenceConverter({ it as T }, { it as S })
-    private val scope = CoroutineScope(SupervisorJob() + AppDispatchers.IO)
+    private val scope = coroutineScope ?: CoroutineScope(SupervisorJob() + AppDispatchers.IO)
+    
     private val _flow = MutableStateFlow(initialValue)
+    // Expose the preference as a read-only StateFlow.
+    fun asStateFlow(): StateFlow<T> = _flow.asStateFlow()
+
     private val isLoaded = CompletableDeferred<Unit>()
     
-    // Configured to never block and always keep the latest value
-    private val updateFlow = MutableSharedFlow<T>(
-        replay = 1,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST
-    )
+    // Guard against stale store updates overwriting newer optimistic updates
+    private var lastOptimisticValue: T? = null
+    
+    // Use a conflated channel to ensure we only process the latest write request
+    private val writeChannel = Channel<T>(Channel.CONFLATED)
 
-    fun asStateFlow(): StateFlow<T> = _flow
-
-    /**
-     * Suspends until the initial value has been loaded from the DataStore.
-     */
-    suspend fun ensureLoaded() {
-        isLoaded.await()
-    }
+    suspend fun ensureLoaded() = isLoaded.await()
 
     init {
-        // Collect data from the store and update our local state
+        // 1. Observe Store: Update local state when DataStore changes
         scope.launch {
             store.data
                 .map { prefs -> prefs[key]?.let { conv.fromStore(it) } ?: initialValue }
-                .onEach { 
-                    _flow.value = it 
+                .distinctUntilChanged()
+                .collect { valueFromStore ->
+                    val optimistic = lastOptimisticValue
+                    // Only apply store update if it matches our last optimistic set or if no set is pending
+                    if (optimistic == null || valueFromStore == optimistic) {
+                        _flow.value = valueFromStore
+                        lastOptimisticValue = null
+                    }
+                    
                     if (!isLoaded.isCompleted) {
                         isLoaded.complete(Unit)
                     }
                 }
-                .distinctUntilChanged()
-                .collect()
         }
 
-        // Serialized and conflated writes using collectLatest
+        // 2. Handle Writes: Persist changes to DataStore sequentially
         scope.launch {
-            updateFlow.collectLatest { v ->
+            for (v in writeChannel) {
                 store.edit { it[key] = conv.toStore(v) }
             }
         }
@@ -67,12 +68,11 @@ class PreferenceState<S, T>(
         get() = _flow.value
         set(v) {
             if (_flow.value != v) {
-                // Optimistic update ensures immediate feedback and consistency
+                // Optimistic update for immediate UI feedback
                 _flow.value = v
-                // Launch to ensure we don't block the caller, although tryEmit with DROP_OLDEST shouldn't block
-                scope.launch {
-                    updateFlow.emit(v)
-                }
+                lastOptimisticValue = v
+                // Queue the write operation
+                writeChannel.trySend(v)
             }
         }
 }
