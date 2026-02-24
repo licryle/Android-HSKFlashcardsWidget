@@ -26,3 +26,5 @@ app/src/main/assets/databases/chinese_words.db-wal
 logs/*
 *.xcuserstate
 *.xcbkptlist
+/iosApp/hskwidget/GoogleService-Info.plist
+/iosApp/Pods
