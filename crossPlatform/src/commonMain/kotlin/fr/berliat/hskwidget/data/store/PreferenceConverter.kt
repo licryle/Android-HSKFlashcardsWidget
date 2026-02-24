@@ -3,6 +3,7 @@ package fr.berliat.hskwidget.data.store
 import io.github.vinceglb.filekit.BookmarkData
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.fromBookmarkData
+
 import kotlin.io.encoding.Base64
 
 open class PreferenceConverter<S, T>(
@@ -10,7 +11,7 @@ open class PreferenceConverter<S, T>(
     val toStore: (T) -> S
 )
 
-class ByteArrayPreferenceConverter : PreferenceConverter<String, BookmarkData?>(
+class FileKitBookmarkPreferenceConverter : PreferenceConverter<String, BookmarkData?>(
     fromStore = { stored ->
         try {
             if (stored == "") {

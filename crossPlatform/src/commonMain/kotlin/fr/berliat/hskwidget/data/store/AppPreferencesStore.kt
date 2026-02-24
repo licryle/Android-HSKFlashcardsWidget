@@ -87,7 +87,7 @@ class AppPreferencesStore private constructor(store: DataStore<Preferences>):
     )
     val dbBackUpDiskDirectory = registerStringPref(
         "database_backup_disk_directory", null,
-        ByteArrayPreferenceConverter()
+        FileKitBookmarkPreferenceConverter()
     )
     val lastAnnotatedClassLevel = registerStringPref("class_level", ClassLevel.NotFromClass,
         PreferenceConverter({ ClassLevel.from(it) }, { it.name })
