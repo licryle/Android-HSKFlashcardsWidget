@@ -25,9 +25,6 @@ kotlin {
         }.configure {
             instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         }
-
-        // https://youtrack.jetbrains.com/projects/CMP/issues/CMP-8363/Missing-resource-used-in-shared-module
-        experimentalProperties["android.experimental.kmp.enableAndroidResources"] = true
     }
 
 
@@ -41,7 +38,7 @@ kotlin {
     // A step-by-step guide on how to include this library in an XCode
     // project can be found here:
     // https://developer.android.com/kotlin/multiplatform/migrate
-    val xcfName = "crossPlatformKit"
+    val xcfName = "hsktextviews"
 
     iosTargets.forEach {
         it.binaries.framework {
@@ -76,7 +73,6 @@ kotlin {
         }
 
         androidMain {
-            resources.srcDirs("src/commonMain/composeResources")
             dependencies {
             }
         }
