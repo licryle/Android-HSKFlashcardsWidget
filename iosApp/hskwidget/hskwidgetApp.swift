@@ -1,10 +1,10 @@
 import SwiftUI
-import crossPlatformKit
+import crossPlatform
 
 struct ComposeView: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIViewController {
-        let _ = crossPlatformKit.HSKAppServices.shared
-        return crossPlatformKit.AppViewControllerKt.AppViewController() // Call the Kotlin ViewController
+        let _ = crossPlatform.HSKAppServices.shared
+        return crossPlatform.AppViewControllerKt.AppViewController() // Call the Kotlin ViewController
     }
 
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}

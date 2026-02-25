@@ -7,10 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1CD8A4282EE99796009F8CC4 /* crossPlatformKit in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CD8A4252EE9976C009F8CC4 /* crossPlatformKit */; };
-		1CD8A4292EE99796009F8CC4 /* crossPlatformKit in Embed Libraries */ = {isa = PBXBuildFile; fileRef = 1CD8A4252EE9976C009F8CC4 /* crossPlatformKit */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		1CD8DF532EDE03DE00AB930B /* Vision.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CD8DF522EDE03DE00AB930B /* Vision.framework */; };
 		1CDFB1232EE2FB89001B8494 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CDFB1222EE2FB89001B8494 /* AVFoundation.framework */; };
+		3EAA43202CFF62AC50A94992 /* Pods_hskwidget.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65DDA0CFDA998B3FFE30F6FE /* Pods_hskwidget.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -30,28 +29,15 @@
 		};
 /* End PBXContainerItemProxy section */
 
-/* Begin PBXCopyFilesBuildPhase section */
-		1CD8A42A2EE99796009F8CC4 /* Embed Libraries */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				1CD8A4292EE99796009F8CC4 /* crossPlatformKit in Embed Libraries */,
-			);
-			name = "Embed Libraries";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
-
 /* Begin PBXFileReference section */
-		1C200D122EB64F7900615172 /* crossPlatformKit */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = crossPlatformKit; path = "../crossPlatform/build/XCFrameworks/debug/crossPlatform.xcframework/ios-arm64/crossPlatformKit.framework/crossPlatformKit"; sourceTree = "<group>"; };
 		1C7166D52E71E186000B4154 /* hskwidget.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = hskwidget.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1C7166E32E71E189000B4154 /* hskwidgetTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = hskwidgetTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1C7166ED2E71E189000B4154 /* hskwidgetUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = hskwidgetUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		1CD8A4252EE9976C009F8CC4 /* crossPlatformKit */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = crossPlatformKit; path = "../crossPlatform/build/xcode-frameworks/Debug/iphoneos18.5/crossPlatformKit.framework/crossPlatformKit"; sourceTree = "<group>"; };
 		1CD8DF522EDE03DE00AB930B /* Vision.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Vision.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.5.sdk/System/Library/Frameworks/Vision.framework; sourceTree = DEVELOPER_DIR; };
 		1CDFB1222EE2FB89001B8494 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.5.sdk/System/Library/Frameworks/AVFoundation.framework; sourceTree = DEVELOPER_DIR; };
+		20FC8FC0B45987068940097D /* Pods-hskwidget.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hskwidget.debug.xcconfig"; path = "Target Support Files/Pods-hskwidget/Pods-hskwidget.debug.xcconfig"; sourceTree = "<group>"; };
+		65DDA0CFDA998B3FFE30F6FE /* Pods_hskwidget.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_hskwidget.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		CD46E65773DAFFC0D9370B7D /* Pods-hskwidget.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hskwidget.release.xcconfig"; path = "Target Support Files/Pods-hskwidget/Pods-hskwidget.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -75,23 +61,29 @@
 		};
 		1C7166E62E71E189000B4154 /* hskwidgetTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = hskwidgetTests;
 			sourceTree = "<group>";
 		};
 		1C7166F02E71E189000B4154 /* hskwidgetUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = hskwidgetUITests;
 			sourceTree = "<group>";
 		};
-		1CE7E5D52E96CCED00627840 /* commonMain */ = {
+		1CE7E5D52E96CCED00627840 /* ../crossPlatform/src/commonMain */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			name = commonMain;
+			exceptions = (
+			);
 			path = ../crossPlatform/src/commonMain;
 			sourceTree = SOURCE_ROOT;
 		};
-		1CE7E5F92E96CCED00627840 /* iosMain */ = {
+		1CE7E5F92E96CCED00627840 /* ../crossPlatform/src/iosMain */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			name = iosMain;
+			exceptions = (
+			);
 			path = ../crossPlatform/src/iosMain;
 			sourceTree = SOURCE_ROOT;
 		};
@@ -103,8 +95,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				1CDFB1232EE2FB89001B8494 /* AVFoundation.framework in Frameworks */,
-				1CD8A4282EE99796009F8CC4 /* crossPlatformKit in Frameworks */,
 				1CD8DF532EDE03DE00AB930B /* Vision.framework in Frameworks */,
+				3EAA43202CFF62AC50A94992 /* Pods_hskwidget.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -134,6 +126,7 @@
 				1C8A8BF62E733E1B00B8E39B /* Frameworks */,
 				1C7166D62E71E186000B4154 /* Products */,
 				1CE7E50F2E96CC5F00627840 /* Kotlin Debug */,
+				374EA8874F5E204406F30A54 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -150,10 +143,9 @@
 		1C8A8BF62E733E1B00B8E39B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				1CD8A4252EE9976C009F8CC4 /* crossPlatformKit */,
 				1CDFB1222EE2FB89001B8494 /* AVFoundation.framework */,
 				1CD8DF522EDE03DE00AB930B /* Vision.framework */,
-				1C200D122EB64F7900615172 /* crossPlatformKit */,
+				65DDA0CFDA998B3FFE30F6FE /* Pods_hskwidget.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -161,10 +153,20 @@
 		1CE7E50F2E96CC5F00627840 /* Kotlin Debug */ = {
 			isa = PBXGroup;
 			children = (
-				1CE7E5D52E96CCED00627840 /* commonMain */,
-				1CE7E5F92E96CCED00627840 /* iosMain */,
+				1CE7E5D52E96CCED00627840 /* ../crossPlatform/src/commonMain */,
+				1CE7E5F92E96CCED00627840 /* ../crossPlatform/src/iosMain */,
 			);
 			path = "Kotlin Debug";
+			sourceTree = "<group>";
+		};
+		374EA8874F5E204406F30A54 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				20FC8FC0B45987068940097D /* Pods-hskwidget.debug.xcconfig */,
+				CD46E65773DAFFC0D9370B7D /* Pods-hskwidget.release.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -174,11 +176,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1C7166F72E71E189000B4154 /* Build configuration list for PBXNativeTarget "hskwidget" */;
 			buildPhases = (
-				1C71670D2E71E282000B4154 /* ShellScript */,
+				E1F87436D05361B8D82FCC02 /* [CP] Check Pods Manifest.lock */,
 				1C7166D12E71E186000B4154 /* Sources */,
 				1C7166D22E71E186000B4154 /* Frameworks */,
 				1C7166D32E71E186000B4154 /* Resources */,
-				1CD8A42A2EE99796009F8CC4 /* Embed Libraries */,
+				8602D24C74F6A957016A6787 /* [CP] Copy Pods Resources */,
+				60337D5D3641602AA3E8EB4A /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -188,8 +191,6 @@
 				1C7166D72E71E186000B4154 /* hskwidget */,
 			);
 			name = hskwidget;
-			packageProductDependencies = (
-			);
 			productName = hskwidget;
 			productReference = 1C7166D52E71E186000B4154 /* hskwidget.app */;
 			productType = "com.apple.product-type.application";
@@ -211,8 +212,6 @@
 				1C7166E62E71E189000B4154 /* hskwidgetTests */,
 			);
 			name = hskwidgetTests;
-			packageProductDependencies = (
-			);
 			productName = hskwidgetTests;
 			productReference = 1C7166E32E71E189000B4154 /* hskwidgetTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -234,8 +233,6 @@
 				1C7166F02E71E189000B4154 /* hskwidgetUITests */,
 			);
 			name = hskwidgetUITests;
-			packageProductDependencies = (
-			);
 			productName = hskwidgetUITests;
 			productReference = 1C7166ED2E71E189000B4154 /* hskwidgetUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
@@ -272,8 +269,6 @@
 			);
 			mainGroup = 1C7166CC2E71E186000B4154;
 			minimizedProjectReferenceProxies = 1;
-			packageReferences = (
-			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 1C7166D62E71E186000B4154 /* Products */;
 			projectDirPath = "";
@@ -311,23 +306,60 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		1C71670D2E71E282000B4154 /* ShellScript */ = {
+		60337D5D3641602AA3E8EB4A /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-hskwidget/Pods-hskwidget-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-hskwidget/Pods-hskwidget-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-hskwidget/Pods-hskwidget-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		8602D24C74F6A957016A6787 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-hskwidget/Pods-hskwidget-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-hskwidget/Pods-hskwidget-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-hskwidget/Pods-hskwidget-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		E1F87436D05361B8D82FCC02 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
 			);
 			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
 			);
+			name = "[CP] Check Pods Manifest.lock";
 			outputFileListPaths = (
 			);
 			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-hskwidget-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "#!/bin/sh\ncd \"$SRCROOT/..\"\n\n# Let Gradle pick up Xcode's environment variables\n#CONFIGURATION=Debug TARGET_BUILD_DIR=some_dir FRAMEWORKS_FOLDER_PATH=other_dir SDK_NAME=iphonesimulator ARCHS=x86_64 ./gradlew :crossPlatform:embedAndSignAppleFrameworkForXcode\n#CONFIGURATION=Debug TARGET_BUILD_DIR=some_dir FRAMEWORKS_FOLDER_PATH=other_dir ARCHS=arm64 ./gradlew :crossPlatform:embedAndSignAppleFrameworkForXcode\n\n$SRCROOT/../gradlew :crossPlatform:embedAndSignAppleFrameworkForXcode \\\n    -PCONFIGURATION=$CONFIGURATION \\\n    -PTARGET_BUILD_DIR=$TARGET_BUILD_DIR \\\n    -PFRAMEWORKS_FOLDER_PATH=$FRAMEWORKS_FOLDER_PATH \\\n    -PARCHS=\"$ARCHS\" \\\n    -PPLATFORM_NAME=$PLATFORM_NAME \\\n    -PSDK_NAME=$SDK_NAME\n";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -488,6 +520,7 @@
 		};
 		1C7166F82E71E189000B4154 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 20FC8FC0B45987068940097D /* Pods-hskwidget.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -498,7 +531,6 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				"EXCLUDED_ARCHS[sdk=*]" = x86_64;
-				"FRAMEWORK_SEARCH_PATHS[arch=*]" = "$(SRCROOT)/../crossPlatform/build/bin";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = hskwidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Mandarin Assistant HSK Widget";
@@ -538,6 +570,7 @@
 		};
 		1C7166F92E71E189000B4154 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = CD46E65773DAFFC0D9370B7D /* Pods-hskwidget.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -548,7 +581,6 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				"EXCLUDED_ARCHS[sdk=*]" = x86_64;
-				"FRAMEWORK_SEARCH_PATHS[arch=*]" = "$(SRCROOT)/../crossPlatform/build/bin/";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = hskwidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Mandarin Assistant HSK Widget";

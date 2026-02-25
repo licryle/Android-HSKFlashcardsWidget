@@ -1,4 +1,3 @@
-import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.*
 import org.gradle.internal.os.OperatingSystem
 
@@ -17,6 +16,7 @@ plugins {
     alias(libs.plugins.room)
     alias(libs.plugins.buildKonfig)
     alias(libs.plugins.skie)
+    id("org.jetbrains.kotlin.native.cocoapods")
 }
 
 buildkonfig {
@@ -35,6 +35,31 @@ kotlin {
             }
         }
     }
+
+    cocoapods {
+        summary = "HSK Flashcards cross-platform module"
+        homepage = "https://github.com/Licryle/HSKFlashcardsWidget"
+        version = "1.0"
+        ios.deploymentTarget = "16.0"
+        podfile = project.file("../iosApp/Podfile")  // Good
+        framework {
+            baseName = "crossPlatform"
+            isStatic = true
+            export(":googledrivebackup")
+        }
+    }
+
+    listOf(
+        iosX64(),
+        iosArm64(),
+        iosSimulatorArm64()
+    ).forEach { iosTarget ->
+        iosTarget.binaries.framework {
+            baseName = "crossPlatform"
+            isStatic = true
+        }
+    }
+
 
     sourceSets {
         val commonMain by getting {
@@ -104,6 +129,9 @@ kotlin {
         if (os?.isMacOsX == true) {
             val iosMain by creating {
                 dependsOn(commonMain)
+                dependencies {
+                    api(project(":googledrivebackup"))
+                }
             }
             val iosTest by creating {
                 dependsOn(commonTest)
@@ -111,18 +139,6 @@ kotlin {
             listOf(iosX64(), iosArm64(), iosSimulatorArm64()).forEach { target ->
                 target.compilations["main"].defaultSourceSet.dependsOn(iosMain)
                 target.compilations["test"].defaultSourceSet.dependsOn(iosTest)
-            }
-        }
-    }
-
-    if (os?.isMacOsX == true) {
-        val xcf = XCFramework()
-        val iosTargets = listOf(iosX64(), iosArm64(), iosSimulatorArm64())
-
-        iosTargets.forEach { target ->
-            target.binaries.framework {
-                baseName = "crossPlatformKit"
-                xcf.add(this)
             }
         }
     }
