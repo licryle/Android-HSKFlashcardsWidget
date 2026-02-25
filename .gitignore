@@ -28,3 +28,6 @@ logs/*
 *.xcbkptlist
 /iosApp/hskwidget/GoogleService-Info.plist
 /iosApp/Pods
+/androidApp/build/
+/androidApp/google-services.json
+/iosApp/hskwidget.xcworkspace/
