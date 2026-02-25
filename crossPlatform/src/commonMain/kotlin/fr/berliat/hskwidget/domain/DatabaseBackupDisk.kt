@@ -19,8 +19,6 @@ import io.github.vinceglb.filekit.fromBookmarkData
 import io.github.vinceglb.filekit.isDirectory
 import io.github.vinceglb.filekit.list
 import io.github.vinceglb.filekit.name
-import io.github.vinceglb.filekit.parent
-import io.github.vinceglb.filekit.path
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -68,16 +66,9 @@ object DatabaseDiskBackup {
             val snapshot = DatabaseHelper.getInstance().liveDatabase.snapshotToFile()
             val timestamp = Clock.System.now()
             val filename = "${timestamp.YYMMDDHHMMSS()}_${DatabaseHelper.DATABASE_FILENAME}".toSafeFileName()
-			val newCacheFile = PlatformFile(snapshot!!.parent()!!.path) / filename
 
-			snapshot.atomicMove(newCacheFile)
-
-			try { // Android
-				newCacheFile.atomicMove(PlatformFile.fromBookmarkData(destinationFolder))
-			} catch (_: Throwable) { // iOS
-				val backupFile = PlatformFile.fromBookmarkData(destinationFolder) / filename
-				newCacheFile.atomicMove(backupFile)
-			}
+            val backupFile = PlatformFile.fromBookmarkData(destinationFolder) / filename
+            snapshot!!.atomicMove(backupFile)
 
             withContext(Dispatchers.Main) {
                 onSuccess()
