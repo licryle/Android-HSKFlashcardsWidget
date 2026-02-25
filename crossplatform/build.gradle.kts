@@ -10,14 +10,12 @@ val versionCodeName = "4.0.2"
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.serialization)
-    alias(libs.plugins.androidApplication)
+    alias(libs.plugins.androidLibrary) // Changed from androidApplication
     alias(libs.plugins.composePlugin)
     alias(libs.plugins.kotlinCompose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
     alias(libs.plugins.buildKonfig)
-    alias(libs.plugins.googleServices)
-    alias(libs.plugins.crashlytics)
     alias(libs.plugins.skie)
 }
 
@@ -38,7 +36,6 @@ kotlin {
         }
     }
 
-    // --- common source sets
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -91,10 +88,9 @@ kotlin {
                 implementation(libs.firebase.analytics)
                 implementation(libs.firebase.crashlytics)
 
-                // To remove with PrefCompat
+                // To remove alongside removing PrefCompat
                 implementation("androidx.preference:preference-ktx:1.2.1")
             }
-            resources.srcDirs("src/commonMain/composeResources")
         }
 
         val commonTest by getting {
@@ -105,19 +101,12 @@ kotlin {
             }
         }
 
-        /* Explicitly exclude iOS when not on iOS. This shouldn't be needed but because we locally
-         * build cameraK makes it suddenly required as an upstream dependency.
-         */
         if (os?.isMacOsX == true) {
-            // Minimal iosTest to avoid Gradle appleTest issues
             val iosMain by creating {
                 dependsOn(commonMain)
             }
             val iosTest by creating {
                 dependsOn(commonTest)
-                dependencies {
-                    // No test dependencies yet
-                }
             }
             listOf(iosX64(), iosArm64(), iosSimulatorArm64()).forEach { target ->
                 target.compilations["main"].defaultSourceSet.dependsOn(iosMain)
@@ -127,7 +116,6 @@ kotlin {
     }
 
     if (os?.isMacOsX == true) {
-        // --- iOS XCFramework setup
         val xcf = XCFramework()
         val iosTargets = listOf(iosX64(), iosArm64(), iosSimulatorArm64())
 
@@ -135,9 +123,6 @@ kotlin {
             target.binaries.framework {
                 baseName = "crossPlatformKit"
                 xcf.add(this)
-            }
-            target.compilations.findByName("test")?.compileTaskProvider?.configure {
-                enabled = false
             }
         }
     }
@@ -148,11 +133,16 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "fr.berliat.hskwidget"
         minSdk = 26
-        targetSdk = 36
-        versionCode = versionCodeValue
-        versionName = versionCodeName
+        // applicationId, versionCode, versionName moved to androidApp
+    }
+
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "META-INF/INDEX.LIST"
+            excludes += "META-INF/DEPENDENCIES"
+        }
     }
 
     compileOptions {
@@ -167,21 +157,6 @@ android {
     buildFeatures {
         compose = true
     }
-
-    packaging {
-        resources {
-            excludes += setOf(
-                "META-INF/INDEX.LIST",
-                "META-INF/DEPENDENCIES",
-                "META-INF/NOTICE",
-                "META-INF/LICENSE",
-                "META-INF/LICENSE.txt",
-                "META-INF/NOTICE.txt",
-                "META-INF/ASL2.0",
-                "META-INF/*.kotlin_module"
-            )
-        }
-    }
 }
 
 dependencies {
@@ -193,7 +168,6 @@ dependencies {
     }
 }
 
-// Compose resources
 compose.resources {
     publicResClass = true
     packageOfResClass = "fr.berliat.hskwidget"

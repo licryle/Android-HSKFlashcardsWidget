@@ -10,7 +10,6 @@ import android.util.Log
 import android.view.View
 import android.widget.RemoteViews
 
-import fr.berliat.hskwidget.MainActivity
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.core.ExpectedUtils
 import fr.berliat.hskwidget.core.Locale
@@ -83,8 +82,8 @@ actual class WidgetController(
 
     fun startActivityToConfigure() {
         val context = contextProvider.invoke()
-        val confIntent = Intent(context, MainActivity::class.java).apply {
-            action = ACTION_APPWIDGET_CONFIGURE
+        val confIntent = Intent(ACTION_APPWIDGET_CONFIGURE).apply {
+            setPackage(context.packageName)
             putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
         }

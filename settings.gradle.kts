@@ -17,7 +17,6 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven { url = uri("https://jitpack.io") }
-        mavenLocal() // must be present
     }
 }
 
@@ -28,4 +27,4 @@ include(":floatlayouts")
 include(":googledrivebackup")
 include(":AnkiDroidAPIHelper")
 include(":crossPlatform")
-
+include(":androidApp")
