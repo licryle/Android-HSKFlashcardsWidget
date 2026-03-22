@@ -95,13 +95,13 @@ class AnkiStore(
             = withContext(AppDispatchers.IO) {
         Logger.d(tag = TAG, messageString = "importOrUpdateCard: ${word.simplified} to Anki")
         val modelId = getOrCreateModelId() ?: return@withContext null
-        if (deck.ankiDeckId == WordList.Companion.ANKI_ID_EMPTY)
+        if (deck.ankiDeckId == WordList.ANKI_ID_EMPTY)
             throw IllegalStateException("Couldn't create a new Deck in Anki")
 
         with (word.annotation) {
             val fields = arrayOf(
                 word.simplified,
-                word.word?.pinyins?.toString() ?: "",
+                word.pinyins.toString(),
                 word.word?.definition?.get(Locale.ENGLISH) ?: "",
                 this?.notes ?: "",
                 this?.firstSeen?.toString() ?: "",
@@ -121,7 +121,7 @@ class AnkiStore(
 
 
             var note : AnkiNoteInfo? = null
-            if (wordEntry.ankiNoteId != WordList.Companion.ANKI_ID_EMPTY) {
+            if (wordEntry.ankiNoteId != WordList.ANKI_ID_EMPTY) {
                 note = ankiDAO.getNote(wordEntry.ankiNoteId)
             }
 
