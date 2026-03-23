@@ -12,7 +12,11 @@ object Logging {
                 throwable = exception,
             )
 
-            ExpectedLogging.logCrashalytics(exception)
+            try {
+                ExpectedLogging.logCrashalytics(exception)
+            } catch (e: Throwable) {
+                Logger.w(tag = "Logging", messageString = "Failed to log exception to Crashlytics: ${e.message}")
+            }
         }
 
     fun logAnalyticsScreenView(screenName: String) {
