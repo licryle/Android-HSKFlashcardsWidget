@@ -11,6 +11,7 @@ import fr.berliat.hskwidget.domain.SearchQuery
 import kotlinx.datetime.Instant
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.CoroutineScope
 
 /**
  * Global singleton for managing app preferences via DataStore.
@@ -42,17 +43,22 @@ import kotlinx.coroutines.sync.withLock
  * ```
  */
 
-class AppPreferencesStore private constructor(store: DataStore<Preferences>):
-      PrefixedPreferencesStore(store, "")  {
+class AppPreferencesStore private constructor(
+    store: DataStore<Preferences>,
+    scope: CoroutineScope? = null
+): PrefixedPreferencesStore(store, "", scope)  {
     companion object {
         private val mutex = Mutex()
-        private val instances = mutableMapOf<DataStore<Preferences>, AppPreferencesStore>()
+        internal val instances = mutableMapOf<DataStore<Preferences>, AppPreferencesStore>()
 
-        suspend fun getInstance(store: DataStore<Preferences>): AppPreferencesStore {
+        suspend fun getInstance(
+            store: DataStore<Preferences>,
+            scope: CoroutineScope? = null
+        ): AppPreferencesStore {
             instances[store]?.let { return it }
 
             return mutex.withLock {
-                instances[store] ?: AppPreferencesStore(store).also { instance ->
+                instances[store] ?: AppPreferencesStore(store, scope).also { instance ->
                     instance.ensureAllLoaded()
                     instances[store] = instance
                 }
@@ -64,8 +70,7 @@ class AppPreferencesStore private constructor(store: DataStore<Preferences>):
     val dbBackUpDiskActive = registerBooleanPref("database_backup_disk_active", false)
     val ankiSaveNotes = registerBooleanPref("anki_save_notes", false)
     val searchFilterHasAnnotation = registerBooleanPref("search_filter_hasAnnotation", false)
-    val dictionaryShowHSK3Definition = registerBooleanPref("dictionary_show_hsk3_definition", false
-    )
+    val dictionaryShowHSK3Definition = registerBooleanPref("dictionary_show_hsk3_definition", false)
     val readerSeparateWords = registerBooleanPref("reader_separate_word", false)
     val readerShowAllPinyins = registerBooleanPref("reader_show_pinyins", false)
 

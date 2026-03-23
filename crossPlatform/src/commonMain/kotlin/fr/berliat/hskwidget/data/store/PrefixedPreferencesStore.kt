@@ -21,44 +21,51 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.CoroutineScope
 
 import okio.Path.Companion.toPath
 
-open class PrefixedPreferencesStore protected constructor(
+open class PrefixedPreferencesStore internal constructor(
     private val store: DataStore<Preferences>,
-    private val prefix: String
+    private val prefix: String,
+    private val scope: CoroutineScope? = null
 ) {
-    private val registeredPreferences = mutableListOf<PreferenceState<*, *>>()
+    private val registeredPreferences = mutableMapOf<String, PreferenceState<*, *>>()
 
     companion object {
         private val mutex = Mutex()
-        private val instances = mutableMapOf<Pair<DataStore<Preferences>, String>, PrefixedPreferencesStore>()
+        internal val instances = mutableMapOf<Pair<DataStore<Preferences>, String>, PrefixedPreferencesStore>()
 
-        suspend fun getInstance(store: DataStore<Preferences>, prefix: String): PrefixedPreferencesStore {
+        suspend fun getInstance(
+            store: DataStore<Preferences>, 
+            prefix: String, 
+            scope: CoroutineScope? = null
+        ): PrefixedPreferencesStore {
             val key = Pair(store, prefix)
             instances[key]?.let { return it }
 
             return mutex.withLock {
-                instances[key] ?: PrefixedPreferencesStore(store, prefix).also { instance ->
+                instances[key] ?: PrefixedPreferencesStore(store, prefix, scope).also { instance ->
                     instances[key] = instance
                 }
             }
         }
 
         private val dataStoreMutex = Mutex()
-        private val dataStoreInstances = mutableMapOf<String, DataStore<Preferences>>()
+        internal val dataStoreInstances = mutableMapOf<String, DataStore<Preferences>>()
         suspend fun getDataStore(file: String): DataStore<Preferences> {
 			val fileAbsPath = FileKit.filesDir.resolve(file).absolutePath()
-				.removePrefix("file://") // Handles the case where it starts with file://
-				.removePrefix("file:")   // Handles the case where it starts with file:/ (your error)
-				.removePrefix("/")       // Ensures we don't double-slash
-				.removePrefix("//")      // Ensures we don't have multiple slashes at the start
+				.removePrefix("file://")
+                .removePrefix("file:/")
+                .removePrefix("file:")
+				.removePrefix("/")
+				.removePrefix("//")
 
             dataStoreInstances[fileAbsPath]?.let { return it }
 
             return dataStoreMutex.withLock {
                 dataStoreInstances[fileAbsPath] ?: PreferenceDataStoreFactory.createWithPath(
-                    produceFile = { "/$fileAbsPath".toPath() }
+                    produceFile = { fileAbsPath.toPath() }
                 ).also { instance ->
                     dataStoreInstances[fileAbsPath] = instance
                 }
@@ -66,13 +73,18 @@ open class PrefixedPreferencesStore protected constructor(
         }
     }
 
+    /**
+     * Clears all preferences registered in this store.
+     * 
+     * Note: This only clears keys that have been explicitly registered via the `register*` methods.
+     * This prevents accidental deletion of keys belonging to other stores with overlapping 
+     * prefixes (e.g., a "user" store won't clear "user_profile" keys).
+     */
     suspend fun clear() {
         store.edit { prefs ->
-            val keysToRemove = prefs.asMap()
-                .keys
-                .filter { it.name.startsWith(prefix) }
-
-            keysToRemove.forEach { prefs.remove(it) }
+            registeredPreferences.values.forEach { state ->
+                prefs.remove(state.key)
+            }
         }
     }
 
@@ -84,19 +96,20 @@ open class PrefixedPreferencesStore protected constructor(
      * Waits for all registered preferences to be loaded from the DataStore.
      */
     suspend fun ensureAllLoaded() = coroutineScope {
-        registeredPreferences.map { async { it.ensureLoaded() } }.awaitAll()
+        registeredPreferences.values.map { async { it.ensureLoaded() } }.awaitAll()
     }
 
+    @Suppress("UNCHECKED_CAST")
     fun <S, T> registerPreference(
         factory: (String) -> Preferences.Key<S>,
         name: String,
         default: T,
         converter: PreferenceConverter<S, T>? = null
     ): PreferenceState<S, T> {
-        val key = prefixKey(name)
-        return PreferenceState(store, factory(key), default, converter).also {
-            registeredPreferences.add(it)
-        }
+        val keyName = prefixKey(name)
+        return (registeredPreferences.getOrPut(keyName) {
+            PreferenceState(store, factory(keyName), default, converter, scope)
+        } as PreferenceState<S, T>)
     }
 
     fun <T> registerBooleanPref(name: String, default: T, converter: PreferenceConverter<Boolean, T>? = null) =

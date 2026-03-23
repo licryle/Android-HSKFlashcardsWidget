@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.*
  */
 class PreferenceState<S, T>(
     private val store: DataStore<Preferences>,
-    private val key: Preferences.Key<S>,
+    internal val key: Preferences.Key<S>,
     private val initialValue: T,
     converter: PreferenceConverter<S, T>? = null,
     coroutineScope: CoroutineScope? = null
