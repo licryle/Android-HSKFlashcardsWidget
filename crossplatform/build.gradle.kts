@@ -9,7 +9,7 @@ val versionCodeName = "4.0.2"
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.serialization)
-    alias(libs.plugins.androidLibrary) // Changed from androidApplication
+    alias(libs.plugins.androidLibrary)
     alias(libs.plugins.composePlugin)
     alias(libs.plugins.kotlinCompose)
     alias(libs.plugins.ksp)
@@ -31,7 +31,7 @@ kotlin {
     androidTarget {
         compilations.all {
             compileTaskProvider.configure {
-                compilerOptions.jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
+                compilerOptions.jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
             }
         }
     }
@@ -41,7 +41,7 @@ kotlin {
         homepage = "https://github.com/Licryle/HSKFlashcardsWidget"
         version = "1.0"
         ios.deploymentTarget = "16.0"
-        podfile = project.file("../iosApp/Podfile")  // Good
+        podfile = project.file("../iosApp/Podfile")
         framework {
             baseName = "crossPlatform"
             isStatic = true
@@ -113,7 +113,6 @@ kotlin {
                 implementation(libs.firebase.analytics)
                 implementation(libs.firebase.crashlytics)
 
-                // To remove alongside removing PrefCompat
                 implementation("androidx.preference:preference-ktx:1.2.1")
             }
         }
@@ -150,7 +149,6 @@ android {
 
     defaultConfig {
         minSdk = 26
-        // applicationId, versionCode, versionName moved to androidApp
     }
 
     packaging {
@@ -162,12 +160,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 
     kotlin {
-        jvmToolchain(11)
+        jvmToolchain(21)
     }
 
     buildFeatures {
