@@ -3,9 +3,6 @@ import org.gradle.internal.os.OperatingSystem
 
 var os: OperatingSystem? = OperatingSystem.current()
 
-val versionCodeValue = 47
-val versionCodeName = "4.0.3"
-
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.serialization)
@@ -19,10 +16,14 @@ plugins {
     id("org.jetbrains.kotlin.native.cocoapods")
 }
 
+val appVersionCode = libs.versions.app.versionCode.get()
+val appVersionName = libs.versions.app.versionName.get()
+
 buildkonfig {
     packageName = "fr.berliat.hskwidget"
     defaultConfigs {
-        buildConfigField(INT, "VERSION_CODE", "$versionCodeValue")
+        buildConfigField(INT, "VERSION_CODE", appVersionCode)
+        buildConfigField(STRING, "VERSION_NAME", appVersionName)
         buildConfigField(BOOLEAN, "DEBUG_MODE", "true")
     }
 }
@@ -39,7 +40,7 @@ kotlin {
     cocoapods {
         summary = "HSK Flashcards cross-platform module"
         homepage = "https://github.com/Licryle/HSKFlashcardsWidget"
-        version = "1.0"
+        version = appVersionName
         ios.deploymentTarget = "16.0"
         podfile = project.file("../iosApp/Podfile")
         framework {
@@ -196,4 +197,29 @@ skie {
     build {
         produceDistributableFramework()
     }
+}
+
+tasks.register("syncIosVersions") {
+    doLast {
+        val pbxprojFile = file("../iosApp/hskwidget.xcodeproj/project.pbxproj")
+        if (pbxprojFile.exists()) {
+            var content = pbxprojFile.readText()
+            
+            // Replace MARKETING_VERSION (Version Name)
+            content = content.replace(Regex("MARKETING_VERSION = [^;]+;"), "MARKETING_VERSION = $appVersionName;")
+            
+            // Replace CURRENT_PROJECT_VERSION (Build Number / Version Code)
+            content = content.replace(Regex("CURRENT_PROJECT_VERSION = [^;]+;"), "CURRENT_PROJECT_VERSION = $appVersionCode;")
+            
+            pbxprojFile.writeText(content)
+            println("Successfully synced version $appVersionName ($appVersionCode) to Xcode project.")
+        } else {
+            println("Xcode project file not found at ${pbxprojFile.absolutePath}")
+        }
+    }
+}
+
+// Automatically sync versions whenever a framework is created
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink>().configureEach {
+    finalizedBy("syncIosVersions")
 }

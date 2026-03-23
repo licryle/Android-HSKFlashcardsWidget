@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
     spec.name                     = 'crossPlatform'
-    spec.version                  = '1.0'
+    spec.version                  = '4.0.3'
     spec.homepage                 = 'https://github.com/Licryle/HSKFlashcardsWidget'
     spec.source                   = { :http=> ''}
     spec.authors                  = ''
@@ -42,5 +42,5 @@ Pod::Spec.new do |spec|
             SCRIPT
         }
     ]
-    spec.resources = ['build/compose/cocoapods/compose-resources']
+    spec.resources = ['build\compose\cocoapods\compose-resources']
 end

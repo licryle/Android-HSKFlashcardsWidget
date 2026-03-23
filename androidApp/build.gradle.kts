@@ -14,8 +14,8 @@ android {
         applicationId = "fr.berliat.hskwidget"
         minSdk = 26
         targetSdk = 36
-        versionCode = 46
-        versionName = "4.0.2"
+        versionCode = libs.versions.app.versionCode.get().toInt()
+        versionName = libs.versions.app.versionName.get()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

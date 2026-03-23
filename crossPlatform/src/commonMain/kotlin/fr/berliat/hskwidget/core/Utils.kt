@@ -29,6 +29,7 @@ object Utils {
         ExpectedUtils.sendEmail(email, subject, body)
 
     fun getAppVersion(): Int = BuildKonfig.VERSION_CODE
+    fun getAppVersionName(): String = BuildKonfig.VERSION_NAME + " (" + BuildKonfig.VERSION_CODE + ")"
 
     fun getAnkiDAO(): AnkiDAO = ExpectedUtils.getAnkiDAO()
 
