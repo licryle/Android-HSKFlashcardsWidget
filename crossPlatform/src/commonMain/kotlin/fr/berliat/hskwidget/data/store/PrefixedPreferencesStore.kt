@@ -65,7 +65,7 @@ open class PrefixedPreferencesStore internal constructor(
 
             return dataStoreMutex.withLock {
                 dataStoreInstances[fileAbsPath] ?: PreferenceDataStoreFactory.createWithPath(
-                    produceFile = { fileAbsPath.toPath() }
+                    produceFile = { "/$fileAbsPath".toPath() }
                 ).also { instance ->
                     dataStoreInstances[fileAbsPath] = instance
                 }
