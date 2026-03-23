@@ -19,6 +19,19 @@ plugins {
 val appVersionCode = libs.versions.app.versionCode.get()
 val appVersionName = libs.versions.app.versionName.get()
 
+val propsFile = file("../gradle.properties")  // Or root gradle.properties
+
+// Clean existing lines first
+propsFile.writeText(propsFile.readText().lines()
+    .filterNot { it.startsWith("kotlin.native.cocoapods.appVersion") }
+    .joinToString("\n") + "\n")
+
+// Append/update versions (idempotent)
+propsFile.appendText("""
+kotlin.native.cocoapods.appVersionName=$appVersionName
+kotlin.native.cocoapods.appVersionCode=$appVersionCode
+""")
+
 buildkonfig {
     packageName = "fr.berliat.hskwidget"
     defaultConfigs {
@@ -197,29 +210,4 @@ skie {
     build {
         produceDistributableFramework()
     }
-}
-
-tasks.register("syncIosVersions") {
-    doLast {
-        val pbxprojFile = file("../iosApp/hskwidget.xcodeproj/project.pbxproj")
-        if (pbxprojFile.exists()) {
-            var content = pbxprojFile.readText()
-            
-            // Replace MARKETING_VERSION (Version Name)
-            content = content.replace(Regex("MARKETING_VERSION = [^;]+;"), "MARKETING_VERSION = $appVersionName;")
-            
-            // Replace CURRENT_PROJECT_VERSION (Build Number / Version Code)
-            content = content.replace(Regex("CURRENT_PROJECT_VERSION = [^;]+;"), "CURRENT_PROJECT_VERSION = $appVersionCode;")
-            
-            pbxprojFile.writeText(content)
-            println("Successfully synced version $appVersionName ($appVersionCode) to Xcode project.")
-        } else {
-            println("Xcode project file not found at ${pbxprojFile.absolutePath}")
-        }
-    }
-}
-
-// Automatically sync versions whenever a framework is created
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink>().configureEach {
-    finalizedBy("syncIosVersions")
 }

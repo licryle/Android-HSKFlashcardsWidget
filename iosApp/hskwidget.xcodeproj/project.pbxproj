@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		1CD8DF532EDE03DE00AB930B /* Vision.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CD8DF522EDE03DE00AB930B /* Vision.framework */; };
 		1CDFB1232EE2FB89001B8494 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CDFB1222EE2FB89001B8494 /* AVFoundation.framework */; };
-		3EAA43202CFF62AC50A94992 /* Pods_hskwidget.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65DDA0CFDA998B3FFE30F6FE /* Pods_hskwidget.framework */; };
+		5E0B1AAA70E4362F3FFF5173 /* Pods_hskwidget.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8E282DEAD54A791009DCFAB0 /* Pods_hskwidget.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -35,9 +35,9 @@
 		1C7166ED2E71E189000B4154 /* hskwidgetUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = hskwidgetUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1CD8DF522EDE03DE00AB930B /* Vision.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Vision.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.5.sdk/System/Library/Frameworks/Vision.framework; sourceTree = DEVELOPER_DIR; };
 		1CDFB1222EE2FB89001B8494 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.5.sdk/System/Library/Frameworks/AVFoundation.framework; sourceTree = DEVELOPER_DIR; };
-		20FC8FC0B45987068940097D /* Pods-hskwidget.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hskwidget.debug.xcconfig"; path = "Target Support Files/Pods-hskwidget/Pods-hskwidget.debug.xcconfig"; sourceTree = "<group>"; };
-		65DDA0CFDA998B3FFE30F6FE /* Pods_hskwidget.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_hskwidget.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		CD46E65773DAFFC0D9370B7D /* Pods-hskwidget.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hskwidget.release.xcconfig"; path = "Target Support Files/Pods-hskwidget/Pods-hskwidget.release.xcconfig"; sourceTree = "<group>"; };
+		76EBB687A3DBF7F30E3C4386 /* Pods-hskwidget.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hskwidget.debug.xcconfig"; path = "Target Support Files/Pods-hskwidget/Pods-hskwidget.debug.xcconfig"; sourceTree = "<group>"; };
+		8E282DEAD54A791009DCFAB0 /* Pods_hskwidget.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_hskwidget.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		BFA6C209EAC2468F63BA6CEF /* Pods-hskwidget.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hskwidget.release.xcconfig"; path = "Target Support Files/Pods-hskwidget/Pods-hskwidget.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -96,7 +96,7 @@
 			files = (
 				1CDFB1232EE2FB89001B8494 /* AVFoundation.framework in Frameworks */,
 				1CD8DF532EDE03DE00AB930B /* Vision.framework in Frameworks */,
-				3EAA43202CFF62AC50A94992 /* Pods_hskwidget.framework in Frameworks */,
+				5E0B1AAA70E4362F3FFF5173 /* Pods_hskwidget.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -126,7 +126,7 @@
 				1C8A8BF62E733E1B00B8E39B /* Frameworks */,
 				1C7166D62E71E186000B4154 /* Products */,
 				1CE7E50F2E96CC5F00627840 /* Kotlin Debug */,
-				374EA8874F5E204406F30A54 /* Pods */,
+				8392E8F810BAD43125E07396 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -145,7 +145,7 @@
 			children = (
 				1CDFB1222EE2FB89001B8494 /* AVFoundation.framework */,
 				1CD8DF522EDE03DE00AB930B /* Vision.framework */,
-				65DDA0CFDA998B3FFE30F6FE /* Pods_hskwidget.framework */,
+				8E282DEAD54A791009DCFAB0 /* Pods_hskwidget.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -159,13 +159,12 @@
 			path = "Kotlin Debug";
 			sourceTree = "<group>";
 		};
-		374EA8874F5E204406F30A54 /* Pods */ = {
+		8392E8F810BAD43125E07396 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				20FC8FC0B45987068940097D /* Pods-hskwidget.debug.xcconfig */,
-				CD46E65773DAFFC0D9370B7D /* Pods-hskwidget.release.xcconfig */,
+				76EBB687A3DBF7F30E3C4386 /* Pods-hskwidget.debug.xcconfig */,
+				BFA6C209EAC2468F63BA6CEF /* Pods-hskwidget.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -176,12 +175,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1C7166F72E71E189000B4154 /* Build configuration list for PBXNativeTarget "hskwidget" */;
 			buildPhases = (
-				E1F87436D05361B8D82FCC02 /* [CP] Check Pods Manifest.lock */,
+				BB7077A9E2272F1DD60E6AAF /* [CP] Check Pods Manifest.lock */,
 				1C7166D12E71E186000B4154 /* Sources */,
 				1C7166D22E71E186000B4154 /* Frameworks */,
 				1C7166D32E71E186000B4154 /* Resources */,
-				8602D24C74F6A957016A6787 /* [CP] Copy Pods Resources */,
-				60337D5D3641602AA3E8EB4A /* [CP] Embed Pods Frameworks */,
+				7ED294976A4A6FC6483331B4 /* [CP] Copy Pods Resources */,
+				1CE336C22F71CE2A006C1C15 /* ShellScript */,
+				C6B2C54724CA7FA6ACF91CDF /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -306,24 +306,24 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		60337D5D3641602AA3E8EB4A /* [CP] Embed Pods Frameworks */ = {
+		1CE336C22F71CE2A006C1C15 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-hskwidget/Pods-hskwidget-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			name = "[CP] Embed Pods Frameworks";
+			inputPaths = (
+			);
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-hskwidget/Pods-hskwidget-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-hskwidget/Pods-hskwidget-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
+			shellScript = "# Read from Pods-crossPlatform gradle.properties (written by syncFramework)\nFRAMEWORK_GRADLE_PROPS=\"$PODS_ROOT/crossPlatform/gradle.properties\"\nif [ -f \"$FRAMEWORK_GRADLE_PROPS\" ]; then\n  APP_VERSION=$(grep 'kotlin.native.cocoapods.appVersionName' \"$FRAMEWORK_PROPS\" | cut -d'=' -f2)\n  APP_BUILD=$(grep 'kotlin.native.cocoapods.appVersionCode' \"$FRAMEWORK_PROPS\" | cut -d'=' -f2)\n  \n  # Update Info.plist (safer than pbxproj)\n  /usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $APP_VERSION\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\"\n  /usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $APP_BUILD\" \"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\"\n  \n  echo \"Synced appVersion: $APP_VERSION ($APP_BUILD)\"\nelse\n  echo \"No gradle.properties found; skipping sync\"\nfi\n";
 		};
-		8602D24C74F6A957016A6787 /* [CP] Copy Pods Resources */ = {
+		7ED294976A4A6FC6483331B4 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -340,7 +340,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-hskwidget/Pods-hskwidget-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		E1F87436D05361B8D82FCC02 /* [CP] Check Pods Manifest.lock */ = {
+		BB7077A9E2272F1DD60E6AAF /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -360,6 +360,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		C6B2C54724CA7FA6ACF91CDF /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-hskwidget/Pods-hskwidget-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-hskwidget/Pods-hskwidget-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-hskwidget/Pods-hskwidget-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -520,7 +537,7 @@
 		};
 		1C7166F82E71E189000B4154 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 20FC8FC0B45987068940097D /* Pods-hskwidget.debug.xcconfig */;
+			baseConfigurationReference = 76EBB687A3DBF7F30E3C4386 /* Pods-hskwidget.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -570,7 +587,7 @@
 		};
 		1C7166F92E71E189000B4154 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = CD46E65773DAFFC0D9370B7D /* Pods-hskwidget.release.xcconfig */;
+			baseConfigurationReference = BFA6C209EAC2468F63BA6CEF /* Pods-hskwidget.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;

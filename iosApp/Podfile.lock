@@ -9,7 +9,7 @@ PODS:
     - GoogleUtilities/Environment (~> 8.0)
     - GoogleUtilities/UserDefaults (~> 8.0)
     - PromisesObjC (~> 2.4)
-  - crossPlatform (1.0)
+  - crossPlatform (4.0.3)
   - GoogleAPIClientForREST/Core (5.2.0):
     - GTMSessionFetcher/Full (< 6.0, >= 1.6.1)
   - GoogleAPIClientForREST/Drive (5.2.0):
@@ -60,7 +60,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   AppAuth: 1c1a8afa7e12f2ec3a294d9882dfa5ab7d3cb063
   AppCheckCore: cc8fd0a3a230ddd401f326489c99990b013f0c4f
-  crossPlatform: 3381fd5ac828426191c33a5ce037434fa25b5a68
+  crossPlatform: 8392e3891b5179b95f660b73c231f3fcf4403376
   GoogleAPIClientForREST: 81ecc07c0942075f66b8129f5a7f2df5d740bafa
   GoogleSignIn: fcee2257188d5eda57a5e2b6a715550ffff9206d
   GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
