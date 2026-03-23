@@ -32,3 +32,4 @@ build/
 google-services.json
 crossPlatform/test_datastore_*
 /iosApp/hskwidget.xcworkspace/
+/iosApp/GoogleService-Info.plist
