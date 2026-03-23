@@ -172,6 +172,7 @@ You can come back to this screen at any time to set up a new widget, or reconfig
     <string name="database_update_start">Updating base dictionary, backup will be delayed.</string>
     <string name="database_update_success">Updated base dictionary</string>
     <string name="database_update_failure">Error while updating base dictionary: %1$s</string>
+    <string name="database_update_list_system">Populating "At the Exam" and "Annotated words" lists.</string>
 
     <string name="config_restore_file">Restore from file</string>
     <string name="config_restore_file_choose">Choose file</string>

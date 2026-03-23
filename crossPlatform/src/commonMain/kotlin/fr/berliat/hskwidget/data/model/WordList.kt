@@ -43,7 +43,8 @@ data class WordList constructor(
 
     companion object {
         const val ANKI_ID_EMPTY: Long = 0
-        const val SYSTEM_ANNOTATED_NAME = "Annotated Words"
+        const val SYSTEM_ANNOTATED_NAME = "Annotated words"
+        const val SYSTEM_EXAM_NAME = "At the exam"
     }
 }
 

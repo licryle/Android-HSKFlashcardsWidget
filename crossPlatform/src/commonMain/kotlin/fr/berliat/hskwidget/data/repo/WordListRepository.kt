@@ -259,7 +259,17 @@ class WordListRepository(
             = withContext(AppDispatchers.IO) {
         val wordList = getSystemLists()
 
-        val annotList = wordList.find { it.name == WordList.Companion.SYSTEM_ANNOTATED_NAME }
+        val annotList = wordList.find { it.name == WordList.SYSTEM_ANNOTATED_NAME }
+        if (annotList == null) return@withContext null
+
+        return@withContext addWordToList(annotList.wordList, word)
+    }
+
+    suspend fun addWordToSysExamList(word: AnnotatedChineseWord): (suspend () -> Result<Unit>)?
+            = withContext(AppDispatchers.IO) {
+        val wordList = getSystemLists()
+
+        val annotList = wordList.find { it.name == WordList.SYSTEM_EXAM_NAME }
         if (annotList == null) return@withContext null
 
         return@withContext addWordToList(annotList.wordList, word)
@@ -330,5 +340,39 @@ class WordListRepository(
         }
 
         return@withContext deck
+    }
+
+    suspend fun buildListSystemAnnotated() {
+        val list = wordListDAO.getSystemLists().filter { it.name == WordList.SYSTEM_ANNOTATED_NAME }
+        if (list.isEmpty())
+            wordListDAO.insertList(WordList(WordList.SYSTEM_ANNOTATED_NAME, listType = WordList.ListType.SYSTEM))
+
+        rebuildListSystemAnnotated()
+    }
+
+    suspend fun rebuildListSystemAnnotated() {
+        val list = wordListDAO.getSystemLists().filter { it.name == WordList.SYSTEM_ANNOTATED_NAME }
+        wordListDAO.deleteAllFromList(list.first().id)
+
+        for (word in annotatedChineseWordDAO.getAllAnnotated()) {
+            addWordToSysAnnotatedList(word)
+        }
+    }
+
+    suspend fun buildListSystemExam() {
+        val list = wordListDAO.getSystemLists().filter { it.name == WordList.SYSTEM_EXAM_NAME }
+        if (list.isEmpty())
+            wordListDAO.insertList(WordList(WordList.SYSTEM_EXAM_NAME, listType = WordList.ListType.SYSTEM))
+
+        rebuildListSystemExam()
+    }
+
+    suspend fun rebuildListSystemExam() {
+        val list = wordListDAO.getSystemLists().filter { it.name == WordList.SYSTEM_EXAM_NAME }
+        wordListDAO.deleteAllFromList(list.first().id)
+
+        for (word in annotatedChineseWordDAO.getAllAtExam()) {
+            addWordToSysExamList(word)
+        }
     }
 }

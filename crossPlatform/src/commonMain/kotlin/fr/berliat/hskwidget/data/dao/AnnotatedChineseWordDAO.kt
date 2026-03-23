@@ -32,13 +32,15 @@ private const val select_right_join =
 interface AnnotatedChineseWordDAO {
     @Query("$select_left_join WHERE a.a_searchable_text LIKE '%' || :str || '%'" +
             " AND (0=:hasAnnotation OR (1=:hasAnnotation AND a.first_seen IS NOT NULL))" +
+            " AND (a.is_exam=:atExam OR :atExam IS NULL)" +
             " UNION " +
             "$select_right_join WHERE w.searchable_text LIKE '%' || :str || '%'" +
             " AND (0=:hasAnnotation OR (1=:hasAnnotation AND a.first_seen IS NOT NULL))" +
+            " AND (a.is_exam=:atExam OR :atExam IS NULL)" +
             " ORDER BY is_first_seen_null, a.first_seen DESC, w.popularity DESC " +
             " LIMIT :pageSize OFFSET (:page * :pageSize)")
     @RewriteQueriesToDropUnusedColumns
-    suspend fun searchFromStrLike(str: String?, hasAnnotation: Boolean, page: Int = 0, pageSize: Int = 30): List<AnnotatedChineseWord>
+    suspend fun searchFromStrLike(str: String?, hasAnnotation: Boolean, atExam: Boolean? = null, page: Int = 0, pageSize: Int = 30): List<AnnotatedChineseWord>
 
     @Query("SELECT * FROM (" +
            "       $select_left_join WHERE a.a_simplified IN (SELECT simplified FROM word_list_entry WHERE list_id IN (:listIds) AND simplified NOT IN (:bannedWords))" +
@@ -78,7 +80,11 @@ interface AnnotatedChineseWordDAO {
     suspend fun searchFromWordList(listName: String, hasAnnotation: Boolean, page: Int = 0, pageSize: Int = 30): List<AnnotatedChineseWord>
 
     suspend fun getAllAnnotated(): List<AnnotatedChineseWord> {
-        return searchFromStrLike("", true, 0, Int.MAX_VALUE)
+        return searchFromStrLike("", hasAnnotation = true, atExam = null, 0, Int.MAX_VALUE)
+    }
+
+    suspend fun getAllAtExam(): List<AnnotatedChineseWord> {
+        return searchFromStrLike("", hasAnnotation = true, atExam = true, page = 0, pageSize = Int.MAX_VALUE)
     }
 
     @Query("$select_left_join WHERE a_simplified = :simplifiedWord" +

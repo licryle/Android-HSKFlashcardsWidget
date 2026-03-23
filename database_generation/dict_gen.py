@@ -252,6 +252,11 @@ def populate_system_lists(cursor, cedict_words):
 
     print(f'Wrote AnnotatedWords list')
 
+    cursor.execute("INSERT INTO `word_list` (`name`, `creation_date`, `last_modified`, `list_type`) VALUES (?, ?, ?, ?)",
+        ('At the exam', SYSTEM_LISTS_CREATION_DATE, SYSTEM_LISTS_CREATION_DATE + 11, 'SYSTEM'))
+
+    print(f'Wrote AnnotatedWords list')
+
 def populate_dict(cursor, cedict_words, annotations):
     for word in cedict_words.values():
         cursor.execute('''

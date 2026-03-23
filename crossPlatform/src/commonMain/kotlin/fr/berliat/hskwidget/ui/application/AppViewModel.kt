@@ -16,6 +16,7 @@ import fr.berliat.hskwidget.core.HSKAppServicesPriority
 import fr.berliat.hskwidget.core.Logging
 import fr.berliat.hskwidget.core.SnackbarType
 import fr.berliat.hskwidget.database_update_failure
+import fr.berliat.hskwidget.database_update_list_system
 import fr.berliat.hskwidget.database_update_start
 import fr.berliat.hskwidget.database_update_success
 import fr.berliat.hskwidget.dbbackup_failure_folderpermission
@@ -108,6 +109,15 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
 
                     Logging.logAnalyticsError(TAG, "UpdateDatabaseFromAssetFailure", e.message ?: "")
                 })
+            }
+        }
+
+        if (appConfig.appVersionCode.value in 1..<47 && Utils.getAppVersion() >= 47) {
+            HSKAppServices.snackbar.show(SnackbarType.INFO, Res.string.database_update_list_system)
+
+            viewModelScope.launch(AppDispatchers.IO) {
+                HSKAppServices.wordListRepo.buildListSystemAnnotated()
+                HSKAppServices.wordListRepo.buildListSystemExam()
             }
         }
 

@@ -89,6 +89,11 @@ class AnnotateViewModel(
                 Logging.logAnalyticsEvent(Logging.ANALYTICS_EVENTS.ANNOTATION_SAVE)
 
                 ankiCaller(wordListRepo.addWordToSysAnnotatedList(annotatedWord))
+
+                if (annotatedWord.annotation.isExam == true) {
+                    ankiCaller(wordListRepo.addWordToSysExamList(annotatedWord))
+                }
+
                 val ankiOperation = wordListRepo.updateInAllLists(annotatedWord.simplified)
                 ankiCaller(ankiOperation)
             } catch (e: Exception) {
