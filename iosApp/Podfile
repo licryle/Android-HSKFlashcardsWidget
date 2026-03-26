@@ -6,6 +6,7 @@ target 'hskwidget' do
   use_frameworks!
   pod 'crossPlatform', :path => '../crossPlatform'  # Local KMP
   pod 'GoogleSignIn'
+  pod 'Firebase/Analytics'
   pod 'GoogleAPIClientForREST/Drive'
 end
 

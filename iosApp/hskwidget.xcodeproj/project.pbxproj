@@ -61,29 +61,21 @@
 		};
 		1C7166E62E71E189000B4154 /* hskwidgetTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = hskwidgetTests;
 			sourceTree = "<group>";
 		};
 		1C7166F02E71E189000B4154 /* hskwidgetUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = hskwidgetUITests;
 			sourceTree = "<group>";
 		};
 		1CE7E5D52E96CCED00627840 /* ../crossPlatform/src/commonMain */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = ../crossPlatform/src/commonMain;
 			sourceTree = SOURCE_ROOT;
 		};
 		1CE7E5F92E96CCED00627840 /* ../crossPlatform/src/iosMain */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = ../crossPlatform/src/iosMain;
 			sourceTree = SOURCE_ROOT;
 		};
@@ -331,9 +323,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hskwidget/Pods-hskwidget-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hskwidget/Pods-hskwidget-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -370,9 +366,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hskwidget/Pods-hskwidget-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hskwidget/Pods-hskwidget-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
