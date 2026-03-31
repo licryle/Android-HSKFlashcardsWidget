@@ -50,6 +50,7 @@ object HSKAppServices : AppServices() {
 
     // P0
     val database: ChineseWordsDatabase get() = get("database")
+    val resources: CachedResources get() = get("resources")
 
     // P2
     val appPreferences: AppPreferencesStore get() = get("appPreferences")
@@ -67,6 +68,7 @@ object HSKAppServices : AppServices() {
         // Required for Widget -- Minimal Set
         register("snackbar", HSKAppServicesPriority.Widget) { SnackbarManager }
         register("database", HSKAppServicesPriority.Widget) { DatabaseHelper.getInstance().liveDatabase }
+        register("resources", HSKAppServicesPriority.Widget) { CachedResources.load() }
         register("appPreferences", HSKAppServicesPriority.Widget) {
             AppPreferencesStore.getInstance(PrefixedPreferencesStore.getDataStore(Utils.getAppDatabasePath() / "app.preferences_pb"))
         }
@@ -104,4 +106,3 @@ object HSKAppServices : AppServices() {
         }
     }
 }
-
