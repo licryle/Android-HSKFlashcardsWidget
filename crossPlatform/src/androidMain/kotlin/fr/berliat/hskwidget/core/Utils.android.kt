@@ -3,6 +3,7 @@ package fr.berliat.hskwidget.core
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
+import android.appwidget.AppWidgetManager
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Intent
@@ -23,6 +24,7 @@ import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.cancel
 import fr.berliat.hskwidget.core.Logging.logAnalyticsError
 import fr.berliat.hskwidget.dialog_tts_error
+import fr.berliat.hskwidget.domain.WidgetController
 import fr.berliat.hskwidget.fix_it
 import fr.berliat.hskwidget.speech_failure_toast_chinese_unsupported
 import fr.berliat.hskwidget.speech_failure_toast_init
@@ -201,6 +203,15 @@ actual object ExpectedUtils {
             // fallback: app has no launch intent?
             Logger.e(tag = TAG, messageString = "No launch intent found for ${context.packageName}")
         }
+    }
+
+    internal actual fun attemptAddDesktopWidget(): Boolean {
+        val appWidgetManager = AppWidgetManager.getInstance(context)
+
+        if (!appWidgetManager.isRequestPinAppWidgetSupported) return false
+
+        WidgetController.requestAddDesktopWidget(context, appWidgetManager)
+        return true
     }
 
     private const val TAG = "Utils"

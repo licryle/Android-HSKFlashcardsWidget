@@ -5,6 +5,7 @@ actual val MenuItems: List<DecoratedScreen>
         return listOf(
             DecoratedScreen.Dictionary,
             DecoratedScreen.Lists,
+            DecoratedScreen.Widgets,
             DecoratedScreen.Config,
             DecoratedScreen.About
         )

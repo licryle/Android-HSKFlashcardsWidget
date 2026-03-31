@@ -7,9 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1C6C7A7F2F7584EA00CAEF01 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C6C7A7E2F7584EA00CAEF01 /* WidgetKit.framework */; };
+		1C6C7A812F7584EA00CAEF01 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C6C7A802F7584EA00CAEF01 /* SwiftUI.framework */; };
+		1C757CA72F7688A800130DBA /* HskFlashcardsWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 1C6C7A7D2F7584EA00CAEF01 /* HskFlashcardsWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		1CD8DF532EDE03DE00AB930B /* Vision.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CD8DF522EDE03DE00AB930B /* Vision.framework */; };
 		1CDFB1232EE2FB89001B8494 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CDFB1222EE2FB89001B8494 /* AVFoundation.framework */; };
 		5E0B1AAA70E4362F3FFF5173 /* Pods_hskwidget.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8E282DEAD54A791009DCFAB0 /* Pods_hskwidget.framework */; };
+		82C1E3B422A501F3AB8B7684 /* Pods_HskFlashcardsWidgetExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6D8CBF03D000A24F101DF3CE /* Pods_HskFlashcardsWidgetExtension.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -27,20 +31,55 @@
 			remoteGlobalIDString = 1C7166D42E71E186000B4154;
 			remoteInfo = hskwidget;
 		};
+		1C757CA82F7688A800130DBA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1C7166CD2E71E186000B4154 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1C6C7A7C2F7584EA00CAEF01;
+			remoteInfo = HskFlashcardsWidgetExtension;
+		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		1C757CAA2F7688A800130DBA /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				1C757CA72F7688A800130DBA /* HskFlashcardsWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		1C6C7A7D2F7584EA00CAEF01 /* HskFlashcardsWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = HskFlashcardsWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		1C6C7A7E2F7584EA00CAEF01 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		1C6C7A802F7584EA00CAEF01 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		1C7166D52E71E186000B4154 /* hskwidget.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = hskwidget.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1C7166E32E71E189000B4154 /* hskwidgetTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = hskwidgetTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1C7166ED2E71E189000B4154 /* hskwidgetUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = hskwidgetUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		1C757C9B2F7672B600130DBA /* HskFlashcardsWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = HskFlashcardsWidgetExtension.entitlements; sourceTree = "<group>"; };
 		1CD8DF522EDE03DE00AB930B /* Vision.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Vision.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.5.sdk/System/Library/Frameworks/Vision.framework; sourceTree = DEVELOPER_DIR; };
 		1CDFB1222EE2FB89001B8494 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.5.sdk/System/Library/Frameworks/AVFoundation.framework; sourceTree = DEVELOPER_DIR; };
+		6D8CBF03D000A24F101DF3CE /* Pods_HskFlashcardsWidgetExtension.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HskFlashcardsWidgetExtension.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		76EBB687A3DBF7F30E3C4386 /* Pods-hskwidget.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hskwidget.debug.xcconfig"; path = "Target Support Files/Pods-hskwidget/Pods-hskwidget.debug.xcconfig"; sourceTree = "<group>"; };
 		8E282DEAD54A791009DCFAB0 /* Pods_hskwidget.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_hskwidget.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		BFA6C209EAC2468F63BA6CEF /* Pods-hskwidget.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hskwidget.release.xcconfig"; path = "Target Support Files/Pods-hskwidget/Pods-hskwidget.release.xcconfig"; sourceTree = "<group>"; };
+		C2F890F7FAF61F8D564220CB /* Pods-HskFlashcardsWidgetExtension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HskFlashcardsWidgetExtension.debug.xcconfig"; path = "Target Support Files/Pods-HskFlashcardsWidgetExtension/Pods-HskFlashcardsWidgetExtension.debug.xcconfig"; sourceTree = "<group>"; };
+		D0E80B30BCB2E15DADA6E998 /* Pods-HskFlashcardsWidgetExtension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HskFlashcardsWidgetExtension.release.xcconfig"; path = "Target Support Files/Pods-HskFlashcardsWidgetExtension/Pods-HskFlashcardsWidgetExtension.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		1C6C7A972F7584EE00CAEF01 /* Exceptions for "HskFlashcardsWidget" folder in "HskFlashcardsWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 1C6C7A7C2F7584EA00CAEF01 /* HskFlashcardsWidgetExtension */;
+		};
 		1CD8DF4E2EDDF04B00AB930B /* Exceptions for "hskwidget" folder in "hskwidget" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -51,6 +90,14 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		1C6C7A822F7584EA00CAEF01 /* HskFlashcardsWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				1C6C7A972F7584EE00CAEF01 /* Exceptions for "HskFlashcardsWidget" folder in "HskFlashcardsWidgetExtension" target */,
+			);
+			path = HskFlashcardsWidget;
+			sourceTree = "<group>";
+		};
 		1C7166D72E71E186000B4154 /* hskwidget */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -82,6 +129,16 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		1C6C7A7A2F7584EA00CAEF01 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1C6C7A812F7584EA00CAEF01 /* SwiftUI.framework in Frameworks */,
+				1C6C7A7F2F7584EA00CAEF01 /* WidgetKit.framework in Frameworks */,
+				82C1E3B422A501F3AB8B7684 /* Pods_HskFlashcardsWidgetExtension.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		1C7166D22E71E186000B4154 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -112,9 +169,11 @@
 		1C7166CC2E71E186000B4154 = {
 			isa = PBXGroup;
 			children = (
+				1C757C9B2F7672B600130DBA /* HskFlashcardsWidgetExtension.entitlements */,
 				1C7166D72E71E186000B4154 /* hskwidget */,
 				1C7166E62E71E189000B4154 /* hskwidgetTests */,
 				1C7166F02E71E189000B4154 /* hskwidgetUITests */,
+				1C6C7A822F7584EA00CAEF01 /* HskFlashcardsWidget */,
 				1C8A8BF62E733E1B00B8E39B /* Frameworks */,
 				1C7166D62E71E186000B4154 /* Products */,
 				1CE7E50F2E96CC5F00627840 /* Kotlin Debug */,
@@ -128,6 +187,7 @@
 				1C7166D52E71E186000B4154 /* hskwidget.app */,
 				1C7166E32E71E189000B4154 /* hskwidgetTests.xctest */,
 				1C7166ED2E71E189000B4154 /* hskwidgetUITests.xctest */,
+				1C6C7A7D2F7584EA00CAEF01 /* HskFlashcardsWidgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -138,6 +198,9 @@
 				1CDFB1222EE2FB89001B8494 /* AVFoundation.framework */,
 				1CD8DF522EDE03DE00AB930B /* Vision.framework */,
 				8E282DEAD54A791009DCFAB0 /* Pods_hskwidget.framework */,
+				1C6C7A7E2F7584EA00CAEF01 /* WidgetKit.framework */,
+				1C6C7A802F7584EA00CAEF01 /* SwiftUI.framework */,
+				6D8CBF03D000A24F101DF3CE /* Pods_HskFlashcardsWidgetExtension.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -156,6 +219,8 @@
 			children = (
 				76EBB687A3DBF7F30E3C4386 /* Pods-hskwidget.debug.xcconfig */,
 				BFA6C209EAC2468F63BA6CEF /* Pods-hskwidget.release.xcconfig */,
+				C2F890F7FAF61F8D564220CB /* Pods-HskFlashcardsWidgetExtension.debug.xcconfig */,
+				D0E80B30BCB2E15DADA6E998 /* Pods-HskFlashcardsWidgetExtension.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -163,6 +228,28 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		1C6C7A7C2F7584EA00CAEF01 /* HskFlashcardsWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1C6C7A962F7584EE00CAEF01 /* Build configuration list for PBXNativeTarget "HskFlashcardsWidgetExtension" */;
+			buildPhases = (
+				C7C9904B23E47F3381864FCD /* [CP] Check Pods Manifest.lock */,
+				1C6C7A792F7584EA00CAEF01 /* Sources */,
+				1C6C7A7A2F7584EA00CAEF01 /* Frameworks */,
+				1C6C7A7B2F7584EA00CAEF01 /* Resources */,
+				14DA8CCF08BFF679906F5D2A /* [CP] Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				1C6C7A822F7584EA00CAEF01 /* HskFlashcardsWidget */,
+			);
+			name = HskFlashcardsWidgetExtension;
+			productName = HskFlashcardsWidgetExtension;
+			productReference = 1C6C7A7D2F7584EA00CAEF01 /* HskFlashcardsWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		1C7166D42E71E186000B4154 /* hskwidget */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1C7166F72E71E189000B4154 /* Build configuration list for PBXNativeTarget "hskwidget" */;
@@ -173,11 +260,12 @@
 				1C7166D32E71E186000B4154 /* Resources */,
 				7ED294976A4A6FC6483331B4 /* [CP] Copy Pods Resources */,
 				1CE336C22F71CE2A006C1C15 /* ShellScript */,
-				C6B2C54724CA7FA6ACF91CDF /* [CP] Embed Pods Frameworks */,
+				1C757CAA2F7688A800130DBA /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				1C757CA92F7688A800130DBA /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				1C7166D72E71E186000B4154 /* hskwidget */,
@@ -236,9 +324,12 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1640;
+				LastSwiftUpdateCheck = 2630;
 				LastUpgradeCheck = 1640;
 				TargetAttributes = {
+					1C6C7A7C2F7584EA00CAEF01 = {
+						CreatedOnToolsVersion = 26.3;
+					};
 					1C7166D42E71E186000B4154 = {
 						CreatedOnToolsVersion = 16.4;
 					};
@@ -269,11 +360,19 @@
 				1C7166D42E71E186000B4154 /* hskwidget */,
 				1C7166E22E71E189000B4154 /* hskwidgetTests */,
 				1C7166EC2E71E189000B4154 /* hskwidgetUITests */,
+				1C6C7A7C2F7584EA00CAEF01 /* HskFlashcardsWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		1C6C7A7B2F7584EA00CAEF01 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		1C7166D32E71E186000B4154 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -298,6 +397,27 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		14DA8CCF08BFF679906F5D2A /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-HskFlashcardsWidgetExtension/Pods-HskFlashcardsWidgetExtension-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-HskFlashcardsWidgetExtension/Pods-HskFlashcardsWidgetExtension-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-HskFlashcardsWidgetExtension/Pods-HskFlashcardsWidgetExtension-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		1CE336C22F71CE2A006C1C15 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -358,30 +478,38 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		C6B2C54724CA7FA6ACF91CDF /* [CP] Embed Pods Frameworks */ = {
+		C7C9904B23E47F3381864FCD /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-hskwidget/Pods-hskwidget-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
 			);
-			name = "[CP] Embed Pods Frameworks";
+			name = "[CP] Check Pods Manifest.lock";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-hskwidget/Pods-hskwidget-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-HskFlashcardsWidgetExtension-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-hskwidget/Pods-hskwidget-frameworks.sh\"\n";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		1C6C7A792F7584EA00CAEF01 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		1C7166D12E71E186000B4154 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -416,9 +544,89 @@
 			target = 1C7166D42E71E186000B4154 /* hskwidget */;
 			targetProxy = 1C7166EE2E71E189000B4154 /* PBXContainerItemProxy */;
 		};
+		1C757CA92F7688A800130DBA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1C6C7A7C2F7584EA00CAEF01 /* HskFlashcardsWidgetExtension */;
+			targetProxy = 1C757CA82F7688A800130DBA /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		1C6C7A942F7584EE00CAEF01 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = C2F890F7FAF61F8D564220CB /* Pods-HskFlashcardsWidgetExtension.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = HskFlashcardsWidgetExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 47;
+				DEVELOPMENT_TEAM = V7M52D35G4;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = HskFlashcardsWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = HskFlashcardsWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 4.0.3;
+				NEW_SETTING1 = "";
+				PRODUCT_BUNDLE_IDENTIFIER = fr.berliat.hskwidget.HskFlashcardsWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		1C6C7A952F7584EE00CAEF01 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = D0E80B30BCB2E15DADA6E998 /* Pods-HskFlashcardsWidgetExtension.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = HskFlashcardsWidgetExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 47;
+				DEVELOPMENT_TEAM = V7M52D35G4;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = HskFlashcardsWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = HskFlashcardsWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 4.0.3;
+				NEW_SETTING1 = "";
+				PRODUCT_BUNDLE_IDENTIFIER = fr.berliat.hskwidget.HskFlashcardsWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 		1C7166F52E71E189000B4154 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -473,6 +681,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACH_O_TYPE = mh_execute;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -529,6 +738,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACH_O_TYPE = mh_execute;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
@@ -562,8 +772,7 @@
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"@executable_path/Frameworks",
@@ -612,8 +821,7 @@
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"@executable_path/Frameworks",
@@ -724,6 +932,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		1C6C7A962F7584EE00CAEF01 /* Build configuration list for PBXNativeTarget "HskFlashcardsWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1C6C7A942F7584EE00CAEF01 /* Debug */,
+				1C6C7A952F7584EE00CAEF01 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		1C7166D02E71E186000B4154 /* Build configuration list for PBXProject "hskwidget" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

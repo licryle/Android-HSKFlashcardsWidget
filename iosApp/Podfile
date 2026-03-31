@@ -2,19 +2,40 @@ source 'https://cdn.cocoapods.org'
 
 platform :ios, '16.0'
 
-target 'hskwidget' do
-  use_frameworks!
-  pod 'crossPlatform', :path => '../crossPlatform'  # Local KMP
-  pod 'GoogleSignIn'
+def shared_pods
+  pod 'crossPlatform', :path => '../crossPlatform'
   pod 'Firebase/Analytics'
+  pod 'GoogleSignIn'
   pod 'GoogleAPIClientForREST/Drive'
 end
 
+target 'hskwidget' do
+  use_frameworks! :linkage => :static
+  shared_pods
+end
+
+target 'HskFlashcardsWidgetExtension' do
+  use_frameworks! :linkage => :static
+  shared_pods
+end
 
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '16.0'
+
+      # Fix for "sharedApplication is unavailable" in App Extensions
+      # We allow it because these pods are transitively required but not actually used by the widget code
+      config.build_settings['APPLICATION_EXTENSION_API_ONLY'] = 'NO'
+
+      # Fix for SwiftUICore linking issue in Xcode 16+
+      if config.build_settings['OTHER_LDFLAGS'].nil?
+        config.build_settings['OTHER_LDFLAGS'] = ['$(inherited)', '-framework "SwiftUI"']
+      else
+        unless config.build_settings['OTHER_LDFLAGS'].include?('-framework "SwiftUI"')
+          config.build_settings['OTHER_LDFLAGS'] << ' -framework "SwiftUI"'
+        end
+      end
     end
   end
 end

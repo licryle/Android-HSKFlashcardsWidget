@@ -7,17 +7,21 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 import fr.berliat.hskwidget.core.Locale
 import fr.berliat.hskwidget.data.model.ChineseWord
@@ -26,17 +30,11 @@ import fr.berliat.hskwidget.data.type.Pinyins
 import fr.berliat.hskwidget.ui.components.IconButton
 import fr.berliat.hskwidget.ui.components.WidgetWordView
 import fr.berliat.hskwidget.ui.screens.widgetConfigure.WidgetConfigWithPreviewScreen
-import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.*
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.core.SnackbarType
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
-import fr.berliat.hskwidget.ic_add_24dp
 import fr.berliat.hskwidget.ui.theme.widgetDefaultBox
-import fr.berliat.hskwidget.widget_configure_saved
-import fr.berliat.hskwidget.widget_demo_update_click
-import fr.berliat.hskwidget.widget_demo_word_click
-import fr.berliat.hskwidget.widgets_add_widget
-import fr.berliat.hskwidget.widgets_intro
 
 import kotlinx.coroutines.launch
 
@@ -50,12 +48,26 @@ fun WidgetsListScreen(
     expectsActivityResult: Boolean,
     modifier: Modifier = Modifier,
     selectedWidgetId: Int? = null,
-    viewModel: WidgetsListViewModel = WidgetsListViewModel()
+    viewModel: WidgetsListViewModel = viewModel { WidgetsListViewModel() }
 ) {
-    val widgetIds = viewModel.widgetIds.collectAsState()
+    val widgetIds by viewModel.widgetIds.collectAsState()
+    val showAddWidgetInstructions by viewModel.showAddWidgetInstructions.collectAsState()
     val scope = rememberCoroutineScope()
 
-    val ids = widgetIds.value
+    if (showAddWidgetInstructions) {
+        AlertDialog(
+            onDismissRequest = viewModel::dismissAddWidgetInstructions,
+            title = { Text(text = stringResource(Res.string.widgets_add_widget)) },
+            text = { Text(text = stringResource(Res.string.widgets_add_widget_instructions)) },
+            confirmButton = {
+                TextButton(onClick = viewModel::dismissAddWidgetInstructions) {
+                    Text(text = stringResource(Res.string.understood))
+                }
+            }
+        )
+    }
+
+    val ids = widgetIds
     Column(modifier = modifier.fillMaxSize()) {
         if (ids.isEmpty()) {
             // Intro + demo flashcard
@@ -68,20 +80,26 @@ fun WidgetsListScreen(
             Box(
                 modifier = widgetDefaultBox.align(Alignment.CenterHorizontally)
             ) {
+                val placeholderWord = stringResource(Res.string.widget_placeholder_word)
+                val placeholderPinyin = stringResource(Res.string.widget_placeholder_pinyin)
+                val placeholderLanguage = stringResource(Res.string.widget_placeholder_language)
+                val placeholderHSKLevel = stringResource(Res.string.widget_placeholder_level)
+                val placeholderDefinition = stringResource(Res.string.widget_placeholder_definition)
+
                 WidgetWordView(
                     AnnotatedChineseWord(
                         word = ChineseWord(
-                            simplified = "你好",
-                            definition = mapOf(Locale.ENGLISH to "Hello"),
-                            hskLevel = HSK_Level.HSK1,
-                            pinyins = Pinyins.fromString("nǐ hǎo"),
-                            traditional = "你好",
+                            simplified = placeholderWord,
+                            definition = mapOf((Locale.fromCode(placeholderLanguage) ?: Locale.getDefault()) to placeholderDefinition),
+                            hskLevel = HSK_Level.valueOf(placeholderHSKLevel),
+                            pinyins = Pinyins.fromString(placeholderPinyin),
+                            traditional = placeholderWord,
                             popularity = null
                         ),
                         annotation = null,
                     ),
                     onClickWord = { HSKAppServices.snackbar.show(SnackbarType.INFO, Res.string.widget_demo_word_click) },
-                    onClickSpeak = { viewModel.speakWord("你好") },
+                    onClickSpeak = { viewModel.speakWord(placeholderWord) },
                     onClickUpdate = { HSKAppServices.snackbar.show(SnackbarType.INFO, Res.string.widget_demo_update_click) }
                 )
             }
@@ -94,7 +112,7 @@ fun WidgetsListScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
-        if (!ids.isEmpty()) {
+        if (ids.isNotEmpty()) {
             val pagerState = rememberPagerState(
                 initialPage = max(ids.indexOf(selectedWidgetId), 0),
                 pageCount = { ids.size }

@@ -119,9 +119,11 @@ actual class FlashcardWidgetProvider actual constructor()
         }
     }
 
+    actual suspend fun getWidgetIds(): List<Int> = Companion.getWidgetIds().asList()
+
     actual fun updateAllFlashCardWidgets() {
         val context = contextProvider.invoke()
-        val widgetIds = getWidgetIds()
+        val widgetIds = Companion.getWidgetIds()
         onUpdate(context,
             AppWidgetManager.getInstance(context),
             widgetIds)
@@ -159,7 +161,7 @@ actual class FlashcardWidgetProvider actual constructor()
                 getWidgetPreferences(widgetId).clear()
             }
 
-            getWidgetIds() // Update local value and listeners
+            Companion.getWidgetIds() // Update local value and listeners
         }
     }
 
@@ -174,20 +176,20 @@ actual class FlashcardWidgetProvider actual constructor()
             if (!isInitialized) init { context }
 
             when (intent!!.action) {
-                WidgetController.Companion.ACTION_CONFIGURE_LATEST -> {
-                    getWidgetController(getWidgetIds().last()).startActivityToConfigure()
+                WidgetController.ACTION_CONFIGURE_LATEST -> {
+                    getWidgetController(Companion.getWidgetIds().last()).startActivityToConfigure()
                     Logging.logAnalyticsEvent(Logging.ANALYTICS_EVENTS.WIGDET_ADD)
                 }
 
                 AppWidgetManager.ACTION_APPWIDGET_CONFIGURE -> {
-                    getWidgetController(getWidgetIds().last()).startActivityToConfigure()
+                    getWidgetController(Companion.getWidgetIds().last()).startActivityToConfigure()
                 }
 
-                WidgetController.Companion.ACTION_SPEAK -> {
+                WidgetController.ACTION_SPEAK -> {
                     getWidgetController(widgetId).speakWord()
                 }
 
-                WidgetController.Companion.ACTION_DICTIONARY -> {
+                WidgetController.ACTION_DICTIONARY -> {
                     getWidgetController(widgetId).openDictionary()
                 }
 
@@ -196,7 +198,7 @@ actual class FlashcardWidgetProvider actual constructor()
 
                     var widgetIds = IntArray(1)
                     if (widgetId == -1) {
-                        widgetIds = getWidgetIds()
+                        widgetIds = Companion.getWidgetIds()
 
                         Logging.logAnalyticsEvent(Logging.ANALYTICS_EVENTS.AUTO_WORD_CHANGE)
                     } else {
@@ -238,7 +240,7 @@ actual class FlashcardWidgetProvider actual constructor()
         preventUnnecessaryAppWidgetUpdates(context)
 
         val appMgr = AppWidgetManager.getInstance(context)
-        onUpdate(context, appMgr, getWidgetIds())
+        onUpdate(context, appMgr, Companion.getWidgetIds())
     }
 
     override fun onDisabled(context: Context) {
@@ -246,7 +248,7 @@ actual class FlashcardWidgetProvider actual constructor()
         // Enter relevant functionality for when the last widget is disabled
         super.onDisabled(context)
 
-        WorkManager.Companion.getInstance(context).cancelUniqueWork("always_pending_work")
+        WorkManager.getInstance(context).cancelUniqueWork("always_pending_work")
     }
 
     override fun onRestored(context: Context?, oldWidgetIds: IntArray?, newWidgetIds: IntArray?) {
@@ -267,7 +269,7 @@ actual class FlashcardWidgetProvider actual constructor()
      * Read more at: https://www.reddit.com/r/android_devs/comments/llq2mw/question_why_should_it_be_expected_that/
      */
     private fun preventUnnecessaryAppWidgetUpdates(context: Context): Boolean {
-        val workInfos = WorkManager.Companion.getInstance(context).getWorkInfosByTag("always_pending_work")
+        val workInfos = WorkManager.getInstance(context).getWorkInfosByTag("always_pending_work")
         if (workInfos.get().size > 0) return false
 
         val alwaysPendingWork = OneTimeWorkRequestBuilder<DummyWorker>()
@@ -275,7 +277,7 @@ actual class FlashcardWidgetProvider actual constructor()
             .addTag("always_pending_work")
             .build()
 
-        WorkManager.Companion.getInstance(context).enqueueUniqueWork(
+        WorkManager.getInstance(context).enqueueUniqueWork(
             "always_pending_work",
             ExistingWorkPolicy.KEEP,
             alwaysPendingWork

@@ -144,6 +144,10 @@ actual object ExpectedUtils {
 		val settingsUrl = NSURL(string = UIApplicationOpenSettingsURLString )
 		UIApplication.sharedApplication.openURL(settingsUrl)
 	}
+
+    internal actual fun attemptAddDesktopWidget(): Boolean {
+        return false
+    }
 }
 
 fun NSRange.toKmpIntRange(string: String): IntRange? {

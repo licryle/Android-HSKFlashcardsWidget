@@ -87,6 +87,7 @@ object Utils {
 
     fun getAppDataPath(): PlatformFile = ExpectedUtils.getAppDataPath()
     fun getAppDatabasePath(): PlatformFile = ExpectedUtils.getAppDatabasePath()
+    fun attemptAddDesktopWidget(): Boolean = ExpectedUtils.attemptAddDesktopWidget()
 }
 
 expect object ExpectedUtils {
@@ -106,6 +107,8 @@ expect object ExpectedUtils {
     internal fun playWordInBackground(word: String)
 
     internal fun openAppForSearchQuery(query: SearchQuery)
+
+    internal fun attemptAddDesktopWidget(): Boolean
 }
 
 fun String.capitalize() =
