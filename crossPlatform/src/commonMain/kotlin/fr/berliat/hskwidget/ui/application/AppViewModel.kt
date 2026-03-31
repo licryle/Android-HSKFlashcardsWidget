@@ -119,7 +119,7 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
             }
         }
 
-        if (appConfig.appVersionCode.value in 1..<47 && Utils.getAppVersion() >= 47) {
+        if (appConfig.appVersionCode.value < 47 && Utils.getAppVersion() >= 47) {
             HSKAppServices.snackbar.show(SnackbarType.INFO, Res.string.database_update_list_system)
 
             viewModelScope.launch(AppDispatchers.IO) {
@@ -128,7 +128,7 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
             }
         }
 
-        if (appConfig.appVersionCode.value in 1..<48 && Utils.getAppVersion() >= 48) {
+        if (appConfig.appVersionCode.value < 48 && Utils.getAppVersion() >= 48) {
             viewModelScope.launch(AppDispatchers.IO) {
                 // Migrate datastore files folders
                 val oldAppPrefFile = FileKit.filesDir.resolve("app.preferences_pb")
