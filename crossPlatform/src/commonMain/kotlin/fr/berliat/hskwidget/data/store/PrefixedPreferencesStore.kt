@@ -22,6 +22,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.first
 
 import okio.Path.Companion.toPath
 
@@ -30,7 +31,7 @@ open class PrefixedPreferencesStore internal constructor(
     private val prefix: String,
     private val scope: CoroutineScope? = null
 ) {
-    private val registeredPreferences = mutableMapOf<String, PreferenceState<*, *>>()
+    internal val registeredPreferences = mutableMapOf<String, PreferenceState<*, *>>()
 
     companion object {
         private val mutex = Mutex()
@@ -71,6 +72,20 @@ open class PrefixedPreferencesStore internal constructor(
                 }
             }
         }
+
+        /**
+         * Copies all preferences from one DataStore to another.
+         * Useful for full migrations when keys are unknown or dynamic (like widgets).
+         */
+        suspend fun copyAll(source: DataStore<Preferences>, target: DataStore<Preferences>) {
+            val sourceData = source.data.first()
+            target.edit { prefs ->
+                sourceData.asMap().forEach { (key, value) ->
+                    @Suppress("UNCHECKED_CAST")
+                    prefs[key as Preferences.Key<Any>] = value
+                }
+            }
+        }
     }
 
     /**
@@ -84,6 +99,32 @@ open class PrefixedPreferencesStore internal constructor(
         store.edit { prefs ->
             registeredPreferences.values.forEach { state ->
                 prefs.remove(state.key)
+            }
+        }
+    }
+
+    /**
+     * Overwrites the values of this store with the values from another store.
+     * 
+     * It maps registered preferences by their short names (without prefix).
+     */
+    suspend fun overwriteWith(other: PrefixedPreferencesStore) {
+        // Ensure both are loaded
+        this.ensureAllLoaded()
+        other.ensureAllLoaded()
+
+        registeredPreferences.forEach { (keyName, state) ->
+            // Extract short name by removing our prefix
+            val shortName = if (prefix.isEmpty()) keyName else keyName.removePrefix("${prefix}_")
+            
+            // Find corresponding state in other store
+            val otherKeyName = other.prefixKey(shortName)
+            val otherState = other.registeredPreferences[otherKeyName]
+
+            if (otherState != null) {
+                // We use dynamic dispatch via a helper in PreferenceState to bypass type safety 
+                // since we're dealing with generic PreferenceState<*, *>
+                state.overwriteWith(otherState)
             }
         }
     }

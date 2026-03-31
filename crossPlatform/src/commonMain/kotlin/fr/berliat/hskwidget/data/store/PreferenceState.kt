@@ -64,6 +64,15 @@ class PreferenceState<S, T>(
         }
     }
 
+    /**
+     * Internal helper to overwrite this state's value with another state's value
+     * without knowing the specific type T at compile time.
+     */
+    @Suppress("UNCHECKED_CAST")
+    internal fun overwriteWith(other: PreferenceState<*, *>) {
+        this.value = other.value as T
+    }
+
     var value: T
         get() = _flow.value
         set(v) {

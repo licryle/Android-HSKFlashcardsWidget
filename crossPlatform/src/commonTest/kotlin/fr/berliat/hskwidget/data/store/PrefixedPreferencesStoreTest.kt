@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.yield
 import kotlin.test.*
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -131,5 +132,113 @@ class PrefixedPreferencesStoreTest {
         // After loading, values should be updated from DataStore
         assertEquals("value1", pref1.value)
         assertEquals("value2", pref2.value)
+    }
+
+    @Test
+    fun testOverwriteWith() = runTest {
+        val otherDataStore = FakeDataStore()
+        val currentStore = PrefixedPreferencesStore.getInstance(fakeDataStore, "live", backgroundScope)
+        val otherStore = PrefixedPreferencesStore.getInstance(otherDataStore, "backup", backgroundScope)
+
+        val pref1 = currentStore.registerStringPref("pref1", "default1")
+        val pref2 = currentStore.registerIntPref("pref2", 0)
+
+        val otherPref1 = otherStore.registerStringPref("pref1", "other1")
+        val otherPref2 = otherStore.registerIntPref("pref2", 100)
+
+        // Set values in "other" store
+        otherPref1.value = "newValue1"
+        otherPref2.value = 42
+
+        // Overwrite
+        currentStore.overwriteWith(otherStore)
+
+        assertEquals("newValue1", pref1.value, "String pref should be overwritten")
+        assertEquals(42, pref2.value, "Int pref should be overwritten")
+    }
+
+    @Test
+    fun testOverwriteWithDifferentPrefixes() = runTest {
+        val otherDataStore = FakeDataStore()
+        // Source has a prefix, Target has NO prefix
+        val targetStore = PrefixedPreferencesStore.getInstance(fakeDataStore, "", backgroundScope)
+        val sourceStore = PrefixedPreferencesStore.getInstance(otherDataStore, "old_prefix", backgroundScope)
+
+        val targetPref = targetStore.registerStringPref("my_key", "target_default")
+        val sourcePref = sourceStore.registerStringPref("my_key", "source_default")
+
+        sourcePref.value = "migrated_value"
+
+        targetStore.overwriteWith(sourceStore)
+
+        assertEquals("migrated_value", targetPref.value, "Value should migrate correctly regardless of prefixes")
+    }
+
+    @Test
+    fun testCopyAll() = runTest {
+        val sourceDataStore = FakeDataStore()
+        val targetDataStore = FakeDataStore()
+
+        val key1 = stringPreferencesKey("widget_1_word")
+        val key2 = stringPreferencesKey("widget_2_word")
+
+        sourceDataStore.edit {
+            it[key1] = "Hello"
+            it[key2] = "World"
+        }
+
+        PrefixedPreferencesStore.copyAll(sourceDataStore, targetDataStore)
+
+        val targetPrefs = targetDataStore.data.first()
+        assertEquals("Hello", targetPrefs[key1])
+        assertEquals("World", targetPrefs[key2])
+    }
+
+    @Test
+    fun testCopyAllTriggersReflow() = runTest {
+        val sourceDataStore = FakeDataStore()
+        val targetDataStore = FakeDataStore()
+        
+        // 1. Setup a live preference store observing the target DataStore
+        val store = PrefixedPreferencesStore.getInstance(targetDataStore, "widget_1", backgroundScope)
+        val pref = store.registerStringPref("word", "initial")
+        store.ensureAllLoaded()
+        
+        assertEquals("initial", pref.value)
+
+        // 2. Prepare data in source DataStore
+        sourceDataStore.edit {
+            it[stringPreferencesKey("widget_1_word")] = "migrated"
+        }
+
+        // 3. Perform copyAll
+        PrefixedPreferencesStore.copyAll(sourceDataStore, targetDataStore)
+        
+        // Yield to allow background collection coroutines to process the DataStore change
+        yield()
+
+        // 4. Verify the PreferenceState reflowed automatically
+        assertEquals("migrated", pref.value, "PreferenceState should have automatically updated via reflow")
+    }
+
+    @Test
+    fun testOverwriteWithTriggersReflow() = runTest {
+        val otherDataStore = FakeDataStore()
+        val currentStore = PrefixedPreferencesStore.getInstance(fakeDataStore, "live", backgroundScope)
+        val otherStore = PrefixedPreferencesStore.getInstance(otherDataStore, "backup", backgroundScope)
+
+        val pref = currentStore.registerStringPref("my_key", "initial")
+        currentStore.ensureAllLoaded()
+
+        val otherPref = otherStore.registerStringPref("my_key", "other")
+        otherPref.value = "migrated"
+
+        // Overwrite
+        currentStore.overwriteWith(otherStore)
+        
+        // Yield to allow background collection coroutines to process the DataStore change
+        yield()
+
+        assertEquals("migrated", pref.value, "PreferenceState should have automatically reflowed after overwriteWith")
     }
 }

@@ -77,4 +77,27 @@ class PreferenceStateTest {
 
         assertEquals(42, fakeDataStore.latestPreferences[intKey])
     }
+
+    @Test
+    fun testOverwriteWith() = runTest(UnconfinedTestDispatcher()) {
+        val targetState = PreferenceState(fakeDataStore, testKey, "initial", coroutineScope = backgroundScope)
+        
+        val otherDataStore = FakeDataStore()
+        val otherKey = stringPreferencesKey("other_key")
+        val sourceState = PreferenceState(otherDataStore, otherKey, "migrated", coroutineScope = backgroundScope)
+        
+        targetState.ensureLoaded()
+        sourceState.ensureLoaded()
+        
+        assertEquals("initial", targetState.value)
+        
+        // Execute the overwrite
+        targetState.overwriteWith(sourceState)
+        
+        assertEquals("migrated", targetState.value, "Target state should now hold the value from source state")
+        
+        // Ensure it also persisted to target store
+        advanceUntilIdle()
+        assertEquals("migrated", fakeDataStore.latestPreferences[testKey])
+    }
 }
