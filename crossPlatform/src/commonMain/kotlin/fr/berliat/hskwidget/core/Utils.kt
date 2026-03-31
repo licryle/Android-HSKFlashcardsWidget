@@ -11,8 +11,9 @@ import fr.berliat.hskwidget.data.repo.ChineseWordFrequencyRepo
 import fr.berliat.hskwidget.domain.SearchQuery
 import fr.berliat.hskwidget.speech_failure_toast_muted
 
-import kotlinx.coroutines.CoroutineScope
+import io.github.vinceglb.filekit.PlatformFile
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
@@ -83,9 +84,15 @@ object Utils {
             .map { allowedChars.random() }
             .joinToString("")
     }
+
+    fun getAppDataPath(): PlatformFile = ExpectedUtils.getAppDataPath()
+    fun getAppDatabasePath(): PlatformFile = ExpectedUtils.getAppDatabasePath()
 }
 
 expect object ExpectedUtils {
+    internal fun getAppDataPath(): PlatformFile
+    internal fun getAppDatabasePath(): PlatformFile
+
     internal fun openLink(url: String)
     internal fun sendEmail(email: String, subject: String = "", body: String = "") : Boolean
 

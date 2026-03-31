@@ -4,6 +4,10 @@ import fr.berliat.hsktextviews.HSKTextSegmenter
 import fr.berliat.hsktextviews.HSKTextSegmenterListener
 import fr.berliat.hskwidget.data.dao.AnkiDAO
 import fr.berliat.hskwidget.domain.SearchQuery
+import io.github.vinceglb.filekit.PlatformFile
+import io.github.vinceglb.filekit.FileKit
+import io.github.vinceglb.filekit.databasesDir
+import io.github.vinceglb.filekit.filesDir
 
 import kotlinx.coroutines.withContext
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -18,6 +22,7 @@ import platform.Foundation.NSURL
 import platform.Foundation.NSMakeRange
 import platform.Foundation.NSNotFound
 import platform.Foundation.NSRange
+import platform.Foundation.NSFileManager
 
 import platform.NaturalLanguage.NLTokenUnit
 import platform.NaturalLanguage.*
@@ -28,6 +33,20 @@ import platform.UIKit.UIPasteboard
 
 actual object ExpectedUtils {
 	val TTSynthesizer = AVSpeechSynthesizer()
+
+    internal actual fun getAppDataPath(): PlatformFile {
+        val path = NSFileManager.defaultManager
+            .containerURLForSecurityApplicationGroupIdentifier("group.fr.berliat.hskwidget")?.path
+        
+        return path?.let { PlatformFile(it) } ?: FileKit.filesDir
+    }
+
+    internal actual fun getAppDatabasePath(): PlatformFile {
+        val path = NSFileManager.defaultManager
+            .containerURLForSecurityApplicationGroupIdentifier("group.fr.berliat.hskwidget")?.path
+
+        return path?.let { PlatformFile(it) } ?: FileKit.databasesDir
+    }
 
     internal actual fun openLink(url: String) {
         val nsUrl = NSURL.URLWithString(url) ?: return
@@ -56,7 +75,7 @@ actual object ExpectedUtils {
 
             val tokens = mutableListOf<String>()
 
-            tokenizer.enumerateTokensInRange(NSMakeRange(0u, text.length.toULong())) { tokenRange, _, stop ->
+            tokenizer.enumerateTokensInRange(NSMakeRange(0u, text.length.toULong())) { tokenRange, _, _ ->
                 val swiftRange = tokenRange.useContents {
                     // Inside this block, 'this' refers to the actual NSRange struct,
                     // which has 'location' and 'length' properties.
@@ -118,7 +137,7 @@ actual object ExpectedUtils {
     }
 
     internal actual fun openAppForSearchQuery(query: SearchQuery) {
-
+        // Todo: implement
     }
 
 	internal fun openSettings() {

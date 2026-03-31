@@ -5,6 +5,7 @@ import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 
 import co.touchlab.kermit.Logger
 
+import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.core.AppDispatchers
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 
@@ -13,7 +14,6 @@ import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.absolutePath
 import io.github.vinceglb.filekit.cacheDir
 import io.github.vinceglb.filekit.copyTo
-import io.github.vinceglb.filekit.databasesDir
 import io.github.vinceglb.filekit.delete
 import io.github.vinceglb.filekit.div
 import io.github.vinceglb.filekit.exists
@@ -43,7 +43,7 @@ class DatabaseHelper private constructor() {
         const val DATABASE_ASSET_PATH = "databases/$DATABASE_FILENAME"
         private const val TAG = "ChineseWordsDatabase"
 
-        fun getDatabaseLiveDir() = FileKit.databasesDir
+        fun getDatabaseLiveDir() = Utils.getAppDatabasePath()
         fun getDatabaseLiveFile() = getDatabaseLiveDir() / DATABASE_FILENAME
 
         suspend fun getInstance(): DatabaseHelper = withContext(AppDispatchers.IO) {

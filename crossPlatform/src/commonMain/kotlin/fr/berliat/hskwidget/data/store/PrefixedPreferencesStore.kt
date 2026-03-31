@@ -11,10 +11,8 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 
-import io.github.vinceglb.filekit.FileKit
+import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.absolutePath
-import io.github.vinceglb.filekit.filesDir
-import io.github.vinceglb.filekit.resolve
 
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -54,13 +52,13 @@ open class PrefixedPreferencesStore internal constructor(
 
         private val dataStoreMutex = Mutex()
         internal val dataStoreInstances = mutableMapOf<String, DataStore<Preferences>>()
-        suspend fun getDataStore(file: String): DataStore<Preferences> {
-			val fileAbsPath = FileKit.filesDir.resolve(file).absolutePath()
-				.removePrefix("file://")
-                .removePrefix("file:/")
-                .removePrefix("file:")
-				.removePrefix("/")
-				.removePrefix("//")
+        suspend fun getDataStore(file: PlatformFile): DataStore<Preferences> {
+			val fileAbsPath = file.absolutePath().
+				removePrefix("file://").
+                removePrefix("file:/").
+                removePrefix("file:").
+				removePrefix("/").
+				removePrefix("//")
 
             dataStoreInstances[fileAbsPath]?.let { return it }
 

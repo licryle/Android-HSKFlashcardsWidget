@@ -15,6 +15,7 @@ import fr.berliat.hskwidget.core.AppDispatchers
 import fr.berliat.hskwidget.core.HSKAppServicesPriority
 import fr.berliat.hskwidget.core.Logging
 import fr.berliat.hskwidget.core.SnackbarType
+import fr.berliat.hskwidget.data.store.PrefixedPreferencesStore
 import fr.berliat.hskwidget.database_update_failure
 import fr.berliat.hskwidget.database_update_list_system
 import fr.berliat.hskwidget.database_update_start
@@ -23,10 +24,16 @@ import fr.berliat.hskwidget.dbbackup_failure_folderpermission
 import fr.berliat.hskwidget.dbbackup_failure_write
 import fr.berliat.hskwidget.dbbackup_success
 import fr.berliat.hskwidget.ui.navigation.NavigationManager
+import io.github.vinceglb.filekit.FileKit
 
 import io.github.vinceglb.filekit.PlatformFile
+import io.github.vinceglb.filekit.delete
+import io.github.vinceglb.filekit.div
+import io.github.vinceglb.filekit.exists
+import io.github.vinceglb.filekit.filesDir
 import io.github.vinceglb.filekit.fromBookmarkData
 import io.github.vinceglb.filekit.path
+import io.github.vinceglb.filekit.resolve
 import kotlinx.coroutines.flow.MutableStateFlow
 
 import kotlinx.coroutines.flow.StateFlow
@@ -118,6 +125,34 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
             viewModelScope.launch(AppDispatchers.IO) {
                 HSKAppServices.wordListRepo.buildListSystemAnnotated()
                 HSKAppServices.wordListRepo.buildListSystemExam()
+            }
+        }
+
+        if (appConfig.appVersionCode.value in 1..<48 && Utils.getAppVersion() >= 48) {
+            viewModelScope.launch(AppDispatchers.IO) {
+                // Migrate datastore files folders
+                val oldAppPrefFile = FileKit.filesDir.resolve("app.preferences_pb")
+                if (oldAppPrefFile.exists()) {
+                    val oldDataStore = PrefixedPreferencesStore.getDataStore(oldAppPrefFile)
+                    // We create a temporary store instance with the old DataStore
+                    val oldStore = AppPreferencesStore.getInstance(oldDataStore)
+
+                    // Overwrite our current live config with the old values
+                    appConfig.overwriteWith(oldStore)
+
+                    oldAppPrefFile.delete() 
+                }
+
+                val oldWidgetPrefFile = FileKit.filesDir.resolve("widgets.preferences_pb")
+                if (oldWidgetPrefFile.exists()) {
+                    val oldDataStore = PrefixedPreferencesStore.getDataStore(oldWidgetPrefFile)
+                    val targetDataStore = PrefixedPreferencesStore.getDataStore(Utils.getAppDatabasePath() / "widgets.preferences_pb")
+
+                    // Full copy of the DataStore content (to catch all widget IDs)
+                    PrefixedPreferencesStore.copyAll(oldDataStore, targetDataStore)
+
+                    oldWidgetPrefFile.delete()
+                }
             }
         }
 

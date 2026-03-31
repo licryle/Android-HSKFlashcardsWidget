@@ -4,6 +4,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
+import fr.berliat.hskwidget.domain.DatabaseHelper.Companion.getDatabaseLiveDir
 
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.path
@@ -26,14 +27,8 @@ actual suspend fun copyDatabaseAssetFile() {
         requireNotNull(databasePathInBundle) { "Database asset file not found in bundle: ${DatabaseHelper.DATABASE_FILENAME}" }
 
         // 2. Define the destination path (typically the 'Documents' directory for persistent storage)
-        val documentsPath = NSSearchPathForDirectoriesInDomains(
-            NSDocumentDirectory,
-            NSUserDomainMask,
-            true
-        ).first() as NSString
-
-		val destinationDir = documentsPath.stringByAppendingPathComponent("databases") // Assuming FileKit.databasesDir points to a subdirectory
-        val destinationPath = NSString.create(destinationDir).stringByAppendingPathComponent(DatabaseHelper.DATABASE_FILENAME)
+		val destinationDir = getDatabaseLiveDir()
+        val destinationPath = NSString.create(string = destinationDir.path).stringByAppendingPathComponent(DatabaseHelper.DATABASE_FILENAME)
 
         // Create destination directory if it doesn't exist (simulating FileKit.databasesDir.createDirectories())
         // Note: You may need to adapt 'FileKit.databasesDir' to its actual iOS representation.
@@ -42,13 +37,13 @@ actual suspend fun copyDatabaseAssetFile() {
         // If you need the equivalent of FileKit.databasesDir.createDirectories():
         try {
             fileManager.createDirectoryAtPath(
-                path = destinationDir,
+                path = destinationDir.path,
                 withIntermediateDirectories = true,
                 attributes = null,
                 error = null // Kotlin/Native often uses `error: NSErrorPointer?` which can be cumbersome; simplified for this example
             )
         } catch (e: Exception) {
-            println("Could not create directory at $destinationDir: $e")
+            println("Could not create directory at ${destinationDir.path}: $e")
         }
 
 		NSLog("INFO: copyDatabaseAssetFile $destinationPath")

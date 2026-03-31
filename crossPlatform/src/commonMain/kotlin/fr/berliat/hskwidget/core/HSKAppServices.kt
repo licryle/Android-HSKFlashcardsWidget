@@ -17,6 +17,8 @@ import fr.berliat.hskwidget.domain.HSKAnkiDelegate
 import fr.berliat.hskwidget.domain.KAnkiDelegator
 import fr.berliat.hskwidget.domain.KAnkiServiceDelegator
 
+import io.github.vinceglb.filekit.div
+
 sealed class HSKAppServicesPriority(priority: UInt): AppServices.Priority(priority) {
     constructor(prio : AppServices.Priority) : this(prio.priority)
 
@@ -66,12 +68,12 @@ object HSKAppServices : AppServices() {
         register("snackbar", HSKAppServicesPriority.Widget) { SnackbarManager }
         register("database", HSKAppServicesPriority.Widget) { DatabaseHelper.getInstance().liveDatabase }
         register("appPreferences", HSKAppServicesPriority.Widget) {
-            AppPreferencesStore.getInstance(PrefixedPreferencesStore.getDataStore("app.preferences_pb"))
+            AppPreferencesStore.getInstance(PrefixedPreferencesStore.getDataStore(Utils.getAppDatabasePath() / "app.preferences_pb"))
         }
 
         register("widgetsPreferencesProvider", HSKAppServicesPriority.Widget) {
             val provider : WidgetPreferencesStoreProvider = { widgetId: Int ->
-                val widgetDataStore = PrefixedPreferencesStore.getDataStore("widgets.preferences_pb")
+                val widgetDataStore = PrefixedPreferencesStore.getDataStore(Utils.getAppDatabasePath() / "widgets.preferences_pb")
                 WidgetPreferencesStore.getInstance(widgetDataStore, widgetId)
             }
             provider

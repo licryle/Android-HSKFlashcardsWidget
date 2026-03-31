@@ -27,6 +27,10 @@ import fr.berliat.hskwidget.fix_it
 import fr.berliat.hskwidget.speech_failure_toast_chinese_unsupported
 import fr.berliat.hskwidget.speech_failure_toast_init
 import fr.berliat.hskwidget.speech_failure_toast_unknown
+import io.github.vinceglb.filekit.FileKit
+import io.github.vinceglb.filekit.PlatformFile
+import io.github.vinceglb.filekit.databasesDir
+import io.github.vinceglb.filekit.filesDir
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -54,6 +58,9 @@ actual object ExpectedUtils {
     fun init(context: Context) {
         _context = context
     }
+
+    internal actual fun getAppDataPath(): PlatformFile = FileKit.filesDir
+    internal actual fun getAppDatabasePath(): PlatformFile = FileKit.databasesDir
 
     internal actual fun openLink(url: String) {
         val intent = Intent(
