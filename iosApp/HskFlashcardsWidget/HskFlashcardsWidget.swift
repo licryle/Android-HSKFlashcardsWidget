@@ -8,6 +8,7 @@ struct HskEntry: TimelineEntry {
     let pinyin: String
     let definition: String
     let level: String
+    let isPlaceholder: Bool
 }
 
 struct Provider: AppIntentTimelineProvider {
@@ -25,26 +26,29 @@ struct Provider: AppIntentTimelineProvider {
         if isReady == true {
             let selectedListIds = configuration.selectedLists?.map { KotlinLong(value: Int64($0.id)) } ?? []
 
-            // Use the DAO directly to pick a random word from the selected lists
-            let word = try? await services.database.annotatedChineseWordDAO().getRandomWordFromLists(
-                listIds: selectedListIds, 
-                bannedWords: KotlinArray(size: 0, init: { _ in "" as NSString })
-            )
-
-            if let word = word {
-                let pinyinList = word.pinyins as! [crossPlatform.Pinyin]
-                let pinyinStr = pinyinList.map { $0.syllable }.joined(separator: " ")
-                let definitionMap = word.word?.definition ?? [:]
-                let definition = (definitionMap[crossPlatform.Locale.english] as? String) ?? (word.annotation?.notes as? String) ?? ""
-                let levelStr = word.hskLevel.name
-                
-                return HskEntry(
-                    date: Date(),
-                    word: word.simplified,
-                    pinyin: pinyinStr,
-                    definition: definition,
-                    level: levelStr
+            if !selectedListIds.isEmpty {
+                // Use the DAO directly to pick a random word from the selected lists
+                let word = try? await services.database.annotatedChineseWordDAO().getRandomWordFromLists(
+                    listIds: selectedListIds, 
+                    bannedWords: KotlinArray(size: 0, init: { _ in "" as NSString })
                 )
+
+                if let word = word {
+                    let pinyinList = word.pinyins as! [crossPlatform.Pinyin]
+                    let pinyinStr = pinyinList.map { $0.syllable }.joined(separator: " ")
+                    let definitionMap = word.word?.definition ?? [:]
+                    let definition = (definitionMap[crossPlatform.Locale.english] as? String) ?? (word.annotation?.notes as? String) ?? ""
+                    let levelStr = word.hskLevel.name
+                    
+                    return HskEntry(
+                        date: Date(),
+                        word: word.simplified,
+                        pinyin: pinyinStr,
+                        definition: definition,
+                        level: levelStr,
+                        isPlaceholder: false
+                    )
+                }
             }
         }
 
@@ -53,7 +57,8 @@ struct Provider: AppIntentTimelineProvider {
             word: resources.placeholderWord,
             pinyin: resources.placeholderPinyin,
             definition: resources.placeholderDefinition,
-            level: resources.placeholderLevel
+            level: resources.placeholderLevel,
+            isPlaceholder: true
         )
     }
 
@@ -63,7 +68,8 @@ struct Provider: AppIntentTimelineProvider {
             word: resources.placeholderWord,
             pinyin: resources.placeholderPinyin,
             definition: resources.placeholderDefinition,
-            level: resources.placeholderLevel
+            level: resources.placeholderLevel,
+            isPlaceholder: true
         )
     }
 

@@ -13,7 +13,7 @@ object CachedResources {
         private set
     var widgetSpeakWord: String = "Speak Word"
         private set
-    var widgetNotConfigured: String = "No word.\nConfigure list(s)"
+    var widgetNotConfigured: String = "No word. Configure list(s)"
         private set
     var placeholderWord: String = "你好"
         private set
