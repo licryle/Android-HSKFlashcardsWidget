@@ -27,8 +27,7 @@ propsFile.writeText(propsFile.readText().lines()
     .joinToString("\n") + "\n")
 
 // Append/update versions (idempotent)
-propsFile.appendText("""
-kotlin.native.cocoapods.appVersionName=$appVersionName
+propsFile.appendText("""kotlin.native.cocoapods.appVersionName=$appVersionName
 kotlin.native.cocoapods.appVersionCode=$appVersionCode
 """)
 
