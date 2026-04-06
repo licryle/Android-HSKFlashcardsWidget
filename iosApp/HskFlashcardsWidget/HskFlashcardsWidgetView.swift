@@ -12,7 +12,7 @@ struct HskFlashcardsWidgetView: View {
         VStack(spacing: 4) {
             // Top Row: Reload - Level - Speak
             HStack {
-                Button(intent: NextWordIntent(widgetId: entry.widgetId)) {
+                Button(intent: NextWordIntent()) {
                     Image(systemName: "arrow.clockwise")
                         .font(.system(size: 12))
                         .frame(width: 24, height: 24)
@@ -60,13 +60,11 @@ struct HskFlashcardsWidgetView: View {
                         .minimumScaleFactor(0.5)
                         .lineLimit(1)
 
-                    if family != .systemSmall {
-                        Text(entry.definition)
-                            .font(.system(size: 13))
-                            .lineLimit(2)
-                            .multilineTextAlignment(.center)
-                            .foregroundColor(.primary.opacity(0.8))
-                    }
+                    Text(entry.definition)
+                        .font(.system(size: 13))
+                        .lineLimit(2)
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(.primary.opacity(0.8))
                     
                     Spacer(minLength: 0)
                 }
@@ -81,50 +79,11 @@ struct HskFlashcardsWidgetView: View {
 struct NextWordIntent: AppIntent {
     static var title: LocalizedStringResource = "Next Word"
     
-    @Parameter(title: "Widget ID")
-    var widgetId: Int
-
-    init() { self.widgetId = 0 }
-    init(widgetId: Int) { self.widgetId = widgetId }
+    init() {}
 
     func perform() async throws -> some IntentResult {
-        NSLog("NextWordIntent: Started")
-        // Initialize App Group path for KMP (needed since AppIntent runs in background)
-        let services = crossPlatform.HSKAppServices.shared
-        services.doInit(upToLevel: crossPlatform.HSKAppServicesPriority.Widget.shared)
-
-        // Wait for initialization to complete
-        for _ in 1...50 {
-            if services.status.value is crossPlatform.AppServices.StatusReady {
-                break
-            }
-            try await Task.sleep(nanoseconds: 100_000_000) // 100ms
-        }
-
-        guard services.status.value is crossPlatform.AppServices.StatusReady else {
-            NSLog("NextWordIntent: KMP Init Timeout")
-            return .result()
-        }
-
-        // 1. Correct labels: 'listIds' and 'bannedWords'
-        // 2. Correct types: Kotlin List<Long> maps to [KotlinLong], Array<String> maps to KotlinArray
-        let listIds = [0, 1, 2, 3, 4, 5, 6, 7].map { KotlinLong(value: Int64($0)) }
-        let bannedWords = KotlinArray<NSString>(size: 0) { _ in "" }
-
-        let word = try await services.database.annotatedChineseWordDAO().getRandomWordFromLists(
-            listIds: listIds,
-            bannedWords: bannedWords
-        )
-
-        // Save the new word to the widget's store so it displays on refresh
-        if let simplified = word?.simplified {
-            let _ = try await services.widgetsPreferencesProvider.invoke(p1: Int32(widgetId))
-            NSLog("New word found: \(simplified)")
-        }
-
         // Trigger the iOS Widget reload
         WidgetCenter.shared.reloadAllTimelines()
-
         return .result()
     }
 }
@@ -144,14 +103,12 @@ struct SpeakWordIntent: AppIntent {
         services.doInit(upToLevel: crossPlatform.HSKAppServicesPriority.Widget.shared)
         
         // Wait for initialization
-        for _ in 1...50 {
-            if services.status.value is crossPlatform.AppServices.StatusReady {
-                break
-            }
-            try await Task.sleep(nanoseconds: 100_000_000)
+        let isReady = try? await services.awaitReady(timeoutMs: 5000)
+
+        if isReady == true {
+            crossPlatform.Utils.shared.playWordInBackground(word: word)
         }
 
-        crossPlatform.Utils.shared.playWordInBackground(word: word)
         return .result()
     }
 }

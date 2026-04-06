@@ -1,5 +1,8 @@
 package fr.berliat.hskwidget.domain
 
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
+
 /**
  * Interface to allow shared code to interact with native platform widget systems.
  */
@@ -14,6 +17,16 @@ interface WidgetPlatformDelegate {
      */
     fun getWidgetIds(callback: (List<Int>) -> Unit)
 }
+
+/**
+ * Suspendable version of [WidgetPlatformDelegate.getWidgetIds].
+ */
+suspend fun WidgetPlatformDelegate.awaitWidgetIds(): List<Int> =
+    suspendCancellableCoroutine { continuation ->
+        getWidgetIds { ids ->
+            continuation.resume(ids)
+        }
+    }
 
 /**
  * Singleton registry for the [WidgetPlatformDelegate].

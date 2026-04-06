@@ -25,6 +25,12 @@ object CachedResources {
         private set
     var placeholderLanguage: String = "en"
         private set
+    var widgetConfigTitle: String = "Configure Widget"
+        private set
+    var widgetConfigDescription: String = "Vocabulary list to include:"
+        private set
+    var widgetConfigSelectedLists: String = "Selected Lists"
+        private set
 
     suspend fun load(): CachedResources = CachedResources.apply {
         appName = getString(Res.string.app_name)
@@ -37,5 +43,8 @@ object CachedResources {
         placeholderDefinition = getString(Res.string.widget_placeholder_definition)
         placeholderLevel = getString(Res.string.widget_placeholder_level)
         placeholderLanguage = getString(Res.string.widget_placeholder_language)
+        widgetConfigTitle = getString(Res.string.widget_configure)
+        widgetConfigDescription = getString(Res.string.widget_configure_wordlist_title)
+        widgetConfigSelectedLists = getString(Res.string.widget_config_selected_lists)
     }
 }

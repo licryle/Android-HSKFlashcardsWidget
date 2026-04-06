@@ -355,4 +355,9 @@ padding: 0;
 }
 
 .mobile .disabled {display: none;visibility: hidden;}</string>
+
+    <string name="widget_config_title">Widget Configuration</string>
+    <string name="widget_config_description">Select the lists to display in the widget.</string>
+    <string name="widget_config_selected_lists">Selected Lists</string>
+
 </resources>

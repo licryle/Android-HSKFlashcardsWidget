@@ -1,21 +1,14 @@
 package fr.berliat.hskwidget.ui.widget
 
 import fr.berliat.hskwidget.domain.WidgetProvider
-import kotlin.coroutines.suspendCoroutine
-import kotlin.coroutines.resume
+import fr.berliat.hskwidget.domain.awaitWidgetIds
 
 actual class FlashcardWidgetProvider actual constructor() {
-    actual fun updateAllFlashCardWidgets() {}
+    actual fun updateAllFlashCardWidgets() {
+        WidgetProvider.triggerReload()
+    }
 
-    actual suspend fun getWidgetIds(): List<Int> = suspendCoroutine { continuation ->
-        val delegate = WidgetProvider.delegate
-        if (delegate == null) {
-            continuation.resume(emptyList())
-            return@suspendCoroutine
-        }
-
-        delegate.getWidgetIds { ids ->
-            continuation.resume(ids)
-        }
+    actual suspend fun getWidgetIds(): List<Int> {
+        return WidgetProvider.delegate?.awaitWidgetIds() ?: emptyList()
     }
 }
