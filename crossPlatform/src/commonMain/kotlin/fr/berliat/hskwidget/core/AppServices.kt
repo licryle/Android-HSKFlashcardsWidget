@@ -5,7 +5,9 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.concurrent.Volatile
 
 open class AppServices {
@@ -98,6 +100,17 @@ open class AppServices {
                 _status.value = Status.Failed(t)
             }
         }
+    }
+
+    /**
+     * Suspend until the status is Ready, or timeout.
+     * @return true if status is Ready, false otherwise.
+     */
+    suspend fun awaitReady(timeoutMs: Long = 5000): Boolean {
+        return withTimeoutOrNull(timeoutMs) {
+            status.first { it is Status.Ready }
+            true
+        } ?: false
     }
 
     fun isRegistered(name: String): Boolean {
