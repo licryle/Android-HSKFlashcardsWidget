@@ -103,9 +103,11 @@ actual object ExpectedUtils {
 	internal fun ensureTTSSetup() {
 		val audioSession = AVAudioSession.sharedInstance()
 		try {
-			// Set category to .playback to bypass the silent switch
+			// Set category to .playback with options to allow background mixing.
+            // These options are critical for Widget/AppIntent audio to trigger.
 			audioSession.setCategory(
 				AVAudioSessionCategoryPlayback,
+				AVAudioSessionCategoryOptionDuckOthers or AVAudioSessionCategoryOptionMixWithOthers,
 				error = null
 			)
 			audioSession.setActive(true, error = null)
@@ -114,24 +116,58 @@ actual object ExpectedUtils {
 		}
 
 		// 2. Check for voices (Option 2)
-		val availableVoices = AVSpeechSynthesisVoice.speechVoices() as List<AVSpeechSynthesisVoice>
-		if (!availableVoices.any { it.language == "zh-CN" }) {
+        val voices = AVSpeechSynthesisVoice.speechVoices() as List<AVSpeechSynthesisVoice>
+        val voice = AVSpeechSynthesisVoice.voiceWithLanguage("zh-CN")
+            ?: AVSpeechSynthesisVoice.voiceWithLanguage("zh-Hans")
+            ?: voices.firstOrNull { it.language.startsWith("zh") }
+
+		if (voice == null) {
 			println("Error: No voices installed. Cannot speak.")
 			// ToDo add dialog
 			openSettings()
 		}
 	}
 
+	@OptIn(ExperimentalForeignApi::class)
     internal actual fun isMuted() : Boolean {
-		val vol = AVAudioSession.sharedInstance().outputVolume
-        return vol == 0.0F
+		val audioSession = AVAudioSession.sharedInstance()
+		if (audioSession.outputVolume > 0f) return false
+
+		// In background contexts like AppIntents/Widgets, outputVolume often returns 0
+		// until the session is active. We try to activate it briefly to get a real reading.
+		try {
+			audioSession.setCategory(AVAudioSessionCategoryPlayback, error = null)
+			audioSession.setActive(true, error = null)
+		} catch (_: Exception) {
+            return false
+        }
+
+		return audioSession.outputVolume == 0.0f
     }
 
     internal actual fun playWordInBackground(word: String) {
+        if (word.isBlank()) return
 		ensureTTSSetup()
+
+        // Interrupt any current speech to ensure the new word is played immediately
+        if (TTSynthesizer.isSpeaking()) {
+            TTSynthesizer.stopSpeakingAtBoundary(AVSpeechBoundary.AVSpeechBoundaryImmediate)
+        }
+
         val utterance = AVSpeechUtterance.speechUtteranceWithString(string = word)
 
-        utterance.voice = AVSpeechSynthesisVoice.voiceWithLanguage("zh-CN")
+        // Find a Chinese voice with fallbacks
+        val voices = AVSpeechSynthesisVoice.speechVoices() as List<AVSpeechSynthesisVoice>
+        val voice = AVSpeechSynthesisVoice.voiceWithLanguage("zh-CN")
+            ?: AVSpeechSynthesisVoice.voiceWithLanguage("zh-Hans")
+            ?: voices.firstOrNull { it.language.startsWith("zh") }
+
+        if (voice != null) {
+            utterance.voice = voice
+        }
+
+        utterance.rate = AVSpeechUtteranceDefaultSpeechRate
+        utterance.volume = 1.0f
 
 		TTSynthesizer.speakUtterance(utterance)
     }
