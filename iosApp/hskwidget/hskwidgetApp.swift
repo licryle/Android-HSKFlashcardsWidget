@@ -56,6 +56,25 @@ struct hskwidgetApp: App {
         WindowGroup {
             ComposeView()
                 .ignoresSafeArea(.all)
+                .onOpenURL { url in
+                    handleOpenURL(url)
+                }
+        }
+    }
+    
+    private func handleOpenURL(_ url: URL) {
+        var appIntent: crossPlatform.AppIntent? = nil
+        
+        if url.scheme == "hskwidget" && url.host == "search" {
+            if let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
+               let word = components.queryItems?.first(where: { $0.name == "q" })?.value {
+                // Convert iOS URL intent to KMP AppIntent
+                appIntent = crossPlatform.AppIntent.Search(query: word)
+            }
+        }
+
+        if let intent = appIntent {
+            crossPlatform.AppIntentBus.shared.emit(intent: intent)
         }
     }
 }

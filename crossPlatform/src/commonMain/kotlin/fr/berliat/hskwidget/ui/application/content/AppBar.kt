@@ -47,26 +47,32 @@ fun AppBar(
     onMenuClick: () -> Unit,
     viewModel: AppBarViewModel = remember { AppBarViewModel() }
 ) {
-    val searchQuery = viewModel.searchQuery.collectAsState()
-    var localText by remember { mutableStateOf(TextFieldValue(searchQuery.value.toString())) }
-    var isSearchFocused by remember { mutableStateOf(false) }
-    val coroutineScope = rememberCoroutineScope()
-    var debounceJob by remember { mutableStateOf<Job?>(null) }
+    val searchQuery by viewModel.searchQuery.collectAsState()
+    var localText by remember { mutableStateOf(TextFieldValue(searchQuery.toString())) }
+    var lastRemoteValue by remember { mutableStateOf(searchQuery) }
 
-    // Update localText only if different from current user input
-    LaunchedEffect(searchQuery.value) {
-        if (!isSearchFocused && localText.text != searchQuery.value.toString()) {
-            localText = localText.copy(searchQuery.value.toString())
+    // Update localText only when searchQuery changes externally (or to sync after debounce)
+    LaunchedEffect(searchQuery) {
+        if (searchQuery != lastRemoteValue) {
+            val newText = searchQuery.toString()
+            if (localText.text != newText) {
+                localText = TextFieldValue(newText, selection = TextRange(newText.length))
+            }
+            lastRemoteValue = searchQuery
         }
     }
+
+    val coroutineScope = rememberCoroutineScope()
+    var debounceJob by remember { mutableStateOf<Job?>(null) }
 
     fun onValueChange(newValue: TextFieldValue) {
         localText = newValue
         debounceJob?.cancel()
         debounceJob = coroutineScope.launch {
             delay(300) // 300ms debounce
-            if (localText.text != searchQuery.value.toString()) {
-                onSearch(localText.text)
+            val currentText = localText.text
+            if (currentText != searchQuery.toString()) {
+                onSearch(currentText)
             }
         }
     }
@@ -95,11 +101,11 @@ fun AppBar(
                         .fillMaxWidth()
                         .focusRequester(focusRequester)
                         .onFocusChanged { focusState ->
-                            isSearchFocused = focusState.isFocused
-
-                            localText = localText.copy(
-                                selection = TextRange(localText.text.length)
-                            )
+                            if (focusState.isFocused) {
+                                localText = localText.copy(
+                                    selection = TextRange(localText.text.length)
+                                )
+                            }
                         },
                     hint = stringResource(Res.string.search_hint),
                     onClear = {

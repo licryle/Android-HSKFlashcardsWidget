@@ -79,6 +79,13 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
                     }
                 }
         }
+
+        // Collect intents from the bus
+        viewModelScope.launch {
+            AppIntentBus.intents.collect { intent ->
+                handleAppIntent(intent)
+            }
+        }
     }
 
     private fun readyUp() {
@@ -209,6 +216,16 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
                         HSKAppServices.snackbar.show(SnackbarType.WARNING, Res.string.dbbackup_failure_folderpermission)
                     }
                 )
+            }
+        }
+    }
+
+    fun handleAppIntent(intent: AppIntent) {
+        executeWhenReady {
+            when (intent) {
+                is AppIntent.Search -> search(intent.query)
+                is AppIntent.WidgetConfiguration -> configureWidget(intent.widgetId)
+                is AppIntent.ImageOCR -> ocrImage(intent.file)
             }
         }
     }

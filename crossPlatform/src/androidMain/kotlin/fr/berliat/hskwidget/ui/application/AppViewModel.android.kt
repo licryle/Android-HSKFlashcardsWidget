@@ -7,7 +7,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Parcelable
-import android.util.Log
 import androidx.fragment.app.FragmentActivity
 
 import com.android.billingclient.api.BillingResult
@@ -120,60 +119,6 @@ actual class AppViewModel(navigationManager: NavigationManager, val activityProv
         FlashcardWidgetProvider().updateAllFlashCardWidgets()
     }
 
-    fun handleIntent(intent: Intent) {
-        // Defer intent handling until services are ready to prevent race conditions
-        executeWhenReady {
-            handleWidgetConfigIntent(intent)
-            handleSearchIntent(intent)
-            handleTextSearchIntent(intent)
-            handleImageOCRIntent(intent)
-        }
-    }
-
-    private fun handleWidgetConfigIntent(intent: Intent?) {
-        intent?.let {
-            if (it.action == ACTION_APPWIDGET_CONFIGURE) {
-                val widgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
-
-                if (widgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
-                    configureWidget(widgetId)
-                }
-            }
-        }
-    }
-
-    private fun handleSearchIntent(intent: Intent?) {
-        intent?.let {
-            if (it.hasExtra(INTENT_SEARCH_WORD)) {
-                val searchWord = it.getStringExtra(INTENT_SEARCH_WORD)
-                Log.i(TAG, "Received a search intent: $searchWord")
-                if (searchWord != null && searchWord != "") {
-                    search(searchWord)
-                }
-            }
-        }
-    }
-
-    private fun handleTextSearchIntent(intent: Intent?) {
-        if (intent?.action == Intent.ACTION_PROCESS_TEXT && intent.type == "text/plain") {
-            val sharedText = intent.getStringExtra(Intent.EXTRA_PROCESS_TEXT)
-            Log.i(TAG, "Received a shared text intent: $sharedText")
-            if (sharedText != null) {
-                search(sharedText)
-            }
-        }
-    }
-
-    private fun handleImageOCRIntent(intent: Intent?) {
-        if (intent?.action == Intent.ACTION_SEND && intent.type?.startsWith("image/") == true) {
-            Log.i(TAG, "Received a shared image intent")
-            intent.getParcelableExtraCompat(Intent.EXTRA_STREAM, Uri::class.java)?.let { imageUri ->
-                // Handle the image URI here
-                ocrImage(PlatformFile(imageUri))
-            }
-        }
-    }
-
     override fun finalizeWidgetConfiguration(widgetId: Int) {
         val resultIntent = Intent()
         resultIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
@@ -181,16 +126,54 @@ actual class AppViewModel(navigationManager: NavigationManager, val activityProv
         activityProvider.invoke().finish()
     }
 
-    private fun <T : Parcelable> Intent.getParcelableExtraCompat(key: String, clazz: Class<T>): T? {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            getParcelableExtra(key, clazz)
-        } else {
-            @Suppress("DEPRECATION")
-            getParcelableExtra(key) as? T
-        }
-    }
-
     companion object {
         const val TAG = "AppViewModel"
+
+        /**
+         * Converts Android Intents to KMP AppIntents.
+         */
+        fun convertToAppIntent(intent: Intent): AppIntent? {
+            // Handle Widget Configuration
+            if (intent.action == ACTION_APPWIDGET_CONFIGURE) {
+                val widgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
+                if (widgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
+                    return AppIntent.WidgetConfiguration(widgetId)
+                }
+            }
+
+            // Handle Search Intent (Internal)
+            if (intent.hasExtra(INTENT_SEARCH_WORD)) {
+                val searchWord = intent.getStringExtra(INTENT_SEARCH_WORD)
+                if (!searchWord.isNullOrEmpty()) {
+                    return AppIntent.Search(searchWord)
+                }
+            }
+
+            // Handle Text Search Intent (Action Process Text)
+            if (intent.action == Intent.ACTION_PROCESS_TEXT && intent.type == "text/plain") {
+                val sharedText = intent.getStringExtra(Intent.EXTRA_PROCESS_TEXT)
+                if (!sharedText.isNullOrEmpty()) {
+                    return AppIntent.Search(sharedText)
+                }
+            }
+
+            // Handle Image OCR Intent (Action Send)
+            if (intent.action == Intent.ACTION_SEND && intent.type?.startsWith("image/") == true) {
+                intent.getParcelableExtraCompat(Intent.EXTRA_STREAM, Uri::class.java)?.let { imageUri ->
+                    return AppIntent.ImageOCR(PlatformFile(imageUri))
+                }
+            }
+
+            return null
+        }
+
+        private fun <T : Parcelable> Intent.getParcelableExtraCompat(key: String, clazz: Class<T>): T? {
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                getParcelableExtra(key, clazz)
+            } else {
+                @Suppress("DEPRECATION")
+                getParcelableExtra(key) as? T
+            }
+        }
     }
 }
