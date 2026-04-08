@@ -151,25 +151,37 @@ actual object ExpectedUtils {
 
         // Interrupt any current speech to ensure the new word is played immediately
         if (TTSynthesizer.isSpeaking()) {
+            println("TTS: Synthesizer already speaking, stopping current utterance.")
             TTSynthesizer.stopSpeakingAtBoundary(AVSpeechBoundary.AVSpeechBoundaryImmediate)
         }
 
-        val utterance = AVSpeechUtterance.speechUtteranceWithString(string = word)
-
+        val utterance = AVSpeechUtterance(string = word)
+        println("TTS: Utterance created successfully: $utterance")
+        
         // Find a Chinese voice with fallbacks
-        val voices = AVSpeechSynthesisVoice.speechVoices() as List<AVSpeechSynthesisVoice>
         val voice = AVSpeechSynthesisVoice.voiceWithLanguage("zh-CN")
             ?: AVSpeechSynthesisVoice.voiceWithLanguage("zh-Hans")
-            ?: voices.firstOrNull { it.language.startsWith("zh") }
+            ?: AVSpeechSynthesisVoice.speechVoices().mapNotNull { it as? AVSpeechSynthesisVoice }.firstOrNull { 
+                it.language.startsWith("zh") 
+            }
 
         if (voice != null) {
+            println("TTS: Selected voice: ${voice.language} (${voice.name})")
             utterance.voice = voice
+        } else {
+            println("TTS: WARNING - No Chinese voice found. Using default.")
         }
 
         utterance.rate = AVSpeechUtteranceDefaultSpeechRate
         utterance.volume = 1.0f
 
-		TTSynthesizer.speakUtterance(utterance)
+        try {
+            println("TTS: Calling speakUtterance...")
+		    TTSynthesizer.speakUtterance(utterance)
+            println("TTS: speakUtterance called.")
+        } catch (e: Exception) {
+            println("TTS: CRITICAL ERROR - speakUtterance failed: $e")
+        }
     }
 
     internal actual fun openAppForSearchQuery(query: SearchQuery) {
