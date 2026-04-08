@@ -60,7 +60,7 @@ struct HskFlashcardsWidgetView: View {
                 }
 
                 // Middle Content: Pinyin - Simplified - Definition
-                Link(destination: URL(string: "hskwidget://search?q=\(entry.word.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")")!) {
+                Link(destination: URL(string: "hskwidget://search?q=\((crossPlatform.SearchQuery(query: entry.word, ignoreAnnotation: true, inListName: nil).description()).addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed) ?? "")")!) {
                     VStack(spacing: 2) {
                         Spacer(minLength: 0)
                         
