@@ -12,7 +12,7 @@ struct HskFlashcardsWidgetView: View {
         if entry.isPlaceholder {
             VStack(spacing: 8) {
                 Spacer()
-                Image("AppIcon") // Standard way to reference app icon if available in assets, or use a specific asset
+                Image("AppIconSmall") 
                     .resizable()
                     .frame(width: 60, height: 60)
                     .cornerRadius(12)
