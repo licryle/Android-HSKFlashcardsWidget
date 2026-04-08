@@ -58,8 +58,9 @@ open class CommonWidgetController(
     protected open suspend fun updateDesktopWidget(word: AnnotatedChineseWord?) {}
 
     fun openDictionary() {
-        val query = SearchQuery.fromString(simplified.value)
-        query.ignoreAnnotation = true
+        val query = SearchQuery.fromString(simplified.value).copy(
+            ignoreAnnotation = true
+        )
 
         Utils.openAppForSearchQuery(query)
     }

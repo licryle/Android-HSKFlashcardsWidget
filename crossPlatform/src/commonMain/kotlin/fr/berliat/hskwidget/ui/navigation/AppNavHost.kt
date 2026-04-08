@@ -41,7 +41,7 @@ fun AppNavHost(viewModel : AppViewModel) {
             val args = backStackEntry.toRoute<Screen.Dictionary>()
 
             // Queue the search update until the viewModel is ready
-            LaunchedEffect(args.search) {
+            LaunchedEffect(args.search, isViewModelReady) {
                 if (isViewModelReady && args.search != null) {
                     val currentSearch = viewModel.appConfig.searchQuery.value.toString()
                     if (args.search != currentSearch) {
@@ -84,8 +84,7 @@ fun AppNavHost(viewModel : AppViewModel) {
 
             WordListScreen(
                 onClickList = { list ->
-                    val sq = SearchQuery()
-                    sq.inListName = list.name
+                    val sq = SearchQuery(inListName = list.name)
                     navController.navigate(Screen.Dictionary(sq.toString()))
                 }
             )

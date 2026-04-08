@@ -1,10 +1,10 @@
 package fr.berliat.hskwidget.domain
 
-class SearchQuery() {
-    var query = ""
-    var ignoreAnnotation = false
-    var inListName: String? = null
-
+data class SearchQuery(
+    val query: String = "",
+    val ignoreAnnotation: Boolean = false,
+    val inListName: String? = null
+) {
     override fun toString(): String {
         val params = mutableListOf(query)
 
@@ -23,18 +23,23 @@ class SearchQuery() {
 
         fun processSearchQuery(query: String): SearchQuery {
             val flags = extractFlags(query)
+            val baseQuery = extractQuery(query)
 
-            val sq = SearchQuery()
-            sq.query = extractQuery(query)
+            var inListName: String? = null
+            var ignoreAnnotation = false
 
             flags.forEach { (flag, value) ->
                 when (flag) {
-                    "list" -> sq.inListName = value
-                    "ignAnnot" -> sq.ignoreAnnotation = true
+                    "list" -> inListName = value
+                    "ignAnnot" -> ignoreAnnotation = true
                 }
             }
 
-            return sq
+            return SearchQuery(
+                query = baseQuery,
+                ignoreAnnotation = ignoreAnnotation,
+                inListName = inListName
+            )
         }
 
         fun extractFlags(input: String): Map<String, String> {
