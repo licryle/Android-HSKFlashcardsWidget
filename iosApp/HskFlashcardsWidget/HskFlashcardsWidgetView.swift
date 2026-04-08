@@ -9,21 +9,7 @@ struct HskFlashcardsWidgetView: View {
     @Environment(\.widgetFamily) var family
 
     var body: some View {
-        if entry.isPlaceholder {
-            VStack(spacing: 8) {
-                Spacer()
-                Image("AppIconSmall") 
-                    .resizable()
-                    .frame(width: 60, height: 60)
-                    .cornerRadius(12)
-                
-                Text(crossPlatform.CachedResources.shared.widgetNotConfigured)
-                    .font(.system(size: 14, weight: .medium))
-                    .multilineTextAlignment(.center)
-                    .foregroundColor(.secondary)
-                Spacer()
-            }
-        } else {
+        if !entry.isEmpty {
             VStack(spacing: 4) {
                 // Top Row: Reload - Level - Speak
                 HStack {
@@ -84,6 +70,20 @@ struct HskFlashcardsWidgetView: View {
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
+            }
+        } else {
+            VStack(spacing: 8) {
+                Spacer()
+                Image("AppIconSmall")
+                    .resizable()
+                    .frame(width: 60, height: 60)
+                    .cornerRadius(12)
+
+                Text(crossPlatform.CachedResources.shared.widgetNotConfigured)
+                    .font(.system(size: 14, weight: .medium))
+                    .multilineTextAlignment(.center)
+                    .foregroundColor(.secondary)
+                Spacer()
             }
         }
     }

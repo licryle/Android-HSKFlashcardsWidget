@@ -8,7 +8,7 @@ struct HskEntry: TimelineEntry {
     let pinyin: String
     let definition: String
     let level: String
-    let isPlaceholder: Bool
+    let isEmpty: Bool
 }
 
 struct Provider: AppIntentTimelineProvider {
@@ -46,7 +46,7 @@ struct Provider: AppIntentTimelineProvider {
                         pinyin: pinyinStr,
                         definition: definition,
                         level: levelStr,
-                        isPlaceholder: false
+                        isEmpty: false
                     )
                 }
             }
@@ -54,11 +54,11 @@ struct Provider: AppIntentTimelineProvider {
 
         return HskEntry(
             date: Date(),
-            word: resources.placeholderWord,
-            pinyin: resources.placeholderPinyin,
-            definition: resources.placeholderDefinition,
-            level: resources.placeholderLevel,
-            isPlaceholder: true
+            word: "",
+            pinyin: "",
+            definition: "",
+            level: "",
+            isEmpty: true
         )
     }
 
@@ -69,12 +69,17 @@ struct Provider: AppIntentTimelineProvider {
             pinyin: resources.placeholderPinyin,
             definition: resources.placeholderDefinition,
             level: resources.placeholderLevel,
-            isPlaceholder: true
+            isEmpty: false
         )
     }
 
     func snapshot(for configuration: HskWidgetConfigurationIntent, in context: Context) async -> HskEntry {
-        await fetchEntry(for: configuration)
+        if context.isPreview {
+            // Return mock data for the widget gallery
+            return placeholder(in: context)
+        }
+        
+        return await fetchEntry(for: configuration)
     }
 
     func timeline(for configuration: HskWidgetConfigurationIntent, in context: Context) async -> Timeline<HskEntry> {
