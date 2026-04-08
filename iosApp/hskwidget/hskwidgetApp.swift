@@ -65,11 +65,15 @@ struct hskwidgetApp: App {
     private func handleOpenURL(_ url: URL) {
         var appIntent: crossPlatform.AppIntent? = nil
         
-        if url.scheme == "hskwidget" && url.host == "search" {
-            if let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
-               let word = components.queryItems?.first(where: { $0.name == "q" })?.value {
-                // Convert iOS URL intent to KMP AppIntent
-                appIntent = crossPlatform.AppIntent.Search(query: word)
+        if url.scheme == "hskwidget" {
+            if url.host == "search" {
+                if let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
+                   let word = components.queryItems?.first(where: { $0.name == "q" })?.value {
+                    // Convert iOS URL intent to KMP AppIntent
+                    appIntent = crossPlatform.AppIntent.Search(query: word)
+                }
+            } else if url.host == "configure" {
+                appIntent = crossPlatform.AppIntent.WidgetConfiguration(widgetId: 0)
             }
         }
 

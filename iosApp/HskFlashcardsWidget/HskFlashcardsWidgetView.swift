@@ -72,18 +72,20 @@ struct HskFlashcardsWidgetView: View {
                 }
             }
         } else {
-            VStack(spacing: 8) {
-                Spacer()
-                Image("AppIconSmall")
-                    .resizable()
-                    .frame(width: 60, height: 60)
-                    .cornerRadius(12)
+            Link(destination: URL(string: "hskwidget://configure")!) {
+                VStack(spacing: 8) {
+                    Spacer()
+                    Image("AppIconSmall")
+                        .resizable()
+                        .frame(width: 60, height: 60)
+                        .cornerRadius(12)
 
-                Text(crossPlatform.CachedResources.shared.widgetNotConfigured)
-                    .font(.system(size: 14, weight: .medium))
-                    .multilineTextAlignment(.center)
-                    .foregroundColor(.secondary)
-                Spacer()
+                    Text(crossPlatform.CachedResources.shared.widgetNotConfigured)
+                        .font(.system(size: 14, weight: .medium))
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                }
             }
         }
     }
