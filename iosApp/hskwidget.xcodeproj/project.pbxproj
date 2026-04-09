@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1C6948322F87637600E2F818 /* AddWidget.MP4 in Resources */ = {isa = PBXBuildFile; fileRef = 1C6948312F87637600E2F818 /* AddWidget.MP4 */; };
 		1C6C7A7F2F7584EA00CAEF01 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C6C7A7E2F7584EA00CAEF01 /* WidgetKit.framework */; };
 		1C6C7A812F7584EA00CAEF01 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C6C7A802F7584EA00CAEF01 /* SwiftUI.framework */; };
 		1C757CA72F7688A800130DBA /* HskFlashcardsWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 1C6C7A7D2F7584EA00CAEF01 /* HskFlashcardsWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -55,6 +56,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1C6948312F87637600E2F818 /* AddWidget.MP4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = AddWidget.MP4; sourceTree = "<group>"; };
 		1C6C7A7D2F7584EA00CAEF01 /* HskFlashcardsWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = HskFlashcardsWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		1C6C7A7E2F7584EA00CAEF01 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		1C6C7A802F7584EA00CAEF01 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
@@ -177,6 +179,7 @@
 		1C7166CC2E71E186000B4154 = {
 			isa = PBXGroup;
 			children = (
+				1C6948312F87637600E2F818 /* AddWidget.MP4 */,
 				1C757C9B2F7672B600130DBA /* HskFlashcardsWidgetExtension.entitlements */,
 				1C7166D72E71E186000B4154 /* hskwidget */,
 				1C7166E62E71E189000B4154 /* hskwidgetTests */,
@@ -385,6 +388,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1C6948322F87637600E2F818 /* AddWidget.MP4 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
