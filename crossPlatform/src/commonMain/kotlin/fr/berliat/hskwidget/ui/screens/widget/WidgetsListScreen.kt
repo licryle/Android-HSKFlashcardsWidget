@@ -77,6 +77,12 @@ fun WidgetsListScreen(
                 textAlign = TextAlign.Start
             )
 
+            Text(
+                text = stringResource(Res.string.widgets_intro2),
+                modifier = Modifier.padding(16.dp),
+                textAlign = TextAlign.Start
+            )
+
             Box(
                 modifier = widgetDefaultBox.align(Alignment.CenterHorizontally)
             ) {

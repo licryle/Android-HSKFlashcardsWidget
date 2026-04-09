@@ -93,9 +93,8 @@ This project uses the awesome projects of:
     <string name="widgets_intro"><![CDATA[Welcome to HSK Flashcard Widget!
 
 This app enables you to set up as many widgets on your phone, and select which HSK words you want to see.
-We recommend to choose the level you're at plus the one below, or above depending on your learning path.
-
-You can come back to this screen at any time to set up a new widget, or reconfigure existing ones.]]></string>
+We recommend to choose the level you're at plus the one below, or above depending on your learning path.]]></string>
+    <string name="widgets_intro2"><![CDATA[You can come back to this screen at any time to set up a new widget, or reconfigure existing ones.]]></string>
 
     <string name="dialog_tts_error">Text-to-Speech Error</string>
     <string name="speech_failure_toast_unknown">Unknown speech error</string>
