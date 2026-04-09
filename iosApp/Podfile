@@ -20,12 +20,24 @@ target 'HskFlashcardsWidgetExtension' do
 end
 
 post_install do |installer|
+  # Automatically link Version.xcconfig to all Pods targets
+  puts "Updating Pods xcconfigs to include Version.xcconfig..."
+  installer.aggregate_targets.each do |target|
+    target.user_build_configurations.each do |config_name, config|
+      path = target.xcconfig_path(config_name)
+      if File.exist?(path)
+        content = File.read(path)
+        unless content.include?('Version.xcconfig')
+          File.open(path, 'a') { |f| f.puts "\n#include \"../../../Version.xcconfig\"" }
+          puts "  Updated #{path}"
+        end
+      end
+    end
+  end
+
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '16.0'
-
-      # Fix for "sharedApplication is unavailable" in App Extensions
-      # We allow it because these pods are transitively required but not actually used by the widget code
       config.build_settings['APPLICATION_EXTENSION_API_ONLY'] = 'NO'
 
       # Fix for SwiftUICore linking issue in Xcode 16+

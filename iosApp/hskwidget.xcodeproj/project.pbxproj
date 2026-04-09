@@ -118,21 +118,29 @@
 		};
 		1C7166E62E71E189000B4154 /* hskwidgetTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = hskwidgetTests;
 			sourceTree = "<group>";
 		};
 		1C7166F02E71E189000B4154 /* hskwidgetUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = hskwidgetUITests;
 			sourceTree = "<group>";
 		};
 		1CE7E5D52E96CCED00627840 /* ../crossPlatform/src/commonMain */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = ../crossPlatform/src/commonMain;
 			sourceTree = SOURCE_ROOT;
 		};
 		1CE7E5F92E96CCED00627840 /* ../crossPlatform/src/iosMain */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = ../crossPlatform/src/iosMain;
 			sourceTree = SOURCE_ROOT;
 		};
@@ -417,13 +425,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-HskFlashcardsWidgetExtension/Pods-HskFlashcardsWidgetExtension-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-HskFlashcardsWidgetExtension/Pods-HskFlashcardsWidgetExtension-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -455,13 +459,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hskwidget/Pods-hskwidget-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hskwidget/Pods-hskwidget-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -573,7 +573,7 @@
 				CODE_SIGN_ENTITLEMENTS = HskFlashcardsWidgetExtension.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 47;
+				CURRENT_PROJECT_VERSION = "$(APP_VERSION_CODE)";
 				DEVELOPMENT_TEAM = V7M52D35G4;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = HskFlashcardsWidget/Info.plist;
@@ -585,7 +585,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 4.0.3;
+				MARKETING_VERSION = "$(APP_VERSION_NAME)";
 				NEW_SETTING1 = "";
 				PRODUCT_BUNDLE_IDENTIFIER = fr.berliat.hskwidget.HskFlashcardsWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -610,7 +610,7 @@
 				CODE_SIGN_ENTITLEMENTS = HskFlashcardsWidgetExtension.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 47;
+				CURRENT_PROJECT_VERSION = "$(APP_VERSION_CODE)";
 				DEVELOPMENT_TEAM = V7M52D35G4;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = HskFlashcardsWidget/Info.plist;
@@ -622,7 +622,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 4.0.3;
+				MARKETING_VERSION = "$(APP_VERSION_NAME)";
 				NEW_SETTING1 = "";
 				PRODUCT_BUNDLE_IDENTIFIER = fr.berliat.hskwidget.HskFlashcardsWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -765,7 +765,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = hskwidget/hskwidget.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 47;
+				CURRENT_PROJECT_VERSION = "$(APP_VERSION_CODE)";
 				DEVELOPMENT_TEAM = V7M52D35G4;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -792,7 +792,7 @@
 				);
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.5;
-				MARKETING_VERSION = 4.0.3;
+				MARKETING_VERSION = "$(APP_VERSION_NAME)";
 				PRODUCT_BUNDLE_IDENTIFIER = fr.berliat.hskwidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -814,7 +814,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = hskwidget/hskwidget.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 47;
+				CURRENT_PROJECT_VERSION = "$(APP_VERSION_CODE)";
 				DEVELOPMENT_TEAM = V7M52D35G4;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -841,7 +841,7 @@
 				);
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.5;
-				MARKETING_VERSION = 4.0.3;
+				MARKETING_VERSION = "$(APP_VERSION_NAME)";
 				PRODUCT_BUNDLE_IDENTIFIER = fr.berliat.hskwidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -860,11 +860,11 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 47;
+				CURRENT_PROJECT_VERSION = "$(APP_VERSION_CODE)";
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
 				MACOSX_DEPLOYMENT_TARGET = 15.5;
-				MARKETING_VERSION = 4.0.3;
+				MARKETING_VERSION = "$(APP_VERSION_NAME)";
 				PRODUCT_BUNDLE_IDENTIFIER = fr.berliat.hskwidgetTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
@@ -882,11 +882,11 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 47;
+				CURRENT_PROJECT_VERSION = "$(APP_VERSION_CODE)";
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
 				MACOSX_DEPLOYMENT_TARGET = 15.5;
-				MARKETING_VERSION = 4.0.3;
+				MARKETING_VERSION = "$(APP_VERSION_NAME)";
 				PRODUCT_BUNDLE_IDENTIFIER = fr.berliat.hskwidgetTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
@@ -903,11 +903,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 47;
+				CURRENT_PROJECT_VERSION = "$(APP_VERSION_CODE)";
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
 				MACOSX_DEPLOYMENT_TARGET = 15.5;
-				MARKETING_VERSION = 4.0.3;
+				MARKETING_VERSION = "$(APP_VERSION_NAME)";
 				PRODUCT_BUNDLE_IDENTIFIER = fr.berliat.hskwidgetUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
@@ -924,11 +924,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 47;
+				CURRENT_PROJECT_VERSION = "$(APP_VERSION_CODE)";
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
 				MACOSX_DEPLOYMENT_TARGET = 15.5;
-				MARKETING_VERSION = 4.0.3;
+				MARKETING_VERSION = "$(APP_VERSION_NAME)";
 				PRODUCT_BUNDLE_IDENTIFIER = fr.berliat.hskwidgetUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
