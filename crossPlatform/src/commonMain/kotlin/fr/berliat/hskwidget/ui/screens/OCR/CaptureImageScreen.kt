@@ -90,7 +90,7 @@ fun CaptureImageScreen(
 
                 // Image output
                 imageFormat = ImageFormat.PNG,
-                directory = Directory.PICTURES,
+                directory = Directory.DOCUMENTS,
                 qualityPrioritization = QualityPrioritization.BALANCED,
 
                 // iOS only: Advanced camera device types

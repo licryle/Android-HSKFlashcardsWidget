@@ -23,7 +23,7 @@ import fr.berliat.hskwidget.ui.screens.wordlist.WordListScreen
 
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.exists
-import io.github.vinceglb.filekit.path
+import io.github.vinceglb.filekit.absolutePath
 
 @Composable
 fun AppNavHost(viewModel : AppViewModel) {
@@ -143,7 +143,7 @@ fun AppNavHost(viewModel : AppViewModel) {
             CaptureImageScreen(onImageReady = { imageFile: PlatformFile ->
                 navController.navigate(Screen.OCRDisplay(
                     preText = args.preText,
-                    imageFilePath = imageFile.path
+                    imageFilePath = imageFile.absolutePath()
                 ))
             })
         }
