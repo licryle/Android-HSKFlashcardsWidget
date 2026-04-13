@@ -94,3 +94,36 @@ struct SpeakWordIntent: AppIntents.AppIntent {
         return .result()
     }
 }
+
+struct OpenOCRIntent: AppIntents.AppIntent {
+    static var title: LocalizedStringResource = "Open OCR"
+    static var openAppWhenRun: Bool = true
+    
+    @Parameter(title: "Image Path")
+    var imagePath: String
+
+    init() { self.imagePath = "" }
+    init(imagePath: String) { self.imagePath = imagePath }
+
+    func perform() async throws -> some AppIntents.IntentResult {
+        let encodedPath = imagePath.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        if let url = URL(string: "hskwidget://ocr?path=\(encodedPath)") {
+            await URLOpener.open(url: url)
+        }
+
+        return .result()
+    }
+}
+
+// Helper to bypass UIApplication.shared restriction in app extensions
+struct URLOpener {
+    @MainActor
+    static func open(url: URL) {
+        let selector = NSSelectorFromString("openURL:")
+        // Use KVC to safely get the application instance without a compiler error
+        if let applicationClass = NSClassFromString("UIApplication") as? NSObject.Type,
+           let sharedApplication = applicationClass.value(forKeyPath: "sharedApplication") as? NSObject {
+            sharedApplication.perform(selector, with: url)
+        }
+    }
+}

@@ -19,6 +19,11 @@ target 'HskFlashcardsWidgetExtension' do
   shared_pods
 end
 
+target 'HskShareExtension' do
+  use_frameworks! :linkage => :static
+  shared_pods
+end
+
 post_install do |installer|
   # Automatically link Version.xcconfig to all Pods targets
   puts "Updating Pods xcconfigs to include Version.xcconfig..."

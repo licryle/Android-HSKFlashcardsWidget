@@ -7,17 +7,26 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1C3B97992F88E8050004B387 /* HskShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 1C3B978F2F88E8050004B387 /* HskShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		1C6948322F87637600E2F818 /* AddWidget.MP4 in Resources */ = {isa = PBXBuildFile; fileRef = 1C6948312F87637600E2F818 /* AddWidget.MP4 */; };
 		1C6C7A7F2F7584EA00CAEF01 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C6C7A7E2F7584EA00CAEF01 /* WidgetKit.framework */; };
 		1C6C7A812F7584EA00CAEF01 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C6C7A802F7584EA00CAEF01 /* SwiftUI.framework */; };
 		1C757CA72F7688A800130DBA /* HskFlashcardsWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 1C6C7A7D2F7584EA00CAEF01 /* HskFlashcardsWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		1CD8DF532EDE03DE00AB930B /* Vision.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CD8DF522EDE03DE00AB930B /* Vision.framework */; };
 		1CDFB1232EE2FB89001B8494 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CDFB1222EE2FB89001B8494 /* AVFoundation.framework */; };
+		50EB842D8415A27F64322DA0 /* Pods_HskShareExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 94CCFCA38AE428512D818D62 /* Pods_HskShareExtension.framework */; };
 		5E0B1AAA70E4362F3FFF5173 /* Pods_hskwidget.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8E282DEAD54A791009DCFAB0 /* Pods_hskwidget.framework */; };
 		82C1E3B422A501F3AB8B7684 /* Pods_HskFlashcardsWidgetExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6D8CBF03D000A24F101DF3CE /* Pods_HskFlashcardsWidgetExtension.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		1C3B97972F88E8050004B387 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1C7166CD2E71E186000B4154 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1C3B978E2F88E8050004B387;
+			remoteInfo = HskShareExtension;
+		};
 		1C7166E42E71E189000B4154 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 1C7166CD2E71E186000B4154 /* Project object */;
@@ -49,6 +58,7 @@
 			dstSubfolderSpec = 13;
 			files = (
 				1C757CA72F7688A800130DBA /* HskFlashcardsWidgetExtension.appex in Embed Foundation Extensions */,
+				1C3B97992F88E8050004B387 /* HskShareExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -56,6 +66,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1C3B978F2F88E8050004B387 /* HskShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = HskShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		1C6948312F87637600E2F818 /* AddWidget.MP4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = AddWidget.MP4; sourceTree = "<group>"; };
 		1C6C7A7D2F7584EA00CAEF01 /* HskFlashcardsWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = HskFlashcardsWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		1C6C7A7E2F7584EA00CAEF01 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
@@ -66,15 +77,25 @@
 		1C757C9B2F7672B600130DBA /* HskFlashcardsWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = HskFlashcardsWidgetExtension.entitlements; sourceTree = "<group>"; };
 		1CD8DF522EDE03DE00AB930B /* Vision.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Vision.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.5.sdk/System/Library/Frameworks/Vision.framework; sourceTree = DEVELOPER_DIR; };
 		1CDFB1222EE2FB89001B8494 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.5.sdk/System/Library/Frameworks/AVFoundation.framework; sourceTree = DEVELOPER_DIR; };
+		3EB8AF2D3679E1BE7D9ED050 /* Pods-HskShareExtension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HskShareExtension.release.xcconfig"; path = "Target Support Files/Pods-HskShareExtension/Pods-HskShareExtension.release.xcconfig"; sourceTree = "<group>"; };
 		6D8CBF03D000A24F101DF3CE /* Pods_HskFlashcardsWidgetExtension.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HskFlashcardsWidgetExtension.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		76EBB687A3DBF7F30E3C4386 /* Pods-hskwidget.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hskwidget.debug.xcconfig"; path = "Target Support Files/Pods-hskwidget/Pods-hskwidget.debug.xcconfig"; sourceTree = "<group>"; };
 		8E282DEAD54A791009DCFAB0 /* Pods_hskwidget.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_hskwidget.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		94CCFCA38AE428512D818D62 /* Pods_HskShareExtension.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HskShareExtension.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		ABEF2888EF699693E608B936 /* Pods-HskShareExtension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HskShareExtension.debug.xcconfig"; path = "Target Support Files/Pods-HskShareExtension/Pods-HskShareExtension.debug.xcconfig"; sourceTree = "<group>"; };
 		BFA6C209EAC2468F63BA6CEF /* Pods-hskwidget.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hskwidget.release.xcconfig"; path = "Target Support Files/Pods-hskwidget/Pods-hskwidget.release.xcconfig"; sourceTree = "<group>"; };
 		C2F890F7FAF61F8D564220CB /* Pods-HskFlashcardsWidgetExtension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HskFlashcardsWidgetExtension.debug.xcconfig"; path = "Target Support Files/Pods-HskFlashcardsWidgetExtension/Pods-HskFlashcardsWidgetExtension.debug.xcconfig"; sourceTree = "<group>"; };
 		D0E80B30BCB2E15DADA6E998 /* Pods-HskFlashcardsWidgetExtension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HskFlashcardsWidgetExtension.release.xcconfig"; path = "Target Support Files/Pods-HskFlashcardsWidgetExtension/Pods-HskFlashcardsWidgetExtension.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		1C3B979D2F88E8050004B387 /* Exceptions for "HskShareExtension" folder in "HskShareExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 1C3B978E2F88E8050004B387 /* HskShareExtension */;
+		};
 		1C6988E32F7F00DB003B5F83 /* Exceptions for "HskFlashcardsWidget" folder in "hskwidget" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -99,6 +120,14 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		1C3B97902F88E8050004B387 /* HskShareExtension */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				1C3B979D2F88E8050004B387 /* Exceptions for "HskShareExtension" folder in "HskShareExtension" target */,
+			);
+			path = HskShareExtension;
+			sourceTree = "<group>";
+		};
 		1C6C7A822F7584EA00CAEF01 /* HskFlashcardsWidget */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -118,35 +147,35 @@
 		};
 		1C7166E62E71E189000B4154 /* hskwidgetTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = hskwidgetTests;
 			sourceTree = "<group>";
 		};
 		1C7166F02E71E189000B4154 /* hskwidgetUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = hskwidgetUITests;
 			sourceTree = "<group>";
 		};
 		1CE7E5D52E96CCED00627840 /* ../crossPlatform/src/commonMain */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = ../crossPlatform/src/commonMain;
 			sourceTree = SOURCE_ROOT;
 		};
 		1CE7E5F92E96CCED00627840 /* ../crossPlatform/src/iosMain */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = ../crossPlatform/src/iosMain;
 			sourceTree = SOURCE_ROOT;
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		1C3B978C2F88E8050004B387 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				50EB842D8415A27F64322DA0 /* Pods_HskShareExtension.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		1C6C7A7A2F7584EA00CAEF01 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -193,6 +222,7 @@
 				1C7166E62E71E189000B4154 /* hskwidgetTests */,
 				1C7166F02E71E189000B4154 /* hskwidgetUITests */,
 				1C6C7A822F7584EA00CAEF01 /* HskFlashcardsWidget */,
+				1C3B97902F88E8050004B387 /* HskShareExtension */,
 				1C8A8BF62E733E1B00B8E39B /* Frameworks */,
 				1C7166D62E71E186000B4154 /* Products */,
 				1CE7E50F2E96CC5F00627840 /* Kotlin Debug */,
@@ -207,6 +237,7 @@
 				1C7166E32E71E189000B4154 /* hskwidgetTests.xctest */,
 				1C7166ED2E71E189000B4154 /* hskwidgetUITests.xctest */,
 				1C6C7A7D2F7584EA00CAEF01 /* HskFlashcardsWidgetExtension.appex */,
+				1C3B978F2F88E8050004B387 /* HskShareExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -220,6 +251,7 @@
 				1C6C7A7E2F7584EA00CAEF01 /* WidgetKit.framework */,
 				1C6C7A802F7584EA00CAEF01 /* SwiftUI.framework */,
 				6D8CBF03D000A24F101DF3CE /* Pods_HskFlashcardsWidgetExtension.framework */,
+				94CCFCA38AE428512D818D62 /* Pods_HskShareExtension.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -240,6 +272,8 @@
 				BFA6C209EAC2468F63BA6CEF /* Pods-hskwidget.release.xcconfig */,
 				C2F890F7FAF61F8D564220CB /* Pods-HskFlashcardsWidgetExtension.debug.xcconfig */,
 				D0E80B30BCB2E15DADA6E998 /* Pods-HskFlashcardsWidgetExtension.release.xcconfig */,
+				ABEF2888EF699693E608B936 /* Pods-HskShareExtension.debug.xcconfig */,
+				3EB8AF2D3679E1BE7D9ED050 /* Pods-HskShareExtension.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -247,6 +281,28 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		1C3B978E2F88E8050004B387 /* HskShareExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1C3B979C2F88E8050004B387 /* Build configuration list for PBXNativeTarget "HskShareExtension" */;
+			buildPhases = (
+				808C5C1E355287EF8312817B /* [CP] Check Pods Manifest.lock */,
+				1C3B978B2F88E8050004B387 /* Sources */,
+				1C3B978C2F88E8050004B387 /* Frameworks */,
+				1C3B978D2F88E8050004B387 /* Resources */,
+				DFF771A47D472C4E32DE8BD1 /* [CP] Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				1C3B97902F88E8050004B387 /* HskShareExtension */,
+			);
+			name = HskShareExtension;
+			productName = HskShareExtension;
+			productReference = 1C3B978F2F88E8050004B387 /* HskShareExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		1C6C7A7C2F7584EA00CAEF01 /* HskFlashcardsWidgetExtension */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1C6C7A962F7584EE00CAEF01 /* Build configuration list for PBXNativeTarget "HskFlashcardsWidgetExtension" */;
@@ -285,6 +341,7 @@
 			);
 			dependencies = (
 				1C757CA92F7688A800130DBA /* PBXTargetDependency */,
+				1C3B97982F88E8050004B387 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				1C7166D72E71E186000B4154 /* hskwidget */,
@@ -346,6 +403,9 @@
 				LastSwiftUpdateCheck = 2630;
 				LastUpgradeCheck = 1640;
 				TargetAttributes = {
+					1C3B978E2F88E8050004B387 = {
+						CreatedOnToolsVersion = 26.3;
+					};
 					1C6C7A7C2F7584EA00CAEF01 = {
 						CreatedOnToolsVersion = 26.3;
 					};
@@ -380,11 +440,19 @@
 				1C7166E22E71E189000B4154 /* hskwidgetTests */,
 				1C7166EC2E71E189000B4154 /* hskwidgetUITests */,
 				1C6C7A7C2F7584EA00CAEF01 /* HskFlashcardsWidgetExtension */,
+				1C3B978E2F88E8050004B387 /* HskShareExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		1C3B978D2F88E8050004B387 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		1C6C7A7B2F7584EA00CAEF01 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -425,9 +493,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-HskFlashcardsWidgetExtension/Pods-HskFlashcardsWidgetExtension-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-HskFlashcardsWidgetExtension/Pods-HskFlashcardsWidgetExtension-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -459,13 +531,39 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hskwidget/Pods-hskwidget-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hskwidget/Pods-hskwidget-resources-${CONFIGURATION}-output-files.xcfilelist",
 			);
+			outputPaths = (
+			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-hskwidget/Pods-hskwidget-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		808C5C1E355287EF8312817B /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-HskShareExtension-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
 		BB7077A9E2272F1DD60E6AAF /* [CP] Check Pods Manifest.lock */ = {
@@ -512,9 +610,37 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
+		DFF771A47D472C4E32DE8BD1 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-HskShareExtension/Pods-HskShareExtension-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-HskShareExtension/Pods-HskShareExtension-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-HskShareExtension/Pods-HskShareExtension-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		1C3B978B2F88E8050004B387 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		1C6C7A792F7584EA00CAEF01 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -546,6 +672,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		1C3B97982F88E8050004B387 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1C3B978E2F88E8050004B387 /* HskShareExtension */;
+			targetProxy = 1C3B97972F88E8050004B387 /* PBXContainerItemProxy */;
+		};
 		1C7166E52E71E189000B4154 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 1C7166D42E71E186000B4154 /* hskwidget */;
@@ -564,6 +695,71 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		1C3B979A2F88E8050004B387 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = ABEF2888EF699693E608B936 /* Pods-HskShareExtension.debug.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = HskShareExtension/HskShareExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = "$(APP_VERSION_CODE)";
+				DEVELOPMENT_TEAM = V7M52D35G4;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = HskShareExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = HskShareExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = "$(APP_VERSION_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = fr.berliat.hskwidget.HskShareExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		1C3B979B2F88E8050004B387 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3EB8AF2D3679E1BE7D9ED050 /* Pods-HskShareExtension.release.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = HskShareExtension/HskShareExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = "$(APP_VERSION_CODE)";
+				DEVELOPMENT_TEAM = V7M52D35G4;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = HskShareExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = HskShareExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = "$(APP_VERSION_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = fr.berliat.hskwidget.HskShareExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 		1C6C7A942F7584EE00CAEF01 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = C2F890F7FAF61F8D564220CB /* Pods-HskFlashcardsWidgetExtension.debug.xcconfig */;
@@ -944,6 +1140,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		1C3B979C2F88E8050004B387 /* Build configuration list for PBXNativeTarget "HskShareExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1C3B979A2F88E8050004B387 /* Debug */,
+				1C3B979B2F88E8050004B387 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		1C6C7A962F7584EE00CAEF01 /* Build configuration list for PBXNativeTarget "HskFlashcardsWidgetExtension" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

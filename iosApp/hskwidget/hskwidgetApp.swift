@@ -66,11 +66,15 @@ struct hskwidgetApp: App {
         var appIntent: crossPlatform.AppIntent? = nil
         
         if url.scheme == "hskwidget" {
+            let components = URLComponents(url: url, resolvingAgainstBaseURL: true)
+            
             if url.host == "search" {
-                if let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
-                   let word = components.queryItems?.first(where: { $0.name == "q" })?.value {
-                    // Convert iOS URL intent to KMP AppIntent
+                if let word = components?.queryItems?.first(where: { $0.name == "q" })?.value {
                     appIntent = crossPlatform.AppIntent.Search(query: word)
+                }
+            } else if url.host == "ocr" {
+                if let path = components?.queryItems?.first(where: { $0.name == "path" })?.value {
+                    appIntent = crossPlatform.AppIntent.ImageOCR(path: path)
                 }
             } else if url.host == "configure" {
                 appIntent = crossPlatform.AppIntent.WidgetConfiguration(widgetId: 0)
