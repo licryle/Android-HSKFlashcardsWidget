@@ -9,7 +9,9 @@ PODS:
     - GoogleUtilities/Environment (~> 8.0)
     - GoogleUtilities/UserDefaults (~> 8.0)
     - PromisesObjC (~> 2.4)
-  - crossPlatform (4.0.4)
+  - crossPlatform (4.0.4):
+    - FirebaseAnalytics
+    - FirebaseCrashlytics
   - Firebase/Analytics (12.11.0):
     - Firebase/Core
   - Firebase/Core (12.11.0):
@@ -17,6 +19,9 @@ PODS:
     - FirebaseAnalytics (~> 12.11.0)
   - Firebase/CoreOnly (12.11.0):
     - FirebaseCore (~> 12.11.0)
+  - Firebase/Crashlytics (12.11.0):
+    - Firebase/CoreOnly
+    - FirebaseCrashlytics (~> 12.11.0)
   - FirebaseAnalytics (12.11.0):
     - FirebaseAnalytics/Default (= 12.11.0)
     - FirebaseCore (~> 12.11.0)
@@ -39,13 +44,34 @@ PODS:
     - FirebaseCoreInternal (~> 12.11.0)
     - GoogleUtilities/Environment (~> 8.1)
     - GoogleUtilities/Logger (~> 8.1)
+  - FirebaseCoreExtension (12.11.0):
+    - FirebaseCore (~> 12.11.0)
   - FirebaseCoreInternal (12.11.0):
     - "GoogleUtilities/NSData+zlib (~> 8.1)"
+  - FirebaseCrashlytics (12.11.0):
+    - FirebaseCore (~> 12.11.0)
+    - FirebaseInstallations (~> 12.11.0)
+    - FirebaseRemoteConfigInterop (~> 12.11.0)
+    - FirebaseSessions (~> 12.11.0)
+    - GoogleDataTransport (~> 10.1)
+    - GoogleUtilities/Environment (~> 8.1)
+    - nanopb (~> 3.30910.0)
+    - PromisesObjC (~> 2.4)
   - FirebaseInstallations (12.11.0):
     - FirebaseCore (~> 12.11.0)
     - GoogleUtilities/Environment (~> 8.1)
     - GoogleUtilities/UserDefaults (~> 8.1)
     - PromisesObjC (~> 2.4)
+  - FirebaseRemoteConfigInterop (12.11.0)
+  - FirebaseSessions (12.11.0):
+    - FirebaseCore (~> 12.11.0)
+    - FirebaseCoreExtension (~> 12.11.0)
+    - FirebaseInstallations (~> 12.11.0)
+    - GoogleDataTransport (~> 10.1)
+    - GoogleUtilities/Environment (~> 8.1)
+    - GoogleUtilities/UserDefaults (~> 8.1)
+    - nanopb (~> 3.30910.0)
+    - PromisesSwift (~> 2.1)
   - GoogleAdsOnDeviceConversion (3.4.0):
     - GoogleUtilities/Environment (~> 8.1)
     - GoogleUtilities/Logger (~> 8.1)
@@ -78,6 +104,9 @@ PODS:
     - GoogleUtilities/Network (~> 8.1)
     - "GoogleUtilities/NSData+zlib (~> 8.1)"
     - nanopb (~> 3.30910.0)
+  - GoogleDataTransport (10.1.0):
+    - nanopb (~> 3.30910.0)
+    - PromisesObjC (~> 2.4)
   - GoogleSignIn (9.1.0):
     - AppAuth (~> 2.0)
     - AppCheckCore (~> 11.0)
@@ -122,10 +151,13 @@ PODS:
   - nanopb/decode (3.30910.0)
   - nanopb/encode (3.30910.0)
   - PromisesObjC (2.4.0)
+  - PromisesSwift (2.4.0):
+    - PromisesObjC (= 2.4.0)
 
 DEPENDENCIES:
   - crossPlatform (from `../crossPlatform`)
   - Firebase/Analytics
+  - Firebase/Crashlytics
   - GoogleAPIClientForREST/Drive
   - GoogleSignIn
 
@@ -136,17 +168,23 @@ SPEC REPOS:
     - Firebase
     - FirebaseAnalytics
     - FirebaseCore
+    - FirebaseCoreExtension
     - FirebaseCoreInternal
+    - FirebaseCrashlytics
     - FirebaseInstallations
+    - FirebaseRemoteConfigInterop
+    - FirebaseSessions
     - GoogleAdsOnDeviceConversion
     - GoogleAPIClientForREST
     - GoogleAppMeasurement
+    - GoogleDataTransport
     - GoogleSignIn
     - GoogleUtilities
     - GTMAppAuth
     - GTMSessionFetcher
     - nanopb
     - PromisesObjC
+    - PromisesSwift
 
 EXTERNAL SOURCES:
   crossPlatform:
@@ -155,22 +193,28 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   AppAuth: 1c1a8afa7e12f2ec3a294d9882dfa5ab7d3cb063
   AppCheckCore: cc8fd0a3a230ddd401f326489c99990b013f0c4f
-  crossPlatform: 910cbfbce274d098145a55aa75f77fb415c887d3
+  crossPlatform: 26471515bb64d73994479fc1dcb64ce581dd9746
   Firebase: 3c3a624c4eb42b091c32590a87678cfee193c9c5
   FirebaseAnalytics: 2513f181a22ba7d5ba547ce0a65f82352cc8a0c9
   FirebaseCore: 1b39aa6e67b4b4d5771045abf9c9a57a585ff1e7
+  FirebaseCoreExtension: dd75d774a2d9bc48a4e559c5b80b7c43e30d66dd
   FirebaseCoreInternal: 26601b1134d192ef73e80c0c0110fb96477db687
+  FirebaseCrashlytics: 0752614319acf43e90df6210e7d8bcf644f5215f
   FirebaseInstallations: 3b65e8f4faed02bad1abf5de40e8286c5b13073d
+  FirebaseRemoteConfigInterop: 372ef310f177ee237dda0a695fe058848effb155
+  FirebaseSessions: 380475216987a33191364c241772d36b24e4e393
   GoogleAdsOnDeviceConversion: 98956ec5399cff7c0886cf757f4c8ca4716a5064
   GoogleAPIClientForREST: 81ecc07c0942075f66b8129f5a7f2df5d740bafa
   GoogleAppMeasurement: 937c97829050e8e83b17724cf873323270b26cb5
+  GoogleDataTransport: aae35b7ea0c09004c3797d53c8c41f66f219d6a7
   GoogleSignIn: fcee2257188d5eda57a5e2b6a715550ffff9206d
   GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
   GTMAppAuth: 217a876b249c3c585a54fd6f73e6b58c4f5c4238
   GTMSessionFetcher: 5aea5ba6bd522a239e236100971f10cb71b96ab6
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
+  PromisesSwift: 9d77319bbe72ebf6d872900551f7eeba9bce2851
 
-PODFILE CHECKSUM: d3a8e251d9daf27ab485f0092dd7c4286944ffe3
+PODFILE CHECKSUM: 92aba078cb37b2550288ef11305862a4e9b84d26
 
 COCOAPODS: 1.16.2

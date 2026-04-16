@@ -9,6 +9,8 @@ Pod::Spec.new do |spec|
     spec.vendored_frameworks      = 'build/cocoapods/framework/crossPlatform.framework'
     spec.libraries                = 'c++'
     spec.ios.deployment_target    = '16.0'
+    spec.dependency 'FirebaseAnalytics'
+    spec.dependency 'FirebaseCrashlytics'
     if !Dir.exist?('build/cocoapods/framework/crossPlatform.framework') || Dir.empty?('build/cocoapods/framework/crossPlatform.framework')
         raise "
         Kotlin framework 'crossPlatform' doesn't exist yet, so a proper Xcode project can't be generated.
