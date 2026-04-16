@@ -20,6 +20,32 @@ class iOSWidgetPlatformDelegate: NSObject, WidgetPlatformDelegate {
             }
         }
     }
+
+    func getWidgetSize(widgetId: Int32, callback: @escaping (String) -> Void) {
+        WidgetCenter.shared.getCurrentConfigurations { result in
+            switch result {
+            case .success(let widgetInfo):
+                let index = Int(widgetId)
+                if index >= 0 && index < widgetInfo.count {
+                    let family = widgetInfo[index].family
+                    switch family {
+                    case .systemSmall: callback("small")
+                    case .systemMedium: callback("medium")
+                    case .systemLarge: callback("large")
+                    case .systemExtraLarge: callback("extraLarge")
+                    case .accessoryCircular: callback("circular")
+                    case .accessoryRectangular: callback("rectangular")
+                    case .accessoryInline: callback("inline")
+                    @unknown default: callback("unknown")
+                    }
+                } else {
+                    callback("UNKNOWN")
+                }
+            case .failure:
+                callback("UNKNOWN")
+            }
+        }
+    }
 }
 
 struct ComposeView: UIViewControllerRepresentable {

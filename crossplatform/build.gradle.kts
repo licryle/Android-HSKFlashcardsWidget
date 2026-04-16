@@ -68,6 +68,9 @@ kotlin {
             isStatic = true
             export(":googledrivebackup")
         }
+
+        pod("FirebaseAnalytics")
+        pod("FirebaseCrashlytics")
     }
 
     listOf(

@@ -5,6 +5,7 @@ platform :ios, '16.0'
 def shared_pods
   pod 'crossPlatform', :path => '../crossPlatform'
   pod 'Firebase/Analytics'
+  pod 'Firebase/Crashlytics'
   pod 'GoogleSignIn'
   pod 'GoogleAPIClientForREST/Drive'
 end

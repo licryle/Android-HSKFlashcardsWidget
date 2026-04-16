@@ -16,6 +16,11 @@ interface WidgetPlatformDelegate {
      * Retrieve a list of current widget configuration identifiers.
      */
     fun getWidgetIds(callback: (List<Int>) -> Unit)
+
+    /**
+     * Retrieve the size/family of a specific widget.
+     */
+    fun getWidgetSize(widgetId: Int, callback: (String) -> Unit)
 }
 
 /**
@@ -25,6 +30,16 @@ suspend fun WidgetPlatformDelegate.awaitWidgetIds(): List<Int> =
     suspendCancellableCoroutine { continuation ->
         getWidgetIds { ids ->
             continuation.resume(ids)
+        }
+    }
+
+/**
+ * Suspendable version of [WidgetPlatformDelegate.getWidgetSize].
+ */
+suspend fun WidgetPlatformDelegate.awaitWidgetSize(widgetId: Int): String =
+    suspendCancellableCoroutine { continuation ->
+        getWidgetSize(widgetId) { size ->
+            continuation.resume(size)
         }
     }
 
