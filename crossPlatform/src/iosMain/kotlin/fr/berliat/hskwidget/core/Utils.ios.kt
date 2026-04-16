@@ -9,13 +9,15 @@ import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.databasesDir
 import io.github.vinceglb.filekit.filesDir
 
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.Dispatchers
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.useContents
 
 import platform.AVFAudio.AVAudioSession
 import platform.AVFAudio.AVSpeechUtterance
-import platform.AVFAudio.outputVolume
 import platform.AVFAudio.*
 
 import platform.Foundation.NSURL
@@ -31,8 +33,10 @@ import platform.UIKit.UIApplication
 import platform.UIKit.UIApplicationOpenSettingsURLString
 import platform.UIKit.UIPasteboard
 
+@OptIn(ExperimentalForeignApi::class)
 actual object ExpectedUtils {
-	val TTSynthesizer = AVSpeechSynthesizer()
+	private val TTSynthesizer = AVSpeechSynthesizer()
+    private var isAudioSessionSetup = false
 
     internal actual fun getAppDataPath(): PlatformFile {
         val path = NSFileManager.defaultManager
@@ -68,7 +72,6 @@ actual object ExpectedUtils {
             }
         }
 
-        @OptIn(ExperimentalForeignApi::class)
         override fun segment(text: String): Array<String>? {
             val tokenizer = NLTokenizer(NLTokenUnit.NLTokenUnitWord)
             tokenizer.string = text
@@ -77,8 +80,6 @@ actual object ExpectedUtils {
 
             tokenizer.enumerateTokensInRange(NSMakeRange(0u, text.length.toULong())) { tokenRange, _, _ ->
                 val swiftRange = tokenRange.useContents {
-                    // Inside this block, 'this' refers to the actual NSRange struct,
-                    // which has 'location' and 'length' properties.
                     this.toKmpIntRange(text)
                 }
 
@@ -99,88 +100,59 @@ actual object ExpectedUtils {
         UIPasteboard.generalPasteboard.string = s
     }
 
-	@OptIn(ExperimentalForeignApi::class)
-	internal fun ensureTTSSetup() {
-		val audioSession = AVAudioSession.sharedInstance()
-		try {
-			// Set category to .playback with options to allow background mixing.
-            // These options are critical for Widget/AppIntent audio to trigger.
-			audioSession.setCategory(
-				AVAudioSessionCategoryPlayback,
-				AVAudioSessionCategoryOptionDuckOthers or AVAudioSessionCategoryOptionMixWithOthers,
-				error = null
-			)
-			audioSession.setActive(true, error = null)
-		} catch (e: Exception) {
-			println("Audio session setup failed: $e")
-		}
-
-		// 2. Check for voices (Option 2)
-        val voices = AVSpeechSynthesisVoice.speechVoices() as List<AVSpeechSynthesisVoice>
-        val voice = AVSpeechSynthesisVoice.voiceWithLanguage("zh-CN")
-            ?: AVSpeechSynthesisVoice.voiceWithLanguage("zh-Hans")
-            ?: voices.firstOrNull { it.language.startsWith("zh") }
-
-		if (voice == null) {
-			println("Error: No voices installed. Cannot speak.")
-			// ToDo add dialog
-			openSettings()
-		}
-	}
-
-	@OptIn(ExperimentalForeignApi::class)
     internal actual fun isMuted() : Boolean {
-		val audioSession = AVAudioSession.sharedInstance()
-		if (audioSession.outputVolume > 0f) return false
-
-		// In background contexts like AppIntents/Widgets, outputVolume often returns 0
-		// until the session is active. We try to activate it briefly to get a real reading.
-		try {
-			audioSession.setCategory(AVAudioSessionCategoryPlayback, error = null)
-			audioSession.setActive(true, error = null)
-		} catch (_: Exception) {
-            return false
-        }
-
-		return audioSession.outputVolume == 0.0f
+        // Optimistic on iOS: outputVolume can be unreliable or blocking in background/launch.
+        // Returning false allows playWordInBackground to trigger setup and play.
+        return false
     }
 
     internal actual fun playWordInBackground(word: String) {
         if (word.isBlank()) return
-		ensureTTSSetup()
-
-        // Interrupt any current speech to ensure the new word is played immediately
-        if (TTSynthesizer.isSpeaking()) {
-            println("TTS: Synthesizer already speaking, stopping current utterance.")
-            TTSynthesizer.stopSpeakingAtBoundary(AVSpeechBoundary.AVSpeechBoundaryImmediate)
-        }
-
-        val utterance = AVSpeechUtterance(string = word)
-        println("TTS: Utterance created successfully: $utterance")
         
-        // Find a Chinese voice with fallbacks
-        val voice = AVSpeechSynthesisVoice.voiceWithLanguage("zh-CN")
-            ?: AVSpeechSynthesisVoice.voiceWithLanguage("zh-Hans")
-            ?: AVSpeechSynthesisVoice.speechVoices().mapNotNull { it as? AVSpeechSynthesisVoice }.firstOrNull { 
-                it.language.startsWith("zh") 
+        // Use appScope and Default dispatcher to perform setup without blocking UI
+        HSKAppServices.appScope.launch(Dispatchers.Default) {
+            try {
+                if (!isAudioSessionSetup) {
+                    val audioSession = AVAudioSession.sharedInstance()
+                    audioSession.setCategory(
+                        AVAudioSessionCategoryPlayback,
+                        AVAudioSessionCategoryOptionDuckOthers or AVAudioSessionCategoryOptionMixWithOthers,
+                        error = null
+                    )
+                    audioSession.setActive(true, error = null)
+                    isAudioSessionSetup = true
+                    // Small delay to let the session stabilize
+                    delay(300)
+                }
+
+                // Find a Chinese voice
+                val voice = AVSpeechSynthesisVoice.voiceWithLanguage("zh-CN")
+                    ?: AVSpeechSynthesisVoice.voiceWithLanguage("zh-Hans")
+                    ?: AVSpeechSynthesisVoice.speechVoices().mapNotNull { it as? AVSpeechSynthesisVoice }.firstOrNull { 
+                        it.language.startsWith("zh") 
+                    }
+
+                val utterance = AVSpeechUtterance(string = word)
+                if (voice != null) {
+                    utterance.voice = voice
+                }
+                utterance.rate = AVSpeechUtteranceDefaultSpeechRate
+                utterance.volume = 1.0f
+
+                // Speech must be triggered on Main thread
+                withContext(Dispatchers.Main) {
+                    if (TTSynthesizer.isSpeaking()) {
+                        TTSynthesizer.stopSpeakingAtBoundary(AVSpeechBoundary.AVSpeechBoundaryImmediate)
+                        delay(200)
+                    }
+
+                    // Safety delay before speaking
+                    delay(200)
+                    TTSynthesizer.speakUtterance(utterance)
+                }
+            } catch (e: Exception) {
+                println("TTS: playWordInBackground failed: ${e.message}")
             }
-
-        if (voice != null) {
-            println("TTS: Selected voice: ${voice.language} (${voice.name})")
-            utterance.voice = voice
-        } else {
-            println("TTS: WARNING - No Chinese voice found. Using default.")
-        }
-
-        utterance.rate = AVSpeechUtteranceDefaultSpeechRate
-        utterance.volume = 1.0f
-
-        try {
-            println("TTS: Calling speakUtterance...")
-		    TTSynthesizer.speakUtterance(utterance)
-            println("TTS: speakUtterance called.")
-        } catch (e: Exception) {
-            println("TTS: CRITICAL ERROR - speakUtterance failed: $e")
         }
     }
 
@@ -198,8 +170,8 @@ actual object ExpectedUtils {
     }
 }
 
+@OptIn(ExperimentalForeignApi::class)
 fun NSRange.toKmpIntRange(string: String): IntRange? {
-    // 'this' here is an actual NSRange struct, so location/length works fine here
     if (this.location == NSNotFound.toULong()) return null
     val start = this.location.toInt()
     val end = (this.location + this.length).toInt()

@@ -70,31 +70,6 @@ struct NextWordIntent: AppIntents.AppIntent {
     }
 }
 
-struct SpeakWordIntent: AppIntents.AppIntent {
-    static var title: LocalizedStringResource = "Speak Word"
-    
-    @Parameter(title: "Word")
-    var word: String
-
-    init() { self.word = "" }
-    init(word: String) { self.word = word }
-
-    func perform() async throws -> some AppIntents.IntentResult {
-        // Initialize App Group path for KMP (needed since AppIntent runs in background)
-        let services = crossPlatform.HSKAppServices.shared
-        services.doInit(upToLevel: crossPlatform.HSKAppServicesPriority.Widget.shared)
-        
-        // Wait for initialization
-        let isReady = try? await services.awaitReady(timeoutMs: 5000)
-
-        if isReady == true {
-            crossPlatform.Utils.shared.playWordInBackground(word: word)
-        }
-
-        return .result()
-    }
-}
-
 struct OpenOCRIntent: AppIntents.AppIntent {
     static var title: LocalizedStringResource = "Open OCR"
     static var openAppWhenRun: Bool = true

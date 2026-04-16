@@ -25,6 +25,7 @@ import fr.berliat.hskwidget.app_name
 import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.data.store.PrefCompat.PrefCompatMigration
 import fr.berliat.hskwidget.data.store.SupportDevStore
+import fr.berliat.hskwidget.domain.SearchQuery
 import fr.berliat.hskwidget.ui.navigation.NavigationManager
 
 import io.github.vinceglb.filekit.FileKit
@@ -145,7 +146,7 @@ actual class AppViewModel(navigationManager: NavigationManager, val activityProv
             if (intent.hasExtra(INTENT_SEARCH_WORD)) {
                 val searchWord = intent.getStringExtra(INTENT_SEARCH_WORD)
                 if (!searchWord.isNullOrEmpty()) {
-                    return AppIntent.Search(searchWord)
+                    return AppIntent.Search(SearchQuery.fromString(searchWord))
                 }
             }
 
@@ -153,7 +154,7 @@ actual class AppViewModel(navigationManager: NavigationManager, val activityProv
             if (intent.action == Intent.ACTION_PROCESS_TEXT && intent.type == "text/plain") {
                 val sharedText = intent.getStringExtra(Intent.EXTRA_PROCESS_TEXT)
                 if (!sharedText.isNullOrEmpty()) {
-                    return AppIntent.Search(sharedText)
+                    return AppIntent.Search(SearchQuery.fromString(sharedText))
                 }
             }
 

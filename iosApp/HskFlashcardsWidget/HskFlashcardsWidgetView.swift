@@ -35,14 +35,13 @@ struct HskFlashcardsWidgetView: View {
 
                     Spacer()
 
-                    Button(intent: SpeakWordIntent(word: entry.word)) {
+                    Link(destination: URL(string: "hskwidget://searchTTS?q=\((crossPlatform.SearchQuery(query: entry.word, ignoreAnnotation: true, inListName: nil).description()).addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed) ?? "")")!) {
                         Image(systemName: "speaker.wave.2")
                             .font(.system(size: 12))
                             .frame(width: 24, height: 24)
                             .background(Color.secondary.opacity(0.1))
                             .clipShape(Circle())
                     }
-                    .buttonStyle(.plain)
                 }
 
                 // Middle Content: Pinyin - Simplified - Definition

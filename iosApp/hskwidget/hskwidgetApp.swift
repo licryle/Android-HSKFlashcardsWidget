@@ -70,7 +70,13 @@ struct hskwidgetApp: App {
             
             if url.host == "search" {
                 if let word = components?.queryItems?.first(where: { $0.name == "q" })?.value {
-                    appIntent = crossPlatform.AppIntent.Search(query: word)
+                    let searchQuery = crossPlatform.SearchQuery.companion.fromString(query: word)
+                    appIntent = crossPlatform.AppIntent.Search(query: searchQuery)
+                }
+            } else if url.host == "searchTTS" {
+                if let word = components?.queryItems?.first(where: { $0.name == "q" })?.value {
+                    let searchQuery = crossPlatform.SearchQuery.companion.fromString(query: word)
+                    appIntent = crossPlatform.AppIntent.SearchTTS(query: searchQuery)
                 }
             } else if url.host == "ocr" {
                 if let path = components?.queryItems?.first(where: { $0.name == "path" })?.value {

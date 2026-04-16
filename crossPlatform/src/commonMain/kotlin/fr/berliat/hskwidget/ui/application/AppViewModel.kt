@@ -23,6 +23,7 @@ import fr.berliat.hskwidget.database_update_success
 import fr.berliat.hskwidget.dbbackup_failure_folderpermission
 import fr.berliat.hskwidget.dbbackup_failure_write
 import fr.berliat.hskwidget.dbbackup_success
+import fr.berliat.hskwidget.domain.SearchQuery
 import fr.berliat.hskwidget.ui.navigation.NavigationManager
 import io.github.vinceglb.filekit.FileKit
 
@@ -224,14 +225,20 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
         executeWhenReady {
             when (intent) {
                 is AppIntent.Search -> search(intent.query)
+                is AppIntent.SearchTTS -> searchTTS(intent.query)
                 is AppIntent.WidgetConfiguration -> configureWidget(intent.widgetId)
                 is AppIntent.ImageOCR -> ocrImage(intent.file)
             }
         }
     }
 
-    fun search(s: String) {
-        navigationManager.navigate(Screen.Dictionary(s))
+    fun search(query: SearchQuery) {
+        navigationManager.navigate(Screen.Dictionary(query.toString()))
+    }
+
+    fun searchTTS(query: SearchQuery) {
+        search(query)
+        Utils.playWordInBackground(query.query)
     }
 
     fun configureWidget(widgetId: Int) {
