@@ -64,8 +64,7 @@ struct NextWordIntent: AppIntents.AppIntent {
     init() {}
 
     func perform() async throws -> some AppIntents.IntentResult {
-        // Trigger the iOS Widget reload
-        WidgetCenter.shared.reloadAllTimelines()
+        // Note: iOS 17+ automatically reloads the widget that triggered the intent.
         return .result()
     }
 }
