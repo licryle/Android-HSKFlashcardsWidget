@@ -106,7 +106,7 @@ class ShareViewController: UIViewController {
     
     private func saveImageAndOpenApp(data: Data) {
         let fileManager = FileManager.default
-        if let groupURL = fileManager.containerURL(forSecurityApplicationGroupIdentifier: "group.fr.berliat.hskwidget") {
+        if let groupURL = fileManager.containerURL(forSecurityApplicationGroupIdentifier: "net.vertex8.hskwidget") {
             let targetURL = groupURL.appendingPathComponent("shared_ocr_input.jpg")
             try? fileManager.removeItem(at: targetURL)
             try? data.write(to: targetURL)
