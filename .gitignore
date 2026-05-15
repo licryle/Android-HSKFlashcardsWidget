@@ -36,3 +36,4 @@ crossPlatform/test_datastore_*
 /androidApp/release/androidApp-release.aab
 
 /backups/
+.direnv/

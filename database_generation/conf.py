@@ -11,7 +11,7 @@ HSK_FILES = ['new_hsk/HSK List (Frequency)/HSK 7-9.txt', 'new_hsk/HSK List (Freq
     'new_hsk/HSK List (Frequency)/HSK 5.txt', 'new_hsk/HSK List (Frequency)/HSK 4.txt',
     'new_hsk/HSK List (Frequency)/HSK 3.txt', 'new_hsk/HSK List (Frequency)/HSK 2.txt',
     'new_hsk/HSK List (Frequency)/HSK 1.txt']  # List of other files containing Chinese words
-DB_FILE = '../app/src/main/assets/databases/Mandarin_Assistant.db'
+DB_FILE = '../crossPlatform/src/androidMain/assets/databases/Mandarin_Assistant.db'
 
 SYSTEM_LISTS_CREATION_DATE = 1746863357780
 
@@ -22,7 +22,7 @@ API_ENDPOINT = os.getenv('LLM_API_ENDPOINT', 'http://localhost:1234/v1/chat/comp
 MODEL_NAME = os.getenv('LLM_MODEL_NAME', 'Yi-1.5-6B-Chat-Q6_K')  # Default model name
 MAX_CONSECUTIVE_FAILURES = 10  # Maximum number of consecutive API failures before exiting
 AI_CACHE_DB = 'ai_fields_cache.db'
-AI_WORDS_WHERE_CLAUSE = "hsk_level != 'NOT_HSK'"
+AI_WORDS_WHERE_CLAUSE = "(hsk_level != 'NOT_HSK')"
 
 DEFINITION_AI_LOCALE = 'zh_CN_HSK03'
 
