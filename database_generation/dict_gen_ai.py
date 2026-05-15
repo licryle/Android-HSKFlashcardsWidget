@@ -49,23 +49,12 @@ def get_words_without_definitions(cursor, limit: int, where_clause) -> List[str]
     cursor.execute('''
         SELECT simplified
         FROM chinese_word
-        WHERE examples IS NULL AND hsk_level != 'NOT_HSK'
+        WHERE examples IS NULL AND ?
         LIMIT ?
-    ''', (limit,))
+    ''', (where_clause, limit))
     hsk_words = [row[0] for row in cursor.fetchall()]
-    
-    # If there are not enough HSK words, get non-HSK words to fill the batch
-    if len(hsk_words) < limit:
-        remaining = limit - len(hsk_words)
-        cursor.execute('''
-            SELECT simplified
-            FROM chinese_word
-            WHERE examples IS NULL AND ?
-            LIMIT ?
-        ''', (where_clause,remaining))
-        non_hsk_words = [row[0] for row in cursor.fetchall()]
-        hsk_words.extend(non_hsk_words)
-        
+
+    print(limit, hsk_words)
     return hsk_words
 
 def generate_prompt(words: List[str]) -> str:
