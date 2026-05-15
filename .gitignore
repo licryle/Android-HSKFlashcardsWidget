@@ -34,3 +34,5 @@ crossPlatform/test_datastore_*
 /iosApp/hskwidget.xcworkspace/
 /iosApp/GoogleService-Info.plist
 /androidApp/release/androidApp-release.aab
+
+/backups/
