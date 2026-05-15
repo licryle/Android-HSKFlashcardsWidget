@@ -37,3 +37,6 @@ crossPlatform/test_datastore_*
 
 /backups/
 .direnv/
+
+/iosApp/hskwidget/databases/*
+/crossPlatform/src/androidMain/assets/databases/*

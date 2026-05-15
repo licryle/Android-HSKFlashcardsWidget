@@ -221,3 +221,41 @@ skie {
         produceDistributableFramework()
     }
 }
+
+val copyGeneratedDatabase = tasks.register("copyGeneratedDatabase") {
+    group = "database"
+    description = "Copies the generated Mandarin Assistant database to Android and iOS assets."
+
+    val dbFile = file("${rootProject.projectDir}/database_generation/output/Mandarin_Assistant.db")
+
+    doFirst {
+        if (!dbFile.exists()) {
+            throw GradleException(
+                "Mandarin_Assistant.db not found in 'database_generation/' folder. " +
+                "This file is required to build the application. " +
+                "Please run the database generation script first."
+            )
+        }
+    }
+
+    doLast {
+        // Copy to Android assets
+        copy {
+            from(dbFile)
+            into(file("${projectDir}/src/androidMain/assets/databases"))
+        }
+        // Copy to iOS assets
+        copy {
+            from(dbFile)
+            into(file("${rootProject.projectDir}/iosApp/hskwidget/databases"))
+        }
+    }
+}
+
+tasks.matching {
+    it.name.startsWith("preBuild") ||
+    it.name.startsWith("generate") ||
+    it.name.contains("Package")
+}.all {
+    dependsOn(copyGeneratedDatabase)
+}

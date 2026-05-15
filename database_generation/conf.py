@@ -11,7 +11,10 @@ HSK_FILES = ['new_hsk/HSK List (Frequency)/HSK 7-9.txt', 'new_hsk/HSK List (Freq
     'new_hsk/HSK List (Frequency)/HSK 5.txt', 'new_hsk/HSK List (Frequency)/HSK 4.txt',
     'new_hsk/HSK List (Frequency)/HSK 3.txt', 'new_hsk/HSK List (Frequency)/HSK 2.txt',
     'new_hsk/HSK List (Frequency)/HSK 1.txt']  # List of other files containing Chinese words
-DB_FILE = '../crossPlatform/src/androidMain/assets/databases/Mandarin_Assistant.db'
+
+# The database is generated locally in this folder.
+# It is copied to the application's assets by the Gradle build task 'copyGeneratedDatabase'.
+DB_FILE = 'output/Mandarin_Assistant.db'
 
 SYSTEM_LISTS_CREATION_DATE = 1746863357780
 
