@@ -58,29 +58,3 @@ def merge_json_strings(current_json: Optional[str], new_json_data: str) -> str:
         return json.dumps(current_data, ensure_ascii=False)
     except:
         return new_json_data
-
-def generate_searchable_text(*parts: Any) -> str:
-    """Combines parts into a searchable string, including pinyin normalization and definition unwrapping."""
-    processed_parts = []
-    for p in parts:
-        if not p: continue
-        
-        # Handle JSON definitions
-        if isinstance(p, str) and (p.startswith('{') or p.startswith('[')):
-            try:
-                data = json.loads(p)
-                if isinstance(data, dict):
-                    for val in data.values():
-                        processed_parts.append(str(val))
-                continue
-            except: pass
-            
-        text = str(p)
-        processed_parts.append(text)
-        
-        # Add unidecoded pinyin (no tones, no spaces)
-        clean_pinyin = unidecode(text).replace(" ", "")
-        if clean_pinyin != text and len(clean_pinyin) > 0:
-            processed_parts.append(clean_pinyin)
-
-    return " ".join(filter(None, processed_parts))

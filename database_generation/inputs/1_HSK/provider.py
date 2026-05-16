@@ -1,6 +1,6 @@
 import os
 from typing import List, Dict, Any, Iterator, Tuple
-from base_provider import Provider, ProviderType
+from lib import Provider, ProviderType
 
 class HskProvider(Provider):
     SYSTEM_LISTS_CREATION_DATE = 1746863357780
@@ -18,7 +18,7 @@ class HskProvider(Provider):
             },
             "word_list": {
                 "type": ProviderType.TABLE,
-                "columns": ["name", "creation_date", "last_modified", "list_type", "anki_deck_id"]
+                "columns": ["id", "name", "creation_date", "last_modified", "list_type", "anki_deck_id"]
             },
             "word_list_entry": {
                 "type": ProviderType.TABLE,
@@ -34,22 +34,16 @@ class HskProvider(Provider):
             return
 
         hsk_files = [
-            ('HSK 7-9.txt', 'HSK7-9', 7),
-            ('HSK 6.txt', 'HSK6', 6),
-            ('HSK 5.txt', 'HSK5', 5),
+            ('HSK 7-9.txt', 'HSK7', 1),
+            ('HSK 6.txt', 'HSK6', 2),
+            ('HSK 5.txt', 'HSK5', 3),
             ('HSK 4.txt', 'HSK4', 4),
-            ('HSK 3.txt', 'HSK3', 3),
-            ('HSK 2.txt', 'HSK2', 2),
-            ('HSK 1.txt', 'HSK1', 1),
+            ('HSK 3.txt', 'HSK3', 5),
+            ('HSK 2.txt', 'HSK2', 6),
+            ('HSK 1.txt', 'HSK1', 7),
         ]
 
         popularity = 0
-        # For word_list, we need IDs. But since we are yielding, 
-        # the Orchestrator might need to handle ID generation for TABLE types 
-        # or we assume we can provide them.
-        # Actually, if word_list uses AUTOINCREMENT, we might have an issue 
-        # if multiple providers yield to it.
-        # However, HSK levels are distinct.
         
         for filename, level_name, level_num in hsk_files:
             file_path = os.path.join(hsk_freq_dir, filename)

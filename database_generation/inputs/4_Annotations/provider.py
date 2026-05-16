@@ -2,8 +2,7 @@ import csv
 import os
 from datetime import datetime
 from typing import List, Dict, Any, Iterator, Tuple
-from base_provider import Provider, ProviderType
-from utils import generate_searchable_text
+from lib import Provider, ProviderType, unidecode
 
 class AnnotationsProvider(Provider):
     SYSTEM_LISTS_CREATION_DATE = 1746863357780
@@ -39,12 +38,9 @@ class AnnotationsProvider(Provider):
         }
 
     def data(self) -> Iterator[Tuple[str, Dict[str, Any]]]:
-        csv_path = os.path.join(os.path.dirname(__file__), "annotations.csv")
-        if not os.path.exists(csv_path):
-            return
-
         # System lists for annotations
-        annotated_list_id = 100 # Arbitrary ID for system lists
+        annotated_list_id = 8
+        exam_list_id = 9
 
         yield ("word_list", {
             "id": annotated_list_id,
@@ -55,9 +51,21 @@ class AnnotationsProvider(Provider):
             "anki_deck_id": 0
         })
 
+        yield ("word_list", {
+            "id": exam_list_id,
+            "name": 'At the exam',
+            "creation_date": self.SYSTEM_LISTS_CREATION_DATE,
+            "last_modified": self.SYSTEM_LISTS_CREATION_DATE + 11,
+            "list_type": 'SYSTEM',
+            "anki_deck_id": 0
+        })
+
+        csv_path = os.path.join(os.path.dirname(__file__), "annotations.csv")
+        if not os.path.exists(csv_path):
+            return
+
         with open(csv_path, mode='r', encoding='utf-8-sig') as file:
             # Robustly skip comments and empty lines at the file level
-            # This handles cases where the comment character might be preceded by whitespace or BOM
             filtered_lines = (line for line in file if line.strip() and not line.lstrip().startswith('#'))
             reader = csv.reader(filtered_lines)
             
@@ -79,7 +87,7 @@ class AnnotationsProvider(Provider):
                 except (ValueError, TypeError):
                     first_seen = 0
 
-                searchable_text = generate_searchable_text(pinyins, notes, themes, simplified)
+                searchable_text = unidecode(pinyins).replace(" ", "") + ' ' + notes + ' ' + themes + ' ' + simplified
 
                 yield ("chinese_word_annotation", {
                     "a_simplified": simplified,

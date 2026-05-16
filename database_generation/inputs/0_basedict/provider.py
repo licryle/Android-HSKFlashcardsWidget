@@ -2,12 +2,10 @@ import os
 import re
 import json
 from typing import List, Dict, Optional, Any, Iterator, Tuple
-from base_provider import Provider, ProviderType
-from utils import convert_pinyin_with_tones, generate_searchable_text
+from lib import Provider, ProviderType, convert_pinyin_with_tones, unidecode
 
 class BaseDictProvider(Provider):
     def update(self):
-        # Placeholder for downloading latest CEDICT if needed
         pass
 
     def schema(self) -> Dict[str, Dict[str, Any]]:
@@ -24,16 +22,19 @@ class BaseDictProvider(Provider):
         if match:
             traditional, simplified, pinyins_raw, definition_raw = match.groups()
             pinyins = convert_pinyin_with_tones(pinyins_raw)
-            definition = json.dumps({"en": definition_raw}, ensure_ascii=False)
+            definition_dict = {"en": definition_raw}
+            definition_json = json.dumps(definition_dict, ensure_ascii=False)
+
+            searchable_text = simplified + ' ' + traditional + ' ' + unidecode(pinyins).replace(" ", "") + ' ' + definition_json
             
             return {
                 "simplified": simplified,
                 "traditional": traditional,
-                "definition": definition,
+                "definition": definition_json,
                 "pinyins": pinyins,
                 "hsk_level": "NOT_HSK",
                 "popularity": 0,
-                "searchable_text": generate_searchable_text(simplified, traditional, pinyins, definition_raw)
+                "searchable_text": searchable_text
             }
         return None
 
