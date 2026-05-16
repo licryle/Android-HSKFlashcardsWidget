@@ -75,7 +75,8 @@ def parse_json_permissive(s: str, required_fields: List[str]) -> Optional[List[D
                     start_pos = None
         return valid_entries if valid_entries else None
 
-def call_llm_api(endpoint: str, model: str, prompt: str, required_fields: List[str]) -> Optional[List[Dict]]:
+def call_llm_api(endpoint: str, model: str, prompt: str, required_fields: List[str]) -> List[Dict]:
+    """Call the LLM API. Raises an exception on any failure to ensure hard fail."""
     headers = {'Content-Type': 'application/json'}
     data = {
         'model': model,
@@ -84,12 +85,16 @@ def call_llm_api(endpoint: str, model: str, prompt: str, required_fields: List[s
         'max_tokens': 2000,
         'stream': False
     }
-    try:
-        response = requests.post(endpoint, headers=headers, json=data, timeout=120)
-        response.raise_for_status()
-        content = response.json()['choices'][0]['message']['content']
-        cleaned = clean_json_string(content)
-        return parse_json_permissive(cleaned, required_fields)
-    except Exception as e:
-        logging.error(f"LLM API Error: {e}")
-        return None
+    
+    # We let requests exceptions bubble up
+    response = requests.post(endpoint, headers=headers, json=data, timeout=120)
+    response.raise_for_status()
+    
+    content = response.json()['choices'][0]['message']['content']
+    cleaned = clean_json_string(content)
+    parsed = parse_json_permissive(cleaned, required_fields)
+    
+    if parsed is None:
+        raise ValueError(f"Failed to parse any valid JSON objects from LLM response: {content}")
+        
+    return parsed
