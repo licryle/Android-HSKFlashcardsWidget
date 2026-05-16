@@ -13,7 +13,7 @@ class HskProvider(Provider):
         return {
             "chinese_word": {
                 "type": ProviderType.COLUMN,
-                "columns": ["hsk_level", "popularity"],
+                "columns": ["hsk_level"],
                 "index": "simplified"
             },
             "word_list": {
@@ -43,8 +43,6 @@ class HskProvider(Provider):
             ('HSK 1.txt', 'HSK1', 7),
         ]
 
-        popularity = 0
-        
         for filename, level_name, level_num in hsk_files:
             file_path = os.path.join(hsk_freq_dir, filename)
             if not os.path.exists(file_path):
@@ -62,7 +60,7 @@ class HskProvider(Provider):
             })
 
             with open(file_path, 'r', encoding='utf-8') as f:
-                lines = f.readlines()[::-1]
+                lines = f.readlines()
                 for line in lines:
                     word = line.strip()
                     if not word: continue
@@ -70,8 +68,7 @@ class HskProvider(Provider):
                     # Update word metadata
                     yield ("chinese_word", {
                         "simplified": word,
-                        "hsk_level": level_name,
-                        "popularity": popularity
+                        "hsk_level": level_name
                     })
                     
                     # Link to list
@@ -80,5 +77,3 @@ class HskProvider(Provider):
                         "simplified": word,
                         "anki_note_id": 0
                     })
-                    
-                    popularity += 1

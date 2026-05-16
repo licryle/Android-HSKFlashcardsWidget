@@ -16,6 +16,7 @@ class Orchestrator:
         self.providers: List[Provider] = []
         self.schema_data = self._load_schema()
         self.table_definitions = self._parse_room_entities()
+        self.column_defaults: Dict[str, Dict[str, Any]] = {}
         self._setup_logging()
 
     def _setup_logging(self):
@@ -116,6 +117,12 @@ class Orchestrator:
                 for col in info['columns']:
                     if col not in valid_cols:
                         errors.append(f"Provider {p_name} targets unknown column '{col}' in table '{table}'")
+
+                # Collect defaults from provider schema
+                if 'defaults' in info:
+                    if table not in self.column_defaults:
+                        self.column_defaults[table] = {}
+                    self.column_defaults[table].update(info['defaults'])
         
         if errors:
             for err in errors:
@@ -145,8 +152,20 @@ class Orchestrator:
                     data_to_insert = record.copy()
                     table_fields = self.table_definitions[table_name]
                     for col_name, field_info in table_fields.items():
-                        if col_name not in data_to_insert and not field_info.get('notNull', False):
-                            data_to_insert[col_name] = None
+                        if col_name not in data_to_insert:
+                            default_val = field_info.get('defaultValue')
+                            if default_val is not None:
+                                if isinstance(default_val, str) and default_val.startswith("'") and default_val.endswith("'"):
+                                    data_to_insert[col_name] = default_val[1:-1]
+                                else:
+                                    try:
+                                        data_to_insert[col_name] = int(default_val)
+                                    except (ValueError, TypeError):
+                                        data_to_insert[col_name] = default_val
+                            elif table_name in self.column_defaults and col_name in self.column_defaults[table_name]:
+                                data_to_insert[col_name] = self.column_defaults[table_name][col_name]
+                            elif not field_info.get('notNull', False):
+                                data_to_insert[col_name] = None
                     
                     cols = list(data_to_insert.keys())
                     placeholders = ', '.join(['?'] * len(cols))

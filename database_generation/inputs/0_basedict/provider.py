@@ -12,7 +12,7 @@ class BaseDictProvider(Provider):
         return {
             "chinese_word": {
                 "type": ProviderType.TABLE,
-                "columns": ["simplified", "traditional", "definition", "pinyins", "searchable_text", "hsk_level", "popularity"]
+                "columns": ["simplified", "traditional", "definition", "pinyins", "searchable_text", "hsk_level"]
             }
         }
 
@@ -33,7 +33,6 @@ class BaseDictProvider(Provider):
                 "definition": definition_json,
                 "pinyins": pinyins,
                 "hsk_level": "NOT_HSK",
-                "popularity": 0,
                 "searchable_text": searchable_text
             }
         return None
