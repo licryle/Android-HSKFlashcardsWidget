@@ -16,37 +16,49 @@ nix develop
 
 ## Configuration
 
-The script can optionally use an LLM (Large Language Model) to populate extra fields like synonyms, antonyms, and usage examples.
+The script uses an Orchestrator to discover and run data providers.
 
-1.  **Environment Variables**: Configure your settings in `.env`:
-    *   `LLM_API_ENDPOINT`: The URL of your OpenAI-compatible API (e.g., LM Studio: `http://localhost:1234/v1/chat/completions`).
+1.  **Environment Variables**: Configure your settings in `.env` (used by some providers like AI enrichment):
+    *   `LLM_API_ENDPOINT`: The URL of your OpenAI-compatible API.
     *   `LLM_MODEL_NAME`: The name of the model to use.
-2.  **Configuration File**: Further settings like file paths and database schema are defined in `conf.py`.
+2.  **Schema**: The database structure is driven by the Room export schema located in `crossPlatform/schemas/`.
 
 ## Usage
 
 To generate the database, run:
 
 ```bash
-python3 dict_gen.py
+python3 main.py
 ```
 
-This will:
-1.  Delete any existing database file at the path specified in `conf.py` (defaulting to `../app/src/main/assets/databases/Mandarin_Assistant.db`).
-2.  Parse `cedict_ts.u8` for base dictionary definitions.
-3.  Parse HSK lists in `new_hsk/` to assign HSK levels and popularity rankings.
-4.  Import user annotations from `annotations.csv`.
-5.  Populate system word lists (HSK levels and Annotated words).
-6.  (Optional) Call `dict_gen_ai.py` to fill in AI-generated columns, using `ai_fields_cache.db` to avoid re-querying the API for known words.
+Optional arguments:
+*   `--update`: Triggers the `update()` method on all providers (e.g., to download new source files).
+*   `--db <path>`: Specify output database path.
+*   `--schema <path>`: Specify the Room schema JSON file.
+
+### How it works
+
+The `Orchestrator` performs the following steps:
+1.  **Schema Creation**: Initializes a new SQLite database based on the Room schema.
+2.  **Provider Discovery**: Automatically loads providers from the `inputs/` directory.
+3.  **Data Assembly**: 
+    *   Runs `TABLE` providers (e.g., `0_basedict`) to create primary word entries.
+    *   Runs `COLUMN` providers (e.g., `1_HSK`, `2_Popularity`, `3_AiFields1`) to enrich existing entries or populate secondary tables.
+
+## Inputs & Providers
+
+Data is managed by modular providers in the `inputs/` directory:
+
+*   **`0_basedict`**: Parses CC-CEDICT (`cedict_ts.u8`) to populate the core `chinese_word` table.
+*   **`1_HSK`**: Assigns HSK levels to words and generates system HSK word lists.
+*   **`2_Popularity`**: Uses word frequency data (e.g., BCC corpus) to populate the `popularity` field.
+*   **`3_AiFields1`**: Enriches words with AI-generated examples, synonyms, and antonyms.
+*   **`4_Annotations`**: Imports user-defined annotations from `annotations.csv`.
 
 ## Files Overview
 
-*   `dict_gen.py`: The main entry point for database generation.
-*   `dict_gen_ai.py`: Handles interaction with the LLM API to enrich dictionary entries.
-*   `conf.py`: Configuration constants (paths, API settings, database schema).
-*   `cedict_ts.u8`: The CC-CEDICT source file.
-*   `annotations.csv`: CSV file containing personal annotations and study progress.
-*   `new_hsk/`: Folder containing the HSK word lists.
+*   `main.py`: The main entry point for database generation.
+*   `lib/orchestrator.py`: Logic for database creation and provider execution.
+*   `lib/base_provider.py`: Abstract base class and types for data providers.
 *   `flake.nix`: Nix flake defining the reproducible development environment.
 *   `requirements.txt`: Python dependencies (for non-Nix users).
-*   `.env.example`: Template for environment variables.
