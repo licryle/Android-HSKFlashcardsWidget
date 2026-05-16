@@ -5,12 +5,12 @@ import traceback
 import random
 from collections import defaultdict
 
-# Add the current directory to sys.path so that providers can import utils, base_provider, etc.
+# Ensure the root of database_generation is in sys.path so 'lib' can be imported
 current_dir = os.path.dirname(os.path.abspath(__file__))
 if current_dir not in sys.path:
     sys.path.insert(0, current_dir)
 
-from base_provider import Provider
+from lib import Provider
 
 def test_providers(inputs_dir: str):
     print(f"Scanning for providers in {os.path.abspath(inputs_dir)}...\n")
@@ -32,9 +32,8 @@ def test_providers(inputs_dir: str):
                 spec = importlib.util.spec_from_file_location(module_name, provider_file)
                 module = importlib.util.module_from_spec(spec)
                 
-                provider_dir = os.path.dirname(provider_file)
-                if provider_dir not in sys.path:
-                    sys.path.insert(0, provider_dir)
+                # We don't necessarily need to add the provider_dir to sys.path 
+                # if they import from 'lib', as 'lib' is in the root path.
                 
                 spec.loader.exec_module(module)
                 
@@ -82,10 +81,6 @@ def test_providers(inputs_dir: str):
                         print(f"      {k}: {val_str}")
                 
                 print(f"  [OK] Data summary: {counts}")
-                
-                # Cleanup path for next provider
-                if provider_dir in sys.path:
-                    sys.path.remove(provider_dir)
 
             except Exception as e:
                 print(f"  [ERROR] Failed to test provider {item}: {e}")
