@@ -4,15 +4,46 @@ import json
 import sys
 import time
 import logging
-from typing import Dict, Any, Iterator, Tuple
+from typing import Dict, Any, Iterator, Tuple, List
 
-# Local import for ai_logic
-current_dir = os.path.dirname(os.path.abspath(__file__))
-if current_dir not in sys.path:
-    sys.path.insert(0, current_dir)
-from ai_logic import call_llm_api, generate_prompt
+from lib.utils_ai import call_llm_api
+from lib import Provider, ProviderType, BATCH_SIZE, API_ENDPOINT, MODEL_NAME, DEFINITION_AI_LOCALE, HSK_FILES
 
-from lib import Provider, ProviderType, BATCH_SIZE, API_ENDPOINT, MODEL_NAME, DEFINITION_AI_LOCALE, HSK_FILES, MAX_CONSECUTIVE_FAILURES
+def generate_prompt(words: List[str]) -> str:
+    return f"""<|system|>
+You are a precise Chinese language assistant helping learners learn using mostly HSK3 vocabulary. You MUST return a valid JSON array of objects.
+<|user|>
+Analyze the following Chinese words. For each word, return an object with these fields:
+
+1. "word": The original word.
+2. "definition": HSK3-level definitions. If multiple, separate with \\n.
+3. "examples": One example sentence per definition, separated with \\n. Use HSK3 vocabulary.
+4. "modality": EXACTLY ONE of ["ORAL", "WRITTEN", "ORAL_WRITTEN", "N/A"].
+5. "type": EXACTLY ONE of ["NOUN", "VERB", "ADJECTIVE", "ADVERB", "CONJUNCTION", "PREPOSITION", "INTERJECTION", "IDIOM", "N/A"]. If a word has multiple types, choose the most common one.
+6. "synonyms": Comma-separated simplified Chinese words (or empty string).
+7. "antonym": Closest antonym in simplified Chinese (or empty string).
+
+CRITICAL: 
+- Output MUST be a valid JSON array. 
+- No trailing commas in objects.
+- No markdown formatting (no ```json).
+- Fields "modality" and "type" must be a single string from the allowed list, NOT a list or multiple strings.
+
+Words to analyze: {', '.join(words)}
+
+Expected format:
+[
+  {{
+    "word": "example",
+    "definition": "def1\\ndef2",
+    "examples": "ex1\\nex2",
+    "modality": "ORAL_WRITTEN",
+    "type": "NOUN",
+    "synonyms": "syn1, syn2",
+    "antonym": "ant1"
+  }}
+]
+"""
 
 class AiFieldsProvider(Provider):
     def __init__(self):
@@ -22,7 +53,6 @@ class AiFieldsProvider(Provider):
         cache_db = os.path.join(os.path.dirname(__file__), "ai_fields_cache.db")
         conn = sqlite3.connect(cache_db)
         cursor = conn.cursor()
-        # Removed DEFAULT values to ensure we only store what we get, allowing NULLs
         cursor.execute('''CREATE TABLE IF NOT EXISTS `chinese_word` (
                             `simplified` TEXT NOT NULL,
                             `definition` TEXT NOT NULL,
@@ -58,19 +88,20 @@ class AiFieldsProvider(Provider):
 
         self.logger.info(f"AiFieldsProvider: Found {len(missing_words)} words missing from cache. Starting LLM updates...")
         
-        consecutive_failures = 0
         for i in range(0, len(missing_words), BATCH_SIZE):
             batch = missing_words[i:i + BATCH_SIZE]
             prompt = generate_prompt(batch)
             required_fields = ['word', 'definition', 'examples', 'modality', 'type', 'synonyms', 'antonym']
+            
             ai_results = call_llm_api(API_ENDPOINT, MODEL_NAME, prompt, required_fields)
             
             if ai_results:
-                consecutive_failures = 0
                 for res in ai_results:
-                    word = res.pop('word')
+                    word = res.pop('word', None)
+                    if not word: continue
+                    
                     # Wrap definition in the expected JSON locale map
-                    res['definition'] = json.dumps({DEFINITION_AI_LOCALE: res['definition']}, ensure_ascii=False)
+                    res['definition'] = json.dumps({DEFINITION_AI_LOCALE: res.get('definition', '')}, ensure_ascii=False)
                     
                     # Convert empty strings to None (NULL) for better database state
                     for key in res:
@@ -84,11 +115,7 @@ class AiFieldsProvider(Provider):
                 conn.commit()
                 self.logger.info(f"AiFieldsProvider: Progress {i + len(batch)}/{len(missing_words)}")
             else:
-                consecutive_failures += 1
-                self.logger.warning(f"AiFieldsProvider: Failed to get results for batch starting with {batch[0]} (consecutive failures: {consecutive_failures})")
-                if consecutive_failures >= MAX_CONSECUTIVE_FAILURES:
-                    conn.close()
-                    raise RuntimeError(f"AiFieldsProvider: Exiting after {MAX_CONSECUTIVE_FAILURES} consecutive failures")
+                self.logger.warning(f"AiFieldsProvider: Failed to get results for batch starting with {batch[0]}. Skipping.")
             
             # Sleep to avoid rate limiting
             time.sleep(1)
@@ -115,8 +142,6 @@ class AiFieldsProvider(Provider):
         columns = [desc[0] for desc in cursor.description]
         for row in cursor.fetchall():
             record = dict(zip(columns, row))
-            # Clean up: ensure empty fields from cache are also yielded as None
-            # (In case old cache data had empty strings)
             for k, v in record.items():
                 if k != "simplified" and v == "":
                     record[k] = None

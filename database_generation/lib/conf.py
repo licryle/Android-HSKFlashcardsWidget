@@ -11,12 +11,14 @@ HSK_DIR = os.path.join(INPUTS_DIR, '1_HSK')
 POPULARITY_DIR = os.path.join(INPUTS_DIR, '2_Popularity')
 AI_FIELDS_DIR = os.path.join(INPUTS_DIR, '3_AiFields1')
 ANNOTATIONS_DIR = os.path.join(INPUTS_DIR, '4_Annotations')
+COLLOCATIONS_DIR = os.path.join(INPUTS_DIR, '5_Collocations')
 
 # File Paths
 CEDICT_FILE = os.path.join(BASE_DICT_DIR, 'cedict_ts.u8')
 ANNOTATIONS_FILE = os.path.join(ANNOTATIONS_DIR, 'annotations.csv')
 DB_FILE = 'output/Mandarin_Assistant.db'
 AI_CACHE_DB = os.path.join(AI_FIELDS_DIR, 'ai_fields_cache.db')
+COLLOCATIONS_CACHE_DB = os.path.join(COLLOCATIONS_DIR, 'collocations_cache.db')
 
 # HSK Submodule
 HSK_SUBMODULE_PATH = os.path.join(HSK_DIR, 'new_hsk')
