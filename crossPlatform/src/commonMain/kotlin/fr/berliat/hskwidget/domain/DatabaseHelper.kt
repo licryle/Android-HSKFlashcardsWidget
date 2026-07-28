@@ -71,7 +71,7 @@ class DatabaseHelper private constructor() {
             }
         }
 
-        private suspend fun buildDatabase(
+        private fun buildDatabase(
             builder: RoomDatabase.Builder<ChineseWordsDatabase>,
             file: PlatformFile
         ): ChineseWordsDatabase {
@@ -169,7 +169,7 @@ class DatabaseHelper private constructor() {
                 Logger.d(tag = TAG, messageString = "Starting to import Word_List to local DB")
                 dbToUpdate.wordListDAO().deleteAllEntries()
                 dbToUpdate.wordListDAO().deleteAllLists()
-                dbToUpdate.wordListDAO().insertAllLists(importedLists.map { it -> it.wordList })
+                dbToUpdate.wordListDAO().insertAllLists(importedLists.map { it.wordList })
                 dbToUpdate.wordListDAO().insertAllWords(importedListEntries)
 
                 Logger.d(tag = TAG, messageString = "Starting to import WordFrequency to local DB")
