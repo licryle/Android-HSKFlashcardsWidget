@@ -54,6 +54,7 @@ Data is managed by modular providers in the `inputs/` directory:
 *   **`2_Popularity`**: Uses word frequency data (e.g., BCC corpus) to populate the `popularity` field.
 *   **`3_AiFields1`**: Enriches words with AI-generated examples, synonyms, and antonyms.
 *   **`4_Annotations`**: Imports user-defined annotations from `annotations.csv`.
+*   **`5_Collocations`**: Imports AI-generated word collocation (short usage).
 
 ## Files Overview
 

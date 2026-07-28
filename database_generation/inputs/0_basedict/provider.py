@@ -25,8 +25,8 @@ class BaseDictProvider(Provider):
             definition_dict = {"en": definition_raw}
             definition_json = json.dumps(definition_dict, ensure_ascii=False)
 
-            searchable_text = simplified + ' ' + traditional + ' ' + unidecode(pinyins).replace(" ", "") + ' ' + definition_json
-            
+            searchable_text = simplified + ' ' + traditional + ' ' + unidecode(pinyins).replace(" ", "") + ' ' + definition_raw
+
             return {
                 "simplified": simplified,
                 "traditional": traditional,
