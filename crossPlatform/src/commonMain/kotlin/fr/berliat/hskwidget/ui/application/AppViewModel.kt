@@ -182,7 +182,7 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
     fun shouldUpdateDatabaseFromAsset(): Boolean {
         if (appConfig.appVersionCode.value == 0) return false // first launch, nothing to update
 
-        val updateDbVersions = listOf(32, 37)
+        val updateDbVersions = listOf(32, 37, 48)
 
         return updateDbVersions.any { updateVersion ->
             appConfig.appVersionCode.value < updateVersion && Utils.getAppVersion() >= updateVersion

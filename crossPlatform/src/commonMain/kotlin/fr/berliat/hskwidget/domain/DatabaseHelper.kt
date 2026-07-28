@@ -1,7 +1,10 @@
 package fr.berliat.hskwidget.domain
 
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
+import androidx.sqlite.SQLiteConnection
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
+import androidx.sqlite.execSQL
 
 import co.touchlab.kermit.Logger
 
@@ -62,6 +65,12 @@ class DatabaseHelper private constructor() {
             return@withContext INSTANCE!!
         }
 
+        val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(connection: SQLiteConnection) {
+                connection.execSQL("ALTER TABLE chinese_word ADD COLUMN collocations TEXT DEFAULT ''")
+            }
+        }
+
         private suspend fun buildDatabase(
             builder: RoomDatabase.Builder<ChineseWordsDatabase>,
             file: PlatformFile
@@ -71,6 +80,7 @@ class DatabaseHelper private constructor() {
             val finalBuilder = builder
                 .setDriver(sqlDriver)
                 .setQueryCoroutineContext(AppDispatchers.IO)
+                .addMigrations(MIGRATION_1_2)
 
             val db = finalBuilder.build()
             db._databaseFile = file

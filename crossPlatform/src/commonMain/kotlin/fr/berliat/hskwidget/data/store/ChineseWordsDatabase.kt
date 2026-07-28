@@ -39,7 +39,7 @@ import fr.berliat.hskwidget.data.type.WordTypeConverter
 @Database(
     entities = [ChineseWordAnnotation::class, ChineseWord::class, ChineseWordFrequency::class,
         WordList::class, WordListEntry::class, WidgetListEntry::class],
-    version = 1, exportSchema = true)
+    version = ChineseWordsDatabase.DATABASE_VERSION, exportSchema = true)
 @TypeConverters(
     Pinyins::class,
     WordTypeConverter::class,
@@ -51,6 +51,9 @@ import fr.berliat.hskwidget.data.type.WordTypeConverter
 
 @ConstructedBy(ChineseWordsDatabaseConstructor::class)
 abstract class ChineseWordsDatabase: RoomDatabase() {
+    companion object {
+        const val DATABASE_VERSION = 2
+    }
     abstract fun annotatedChineseWordDAO(): AnnotatedChineseWordDAO
     abstract fun chineseWordAnnotationDAO(): ChineseWordAnnotationDAO
     abstract fun chineseWordDAO(): ChineseWordDAO
@@ -80,7 +83,7 @@ abstract class ChineseWordsDatabase: RoomDatabase() {
             // Force WAL checkpoint if needed by platform
             checkpointWal(mainCachedFile)
 
-            // Optionally delete side files, same logic as Android version
+            // Optionally delete side files
             cachedDbFiles
                 .filter { it.name != mainCachedFile.name }
                 .forEach {

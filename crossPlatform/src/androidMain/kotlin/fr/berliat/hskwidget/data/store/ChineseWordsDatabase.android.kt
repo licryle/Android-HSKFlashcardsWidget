@@ -14,7 +14,7 @@ actual suspend fun ChineseWordsDatabase.checkpointWal(file: PlatformFile) {
     val openHelper = factory.create(
         SupportSQLiteOpenHelper.Configuration.builder(ExpectedUtils.context)
             .name(file.absolutePath())
-            .callback(object : SupportSQLiteOpenHelper.Callback(1) {
+            .callback(object : SupportSQLiteOpenHelper.Callback(ChineseWordsDatabase.DATABASE_VERSION) {
                 override fun onCreate(db: SupportSQLiteDatabase) {}
                 override fun onUpgrade(
                     db: SupportSQLiteDatabase,

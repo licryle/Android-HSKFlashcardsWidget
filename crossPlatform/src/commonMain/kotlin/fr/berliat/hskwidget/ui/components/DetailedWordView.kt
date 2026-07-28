@@ -49,6 +49,7 @@ import fr.berliat.hskwidget.dictionary_item_type
 import fr.berliat.hskwidget.format_list_bulleted_add_24px
 import fr.berliat.hskwidget.keyboard_arrow_down_24px
 import fr.berliat.hskwidget.keyboard_arrow_up_24px
+import fr.berliat.hskwidget.dictionary_item_collocations
 import fr.berliat.hskwidget.widget_btn_copy
 import fr.berliat.hskwidget.widget_btn_speak
 
@@ -90,7 +91,7 @@ fun DetailedWordView (
 
     // Show/Hide "more" section
     var isMoreVisible by remember { mutableStateOf(false) }
-    val nothingMore = (altDef + (word.word?.examples ?: "") + (word.word?.antonym ?: "") + (word.word?.synonyms ?: ""))
+    val nothingMore = (altDef + (word.word?.examples ?: "") + (word.word?.collocations ?: "") + (word.word?.antonym ?: "") + (word.word?.synonyms ?: ""))
         .isEmpty() &&
             (word.word?.modality ?: Modality.UNKNOWN) == Modality.UNKNOWN &&
             (word.word?.wordType ?: WordType.UNKNOWN) == WordType.UNKNOWN
@@ -261,15 +262,27 @@ fun DetailedWordView (
                     }
                 }
 
-                Row(
-                    modifier = modifier.padding(10.dp)
-                ) {
-                    Column {
-                        Text(
-                            stringResource(Res.string.dictionary_item_examples),
-                            style = AppTypographies.detailCardSubTitle)
+                word.word?.collocations?.takeIf { it.isNotEmpty() }?.let {
+                    Row(
+                        modifier = modifier.padding(10.dp)
+                    ) {
+                        Column {
+                            Text(
+                                stringResource(Res.string.dictionary_item_collocations),
+                                style = AppTypographies.detailCardSubTitle)
+                            Text(it, style = MaterialTheme.typography.bodyMedium)
+                        }
+                    }
+                }
 
-                        word.word?.examples?.takeIf { it.isNotEmpty() }?.let {
+                word.word?.examples?.takeIf { it.isNotEmpty() }?.let {
+                    Row(
+                        modifier = modifier.padding(10.dp)
+                    ) {
+                        Column {
+                            Text(
+                                stringResource(Res.string.dictionary_item_examples),
+                                style = AppTypographies.detailCardSubTitle)
                             Text(it, style = MaterialTheme.typography.bodyMedium)
                         }
                     }

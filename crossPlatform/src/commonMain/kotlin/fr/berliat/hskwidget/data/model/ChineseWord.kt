@@ -30,6 +30,7 @@ data class ChineseWord(
     @ColumnInfo(name = "pinyins") val pinyins: Pinyins?,
     @ColumnInfo(name = "popularity") val popularity: Int?,
     @ColumnInfo(name = "examples", defaultValue = "") val examples: String? = "",
+    @ColumnInfo(name = "collocations", defaultValue = "") val collocations: String? = "",
     @ColumnInfo(name = "modality", defaultValue = "N/A") val modality: Modality? = Modality.UNKNOWN,
     @ColumnInfo(name = "type", defaultValue = "N/A") val wordType: WordType? = WordType.UNKNOWN,
     @ColumnInfo(name = "synonyms", defaultValue = "") val synonyms: String? = "",
@@ -51,7 +52,7 @@ data class ChineseWord(
     companion object {
         fun getBlank(simplified: String = ""): ChineseWord {
             return ChineseWord(simplified, "", mapOf<Locale, String>(), null,
-                null, null, "", Modality.UNKNOWN, WordType.UNKNOWN,
+                null, null, "", "", Modality.UNKNOWN, WordType.UNKNOWN,
                 "", "", "")
         }
     }

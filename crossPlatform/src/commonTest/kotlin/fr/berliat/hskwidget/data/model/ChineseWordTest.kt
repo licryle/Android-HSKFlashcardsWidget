@@ -26,6 +26,7 @@ class ChineseWordTest {
             pinyins = pinyins,
             popularity = 100,
             examples = "你好吗？",
+            collocations = "你好, 您好",
             modality = Modality.ORAL,
             wordType = WordType.INTERJECTION,
             synonyms = "您好",
@@ -40,6 +41,7 @@ class ChineseWordTest {
         assertEquals(pinyins, word.pinyins)
         assertEquals(100, word.popularity)
         assertEquals("你好吗？", word.examples)
+        assertEquals("你好, 您好", word.collocations)
         assertEquals(Modality.ORAL, word.modality)
         assertEquals(WordType.INTERJECTION, word.wordType)
         assertEquals("您好", word.synonyms)

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "8c11d8c0110e00f9938fbe598f89bced",
+    "identityHash": "48d3499cacd752ba3a42a02e94a0230d",
     "entities": [
       {
         "tableName": "chinese_word_annotation",
@@ -77,7 +77,7 @@
       },
       {
         "tableName": "chinese_word",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`simplified` TEXT NOT NULL, `traditional` TEXT, `definition` TEXT NOT NULL, `hsk_level` TEXT, `pinyins` TEXT, `popularity` INTEGER, `examples` TEXT DEFAULT '', `modality` TEXT DEFAULT 'N/A', `type` TEXT DEFAULT 'N/A', `synonyms` TEXT DEFAULT '', `antonym` TEXT DEFAULT '', `searchable_text` TEXT NOT NULL DEFAULT '', PRIMARY KEY(`simplified`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`simplified` TEXT NOT NULL, `traditional` TEXT, `definition` TEXT NOT NULL, `hsk_level` TEXT, `pinyins` TEXT, `popularity` INTEGER, `examples` TEXT DEFAULT '', `collocations` TEXT DEFAULT '', `modality` TEXT DEFAULT 'N/A', `type` TEXT DEFAULT 'N/A', `synonyms` TEXT DEFAULT '', `antonym` TEXT DEFAULT '', `searchable_text` TEXT NOT NULL DEFAULT '', PRIMARY KEY(`simplified`))",
         "fields": [
           {
             "fieldPath": "simplified",
@@ -118,13 +118,19 @@
             "defaultValue": "''"
           },
           {
+            "fieldPath": "collocations",
+            "columnName": "collocations",
+            "affinity": "TEXT",
+            "defaultValue": "''"
+          },
+          {
             "fieldPath": "modality",
             "columnName": "modality",
             "affinity": "TEXT",
             "defaultValue": "'N/A'"
           },
           {
-            "fieldPath": "type",
+            "fieldPath": "wordType",
             "columnName": "type",
             "affinity": "TEXT",
             "defaultValue": "'N/A'"
@@ -382,7 +388,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8c11d8c0110e00f9938fbe598f89bced')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '48d3499cacd752ba3a42a02e94a0230d')"
     ]
   }
 }

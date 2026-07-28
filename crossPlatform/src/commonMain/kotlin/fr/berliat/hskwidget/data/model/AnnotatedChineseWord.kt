@@ -64,7 +64,8 @@ data class AnnotatedChineseWord (
                 mapOf(Pair<Locale,String>(Locale.ENGLISH, annotation?.notes ?: "")),
                 HSK_Level.NOT_HSK,
                 Pinyins(""),
-                0)
+                0,
+                collocations = "")
         }
 
         return null
