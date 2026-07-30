@@ -1,5 +1,6 @@
 package fr.berliat.hskwidget.ui.screens.widgetConfigure
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,15 +14,25 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -35,12 +46,16 @@ import fr.berliat.hskwidget.ui.theme.widgetDefaultBox
 import fr.berliat.hskwidget.widget_configure
 import fr.berliat.hskwidget.widget_configure_close
 import fr.berliat.hskwidget.widget_configure_error_no_list
+import fr.berliat.hskwidget.widget_configure_frequency
+import fr.berliat.hskwidget.widget_configure_frequency_hint
+import fr.berliat.hskwidget.widget_configure_frequency_options
 import fr.berliat.hskwidget.widget_configure_new_back
 import fr.berliat.hskwidget.widget_configure_no_change
 import fr.berliat.hskwidget.widget_configure_wordlist_title
 import fr.berliat.hskwidget.widget_configure_wordlist_word_count
 
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringArrayResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -74,6 +89,7 @@ fun WidgetConfigWithPreviewScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WidgetConfigScreen(
     widgetId: Int,
@@ -88,17 +104,80 @@ fun WidgetConfigScreen(
     val selectedIds = viewModel.selectedListIds.collectAsState()
     val localSelectedIds = remember(selectedIds) { mutableStateSetOf<Long>() }
 
+    val refreshInterval = viewModel.refreshInterval.collectAsState()
+    val localRefreshInterval = remember(refreshInterval) { mutableLongStateOf(refreshInterval.value) }
+    var expanded by remember { mutableStateOf(false) }
+
     LaunchedEffect(selectedIds.value) {
         // Clear and update the local state only when the ViewModel state changes
         localSelectedIds.clear()
         localSelectedIds.addAll(selectedIds.value)
     }
 
-    Column(modifier = modifier.fillMaxSize()) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 10.dp)
+    ) {
+        // Refresh rate
+        Row(verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween) {
+            Text(stringResource(Res.string.widget_configure_frequency),
+                style = MaterialTheme.typography.bodyMedium)
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            Box {
+                val refreshOptions = stringArrayResource(Res.array.widget_configure_frequency_options)
+                val refreshIntervals =
+                    refreshOptions.associate { option ->
+                        option.substringBefore(" ").toLong() to
+                                option.substringAfter(" ")
+                    }
+                val localRefreshValue = if (refreshIntervals.contains(localRefreshInterval.longValue))
+                    refreshIntervals.getValue(localRefreshInterval.longValue)
+                else
+                    refreshIntervals.getValue(refreshIntervals.keys.first())
+
+
+                ExposedDropdownMenuBox(
+                    expanded = expanded,
+                    onExpandedChange = { expanded = it },
+                    modifier = Modifier.width(160.dp)
+                ) {
+                    OutlinedTextField(
+                        readOnly = true,
+                        value = localRefreshValue,
+                        textStyle = MaterialTheme.typography.bodyMedium,
+                        onValueChange = {},
+                        modifier = Modifier
+                            .menuAnchor(MenuAnchorType.PrimaryEditable, true),
+                        label = {
+                            Text(
+                                stringResource(Res.string.widget_configure_frequency_hint),
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) }
+                    )
+
+                    ExposedDropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }) {
+                        refreshIntervals.map {
+                            DropdownMenuItem(
+                                text = { Text(it.value, style = MaterialTheme.typography.bodyMedium) },
+                                onClick = { localRefreshInterval.longValue = it.key; expanded = false }
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
         Row(
             modifier = modifier
-                .fillMaxWidth()
-                .padding(start = 10.dp, top = 5.dp, bottom = 5.dp),
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
@@ -116,12 +195,12 @@ fun WidgetConfigScreen(
         if (allLists.value.isEmpty()) {
             LoadingView()
         } else {
+            Spacer(modifier = Modifier.height(8.dp))
             // List container (scrollable)
             LazyColumn(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
-                    .padding(horizontal = 10.dp)
             ) {
                 items(allLists.value, key = { it.id }) { list ->
                     WidgetConfigListItem(
@@ -136,9 +215,14 @@ fun WidgetConfigScreen(
                 }
             }
 
+            fun hasUnsavedChanges() =
+                !localSelectedIds.isEmpty() && (
+                        localSelectedIds.toSet() != selectedIds.value.toSet()
+                        || localRefreshInterval.longValue != refreshInterval.value)
+
             val configureButtonLabel = when {
                 localSelectedIds.isEmpty() -> Res.string.widget_configure_error_no_list
-                localSelectedIds.toSet() == selectedIds.value.toSet() -> Res.string.widget_configure_no_change
+                !hasUnsavedChanges() -> Res.string.widget_configure_no_change
                 expectsActivityResult && selectedIds.value.isEmpty() -> Res.string.widget_configure_new_back
                 expectsActivityResult -> Res.string.widget_configure_close
                 else -> Res.string.widget_configure
@@ -149,8 +233,8 @@ fun WidgetConfigScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp),
-                onClick = { viewModel.savePreferences(localSelectedIds) },
-                enabled = !localSelectedIds.isEmpty() && localSelectedIds.toSet() != selectedIds.value.toSet()
+                onClick = { viewModel.savePreferences(localSelectedIds, localRefreshInterval.longValue) },
+                enabled = hasUnsavedChanges()
             ) {
                 Text(text = stringResource(configureButtonLabel))
             }

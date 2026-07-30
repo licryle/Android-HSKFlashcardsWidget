@@ -2,6 +2,7 @@ package fr.berliat.hskwidget.data.store
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.sync.Mutex
@@ -34,4 +35,5 @@ class WidgetPreferencesStore private constructor(
     }
 
     val currentWord = registerPreference(::stringPreferencesKey, "current_word", "")
+    val refreshInterval = registerPreference(::longPreferencesKey, "refresh_interval", 1800000L) // 30 min
 }

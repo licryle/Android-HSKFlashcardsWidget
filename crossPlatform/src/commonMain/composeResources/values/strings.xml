@@ -76,6 +76,17 @@ This project uses the awesome projects of:
     <string name="widget_configure_wordlist_word_count">%1$d words</string>
     <string name="widget_configure_no_change">No change to save</string>
     <string name="widget_configure_saved">Widget configuration updated</string>
+    <string name="widget_configure_frequency_hint">How often do you want a new word?</string>
+
+    <string name="widget_configure_frequency">Refresh frequency</string>
+    <string-array name="widget_configure_frequency_options"> <!-- Must be in format "{Long/milliseconds} {String}" -->
+        <item>-1 Manual</item>
+        <item>1800000 30 min</item>
+        <item>21600000 6 hours</item>
+        <item>43200000 12 hours</item>
+        <item>86400000 1 day</item>
+        <item>604800000 7 day</item>
+    </string-array>
 
     <string name="widget_demo_word_click">This is a demo widget, this would open the dictionary</string>
     <string name="widget_demo_update_click">This is a demo widget, this would update the word</string>

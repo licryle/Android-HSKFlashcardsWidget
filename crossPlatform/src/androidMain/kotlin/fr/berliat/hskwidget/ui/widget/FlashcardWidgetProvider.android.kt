@@ -151,6 +151,15 @@ actual class FlashcardWidgetProvider actual constructor()
     override fun onDeleted(context: Context, appWidgetIds: IntArray) {
         Log.i(TAG, "onDeleted")
 
+        super.onDeleted(context, appWidgetIds)
+
+        scope.launch(AppDispatchers.IO) {
+            if (!isInitialized) init { context }
+            for (appWidgetId in appWidgetIds) {
+                getWidgetController(appWidgetId).clearWidgetUpdate()
+            }
+        }
+
         // When the user deletes the widget, delete the preference associated with it.
         scope.launch(Dispatchers.IO) {
             if (!isInitialized) init { context }
@@ -162,6 +171,29 @@ actual class FlashcardWidgetProvider actual constructor()
             }
 
             Companion.getWidgetIds() // Update local value and listeners
+        }
+    }
+
+    internal suspend fun updateWidgets(context: Context, intent: Intent, widgetId: Int) = withContext(Dispatchers.IO) {
+        if (preventUnnecessaryAppWidgetUpdates(context)) return@withContext
+
+        var widgetIds = IntArray(1)
+        if (widgetId == -1) {
+            widgetIds = Companion.getWidgetIds()
+
+            Logging.logAnalyticsEvent(Logging.ANALYTICS_EVENTS.AUTO_WORD_CHANGE)
+        } else {
+            widgetIds[0] = widgetId
+
+            var event = Logging.ANALYTICS_EVENTS.WIDGET_MANUAL_WORD_CHANGE
+            if (intent.action == WidgetController.ACTION_AUTO_UPDATE)
+                event = Logging.ANALYTICS_EVENTS.AUTO_WORD_CHANGE
+
+            Logging.logAnalyticsWidgetAction(event, widgetId)
+        }
+
+        widgetIds.forEach {
+            getWidgetController(it).updateWord()
         }
     }
 
@@ -193,26 +225,20 @@ actual class FlashcardWidgetProvider actual constructor()
                     getWidgetController(widgetId).openDictionary()
                 }
 
-                Intent.ACTION_BOOT_COMPLETED, AppWidgetManager.ACTION_APPWIDGET_UPDATE -> {
-                    if (preventUnnecessaryAppWidgetUpdates(context)) return@launch
-
-                    var widgetIds = IntArray(1)
+                Intent.ACTION_BOOT_COMPLETED, Intent.ACTION_MY_PACKAGE_REPLACED -> {
                     if (widgetId == -1) {
-                        widgetIds = Companion.getWidgetIds()
-
-                        Logging.logAnalyticsEvent(Logging.ANALYTICS_EVENTS.AUTO_WORD_CHANGE)
+                        for (appWidgetId in Companion.getWidgetIds()) {
+                            getWidgetController(appWidgetId).scheduleWidgetUpdate()
+                        }
                     } else {
-                        widgetIds[0] = widgetId
-
-                        Logging.logAnalyticsWidgetAction(
-                            Logging.ANALYTICS_EVENTS.WIDGET_MANUAL_WORD_CHANGE, widgetId
-                        )
+                        getWidgetController(widgetId).scheduleWidgetUpdate()
                     }
 
-                    widgetIds.forEach {
-                        getWidgetController(it).updateWord()
-                    }
+                    updateWidgets(context, intent, widgetId)
                 }
+
+                AppWidgetManager.ACTION_APPWIDGET_UPDATE, WidgetController.ACTION_AUTO_UPDATE ->
+                    updateWidgets(context, intent, widgetId)
 
                 else -> {
                     super.onReceive(context, intent)
@@ -238,6 +264,11 @@ actual class FlashcardWidgetProvider actual constructor()
         super.onEnabled(context)
 
         preventUnnecessaryAppWidgetUpdates(context)
+        scope.launch(AppDispatchers.IO) {
+            for (appWidgetId in getWidgetIds()) {
+                getWidgetController(appWidgetId).scheduleWidgetUpdate()
+            }
+        }
 
         val appMgr = AppWidgetManager.getInstance(context)
         onUpdate(context, appMgr, Companion.getWidgetIds())
@@ -247,6 +278,11 @@ actual class FlashcardWidgetProvider actual constructor()
         Log.i(TAG, "onDisabled")
         // Enter relevant functionality for when the last widget is disabled
         super.onDisabled(context)
+        scope.launch(AppDispatchers.IO) {
+            for (appWidgetId in getWidgetIds()) {
+                getWidgetController(appWidgetId).clearWidgetUpdate()
+            }
+        }
 
         WorkManager.getInstance(context).cancelUniqueWork("always_pending_work")
     }
@@ -254,6 +290,14 @@ actual class FlashcardWidgetProvider actual constructor()
     override fun onRestored(context: Context?, oldWidgetIds: IntArray?, newWidgetIds: IntArray?) {
         Log.i(TAG, "onRestored")
         super.onRestored(context, oldWidgetIds, newWidgetIds)
+
+        newWidgetIds?.let {
+            scope.launch(AppDispatchers.IO) {
+                for (appWidgetId in newWidgetIds) {
+                    getWidgetController(appWidgetId).scheduleWidgetUpdate()
+                }
+            }
+        }
     }
 
     class DummyWorker(context: Context, workerParams: WorkerParameters)

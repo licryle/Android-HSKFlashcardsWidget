@@ -1,11 +1,13 @@
 package fr.berliat.hskwidget.domain
 
+import android.app.AlarmManager
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetManager.ACTION_APPWIDGET_CONFIGURE
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.icu.util.Calendar
 import android.util.Log
 import android.view.View
 import android.widget.RemoteViews
@@ -24,6 +26,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlin.collections.set
+import kotlin.time.Clock
 
 
 private val mutex = Mutex()
@@ -52,6 +55,7 @@ actual class WidgetController(
         private const val TAG = "WidgetController"
         const val ACTION_SPEAK = "fr.berliat.hskwidget.ACTION_WIDGET_SPEAK"
         const val ACTION_DICTIONARY = "fr.berliat.hskwidget.ACTION_DICTIONARY"
+        const val ACTION_AUTO_UPDATE = "fr.berliat.hskwidget.ACTION_AUTOUPDATE"
         const val ACTION_CONFIGURE_LATEST = "fr.berliat.hskwidget.APPWIDGET_CONFIGURE_LATEST"
 
         fun requestAddDesktopWidget(context: Context, appWidgetManager: AppWidgetManager) {
@@ -77,6 +81,19 @@ actual class WidgetController(
 
             return PendingIntent.getBroadcast(context, widgetId, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        }
+
+        internal fun getWidgetAlarmIntent(context: Context, widgetId: Int): PendingIntent {
+            val intent: Intent = Intent(context, FlashcardWidgetProvider::class.java)
+                .setAction(ACTION_AUTO_UPDATE)
+                .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
+            val pi = PendingIntent.getBroadcast(
+                context,
+                widgetId, // So it's unique to that widget
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT  or PendingIntent.FLAG_IMMUTABLE
+            )
+            return pi
         }
     }
 
@@ -160,5 +177,32 @@ actual class WidgetController(
                 appWidgetManager.updateAppWidget(widgetId, views)
             }
         }
+    }
+
+    fun scheduleWidgetUpdate() {
+        if (widgetStore.refreshInterval.value < 0) { // No refresh
+            clearWidgetUpdate()
+            return
+        }
+
+        val context = contextProvider.invoke()
+        val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val pi = getWidgetAlarmIntent(context, widgetId)
+
+        val calendar: Calendar = Calendar.getInstance()
+        calendar.setTimeInMillis(Clock.System.now().toEpochMilliseconds())
+
+        am.setInexactRepeating(
+            AlarmManager.RTC,
+            calendar.getTimeInMillis(),
+            widgetStore.refreshInterval.value,
+            pi
+        )
+    }
+
+    fun clearWidgetUpdate() {
+        val context = contextProvider.invoke()
+        val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        am.cancel(getWidgetAlarmIntent(context, widgetId))
     }
 }

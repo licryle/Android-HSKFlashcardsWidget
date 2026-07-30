@@ -35,16 +35,22 @@ class WidgetConfigViewModel(
     private val _selectedListIds = MutableStateFlow<Set<Long>>(emptySet())
     val selectedListIds: StateFlow<Set<Long>> = _selectedListIds.asStateFlow()
 
+    private val _refreshInterval = MutableStateFlow(-1L)
+    val refreshInterval: StateFlow<Long> = _refreshInterval.asStateFlow()
+
     init {
-        loadLists()
+        loadSettings()
         Logging.logAnalyticsWidgetAction(
             event = Logging.ANALYTICS_EVENTS.WIDGET_CONFIG_VIEW,
             widgetId = widgetId
         )
     }
 
-    fun loadLists() {
+    fun loadSettings() {
         viewModelScope.launch(AppDispatchers.IO) {
+            val widgetPreferences = widgetPrefProvider.invoke(widgetId)
+            _refreshInterval.value = widgetPreferences.refreshInterval.value
+
             val widgetLists = widgetListDAO.getListsForWidget(widgetId)
             val all = wordListDAO.getAllLists()
             _allLists.value = all
@@ -52,16 +58,22 @@ class WidgetConfigViewModel(
         }
     }
 
-    fun savePreferences(newList: Set<Long>) {
+    fun savePreferences(newList: Set<Long>, newRefreshInterval: Long) {
+        setLists(newList)
+        setRefreshInterval(newRefreshInterval)
+    }
+
+    private fun setLists(newList: Set<Long>) {
         val entriesToAdd = newList.map { listId -> WidgetListEntry(widgetId, listId) }
 
         viewModelScope.launch(AppDispatchers.IO) {
             // Todo, mutex? Low priority
             widgetListDAO.deleteWidget(widgetId)
             widgetListDAO.insertListsToWidget(entriesToAdd)
-            loadLists()
+            loadSettings()
 
-            getWidgetControllerInstance(widgetPrefProvider.invoke(widgetId), database)
+            val widgetPreferences = widgetPrefProvider.invoke(widgetId)
+            getWidgetControllerInstance(widgetPreferences, database)
                 .updateWord()
 
             onSuccessfulSave?.let {
@@ -71,6 +83,16 @@ class WidgetConfigViewModel(
 
                 Logging.logAnalyticsWidgetAction(Logging.ANALYTICS_EVENTS.WIDGET_RECONFIGURE, widgetId)
             }
+        }
+    }
+
+    private fun setRefreshInterval(interval: Long) {
+        viewModelScope.launch(AppDispatchers.IO) {
+            val widgetPreferences = widgetPrefProvider.invoke(widgetId)
+            widgetPreferences.refreshInterval.value = interval
+
+            val widgetController = getWidgetControllerInstance(widgetPreferences, database)
+            widgetController.scheduleWidgetUpdate()
         }
     }
 }
