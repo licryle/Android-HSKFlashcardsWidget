@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.union
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -97,7 +99,7 @@ fun AppView(
                         snackbarManager = SnackbarManager
                     )
                 },
-                contentWindowInsets = WindowInsets.ime, // Respect keyboard insets
+                contentWindowInsets = WindowInsets.systemBars.union(WindowInsets.ime),
                 topBar = {
                     AppBar(
                         onOcrClick = { viewModel.navigationManager.navigate(Screen.OCRCapture()) },

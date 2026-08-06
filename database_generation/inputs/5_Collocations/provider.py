@@ -79,8 +79,23 @@ class CollocationsProvider(Provider):
             if ai_results:
                 for res in ai_results:
                     word = res.get('word')
-                    collocations = res.get('collocations')
-                    if word:
+                    collocations_raw = res.get('collocations')
+                    if word and collocations_raw:
+                        # 1. Trim strings on each line
+                        lines = [line.strip() for line in collocations_raw.split('\n') if line.strip()]
+                        
+                        # 3. Remove any string that doesn't contain the original word
+                        lines = [line for line in lines if word in line]
+                        
+                        # 2. Remove duplicates (preserving order)
+                        seen = set()
+                        unique_lines = []
+                        for line in lines:
+                            if line not in seen:
+                                unique_lines.append(line)
+                                seen.add(line)
+                        
+                        collocations = '\n'.join(unique_lines)
                         cursor.execute(f"INSERT OR REPLACE INTO chinese_word (simplified, collocations) VALUES (?, ?)", (word, collocations))
                 conn.commit()
                 self.logger.info(f"CollocationsProvider: Progress {i + len(batch)}/{len(missing_words)}")
