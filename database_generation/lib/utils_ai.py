@@ -70,7 +70,7 @@ def call_llm_api(endpoint: str, model: str, prompt: str, required_fields: List[s
         'model': model,
         'messages': [{'role': 'user', 'content': prompt}],
         'temperature': 0.1,
-        'max_tokens': 2000,
+        'max_tokens': 8000,
         'stream': False
     }
     
