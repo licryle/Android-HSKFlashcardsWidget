@@ -1,12 +1,10 @@
 package fr.berliat.hskwidget.domain
 
 import androidx.room.Room
-import androidx.room.RoomDatabase
-
-import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
-import fr.berliat.hskwidget.domain.DatabaseHelper.Companion.getDatabaseLiveDir
 
 import io.github.vinceglb.filekit.PlatformFile
+import io.github.vinceglb.filekit.createDirectories
+import io.github.vinceglb.filekit.exists
 import io.github.vinceglb.filekit.path
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.Dispatchers
@@ -14,7 +12,7 @@ import kotlinx.coroutines.withContext
 import platform.Foundation.*
 
 @OptIn(ExperimentalForeignApi::class)
-actual suspend fun copyDatabaseAssetFile() {
+actual suspend fun copyDatabaseAssetFile(file: PlatformFile) {
     withContext(Dispatchers.Default) { // IO dispatcher isn't a direct concept on K/N, use Default for background work
         val fileManager = NSFileManager.defaultManager()
 
@@ -26,33 +24,19 @@ actual suspend fun copyDatabaseAssetFile() {
 
         requireNotNull(databasePathInBundle) { "Database asset file not found in bundle: ${DatabaseHelper.DATABASE_FILENAME}" }
 
-        // 2. Define the destination path (typically the 'Documents' directory for persistent storage)
-		val destinationDir = getDatabaseLiveDir()
-        val destinationPath = NSString.create(string = destinationDir.path).stringByAppendingPathComponent(DatabaseHelper.DATABASE_FILENAME)
-
-        // Create destination directory if it doesn't exist (simulating FileKit.databasesDir.createDirectories())
-        // Note: You may need to adapt 'FileKit.databasesDir' to its actual iOS representation.
-        // For simplicity, I'll assume the destination is directly in Documents/DATABASE_FILENAME unless you provide the exact FileKit logic.
-
-        // If you need the equivalent of FileKit.databasesDir.createDirectories():
         try {
-            fileManager.createDirectoryAtPath(
-                path = destinationDir.path,
-                withIntermediateDirectories = true,
-                attributes = null,
-                error = null // Kotlin/Native often uses `error: NSErrorPointer?` which can be cumbersome; simplified for this example
-            )
+            file.createDirectories(true)
         } catch (e: Exception) {
-            println("Could not create directory at ${destinationDir.path}: $e")
+            println("Could not create directory for ${file.path}: $e")
         }
 
-		NSLog("INFO: copyDatabaseAssetFile $destinationPath")
+		NSLog("INFO: copyDatabaseAssetFile ${file.path}")
         // 3. Copy the file from the bundle to the destination path
-        if (!fileManager.fileExistsAtPath(destinationPath)) {
+        if (!file.exists()) {
             try {
                 fileManager.copyItemAtPath(
                     srcPath = databasePathInBundle,
-                    toPath = destinationPath,
+                    toPath = file.path,
 					error = null
                 )
             } catch (e: Exception) {
@@ -63,12 +47,13 @@ actual suspend fun copyDatabaseAssetFile() {
     }
 }
 
-@OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
-actual suspend fun createRoomDatabaseBuilderFromFile(file: PlatformFile): RoomDatabase.Builder<ChineseWordsDatabase> {
+@OptIn(ExperimentalForeignApi::class)
+actual suspend fun createRoomDatabaseBuilderFromFile(file: PlatformFile): DatabaseBuilderWithPath {
     NSLog("INFO: createRoomDatabaseBuilderFromFile $file")
 
-    return Room.databaseBuilder(
-        name = file.path
+    return DatabaseBuilderWithPath(
+        file,
+        Room.databaseBuilder(name = file.path)
     )
     // Because of the SQLDriver in KMP, can't use createFromXXX()
 }

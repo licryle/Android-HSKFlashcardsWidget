@@ -29,6 +29,11 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
+data class DatabaseBuilderWithPath(
+    val file: PlatformFile,
+    val builder: RoomDatabase.Builder<ChineseWordsDatabase>
+)
+
 class DatabaseHelper private constructor() {
     val liveDatabase
         get() = _db!!
@@ -71,46 +76,43 @@ class DatabaseHelper private constructor() {
             }
         }
 
-        private fun buildDatabase(
-            builder: RoomDatabase.Builder<ChineseWordsDatabase>,
-            file: PlatformFile
-        ): ChineseWordsDatabase {
+        private fun buildDatabase(databaseBuilder: DatabaseBuilderWithPath): ChineseWordsDatabase {
             val sqlDriver = BundledSQLiteDriver()
-            Logger.d(tag=TAG, messageString = "buildDatabase entering - $file")
-            val finalBuilder = builder
+            Logger.d(tag=TAG, messageString = "buildDatabase entering - ${databaseBuilder.file}")
+            val finalBuilder = databaseBuilder.builder
                 .setDriver(sqlDriver)
                 .setQueryCoroutineContext(AppDispatchers.IO)
                 .addMigrations(MIGRATION_1_2)
 
             val db = finalBuilder.build()
-            db._databaseFile = file
+            db._databaseFile = databaseBuilder.file
 
-            Logger.d(tag=TAG, messageString = "buildDatabase exiting - $file")
+            Logger.d(tag=TAG, messageString = "buildDatabase exiting - ${databaseBuilder.file}")
             return db
         }
 
-        suspend fun createRoomDatabaseLive() : ChineseWordsDatabase {
-            return buildDatabase(createRoomDatabaseBuilderLive(), getDatabaseLiveFile())
-        }
-        suspend fun createRoomDatabaseFromFile(file: PlatformFile) : ChineseWordsDatabase {
-            return buildDatabase(createRoomDatabaseBuilderFromFile(file), file)
-        }
-        suspend fun createRoomDatabaseFromAsset() : ChineseWordsDatabase {
-            val file = PlatformFile(DATABASE_ASSET_PATH)
-            return buildDatabase(createRoomDatabaseBuilderFromAsset(), file)
-        }
+        suspend fun createRoomDatabaseLive() : ChineseWordsDatabase =
+            buildDatabase(createRoomDatabaseBuilderLive())
 
-        private suspend fun createRoomDatabaseBuilderLive(): RoomDatabase.Builder<ChineseWordsDatabase> {
+        suspend fun createRoomDatabaseFromFile(file: PlatformFile) : ChineseWordsDatabase =
+            buildDatabase(createRoomDatabaseBuilderFromFile(file))
+
+        suspend fun createRoomDatabaseFromAsset() : ChineseWordsDatabase =
+            buildDatabase(createRoomDatabaseBuilderFromAsset())
+
+        private suspend fun createRoomDatabaseBuilderLive(): DatabaseBuilderWithPath {
             val liveFile = getDatabaseLiveFile()
             if (!liveFile.exists()) {
-                copyDatabaseAssetFile()
+                copyDatabaseAssetFile(getDatabaseLiveFile())
             }
 
             return createRoomDatabaseBuilderFromFile(liveFile)
         }
 
-        private suspend fun createRoomDatabaseBuilderFromAsset(): RoomDatabase.Builder<ChineseWordsDatabase> {
-            return createRoomDatabaseBuilderFromFile(PlatformFile(DATABASE_ASSET_PATH))
+        private suspend fun createRoomDatabaseBuilderFromAsset(): DatabaseBuilderWithPath {
+            val tempFile = FileKit.cacheDir / Utils.getRandomString(10)
+            copyDatabaseAssetFile(tempFile)
+            return createRoomDatabaseBuilderFromFile(tempFile)
         }
 
         suspend fun loadExternalDatabase(dbFilePath: PlatformFile) = withContext(
@@ -234,6 +236,6 @@ class DatabaseHelper private constructor() {
         }
     }
 }
-expect suspend fun createRoomDatabaseBuilderFromFile(file: PlatformFile) : RoomDatabase.Builder<ChineseWordsDatabase>
+expect suspend fun createRoomDatabaseBuilderFromFile(file: PlatformFile) : DatabaseBuilderWithPath
 
-expect suspend fun copyDatabaseAssetFile()
+expect suspend fun copyDatabaseAssetFile(file: PlatformFile)
