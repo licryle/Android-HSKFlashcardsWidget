@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 
 import fr.berliat.hskwidget.core.Utils
+import fr.berliat.hskwidget.core.Utils.BackgroundRestrictionType
 import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
 
 import kotlinx.coroutines.delay
@@ -21,6 +22,9 @@ open class WidgetsListViewModel: ViewModel() {
     private val _showAddWidgetInstructions = MutableStateFlow(false)
     val showAddWidgetInstructions: StateFlow<Boolean> = _showAddWidgetInstructions.asStateFlow()
 
+    private val _backgroundRestriction = MutableStateFlow(BackgroundRestrictionType.NO_RESTRICTION)
+    val backgroundRestriction: StateFlow<BackgroundRestrictionType> = _backgroundRestriction.asStateFlow()
+
     init {
         viewModelScope.launch {
             val provider = FlashcardWidgetProvider()
@@ -30,6 +34,7 @@ open class WidgetsListViewModel: ViewModel() {
                 delay(500.milliseconds)
             }
         }
+        updateBatteryOptimizationStatus()
     }
 
     fun speakWord(word: String) = Utils.playWordInBackground(word)
@@ -42,5 +47,13 @@ open class WidgetsListViewModel: ViewModel() {
 
     fun dismissAddWidgetInstructions() {
         _showAddWidgetInstructions.value = false
+    }
+
+    fun updateBatteryOptimizationStatus() {
+        _backgroundRestriction.value = Utils.isBackgroundRestricted()
+    }
+
+    fun fixBatteryOptimization() {
+        Utils.openBatteryOptimizationSettings()
     }
 }

@@ -13,14 +13,18 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 
 import fr.berliat.hskwidget.core.Locale
 import fr.berliat.hskwidget.data.model.ChineseWord
@@ -32,7 +36,9 @@ import fr.berliat.hskwidget.ui.screens.widgetConfigure.WidgetConfigWithPreviewSc
 import fr.berliat.hskwidget.*
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.core.SnackbarType
+import fr.berliat.hskwidget.core.Utils.BackgroundRestrictionType
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
+import fr.berliat.hskwidget.ui.components.SnackWarning
 import fr.berliat.hskwidget.ui.theme.widgetDefaultBox
 
 import kotlinx.coroutines.launch
@@ -51,7 +57,21 @@ actual fun WidgetsListScreen(
 ) {
     val widgetIds by viewModel.widgetIds.collectAsState()
     val showAddWidgetInstructions by viewModel.showAddWidgetInstructions.collectAsState()
+    val backgroundRestriction by viewModel.backgroundRestriction.collectAsState()
     val scope = rememberCoroutineScope()
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.updateBatteryOptimizationStatus()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
 
     if (showAddWidgetInstructions) {
         AlertDialog(
@@ -108,6 +128,20 @@ actual fun WidgetsListScreen(
                     onClickUpdate = { HSKAppServices.snackbar.show(SnackbarType.INFO, Res.string.widget_demo_update_click) }
                 )
             }
+        }
+
+        val bgMsg = when(backgroundRestriction) {
+            BackgroundRestrictionType.BACKGROUND_RESTRICTED -> Res.string.battery_background_restricted
+            BackgroundRestrictionType.BACKGROUND_MAYBE_RESTRICTED -> Res.string.battery_aggressive_manufacturer
+            else -> null
+        }
+
+        bgMsg?.let {
+            SnackWarning(
+                warningString = bgMsg,
+                fixitString = Res.string.disable,
+                onFixButtonClick = viewModel::fixBatteryOptimization
+            )
         }
 
         IconButton(

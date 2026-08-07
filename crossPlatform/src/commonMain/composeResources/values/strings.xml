@@ -9,6 +9,7 @@
     <string name="understood">Understood</string>
     <string name="loading">Loading</string>
     <string name="fix_it">Attempt to fix it</string>
+    <string name="disable">Disable</string>
     <string name="copied_to_clipboard">Copied %1$s to clipboard</string>
 
     <string name="menu">Menu</string>
@@ -40,7 +41,9 @@ License: GNU GPLv3. In a nutshell, you can do whatever you want with it, but mus
 This project uses the awesome projects of:
 - Full CN-EN from CC-CEDICT list from https://www.mdbg.net/chinese/
 - HSK list from https://github.com/krmanik/HSK-3.0
-- Dictionary metadata in Chinese (BETA!) was generated using Yi 1.5 6B - Q6_K LLM from 01.AI.</string>
+- Words popularity in Chinese comes from the Beijing Langauge and Culture University at http://bcc.blcu.edu.cn/
+- Words metadata in Chinese (BETA!) was generated using Yi 1.5 6B - Q6_K LLM from 01.AI.
+- Words collocations in Chinese (BETA!) was generated using Qwen2.5 7b - Q4_K_M LLM from Alibaba.</string>
     <string name="about_btn_email2">Email the developer</string>
     <string name="about_stats_title">Statistics</string>
     <string name="about_terms_conditions_title"><![CDATA[Privacy Policy & Licences]]></string>
@@ -370,5 +373,9 @@ padding: 0;
     <string name="widget_config_title">Widget Configuration</string>
     <string name="widget_config_description">Select the lists to display in the widget.</string>
     <string name="widget_config_selected_lists">Selected Lists</string>
+
+    <string name="battery_background_restricted">Battery restriction is enabled. Widgets may not refresh reliably.</string>
+    <string name="battery_aggressive_manufacturer">Your phone's manufacturer aggressively optimize power/battery. Widgets may not refresh reliably.</string>
+    <string name="battery_optimization_fix">Fix</string>
 
 </resources>

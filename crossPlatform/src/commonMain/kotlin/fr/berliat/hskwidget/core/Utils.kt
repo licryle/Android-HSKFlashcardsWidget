@@ -6,6 +6,7 @@ import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.copied_to_clipboard
 import fr.berliat.hskwidget.core.Logging.logAnalyticsError
 import fr.berliat.hskwidget.core.Logging.logAnalyticsEvent
+import fr.berliat.hskwidget.core.Utils.BackgroundRestrictionType
 import fr.berliat.hskwidget.data.dao.AnkiDAO
 import fr.berliat.hskwidget.data.repo.ChineseWordFrequencyRepo
 import fr.berliat.hskwidget.domain.SearchQuery
@@ -88,6 +89,16 @@ object Utils {
     fun getAppDataPath(): PlatformFile = ExpectedUtils.getAppDataPath()
     fun getAppDatabasePath(): PlatformFile = ExpectedUtils.getAppDatabasePath()
     fun attemptAddDesktopWidget(): Boolean = ExpectedUtils.attemptAddDesktopWidget()
+
+    enum class BackgroundRestrictionType {
+        BACKGROUND_RESTRICTED,
+        BATTERY_OPTIMIZED,
+        BACKGROUND_MAYBE_RESTRICTED,
+        NO_RESTRICTION
+    }
+
+    fun isBackgroundRestricted(): BackgroundRestrictionType = ExpectedUtils.isBackgroundRestricted()
+    fun openBatteryOptimizationSettings() = ExpectedUtils.openBatteryOptimizationSettings()
 }
 
 expect object ExpectedUtils {
@@ -109,6 +120,9 @@ expect object ExpectedUtils {
     internal fun openAppForSearchQuery(query: SearchQuery)
 
     internal fun attemptAddDesktopWidget(): Boolean
+
+    internal fun isBackgroundRestricted(): BackgroundRestrictionType
+    internal fun openBatteryOptimizationSettings()
 }
 
 fun String.capitalize() =

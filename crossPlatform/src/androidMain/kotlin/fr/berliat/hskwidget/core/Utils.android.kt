@@ -2,6 +2,7 @@ package fr.berliat.hskwidget.core
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.ActivityManager
 import android.app.AlertDialog
 import android.appwidget.AppWidgetManager
 import android.content.ClipData
@@ -11,6 +12,7 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.media.AudioManager
 import android.net.Uri
+import android.os.Build
 import android.provider.Settings
 import android.speech.tts.TextToSpeech
 import android.util.Log
@@ -21,6 +23,7 @@ import fr.berliat.hsktextviews.HSKTextSegmenter
 import fr.berliat.hskwidget.data.dao.AnkiDAO
 import fr.berliat.hskwidget.domain.SearchQuery
 import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.core.Utils.BackgroundRestrictionType
 import fr.berliat.hskwidget.cancel
 import fr.berliat.hskwidget.core.Logging.logAnalyticsError
 import fr.berliat.hskwidget.dialog_tts_error
@@ -212,6 +215,51 @@ actual object ExpectedUtils {
 
         WidgetController.requestAddDesktopWidget(context, appWidgetManager)
         return true
+    }
+
+    internal actual fun isBackgroundRestricted(): BackgroundRestrictionType {
+        val aggressiveManufacturers = setOf(
+            "honor",
+            "huawei",
+            "xiaomi",
+            "oppo",
+            "vivo",
+            "realme",
+            "oneplus"
+        )
+
+        return if(Build.MANUFACTURER.lowercase() in aggressiveManufacturers) {
+            BackgroundRestrictionType.BACKGROUND_MAYBE_RESTRICTED
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+            if (activityManager.isBackgroundRestricted)
+                BackgroundRestrictionType.BACKGROUND_RESTRICTED
+            else
+                BackgroundRestrictionType.BATTERY_OPTIMIZED
+        } else {
+            BackgroundRestrictionType.BATTERY_OPTIMIZED
+        }
+    }
+
+    internal actual fun openBatteryOptimizationSettings() {
+        val intents = listOf(
+            Intent("android.settings.APP_BATTERY_SETTINGS").apply {
+                data = Uri.fromParts("package", context.packageName, null)
+            },
+            Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                data = Uri.fromParts("package", context.packageName, null)
+            }
+        )
+
+        val pm = context.packageManager
+
+        for (intent in intents) {
+            if (intent.resolveActivity(pm) != null) {
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                context.startActivity(intent)
+                return
+            }
+        }
     }
 
     private const val TAG = "Utils"
