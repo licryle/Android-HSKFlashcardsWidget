@@ -46,6 +46,7 @@ import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.getString
 
 import java.util.Locale
+import androidx.core.net.toUri
 
 fun Context.findActivity(): Activity = when (this) {
     is Activity -> this
@@ -70,7 +71,7 @@ actual object ExpectedUtils {
     internal actual fun openLink(url: String) {
         val intent = Intent(
             Intent.ACTION_VIEW,
-            Uri.parse(url)
+            url.toUri()
         ).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
         context.startActivity(intent)
@@ -78,7 +79,7 @@ actual object ExpectedUtils {
 
     internal actual fun sendEmail(email: String, subject: String, body: String) : Boolean {
         val intent = Intent(Intent.ACTION_SENDTO).apply {
-            data = Uri.parse("mailto:") // use only "mailto:", don't put address here
+            data = "mailto:".toUri() // use only "mailto:", don't put address here
             putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
             putExtra(Intent.EXTRA_SUBJECT, subject)
             putExtra(Intent.EXTRA_TEXT, body)
