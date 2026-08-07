@@ -113,31 +113,9 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
     }
 
     protected open fun handleAppUpdate() {
-        if (shouldUpdateDatabaseFromAsset()) {
-            HSKAppServices.snackbar.show(SnackbarType.INFO, Res.string.database_update_start)
-
-            viewModelScope.launch(AppDispatchers.IO) {
-                DatabaseHelper.getInstance().updateLiveDatabaseFromAsset({
-                    HSKAppServices.snackbar.show(SnackbarType.SUCCESS, Res.string.database_update_success)
-                }, { e ->
-                    HSKAppServices.snackbar.show(SnackbarType.ERROR, Res.string.database_update_failure, listOf(e.message ?: ""))
-
-                    Logging.logAnalyticsError(TAG, "UpdateDatabaseFromAssetFailure", e.message ?: "")
-                })
-            }
-        }
-
-        if (appConfig.appVersionCode.value < 47 && Utils.getAppVersion() >= 47) {
-            HSKAppServices.snackbar.show(SnackbarType.INFO, Res.string.database_update_list_system)
-
-            viewModelScope.launch(AppDispatchers.IO) {
-                HSKAppServices.wordListRepo.buildListSystemAnnotated()
-                HSKAppServices.wordListRepo.buildListSystemExam()
-            }
-        }
-
-        if (appConfig.appVersionCode.value < 48 && Utils.getAppVersion() >= 48) {
-            viewModelScope.launch(AppDispatchers.IO) {
+        viewModelScope.launch(AppDispatchers.IO) {
+            var actualVersion = appConfig.appVersionCode.value
+            if (actualVersion < 48 && Utils.getAppVersion() >= 48) {
                 // Migrate datastore files folders
                 val oldAppPrefFile = FileKit.filesDir.resolve("app.preferences_pb")
                 if (oldAppPrefFile.exists()) {
@@ -145,10 +123,12 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
                     // We create a temporary store instance with the old DataStore
                     val oldStore = AppPreferencesStore.getInstance(oldDataStore)
 
-                    // Overwrite our current live config with the old values
+                    actualVersion = oldStore.appVersionCode.value
+                    // Overwri
+                    // te our current live config with the old values
                     appConfig.overwriteWith(oldStore)
 
-                    oldAppPrefFile.delete() 
+                    oldAppPrefFile.delete()
                 }
 
                 val oldWidgetPrefFile = FileKit.filesDir.resolve("widgets.preferences_pb")
@@ -162,9 +142,28 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
                     oldWidgetPrefFile.delete()
                 }
             }
-        }
 
-        appConfig.appVersionCode.value = Utils.getAppVersion()
+            if (shouldUpdateDatabaseFromAsset(actualVersion)) {
+                HSKAppServices.snackbar.show(SnackbarType.INFO, Res.string.database_update_start)
+
+                DatabaseHelper.getInstance().updateLiveDatabaseFromAsset({
+                    HSKAppServices.snackbar.show(SnackbarType.SUCCESS, Res.string.database_update_success)
+                }, { e ->
+                    HSKAppServices.snackbar.show(SnackbarType.ERROR, Res.string.database_update_failure, listOf(e.message ?: ""))
+
+                    Logging.logAnalyticsError(TAG, "UpdateDatabaseFromAssetFailure", e.message ?: "")
+                })
+            }
+
+            if (actualVersion < 47 && Utils.getAppVersion() >= 47) {
+                HSKAppServices.snackbar.show(SnackbarType.INFO, Res.string.database_update_list_system)
+
+                HSKAppServices.wordListRepo.buildListSystemAnnotated()
+                HSKAppServices.wordListRepo.buildListSystemExam()
+            }
+
+            appConfig.appVersionCode.value = Utils.getAppVersion()
+        }
     }
 
     fun didUpdateApp(): Boolean {
@@ -179,13 +178,13 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
         handleBackupDisk()
     }
 
-    fun shouldUpdateDatabaseFromAsset(): Boolean {
-        if (appConfig.appVersionCode.value == 0) return false // first launch, nothing to update
+    fun shouldUpdateDatabaseFromAsset(appVersion: Int): Boolean {
+        if (appVersion == 0) return false // first launch, nothing to update
 
         val updateDbVersions = listOf(32, 37, 48)
 
         return updateDbVersions.any { updateVersion ->
-            appConfig.appVersionCode.value < updateVersion && Utils.getAppVersion() >= updateVersion
+            appVersion < updateVersion && Utils.getAppVersion() >= updateVersion
         }
     }
 
