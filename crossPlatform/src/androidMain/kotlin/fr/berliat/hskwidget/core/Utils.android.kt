@@ -54,6 +54,12 @@ fun Context.findActivity(): Activity = when (this) {
     else -> throw Exception("No activity attached to context")
 }
 
+fun Context.getActivity(): Activity? = try {
+    findActivity()
+} catch (_: Exception) {
+    null
+}
+
 @SuppressLint("StaticFieldLeak")
 actual object ExpectedUtils {
     private var _context: Context? = null
@@ -166,15 +172,17 @@ actual object ExpectedUtils {
         err?.let {
             CoroutineScope(Dispatchers.IO).launch {
                 val errString = getString(err.errStringId)
-                val titleString =getString(Res.string.dialog_tts_error)
+                val titleString = getString(Res.string.dialog_tts_error)
                 val yesButton = getString(Res.string.fix_it)
                 val noButton = getString(Res.string.cancel)
 
-                if (err.errRemedyIntent == null) {
-                    HSKAppServices.snackbar.show(SnackbarType.ERROR, err.errStringId)
-                } else {
-                    withContext(Dispatchers.Main) {
-                        AlertDialog.Builder(context)
+                withContext(Dispatchers.Main) {
+                    val activity = context.getActivity()
+                    if (err.errRemedyIntent == null ||
+                        activity == null || activity.isFinishing || activity.isDestroyed) {
+                        HSKAppServices.snackbar.show(SnackbarType.ERROR, err.errStringId)
+                    } else {
+                        AlertDialog.Builder(activity)
                             .setTitle(titleString)
                             .setMessage(errString)
                             .setPositiveButton(yesButton) { _, _ ->
