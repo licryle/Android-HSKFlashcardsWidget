@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -34,7 +35,7 @@ class Error(
 
 @Composable
 fun ErrorView(
-    backgroundColor: Color = Color(0xFFFFFFFF), // replace with theme color if needed
+    backgroundColor: Color = MaterialTheme.colorScheme.background, // replace with theme color if needed
     modifier: Modifier = Modifier,
     error : Error = Error()
 ) {
