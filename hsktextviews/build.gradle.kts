@@ -12,9 +12,9 @@ kotlin {
     // Target declarations - add or remove as needed below. These define
     // which platforms this KMP module supports.
     // See: https://kotlinlang.org/docs/multiplatform-discover-project.html#targets
-    androidLibrary {
+    android {
         namespace = "fr.berliat.hsktextviews"
-        compileSdk = 36
+        compileSdk = 37
         minSdk = 26
 
         androidResources.enable = true
@@ -35,7 +35,7 @@ kotlin {
     // https://kotlinlang.org/docs/multiplatform-build-native-binaries.html#build-xcframeworks
 
     val xcf = XCFramework()
-    val iosTargets = listOf(iosX64(), iosArm64(), iosSimulatorArm64())
+    val iosTargets = listOf(iosArm64(), iosSimulatorArm64())
 
     // A step-by-step guide on how to include this library in an XCode
     // project can be found here:
@@ -87,14 +87,8 @@ kotlin {
             }
         }
 
-        iosMain {
-            dependencies {
-                // Add iOS-specific dependencies here. This a source set created by Kotlin Gradle
-                // Plugin (KGP) that each specific iOS target (e.g., iosX64) depends on as
-                // part of KMP’s default source set hierarchy. Note that this source set depends
-                // on common by default and will correctly pull the iOS artifacts of any
-                // KMP dependencies declared in commonMain.
-            }
+        val iosMain by creating {
+            // ...
         }
     }
 }

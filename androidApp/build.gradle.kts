@@ -8,12 +8,12 @@ plugins {
 
 android {
     namespace = "fr.berliat.hskwidget.android"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "fr.berliat.hskwidget"
         minSdk = 26
-        targetSdk = 36
+        targetSdk = 37
         versionCode = libs.versions.app.versionCode.get().toInt()
         versionName = libs.versions.app.versionName.get()
 

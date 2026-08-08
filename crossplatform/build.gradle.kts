@@ -2,6 +2,7 @@ import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.*
 import org.gradle.internal.os.OperatingSystem
 
 var os: OperatingSystem? = OperatingSystem.current()
+val isMac = OperatingSystem.current().isMacOsX
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -74,7 +75,6 @@ kotlin {
     }
 
     listOf(
-        iosX64(),
         iosArm64(),
         iosSimulatorArm64()
     ).forEach { iosTarget ->
@@ -149,27 +149,25 @@ kotlin {
             }
         }
 
-        if (os?.isMacOsX == true) {
-            val iosMain by creating {
-                dependsOn(commonMain)
-                dependencies {
-                    api(project(":googledrivebackup"))
-                }
+        val iosMain by creating {
+            dependsOn(commonMain)
+            dependencies {
+                api(project(":googledrivebackup"))
             }
-            val iosTest by creating {
-                dependsOn(commonTest)
-            }
-            listOf(iosX64(), iosArm64(), iosSimulatorArm64()).forEach { target ->
-                target.compilations["main"].defaultSourceSet.dependsOn(iosMain)
-                target.compilations["test"].defaultSourceSet.dependsOn(iosTest)
-            }
+        }
+        val iosTest by creating {
+            dependsOn(commonTest)
+        }
+        listOf(iosArm64(), iosSimulatorArm64()).forEach { target ->
+            target.compilations["main"].defaultSourceSet.dependsOn(iosMain)
+            target.compilations["test"].defaultSourceSet.dependsOn(iosTest)
         }
     }
 }
 
 android {
     namespace = "fr.berliat.hskwidget"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         minSdk = 26
@@ -199,7 +197,7 @@ android {
 
 dependencies {
     add("kspAndroid", libs.room.compiler)
-    if (System.getProperty("os.name").contains("Mac")) {
+    if (OperatingSystem.current().isMacOsX) {
         add("kspIosSimulatorArm64", libs.room.compiler)
         add("kspIosX64", libs.room.compiler)
         add("kspIosArm64", libs.room.compiler)
