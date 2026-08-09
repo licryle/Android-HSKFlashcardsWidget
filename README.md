@@ -1,7 +1,6 @@
-# Mandarin Assistant
+# Mandarin Assistant   [<img height="35" alt="Get It on Google Play" src="https://github.com/user-attachments/assets/7430adf9-3424-47a0-9fd6-7b12527750b6" />](https://play.google.com/store/apps/details?id=fr.berliat.hskwidget)
 
 **Mandarin Assistant** is an all-in-one toolbox for learning Mandarin.
-
 - Consult the dictionary and annotate words  
 - Expand your dictionary with custom entries (grammar points, trendy new words, or example sentences)  
 - Create lists of words  
