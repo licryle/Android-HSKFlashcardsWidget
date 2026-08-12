@@ -5,6 +5,7 @@ import androidx.room.Room
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.createDirectories
 import io.github.vinceglb.filekit.exists
+import io.github.vinceglb.filekit.parent
 import io.github.vinceglb.filekit.path
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.Dispatchers
@@ -25,7 +26,7 @@ actual suspend fun copyDatabaseAssetFile(file: PlatformFile) {
         requireNotNull(databasePathInBundle) { "Database asset file not found in bundle: ${DatabaseHelper.DATABASE_FILENAME}" }
 
         try {
-            file.createDirectories(true)
+            file.parent()!!.createDirectories(true)
         } catch (e: Exception) {
             println("Could not create directory for ${file.path}: $e")
         }
