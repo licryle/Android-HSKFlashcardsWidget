@@ -168,6 +168,14 @@ actual object ExpectedUtils {
     internal actual fun attemptAddDesktopWidget(): Boolean {
         return false
     }
+
+    internal actual fun isBackgroundRestricted(): Utils.BackgroundRestrictionType {
+        return Utils.BackgroundRestrictionType.NO_RESTRICTION
+    }
+
+    internal actual fun openBatteryOptimizationSettings() {
+        // No need in iOS
+    }
 }
 
 @OptIn(ExperimentalForeignApi::class)

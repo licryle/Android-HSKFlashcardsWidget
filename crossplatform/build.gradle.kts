@@ -199,7 +199,6 @@ dependencies {
     add("kspAndroid", libs.room.compiler)
     if (OperatingSystem.current().isMacOsX) {
         add("kspIosSimulatorArm64", libs.room.compiler)
-        add("kspIosX64", libs.room.compiler)
         add("kspIosArm64", libs.room.compiler)
     }
 }
@@ -256,4 +255,9 @@ tasks.matching {
     it.name.contains("Package")
 }.all {
     dependsOn(copyGeneratedDatabase)
+}
+
+// Fix implicit dependency between KSP and BuildKonfig
+tasks.matching { it.name.startsWith("kspKotlin") }.configureEach {
+    dependsOn("generateBuildKonfig")
 }
