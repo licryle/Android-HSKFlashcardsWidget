@@ -16,7 +16,7 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>fr.berliat.hskwidget</string>
+			<string>net.vertex8.mandarinassistant</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>hskwidget</string>

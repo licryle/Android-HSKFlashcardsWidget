@@ -89,7 +89,7 @@ struct Provider: AppIntentTimelineProvider {
 }
 
 struct HskFlashcardsWidget: Widget {
-    let kind: String = "HskFlashcardsWidget"
+    let kind: String = "MandarinAssistantWidget"
 
     var body: some WidgetConfiguration {
         AppIntentConfiguration(kind: kind, intent: HskWidgetConfigurationIntent.self, provider: Provider()) { entry in

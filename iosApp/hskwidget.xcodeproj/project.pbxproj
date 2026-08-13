@@ -92,6 +92,7 @@
 		1C3B979D2F88E8050004B387 /* Exceptions for "HskShareExtension" folder in "HskShareExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				HskShareExtension.entitlements,
 				Info.plist,
 			);
 			target = 1C3B978E2F88E8050004B387 /* HskShareExtension */;
@@ -106,6 +107,7 @@
 		1C6C7A972F7584EE00CAEF01 /* Exceptions for "HskFlashcardsWidget" folder in "HskFlashcardsWidgetExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				HskFlashcardsWidget.entitlements,
 				Info.plist,
 			);
 			target = 1C6C7A7C2F7584EA00CAEF01 /* HskFlashcardsWidgetExtension */;
@@ -113,6 +115,7 @@
 		1CD8DF4E2EDDF04B00AB930B /* Exceptions for "hskwidget" folder in "hskwidget" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				hskwidget.entitlements,
 				Info.plist,
 			);
 			target = 1C7166D42E71E186000B4154 /* hskwidget */;
@@ -715,8 +718,10 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = "$(APP_VERSION_NAME)";
-				PRODUCT_BUNDLE_IDENTIFIER = net.vertex8.hskwidget.HskShareExtension;
+				PRODUCT_BUNDLE_IDENTIFIER = net.vertex8.mandarinassistant.HskShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				REGISTER_APP_GROUPS = YES;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -748,8 +753,10 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = "$(APP_VERSION_NAME)";
-				PRODUCT_BUNDLE_IDENTIFIER = net.vertex8.hskwidget.HskShareExtension;
+				PRODUCT_BUNDLE_IDENTIFIER = net.vertex8.mandarinassistant.HskShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				REGISTER_APP_GROUPS = YES;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -785,8 +792,10 @@
 				);
 				MARKETING_VERSION = "$(APP_VERSION_NAME)";
 				NEW_SETTING1 = "";
-				PRODUCT_BUNDLE_IDENTIFIER = net.vertex8.hskwidget.widget;
+				PRODUCT_BUNDLE_IDENTIFIER = net.vertex8.mandarinassistant.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				REGISTER_APP_GROUPS = YES;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -822,8 +831,10 @@
 				);
 				MARKETING_VERSION = "$(APP_VERSION_NAME)";
 				NEW_SETTING1 = "";
-				PRODUCT_BUNDLE_IDENTIFIER = net.vertex8.hskwidget.widget;
+				PRODUCT_BUNDLE_IDENTIFIER = net.vertex8.mandarinassistant.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				REGISTER_APP_GROUPS = YES;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -991,7 +1002,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.5;
 				MARKETING_VERSION = "$(APP_VERSION_NAME)";
-				PRODUCT_BUNDLE_IDENTIFIER = net.vertex8.hskwidget;
+				PRODUCT_BUNDLE_IDENTIFIER = net.vertex8.mandarinassistant;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
@@ -1040,7 +1051,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.5;
 				MARKETING_VERSION = "$(APP_VERSION_NAME)";
-				PRODUCT_BUNDLE_IDENTIFIER = net.vertex8.hskwidget;
+				PRODUCT_BUNDLE_IDENTIFIER = net.vertex8.mandarinassistant;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
@@ -1064,7 +1075,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
 				MACOSX_DEPLOYMENT_TARGET = 15.5;
 				MARKETING_VERSION = "$(APP_VERSION_NAME)";
-				PRODUCT_BUNDLE_IDENTIFIER = net.vertex8.hskwidgetTests;
+				PRODUCT_BUNDLE_IDENTIFIER = net.vertex8.mandarinassistantTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
@@ -1087,7 +1098,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
 				MACOSX_DEPLOYMENT_TARGET = 15.5;
 				MARKETING_VERSION = "$(APP_VERSION_NAME)";
-				PRODUCT_BUNDLE_IDENTIFIER = net.vertex8.hskwidgetTests;
+				PRODUCT_BUNDLE_IDENTIFIER = net.vertex8.mandarinassistantTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
@@ -1109,7 +1120,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
 				MACOSX_DEPLOYMENT_TARGET = 15.5;
 				MARKETING_VERSION = "$(APP_VERSION_NAME)";
-				PRODUCT_BUNDLE_IDENTIFIER = net.vertex8.hskwidgetUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = net.vertex8.mandarinassistantUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
@@ -1131,7 +1142,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
 				MACOSX_DEPLOYMENT_TARGET = 15.5;
 				MARKETING_VERSION = "$(APP_VERSION_NAME)";
-				PRODUCT_BUNDLE_IDENTIFIER = net.vertex8.hskwidgetUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = net.vertex8.mandarinassistantUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
