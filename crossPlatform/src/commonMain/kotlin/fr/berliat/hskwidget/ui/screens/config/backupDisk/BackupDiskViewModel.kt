@@ -110,13 +110,18 @@ class BackupDiskViewModel(
 
                             Logging.logAnalyticsEvent(Logging.ANALYTICS_EVENTS.CONFIG_BACKUP_RESTORE)
                         } catch (e: Exception) {
+                            val errorDetails = e.message ?: e.toString()
                             withContext(Dispatchers.Main) {
-                                HSKAppServices.snackbar.show(SnackbarType.ERROR, Res.string.dbrestore_failure_import)
+                                HSKAppServices.snackbar.show(
+                                    SnackbarType.ERROR,
+                                    Res.string.dbrestore_failure_import,
+                                    listOf(errorDetails)
+                                )
                             }
                             Logging.logAnalyticsError(
                                 TAG,
                                 "BackupDiskRestorationFailed",
-                                e.message ?: "")
+                                errorDetails)
                         }
                     }
                 },

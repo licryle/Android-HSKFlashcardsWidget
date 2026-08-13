@@ -176,10 +176,14 @@ class BackupCloudViewModel (
                     e.toString()
                 )
             } catch (e: Exception) {
-                HSKAppServices.snackbar.show(SnackbarType.ERROR, Res.string.dbrestore_failure_import)
+                HSKAppServices.snackbar.show(
+                    SnackbarType.ERROR,
+                    Res.string.dbrestore_failure_import,
+                    listOf(e.message ?: e.toString())
+                )
                 Logging.logAnalyticsError(
                     "BACKUP_RESTORE",
-                    getString(Res.string.dbrestore_failure_import),
+                    getString(Res.string.dbrestore_failure_import, e.message ?: e.toString()),
                     e.toString()
                 )
             }
