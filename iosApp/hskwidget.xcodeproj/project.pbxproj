@@ -92,7 +92,6 @@
 		1C3B979D2F88E8050004B387 /* Exceptions for "HskShareExtension" folder in "HskShareExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				HskShareExtension.entitlements,
 				Info.plist,
 			);
 			target = 1C3B978E2F88E8050004B387 /* HskShareExtension */;
@@ -107,7 +106,6 @@
 		1C6C7A972F7584EE00CAEF01 /* Exceptions for "HskFlashcardsWidget" folder in "HskFlashcardsWidgetExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				HskFlashcardsWidget.entitlements,
 				Info.plist,
 			);
 			target = 1C6C7A7C2F7584EA00CAEF01 /* HskFlashcardsWidgetExtension */;
@@ -115,7 +113,6 @@
 		1CD8DF4E2EDDF04B00AB930B /* Exceptions for "hskwidget" folder in "hskwidget" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				hskwidget.entitlements,
 				Info.plist,
 			);
 			target = 1C7166D42E71E186000B4154 /* hskwidget */;
@@ -737,6 +734,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3EB8AF2D3679E1BE7D9ED050 /* Pods-HskShareExtension.release.xcconfig */;
 			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = HskShareExtension/HskShareExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
@@ -773,6 +771,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = C2F890F7FAF61F8D564220CB /* Pods-HskFlashcardsWidgetExtension.debug.xcconfig */;
 			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				CODE_SIGN_ENTITLEMENTS = HskFlashcardsWidgetExtension.entitlements;
@@ -812,6 +811,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = D0E80B30BCB2E15DADA6E998 /* Pods-HskFlashcardsWidgetExtension.release.xcconfig */;
 			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				CODE_SIGN_ENTITLEMENTS = HskFlashcardsWidgetExtension.entitlements;
