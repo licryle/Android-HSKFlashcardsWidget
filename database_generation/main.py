@@ -5,7 +5,7 @@ def main():
     parser = argparse.ArgumentParser(description="Mandarin Assistant Database Generator")
     parser.add_argument('--update', action='store_true', help="Update local source files (download, scrape, etc.)")
     parser.add_argument('--schema', 
-                        default="../crossPlatform/schemas/fr.berliat.hskwidget.data.store.ChineseWordsDatabase/1.json",
+                        default="../crossPlatform/schemas/fr.berliat.hskwidget.data.store.ChineseWordsDatabase/2.json",
                         help="Path to the Room schema JSON file")
     parser.add_argument('--db', 
                         default="output/Mandarin_Assistant.db",

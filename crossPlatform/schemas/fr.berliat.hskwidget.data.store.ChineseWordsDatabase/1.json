@@ -77,7 +77,7 @@
       },
       {
         "tableName": "chinese_word",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`simplified` TEXT NOT NULL, `traditional` TEXT, `definition` TEXT NOT NULL, `hsk_level` TEXT, `pinyins` TEXT, `popularity` INTEGER, `examples` TEXT DEFAULT '', `collocations` TEXT DEFAULT '', `modality` TEXT DEFAULT 'N/A', `type` TEXT DEFAULT 'N/A', `synonyms` TEXT DEFAULT '', `antonym` TEXT DEFAULT '', `searchable_text` TEXT NOT NULL DEFAULT '', PRIMARY KEY(`simplified`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`simplified` TEXT NOT NULL, `traditional` TEXT, `definition` TEXT NOT NULL, `hsk_level` TEXT, `pinyins` TEXT, `popularity` INTEGER, `examples` TEXT DEFAULT '', `modality` TEXT DEFAULT 'N/A', `type` TEXT DEFAULT 'N/A', `synonyms` TEXT DEFAULT '', `antonym` TEXT DEFAULT '', `searchable_text` TEXT NOT NULL DEFAULT '', PRIMARY KEY(`simplified`))",
         "fields": [
           {
             "fieldPath": "simplified",
@@ -114,12 +114,6 @@
           {
             "fieldPath": "examples",
             "columnName": "examples",
-            "affinity": "TEXT",
-            "defaultValue": "''"
-          },
-          {
-            "fieldPath": "collocations",
-            "columnName": "collocations",
             "affinity": "TEXT",
             "defaultValue": "''"
           },
