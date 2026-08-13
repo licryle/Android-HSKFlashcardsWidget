@@ -5,16 +5,15 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.RoomDatabaseConstructor
 import androidx.room.TypeConverters
+import androidx.room.execSQL
+import androidx.room.useWriterConnection
 
 import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.cacheDir
 import io.github.vinceglb.filekit.copyTo
-import io.github.vinceglb.filekit.delete
 import io.github.vinceglb.filekit.div
-import io.github.vinceglb.filekit.list
 import io.github.vinceglb.filekit.name
-import io.github.vinceglb.filekit.parent
 
 import fr.berliat.hskwidget.data.dao.AnnotatedChineseWordDAO
 import fr.berliat.hskwidget.data.dao.ChineseWordAnnotationDAO
@@ -65,43 +64,19 @@ abstract class ChineseWordsDatabase: RoomDatabase() {
     val databaseFile
         get() = _databaseFile!!
 
-    suspend fun snapshotToFile(): PlatformFile? =
-        try {
-            val mainFile = this.databaseFile
-            val mainCachedFile = FileKit.cacheDir / mainFile.name
-
-            // Copy db + side files
-            val allDbFiles = mainFile.parent()!!.list()
-                .filter { it.name.startsWith(mainFile.name) }
-
-            val cachedDbFiles = allDbFiles.map { src ->
-                val dest = FileKit.cacheDir / src.name
-                src.copyTo(dest)
-                dest
-            }
-
-            // Force WAL checkpoint if needed by platform
-            checkpointWal(mainCachedFile)
-
-            // Optionally delete side files
-            cachedDbFiles
-                .filter { it.name != mainCachedFile.name }
-                .forEach {
-                    try {
-                        it.delete(false)
-                    } catch (_: Exception) {
-                    }
-                }
-
-            mainCachedFile
-        } catch (_: Exception) {
-            null
+    suspend fun snapshotToFile(): PlatformFile? = try {
+        // Flush live WAL to the main file
+        this.useWriterConnection { connection ->
+            connection.execSQL("PRAGMA wal_checkpoint(truncate)")
         }
+
+        val mainFile = this.databaseFile
+        val dest = FileKit.cacheDir / mainFile.name
+        mainFile.copyTo(dest)
+        dest
+    } catch (_: Exception) { null }
 }
 
-@Suppress("KotlinNoActualForExpect")
 expect object ChineseWordsDatabaseConstructor : RoomDatabaseConstructor<ChineseWordsDatabase> {
     override fun initialize(): ChineseWordsDatabase
 }
-
-expect suspend fun ChineseWordsDatabase.checkpointWal(file: PlatformFile)
