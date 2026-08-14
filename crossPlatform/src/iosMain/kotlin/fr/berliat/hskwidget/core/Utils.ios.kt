@@ -40,14 +40,14 @@ actual object ExpectedUtils {
 
     internal actual fun getAppDataPath(): PlatformFile {
         val path = NSFileManager.defaultManager
-            .containerURLForSecurityApplicationGroupIdentifier("group.net.vertex8.mandarinassistant")?.path
+            .containerURLForSecurityApplicationGroupIdentifier("group.net.vertex8.hskwidgetassist2")?.path
         
         return path?.let { PlatformFile(it) } ?: FileKit.filesDir
     }
 
     internal actual fun getAppDatabasePath(): PlatformFile {
         val path = NSFileManager.defaultManager
-            .containerURLForSecurityApplicationGroupIdentifier("group.net.vertex8.mandarinassistant")?.path
+            .containerURLForSecurityApplicationGroupIdentifier("group.net.vertex8.hskwidgetassist2")?.path
 
         return path?.let { PlatformFile(it) } ?: FileKit.databasesDir
     }
