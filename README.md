@@ -1,5 +1,7 @@
 # Mandarin Assistant   [<img height="35" alt="Get It on Google Play" src="https://github.com/user-attachments/assets/7430adf9-3424-47a0-9fd6-7b12527750b6" />](https://play.google.com/store/apps/details?id=fr.berliat.hskwidget)
 
+<img width="4312" height="1420" alt="iphone - 6 5 inch (1)" src="https://github.com/user-attachments/assets/83b0f3f0-5f5d-49d7-98b3-c0ad8b93b3ad" />
+
 **Mandarin Assistant** is an all-in-one toolbox for learning Mandarin.
 - Consult the dictionary and annotate words  
 - Expand your dictionary with custom entries (grammar points, trendy new words, or example sentences)  
@@ -23,13 +25,4 @@
 ---
 
 **Currently supports Simplified Chinese and English only.**
-<p>
-  <img src="https://github.com/user-attachments/assets/0a3d4734-4347-4cd5-9385-1a5cf812542c" width="33%" />
-  <img src="https://github.com/user-attachments/assets/74d68355-94f5-4e92-9c69-43231d7f4115" width ="33%" />
-  <img src="https://github.com/user-attachments/assets/dcd35e8c-7792-41e9-a5a1-ae6ce8bac52c" width ="33%" />
-</p>
-<p>
-  <div width="33%" />
-  <img src="https://github.com/user-attachments/assets/dded89d1-a0bd-4720-a7ab-b148b2d9b448" width="33%" />
-  <div width="33%" />
-</p>
+
