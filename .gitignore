@@ -40,3 +40,4 @@ crossPlatform/test_datastore_*
 
 /iosApp/hskwidget/databases/*
 /crossPlatform/src/androidMain/assets/databases/*
+/androidApp/release/
