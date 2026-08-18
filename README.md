@@ -1,6 +1,6 @@
-# Mandarin Assistant   [<img height="35" alt="Get It on Google Play" src="https://github.com/user-attachments/assets/7430adf9-3424-47a0-9fd6-7b12527750b6" />](https://play.google.com/store/apps/details?id=fr.berliat.hskwidget)
+# Mandarin Assistant HSK Widget [<img height="35" alt="Get It on Google Play" src="https://github.com/user-attachments/assets/735a8e12-def8-4d40-b385-ef5b3dfa2b1f" />](https://play.google.com/store/apps/details?id=fr.berliat.hskwidget) [<img height="35" alt="Get it on the App Store" src="https://github.com/user-attachments/assets/3a0d4d2d-67f1-48ad-9698-1998e5f38a69" />](https://apps.apple.com/us/app/mandarin-assistant-hsk-widget/id6801617407)
 
-<img width="4312" height="1420" alt="iphone - 6 5 inch (1)" src="https://github.com/user-attachments/assets/83b0f3f0-5f5d-49d7-98b3-c0ad8b93b3ad" />
+<img width="4312" height="1420" alt="App Overview" src="https://github.com/user-attachments/assets/83b0f3f0-5f5d-49d7-98b3-c0ad8b93b3ad" />
 
 **Mandarin Assistant** is an all-in-one toolbox for learning Mandarin.
 - Consult the dictionary and annotate words  
