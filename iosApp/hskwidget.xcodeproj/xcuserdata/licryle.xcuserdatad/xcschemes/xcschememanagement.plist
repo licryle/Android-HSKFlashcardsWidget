@@ -12,7 +12,7 @@
 		<key>HskShareExtension.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>44</integer>
+			<integer>45</integer>
 		</dict>
 		<key>hskwidget.xcscheme</key>
 		<dict>
@@ -22,7 +22,7 @@
 		<key>hskwidget.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>10</integer>
+			<integer>2</integer>
 		</dict>
 		<key>hskwidgetUITests.xcscheme_^#shared#^_</key>
 		<dict>
@@ -35,12 +35,12 @@
 		<key>1C6C7A7C2F7584EA00CAEF01</key>
 		<dict>
 			<key>primary</key>
-			<true/>
+			<true />
 		</dict>
 		<key>1C7166D42E71E186000B4154</key>
 		<dict>
 			<key>primary</key>
-			<true/>
+			<true />
 		</dict>
 	</dict>
 </dict>
