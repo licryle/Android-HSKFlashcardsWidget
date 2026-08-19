@@ -9,6 +9,10 @@ object CachedResources {
         private set
     var appSlogan: String = "Study at every phone unlock"
         private set
+    var widgetListName: String = "Words from List"
+        private set
+    var widgetListDescription: String = "Read a random word from the lists you have configured."
+        private set
     var widgetNextWord: String = "Next Word"
         private set
     var widgetSpeakWord: String = "Speak Word"

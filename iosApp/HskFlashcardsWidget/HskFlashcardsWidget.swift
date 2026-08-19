@@ -98,8 +98,8 @@ struct HskFlashcardsWidget: Widget {
                     Color(UIColor.systemBackground)
                 }
         }
-        .configurationDisplayName(crossPlatform.CachedResources.shared.appName)
-        .description(crossPlatform.CachedResources.shared.appSlogan)
+        .configurationDisplayName(crossPlatform.CachedResources.shared.widgetListName)
+        .description(crossPlatform.CachedResources.shared.widgetListDescription)
         .supportedFamilies([.systemSmall, .systemMedium, .accessoryRectangular])
     }
 }

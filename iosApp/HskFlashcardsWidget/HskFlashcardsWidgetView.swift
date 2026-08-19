@@ -139,8 +139,16 @@ struct LockScreenRectangularView: View {
             }
             .widgetURL(URL(string: "hskwidget://search?q=\((crossPlatform.SearchQuery(query: entry.word, ignoreAnnotation: true, inListName: nil).description()).addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed) ?? "")")!)
         } else {
-            Text(crossPlatform.CachedResources.shared.widgetNotConfigured)
-                .font(.caption)
+            // Unconfigured state
+            VStack(alignment: .leading, spacing: 0) {
+                Text(crossPlatform.CachedResources.shared.appName)
+                    .font(.caption)
+                    .widgetAccentable()
+                Text(crossPlatform.CachedResources.shared.widgetNotConfigured)
+                    .font(.caption2)
+                    .lineLimit(2)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
         }
     }
 }
