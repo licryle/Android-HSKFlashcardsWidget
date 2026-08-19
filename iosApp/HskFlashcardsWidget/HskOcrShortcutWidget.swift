@@ -25,9 +25,6 @@ struct HskOcrShortcutWidget: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: SimpleProvider()) { entry in
             HskFlashcardsWidgetView(entry: entry)
-                .containerBackground(for: .widget) {
-                    Color(UIColor.systemBackground)
-                }
         }
         .configurationDisplayName(crossPlatform.CachedResources.shared.widgetOCRName)
         .description(crossPlatform.CachedResources.shared.widgetOCRDescription)

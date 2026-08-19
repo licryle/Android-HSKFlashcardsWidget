@@ -94,9 +94,6 @@ struct HskFlashcardsWidget: Widget {
     var body: some WidgetConfiguration {
         AppIntentConfiguration(kind: kind, intent: HskWidgetConfigurationIntent.self, provider: Provider()) { entry in
             HskFlashcardsWidgetView(entry: entry)
-                .containerBackground(for: .widget) {
-                    Color(UIColor.systemBackground)
-                }
         }
         .configurationDisplayName(crossPlatform.CachedResources.shared.widgetListName)
         .description(crossPlatform.CachedResources.shared.widgetListDescription)
