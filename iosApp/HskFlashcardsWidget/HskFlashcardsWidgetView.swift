@@ -11,6 +11,8 @@ struct HskFlashcardsWidgetView: View {
     var body: some View {
         if family == .accessoryRectangular {
             LockScreenRectangularView(entry: entry)
+        } else if family == .accessoryCircular {
+            LockScreenCircularOCRView()
         } else if !entry.isEmpty {
             VStack(spacing: 4) {
                 // Top Row: Reload - Level - Speak
@@ -51,7 +53,7 @@ struct HskFlashcardsWidgetView: View {
                 Link(destination: URL(string: "hskwidget://search?q=\((crossPlatform.SearchQuery(query: entry.word, ignoreAnnotation: true, inListName: nil).description()).addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed) ?? "")")!) {
                     VStack(spacing: 2) {
                         Spacer(minLength: 0)
-                        
+
                         Text(entry.pinyin)
                             .font(.system(size: 14))
                             .foregroundColor(.secondary)
@@ -67,7 +69,7 @@ struct HskFlashcardsWidgetView: View {
                             .lineLimit(2)
                             .multilineTextAlignment(.center)
                             .foregroundColor(.primary.opacity(0.8))
-                        
+
                         Spacer(minLength: 0)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -150,5 +152,31 @@ struct LockScreenRectangularView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
         }
+    }
+}
+
+struct LockScreenCircularOCRView: View {
+    var body: some View {
+        ZStack {
+            AccessoryWidgetBackground()
+
+            Image("AppIconSmall")
+                .resizable()
+                .scaledToFit()
+                .clipShape(Circle())
+                .opacity(0.4)
+            
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+                    Image(systemName: "camera.fill")
+                        .font(.system(size: 16))
+                        .widgetAccentable()
+                }
+            }
+            .padding(4)
+        }
+        .widgetURL(URL(string: "hskwidget://ocr")!)
     }
 }

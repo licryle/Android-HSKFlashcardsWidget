@@ -69,6 +69,11 @@ This project uses the awesome projects of:
     <string name="dictionary_item_modality">Usage</string>
     <string name="dictionary_item_type">Type</string>
 
+    <string name="widget_name">Words from List</string>
+    <string name="widget_description">Read a random word from the lists you have configured.</string>
+    <string name="ocr_shortcut_name">Take Picture/OCR Shortcut</string>
+    <string name="ocr_shortcut_description">Quickly take a picture to extract Mandarin text.</string>
+
     <string name="widget_not_configured">No word. Configure list(s)</string>
 
     <string name="widget_configure">Configure Widget</string>

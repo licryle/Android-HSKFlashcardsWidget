@@ -13,6 +13,10 @@ object CachedResources {
         private set
     var widgetListDescription: String = "Read a random word from the lists you have configured."
         private set
+    var widgetOCRName: String = "Take Picture/OCR Shortcut"
+        private set
+    var widgetOCRDescription: String = "Quickly take a picture to extract Mandarin text."
+        private set
     var widgetNextWord: String = "Next Word"
         private set
     var widgetSpeakWord: String = "Speak Word"
@@ -39,6 +43,10 @@ object CachedResources {
     suspend fun load(): CachedResources = CachedResources.apply {
         appName = getString(Res.string.app_name)
         appSlogan = getString(Res.string.app_slogan)
+        widgetListName = getString(Res.string.widget_name)
+        widgetListDescription = getString(Res.string.widget_description)
+        widgetOCRName = getString(Res.string.ocr_shortcut_name)
+        widgetOCRDescription = getString(Res.string.ocr_shortcut_description)
         widgetNextWord = getString(Res.string.dictionary_item_reload)
         widgetSpeakWord = getString(Res.string.widget_btn_speak)
         widgetNotConfigured = getString(Res.string.widget_not_configured)

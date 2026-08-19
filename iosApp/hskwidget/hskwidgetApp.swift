@@ -107,6 +107,8 @@ struct hskwidgetApp: App {
             } else if url.host == "ocr" {
                 if let path = components?.queryItems?.first(where: { $0.name == "path" })?.value {
                     appIntent = crossPlatform.AppIntent.ImageOCR(path: path)
+                } else {
+                    appIntent = crossPlatform.AppIntent.OCRCapture()
                 }
             } else if url.host == "configure" {
                 appIntent = crossPlatform.AppIntent.WidgetConfiguration(widgetId: 0)

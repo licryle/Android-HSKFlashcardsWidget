@@ -6,8 +6,9 @@
     <string name="widget_default_english">Hello</string>
     <string name="widget_default_pinyin">nĭ hăo</string>
     <string name="widget_default_loading">…Loading…</string>
-    <string name="widget_description"><![CDATA[Display a flashcard of random HSK characters & words.]]></string>
 
     <string name="widget_btn_speak">Listen to this word</string>
     <string name="widget_btn_reload">New word</string>
+
+    <string name="widget_description">Read a random word from the lists you have configured.</string>
 </resources>

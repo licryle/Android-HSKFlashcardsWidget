@@ -227,6 +227,7 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
                 is AppIntent.SearchTTS -> searchTTS(intent.query)
                 is AppIntent.WidgetConfiguration -> configureWidget(intent.widgetId)
                 is AppIntent.ImageOCR -> ocrImage(intent.file)
+                is AppIntent.OCRCapture -> ocrCapture()
             }
         }
     }
@@ -246,6 +247,10 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
 
     fun ocrImage(imageFile: PlatformFile) {
         navigationManager.navigate(Screen.OCRDisplay("", imageFile.path))
+    }
+
+    fun ocrCapture() {
+        navigationManager.navigate(Screen.OCRCapture())
     }
 
     open fun finalizeWidgetConfiguration(widgetId: Int) { }

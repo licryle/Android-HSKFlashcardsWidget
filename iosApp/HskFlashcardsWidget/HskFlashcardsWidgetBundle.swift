@@ -5,5 +5,6 @@ import SwiftUI
 struct HskFlashcardsWidgetBundle: WidgetBundle {
     var body: some Widget {
         HskFlashcardsWidget()
+        HskOcrShortcutWidget()
     }
 }

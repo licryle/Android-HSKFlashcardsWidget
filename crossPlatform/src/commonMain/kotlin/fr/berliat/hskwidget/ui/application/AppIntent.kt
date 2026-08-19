@@ -10,4 +10,5 @@ sealed class AppIntent {
     data class ImageOCR(val file: PlatformFile) : AppIntent() {
         constructor(path: String) : this(PlatformFile(path))
     }
+    data object OCRCapture : AppIntent()
 }
