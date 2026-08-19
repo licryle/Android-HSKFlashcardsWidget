@@ -9,7 +9,7 @@ PODS:
     - GoogleUtilities/Environment (~> 8.0)
     - GoogleUtilities/UserDefaults (~> 8.0)
     - PromisesObjC (~> 2.4)
-  - crossPlatform (4.0.6):
+  - crossPlatform (4.0.7):
     - FirebaseAnalytics
     - FirebaseCrashlytics
   - Firebase/Analytics (12.11.0):
@@ -193,7 +193,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   AppAuth: 1c1a8afa7e12f2ec3a294d9882dfa5ab7d3cb063
   AppCheckCore: cc8fd0a3a230ddd401f326489c99990b013f0c4f
-  crossPlatform: 89a0b0c299fafcad3cd9ec96a543c59aba7a161d
+  crossPlatform: 0d9defd98735e3d4465308014f36e228dbedde0d
   Firebase: 3c3a624c4eb42b091c32590a87678cfee193c9c5
   FirebaseAnalytics: 2513f181a22ba7d5ba547ce0a65f82352cc8a0c9
   FirebaseCore: 1b39aa6e67b4b4d5771045abf9c9a57a585ff1e7
