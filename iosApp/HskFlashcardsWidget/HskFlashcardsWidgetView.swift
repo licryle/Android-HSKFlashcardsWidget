@@ -9,7 +9,9 @@ struct HskFlashcardsWidgetView: View {
     @Environment(\.widgetFamily) var family
 
     var body: some View {
-        if !entry.isEmpty {
+        if family == .accessoryRectangular {
+            LockScreenRectangularView(entry: entry)
+        } else if !entry.isEmpty {
             VStack(spacing: 4) {
                 // Top Row: Reload - Level - Speak
                 HStack {
@@ -35,13 +37,14 @@ struct HskFlashcardsWidgetView: View {
 
                     Spacer()
 
-                    Link(destination: URL(string: "hskwidget://searchTTS?q=\((crossPlatform.SearchQuery(query: entry.word, ignoreAnnotation: true, inListName: nil).description()).addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed) ?? "")")!) {
+                    Button(intent: SpeakWordIntent(word: entry.word)) {
                         Image(systemName: "speaker.wave.2")
                             .font(.system(size: 12))
                             .frame(width: 24, height: 24)
                             .background(Color.secondary.opacity(0.1))
                             .clipShape(Circle())
                     }
+                    .buttonStyle(.plain)
                 }
 
                 // Middle Content: Pinyin - Simplified - Definition
@@ -86,6 +89,58 @@ struct HskFlashcardsWidgetView: View {
                     Spacer()
                 }
             }
+        }
+    }
+}
+
+struct LockScreenRectangularView: View {
+    var entry: HskEntry
+
+    var body: some View {
+        if !entry.isEmpty {
+            HStack(spacing: 4) {
+                VStack(alignment: .leading, spacing: 0) {
+                    HStack(alignment: .firstTextBaseline) {
+                        Text(entry.word)
+                            .font(.headline)
+                            .widgetAccentable()
+                        Text(entry.pinyin)
+                            .font(.caption)
+                            .lineLimit(1)
+                    }
+                    Text(entry.definition)
+                        .font(.caption2)
+                        .lineLimit(2)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                VStack(spacing: 0) {
+                    Button(intent: SpeakWordIntent(word: entry.word)) {
+                        Image(systemName: "speaker.wave.2")
+                            .font(.system(size: 13))
+                            .frame(width: 25, height: 25)
+                            .background(Color.secondary.opacity(0.2))
+                            .clipShape(Circle())
+                    }
+                    .buttonStyle(.plain)
+
+                    Spacer(minLength: 0)
+
+                    Button(intent: NextWordIntent()) {
+                        Image(systemName: "arrow.clockwise")
+                            .font(.system(size: 13))
+                            .frame(width: 25, height: 25)
+                            .background(Color.secondary.opacity(0.2))
+                            .clipShape(Circle())
+                    }
+                    .buttonStyle(.plain)
+                }
+                .frame(maxHeight: .infinity)
+            }
+            .widgetURL(URL(string: "hskwidget://search?q=\((crossPlatform.SearchQuery(query: entry.word, ignoreAnnotation: true, inListName: nil).description()).addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed) ?? "")")!)
+        } else {
+            Text(crossPlatform.CachedResources.shared.widgetNotConfigured)
+                .font(.caption)
         }
     }
 }

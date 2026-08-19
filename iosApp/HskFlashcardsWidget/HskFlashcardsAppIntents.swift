@@ -69,6 +69,27 @@ struct NextWordIntent: AppIntents.AppIntent {
     }
 }
 
+struct SpeakWordIntent: AppIntents.AppIntent {
+    static var title: LocalizedStringResource = "Speak Word"
+    static var openAppWhenRun: Bool = true
+    
+    @Parameter(title: "Word")
+    var word: String
+
+    init() { self.word = "" }
+    init(word: String) { self.word = word }
+
+    func perform() async throws -> some AppIntents.IntentResult {
+        let searchQuery = crossPlatform.SearchQuery(query: word, ignoreAnnotation: true, inListName: nil)
+        let encodedQuery = (searchQuery.description()).addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        if let url = URL(string: "hskwidget://searchTTS?q=\(encodedQuery)") {
+            await URLOpener.open(url: url)
+        }
+
+        return .result()
+    }
+}
+
 struct OpenOCRIntent: AppIntents.AppIntent {
     static var title: LocalizedStringResource = "Open OCR"
     static var openAppWhenRun: Bool = true

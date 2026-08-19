@@ -100,6 +100,6 @@ struct HskFlashcardsWidget: Widget {
         }
         .configurationDisplayName(crossPlatform.CachedResources.shared.appName)
         .description(crossPlatform.CachedResources.shared.appSlogan)
-        .supportedFamilies([.systemSmall, .systemMedium])
+        .supportedFamilies([.systemSmall, .systemMedium, .accessoryRectangular])
     }
 }
