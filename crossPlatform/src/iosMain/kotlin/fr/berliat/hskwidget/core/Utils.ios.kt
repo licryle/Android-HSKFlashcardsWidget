@@ -20,12 +20,7 @@ import platform.AVFAudio.AVAudioSession
 import platform.AVFAudio.AVSpeechUtterance
 import platform.AVFAudio.*
 
-import platform.Foundation.NSURL
-import platform.Foundation.NSMakeRange
-import platform.Foundation.NSNotFound
-import platform.Foundation.NSRange
-import platform.Foundation.NSFileManager
-
+import platform.Foundation.*
 import platform.NaturalLanguage.NLTokenUnit
 import platform.NaturalLanguage.*
 
@@ -53,13 +48,37 @@ actual object ExpectedUtils {
     }
 
     internal actual fun openLink(url: String) {
-        val nsUrl = NSURL.URLWithString(url) ?: return
-        UIApplication.sharedApplication.openURL(nsUrl)
+        val nsUrl = NSURL.URLWithString(url)
+        if (nsUrl == null) {
+            println("ExpectedUtils: Invalid URL: $url")
+            return
+        }
+
+        HSKAppServices.appScope.launch(Dispatchers.Main) {
+            UIApplication.sharedApplication.openURL(nsUrl, mapOf<Any?, Any>(), null)
+        }
     }
 
     internal actual fun sendEmail(email: String, subject: String, body: String) : Boolean {
-        val urlString = "mailto:$email?subject=${subject}&body=${body}"
-        openLink(urlString)
+        val components = NSURLComponents()
+        components.scheme = "mailto"
+        components.path = email
+        
+        val queryItems = mutableListOf<NSURLQueryItem>()
+        if (subject.isNotEmpty()) {
+            queryItems.add(NSURLQueryItem(name = "subject", value = subject))
+        }
+        if (body.isNotEmpty()) {
+            queryItems.add(NSURLQueryItem(name = "body", value = body))
+        }
+        if (queryItems.isNotEmpty()) {
+            components.queryItems = queryItems
+        }
+        
+        val nsUrl = components.URL
+        if (nsUrl != null) {
+            openLink(nsUrl.absoluteString!!)
+        }
         return true
     }
 
