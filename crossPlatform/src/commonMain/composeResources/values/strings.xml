@@ -124,7 +124,6 @@ We recommend to choose the level you're at plus the one below, or above dependin
 
     <string name="annotation_edit_notes_hint">Enter your notes:</string>
     <string name="annotation_edit_is_exam_hint">Is it at the exam?</string>
-    <string name="annotation_edit_themes_hint">Themes covered:</string>
     <string name="annotation_edit_class_level_hint">Class level:</string>
     <string name="annotation_edit_class_type_hint">Class type:</string>
     <string name="annotation_edit_delete_success">%1$s successfully deleted</string>

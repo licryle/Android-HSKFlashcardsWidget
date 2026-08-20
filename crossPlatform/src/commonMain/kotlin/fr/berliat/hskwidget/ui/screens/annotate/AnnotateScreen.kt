@@ -42,7 +42,6 @@ import fr.berliat.hskwidget.annotation_edit_is_exam_hint
 import fr.berliat.hskwidget.annotation_edit_notes_hint
 import fr.berliat.hskwidget.annotation_edit_save_failure
 import fr.berliat.hskwidget.annotation_edit_save_success
-import fr.berliat.hskwidget.annotation_edit_themes_hint
 import fr.berliat.hskwidget.core.SnackbarType
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.delete
@@ -194,22 +193,6 @@ fun AnnotateScreen(
                 labelProvider = labelProvider2,
                 modifier = modifier.weight(1f).padding(start = 3.dp)
             )
-        }
-
-        OutlinedTextField(
-            value = themes,
-            onValueChange = { themes = it },
-            label = { Text(stringResource(Res.string.annotation_edit_themes_hint)) },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(stringResource(Res.string.annotation_edit_is_exam_hint))
-            Switch(checked = isExam, onCheckedChange = { isExam = it })
         }
 
         Row(
