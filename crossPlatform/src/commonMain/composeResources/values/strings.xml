@@ -133,16 +133,17 @@ We recommend to choose the level you're at plus the one below, or above dependin
     <string name="annotation_edit_delete_confirm_title">Confirm deletion</string>
     <string name="annotation_edit_delete_confirm_message">Are you sure you want to *delete* this annotation?</string>
 
-    <string name="wordlist_create_new_list_button">Create New List</string>
+    <string name="wordlist_create_new_list_button">Create personal List</string>
     <string name="wordlist_delete_button">Delete List</string>
-    <string name="wordlist_delete_confirmation">Are you sure you want to delete the list \"%1$s\"?</string>
+    <string name="wordlist_delete_confirmation">Are you sure you want to delete the personal list \"%1$s\"?</string>
     <string name="wordlist_word_count">%1$d words</string>
     <string name="wordlist_name">Word list</string>
     <string name="wordlist_consult_button">Consult</string>
     <string name="wordlist_create_button">Create list</string>
-    <string name="wordlist_list_name">List name</string>
-    <string name="wordlist_select_lists">Select Lists</string>
-    <string name="wordlist_lists_updated_toast">Lists updated successfully</string>
+    <string name="wordlist_list_name">Personal list name</string>
+    <string name="wordlist_select_lists">Select personal list(s)</string>
+    <string name="wordlist_list_none">You have no personal lists to add this word to, create a personal list first.</string>
+    <string name="wordlist_lists_updated_toast">Personal lists updated successfully</string>
     <string name="wordlist_createddate">Created:  %1$s</string>
     <string name="wordlist_editeddate" >Modified: %1$s</string>
     <string name="wordlist_rename_button">Rename list</string>

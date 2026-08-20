@@ -36,6 +36,7 @@ import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.cancel
 import fr.berliat.hskwidget.save
 import fr.berliat.hskwidget.wordlist_create_button
+import fr.berliat.hskwidget.wordlist_list_none
 import fr.berliat.hskwidget.wordlist_select_lists
 import fr.berliat.hskwidget.wordlist_word_count
 
@@ -104,7 +105,8 @@ fun WordListSelectionDialog(
                 Column {
                     Text(
                         stringResource(Res.string.wordlist_select_lists),
-                        style = MaterialTheme.typography.titleLarge
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.padding(bottom = 15.dp)
                     )
 
                     if (status == WordListViewModel.Status.STARTING) {
@@ -112,23 +114,30 @@ fun WordListSelectionDialog(
                         return@Column
                     }
 
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f, fill = false)
-                    ) {
-                        itemsIndexed(allLists) { index, wordList ->
-                            WordListCheckRow(
-                                wordList = wordList,
-                                initialSelected = selectedWordListIds.value.contains(wordList.id),
-                                onSelectionToggle = { isSelected: Boolean ->
-                                    selectedWordListIds.value = if (isSelected) {
-                                        selectedWordListIds.value.plus(wordList.id)
-                                    } else {
-                                        selectedWordListIds.value.minus(wordList.id)
+                    if (allLists.isEmpty()) {
+                        Text(
+                            text = stringResource(Res.string.wordlist_list_none),
+                            modifier = Modifier.clickable(onClick = { showCreateDialog = true })
+                        )
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f, fill = false)
+                        ) {
+                            itemsIndexed(allLists) { _, wordList ->
+                                WordListCheckRow(
+                                    wordList = wordList,
+                                    initialSelected = selectedWordListIds.value.contains(wordList.id),
+                                    onSelectionToggle = { isSelected: Boolean ->
+                                        selectedWordListIds.value = if (isSelected) {
+                                            selectedWordListIds.value.plus(wordList.id)
+                                        } else {
+                                            selectedWordListIds.value.minus(wordList.id)
+                                        }
                                     }
-                                }
-                            )
+                                )
+                            }
                         }
                     }
 
