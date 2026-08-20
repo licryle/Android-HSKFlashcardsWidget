@@ -1,6 +1,7 @@
 package fr.berliat.hskwidget.core
 
 import fr.berliat.hsktextviews.HSKTextSegmenter
+import fr.berliat.hsktextviews.PinyinUtils.isHanzi
 import fr.berliat.hskwidget.BuildKonfig
 import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.copied_to_clipboard
@@ -157,4 +158,27 @@ fun Instant.YYMMDDHHMMSS(timeZone: TimeZone = TimeZone.currentSystemDefault()): 
     val seconds = local.second.toString().padStart(2, '0')
 
     return "${local.year}/$month/$day $hour:$minutes:$seconds"
+}
+
+enum class ContainHanziResult {
+    EMPTY,
+    NONE,
+    SOME,
+    ALL
+}
+
+fun String.containsHanzi(): ContainHanziResult {
+    if (this.isEmpty()) return ContainHanziResult.EMPTY
+
+    var res = ContainHanziResult.NONE
+
+    this.forEachIndexed { index, ch ->
+        if (res == ContainHanziResult.NONE && ch.isHanzi()) {
+            res = if (index == 0) ContainHanziResult.ALL else return ContainHanziResult.SOME
+        }
+
+        if (res == ContainHanziResult.ALL && !ch.isHanzi()) return ContainHanziResult.SOME
+    }
+
+    return res
 }

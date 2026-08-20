@@ -58,4 +58,23 @@ class UtilsTest {
         val tz = TimeZone.UTC
         assertEquals("2024/01/01 00:00:00", instant.YYMMDDHHMMSS(tz))
     }
+
+    @Test
+    fun testContainsHanzi() {
+        assertEquals(ContainHanziResult.EMPTY, "".containsHanzi())
+        assertEquals(ContainHanziResult.NONE, "Hello".containsHanzi())
+        assertEquals(ContainHanziResult.NONE, "123 !?".containsHanzi())
+        assertEquals(ContainHanziResult.NONE, " ".containsHanzi())
+        
+        assertEquals(ContainHanziResult.ALL, "你好".containsHanzi())
+        assertEquals(ContainHanziResult.ALL, "我是一个好人".containsHanzi())
+        
+        assertEquals(ContainHanziResult.NONE, "〇".containsHanzi()) // U+3007 is not in the Hanzi ranges in isHanzi()
+        
+        assertEquals(ContainHanziResult.SOME, "Hello你好".containsHanzi())
+        assertEquals(ContainHanziResult.SOME, "你好Hello".containsHanzi())
+        assertEquals(ContainHanziResult.SOME, "你a好".containsHanzi())
+        assertEquals(ContainHanziResult.SOME, "a你好b".containsHanzi())
+        assertEquals(ContainHanziResult.SOME, "你好。".containsHanzi())
+    }
 }
