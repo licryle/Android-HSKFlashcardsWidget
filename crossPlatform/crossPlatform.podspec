@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
     spec.name                     = 'crossPlatform'
-    spec.version                  = '4.0.7'
+    spec.version                  = '4.0.8'
     spec.homepage                 = 'https://github.com/Licryle/HSKFlashcardsWidget'
     spec.source                   = { :http=> ''}
     spec.authors                  = ''
