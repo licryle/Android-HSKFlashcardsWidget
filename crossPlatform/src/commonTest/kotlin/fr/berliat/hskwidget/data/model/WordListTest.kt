@@ -52,6 +52,6 @@ class WordListTest {
     @Test
     fun testConstants() {
         assertEquals(0L, WordList.ANKI_ID_EMPTY)
-        assertEquals("Annotated Words", WordList.SYSTEM_ANNOTATED_NAME)
+        assertEquals("Annotated words", WordList.SYSTEM_ANNOTATED_NAME)
     }
 }
