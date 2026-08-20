@@ -2,8 +2,10 @@ package fr.berliat.hskwidget.ui.screens.annotate
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -13,6 +15,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults.contentPaddingWithoutLabel
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -46,6 +49,7 @@ import fr.berliat.hskwidget.core.SnackbarType
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.delete
 import fr.berliat.hskwidget.save
+import fr.berliat.hskwidget.ui.components.OutlinedContainer
 import fr.berliat.hskwidget.ui.components.PrettyCardShapeModifier
 
 import org.jetbrains.compose.resources.stringResource
@@ -163,12 +167,19 @@ fun AnnotateScreen(
 
         Spacer(Modifier.height(12.dp))
 
-        Row(modifier = modifier.fillMaxWidth()) {
+        Row(
+            verticalAlignment = Alignment.Bottom,
+            modifier = modifier.fillMaxWidth()
+                .height(IntrinsicSize.Min)
+        ) {
             val labelProvider: (ClassType) -> String = if (showHSK3Definition) {
                 { it.type }
             } else {
                 { it.name }
             }
+
+            val littlePadding = contentPaddingWithoutLabel(8.dp, 4.dp, 8.dp, 4.dp)
+            val switchPadding = contentPaddingWithoutLabel(8.dp, 4.dp, 8.dp, 0.dp)
 
             DropdownSelector(
                 label = stringResource(Res.string.annotation_edit_class_type_hint),
@@ -176,7 +187,8 @@ fun AnnotateScreen(
                 selected = selectedClassType,
                 onSelected = { selectedClassType = it },
                 labelProvider = labelProvider,
-                modifier = modifier.weight(1f).padding(end = 3.dp)
+                contentPadding = littlePadding,
+                modifier = Modifier.weight(1f).fillMaxHeight(),
             )
 
             val labelProvider2: (ClassLevel) -> String = if (showHSK3Definition) {
@@ -191,8 +203,21 @@ fun AnnotateScreen(
                 selected = selectedClassLevel,
                 onSelected = { selectedClassLevel = it },
                 labelProvider = labelProvider2,
-                modifier = modifier.weight(1f).padding(start = 3.dp)
+                contentPadding = littlePadding,
+                modifier = Modifier.weight(1f).fillMaxHeight().padding(start = 3.dp, end = 3.dp),
             )
+
+            OutlinedContainer(
+                label = stringResource(Res.string.annotation_edit_is_exam_hint),
+                contentPadding = switchPadding,
+                contentAlignment = Alignment.Center, // Centers the Switch vertically and horizontally
+                modifier = Modifier.weight(0.4f).fillMaxHeight(),
+            ) {
+                Switch(
+                    checked = isExam,
+                    onCheckedChange = { isExam = it }
+                )
+            }
         }
 
         Row(

@@ -123,9 +123,9 @@ We recommend to choose the level you're at plus the one below, or above dependin
     <string name="speech_failure_toast_init">Failed to initialize the Text-To-Speech service, we need to activate, download or configure it in Settings.</string>
 
     <string name="annotation_edit_notes_hint">Enter your notes:</string>
-    <string name="annotation_edit_is_exam_hint">Is it at the exam?</string>
-    <string name="annotation_edit_class_level_hint">Class level:</string>
-    <string name="annotation_edit_class_type_hint">Class type:</string>
+    <string name="annotation_edit_is_exam_hint">Exam</string>
+    <string name="annotation_edit_class_level_hint">Class level</string>
+    <string name="annotation_edit_class_type_hint">Class type</string>
     <string name="annotation_edit_delete_success">%1$s successfully deleted</string>
     <string name="annotation_edit_delete_failure">Couldn't delete %1$s: %2$s</string>
     <string name="annotation_edit_save_success">%1$s successfully saved</string>
