@@ -53,6 +53,7 @@ This project uses the awesome projects of:
 
     <string name="dictionary_search_filter_hsk3definition_hint">Show HSK3 Definition</string>
     <string name="dictionary_noresult_text">%1$s not in dictionary, add annotation?</string>
+    <string name="dictionary_noresultwithfilter_text">All words are filtered out.\nRemove filters like the lists, or the "♥ only".</string>
     <string name="dictionary_noresult_icon">No result!</string>
     <string name="dictionary_search_loading">Loading results</string>
     <string name="dictionary_search_filter_hasannotation_hint"> only</string>

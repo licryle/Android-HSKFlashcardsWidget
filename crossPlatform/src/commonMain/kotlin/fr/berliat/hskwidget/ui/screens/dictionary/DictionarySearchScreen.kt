@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -40,11 +41,15 @@ import fr.berliat.hskwidget.ui.screens.wordlist.WordListSelectionDialog
 import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.bookmark_add_24px
 import fr.berliat.hskwidget.bookmark_heart_24px
+import fr.berliat.hskwidget.core.ContainHanziResult
+import fr.berliat.hskwidget.core.containsHanzi
 import fr.berliat.hskwidget.dictionary_search_loading
 import fr.berliat.hskwidget.dictionary_noresult_icon
 import fr.berliat.hskwidget.dictionary_noresult_text
+import fr.berliat.hskwidget.dictionary_noresultwithfilter_text
 import fr.berliat.hskwidget.dictionary_search_filter_hasannotation_hint
 import fr.berliat.hskwidget.dictionary_search_filter_hsk3definition_hint
+import fr.berliat.hskwidget.filter_alt_off_24px
 import fr.berliat.hskwidget.ui.components.PrettyCardShapeModifier
 
 import org.jetbrains.compose.resources.painterResource
@@ -64,12 +69,19 @@ fun DictionarySearchScreen(
     val hasMoreResults by viewModel.hasMoreResults.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val isLoadingMore by viewModel.isLoadingMore.collectAsState()
+    val wordExists by viewModel.wordExists.collectAsState()
     val showHSK3 by viewModel.showHSK3.collectAsState()
     val hasAnnotationFilter by viewModel.hasAnnotationFilter.collectAsState()
 
     var showWordListDialog by remember { mutableStateOf<ChineseWord?>(null) }
 
     val listState = rememberLazyListState()
+
+    val queryHasHanzi = when (searchQuery.query.containsHanzi()) {
+        ContainHanziResult.SOME, ContainHanziResult.ALL -> true
+        ContainHanziResult.NONE, ContainHanziResult.EMPTY -> false
+    }
+    val couldAnnotate = wordExists == false && queryHasHanzi
 
     // Whenever searchQuery changes, scroll to top
     LaunchedEffect(searchQuery.toString(), hasAnnotationFilter.toString()) {
@@ -102,8 +114,9 @@ fun DictionarySearchScreen(
         Box(modifier = Modifier.fillMaxSize()) {
             if (isLoading) {
                 LoadingView(loadingText = Res.string.dictionary_search_loading)
-            } else if (results.isEmpty() && searchQuery.query.isNotEmpty()) {
+            } else if (results.isEmpty()) {
                 DictionarySearchNoResult(
+                    couldAnnotate = couldAnnotate,
                     query = searchQuery.query,
                     onClick = { onAnnotate(searchQuery.query) },
                 )
@@ -137,6 +150,21 @@ fun DictionarySearchScreen(
                         }
                     }
                 }
+            }
+
+            if (couldAnnotate) {
+                FloatingActionButton(
+                    onClick = { onAnnotate(searchQuery.query) },
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(16.dp),
+                    content = {
+                        Icon(
+                            painter = painterResource(Res.drawable.bookmark_add_24px),
+                            contentDescription = stringResource(Res.string.dictionary_noresult_icon)
+                        )
+                    }
+                )
             }
         }
     }
@@ -192,23 +220,37 @@ private fun DictionarySearchFilters(
 @Composable
 private fun DictionarySearchNoResult(
     query: String,
+    couldAnnotate: Boolean,
     onClick : ((String) -> Unit)?,
     modifier : Modifier = Modifier
 ) {
+    val (txt, icon, click) = if (couldAnnotate) {
+        Triple(
+            Res.string.dictionary_noresult_text,
+            Res.drawable.bookmark_add_24px,
+            onClick)
+    } else {
+        Triple(
+            Res.string.dictionary_noresultwithfilter_text,
+            Res.drawable.filter_alt_off_24px,
+            { _: String -> })
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .clickable { onClick?.invoke(query) },
+            .clickable { click?.invoke(query) },
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+
         Icon(
-            painter = painterResource(Res.drawable.bookmark_add_24px),
+            painter = painterResource(icon),
             contentDescription = stringResource(Res.string.dictionary_noresult_icon),
             modifier = modifier.size(48.dp)
         )
         Text(
-            text = stringResource(Res.string.dictionary_noresult_text, query),
+            text = stringResource(txt, query),
             style = MaterialTheme.typography.bodyLarge,
             modifier = modifier.padding(top = 8.dp)
         )

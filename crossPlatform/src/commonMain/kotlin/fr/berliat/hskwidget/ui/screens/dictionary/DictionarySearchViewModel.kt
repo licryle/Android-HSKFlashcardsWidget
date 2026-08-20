@@ -27,7 +27,7 @@ class DictionarySearchViewModel(private val prefsStore: AppPreferencesStore = HS
     private val _searchResults = MutableStateFlow<List<AnnotatedChineseWord>>(emptyList())
     val searchResults: StateFlow<List<AnnotatedChineseWord>> = _searchResults.asStateFlow()
 
-    private val _hasMoreResults = MutableStateFlow<Boolean>(false)
+    private val _hasMoreResults = MutableStateFlow(false)
     val hasMoreResults: StateFlow<Boolean> = _hasMoreResults.asStateFlow()
 
     private val _isLoading = MutableStateFlow(false)
@@ -36,6 +36,9 @@ class DictionarySearchViewModel(private val prefsStore: AppPreferencesStore = HS
     private val _isLoadingMore = MutableStateFlow(false)
     val isLoadingMore: StateFlow<Boolean> = _isLoadingMore.asStateFlow()
 
+    private val _wordExists = MutableStateFlow<Boolean?>(null)
+    val wordExists: StateFlow<Boolean?> = _wordExists.asStateFlow()
+
     val showHSK3: StateFlow<Boolean> = prefsStore.dictionaryShowHSK3Definition.asStateFlow()
 
     val hasAnnotationFilter: StateFlow<Boolean> = prefsStore.searchFilterHasAnnotation.asStateFlow()
@@ -43,6 +46,7 @@ class DictionarySearchViewModel(private val prefsStore: AppPreferencesStore = HS
     private var currentPage = 0
     private val itemsPerPage = 30
     private var currentSearchJob: Job? = null
+    private var currentWordCheckJob: Job? = null
 
     fun toggleHSK3(value: Boolean) {
         prefsStore.dictionaryShowHSK3Definition.value = value
@@ -58,6 +62,7 @@ class DictionarySearchViewModel(private val prefsStore: AppPreferencesStore = HS
 
     fun performSearch() {
         currentSearchJob?.cancel()
+        currentWordCheckJob?.cancel()
         currentSearchJob = CoroutineScope(AppDispatchers.IO).launch {
             _isLoading.value = true
             currentPage = 0
@@ -70,7 +75,26 @@ class DictionarySearchViewModel(private val prefsStore: AppPreferencesStore = HS
             }
         }
 
+        checkIfWordExists()
+
         Logging.logAnalyticsEvent(Logging.ANALYTICS_EVENTS.DICT_SEARCH)
+    }
+
+    private fun checkIfWordExists() {
+        val searchWord = searchQuery.value.query.trim()
+
+        if (searchWord.isEmpty()) {
+            _wordExists.value = null
+            return
+        }
+
+        currentWordCheckJob = CoroutineScope(AppDispatchers.IO).launch {
+            val result = annotatedChineseWordDAO.getFromSimplified(searchWord)
+
+            withContext(Dispatchers.Main) {
+                _wordExists.value = result != null
+            }
+        }
     }
 
     fun loadMore() {
@@ -81,7 +105,7 @@ class DictionarySearchViewModel(private val prefsStore: AppPreferencesStore = HS
 
             withContext(Dispatchers.Main) {
                 _hasMoreResults.value = newResults.size == itemsPerPage
-                _searchResults.value = _searchResults.value + newResults
+                _searchResults.value += newResults
                 _isLoadingMore.value = false
             }
         }
