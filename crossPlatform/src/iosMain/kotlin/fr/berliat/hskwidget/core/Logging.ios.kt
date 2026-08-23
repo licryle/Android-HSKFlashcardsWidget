@@ -1,7 +1,7 @@
 package fr.berliat.hskwidget.core
 
-import cocoapods.FirebaseAnalytics.FIRAnalytics
-import cocoapods.FirebaseCrashlytics.FIRCrashlytics
+import swiftPMImport.fr.berliat.hskwidget.crossPlatform.FIRAnalytics
+import swiftPMImport.fr.berliat.hskwidget.crossPlatform.FIRCrashlytics
 import fr.berliat.hskwidget.domain.WidgetProvider
 import fr.berliat.hskwidget.domain.awaitWidgetSize
 import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider

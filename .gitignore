@@ -5,6 +5,8 @@
 .idea/
 /.idea
 ./idea/
+/.swiftpm-locks/
+/iosApp/KotlinMultiplatformLinkedPackage/
 .DS_Store
 /build
 /captures

@@ -3,6 +3,7 @@ pluginManagement {
         google()
         mavenCentral()
         gradlePluginPortal()
+        maven("https://packages.jetbrains.team/maven/p/kt/dev")
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
 }
@@ -16,6 +17,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven("https://packages.jetbrains.team/maven/p/kt/dev")
         maven { url = uri("https://jitpack.io") }
     }
 }
