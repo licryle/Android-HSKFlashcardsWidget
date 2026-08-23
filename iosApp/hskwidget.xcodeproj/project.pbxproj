@@ -88,6 +88,7 @@
 		1CD8DF522EDE03DE00AB930B /* Vision.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Vision.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.5.sdk/System/Library/Frameworks/Vision.framework; sourceTree = DEVELOPER_DIR; };
 		1CDFB1222EE2FB89001B8494 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.5.sdk/System/Library/Frameworks/AVFoundation.framework; sourceTree = DEVELOPER_DIR; };
 		1CEC16D6303ABEAD00701AE3 /* Version.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Version.xcconfig; sourceTree = "<group>"; };
+		1CEC16DA303B1FA100701AE3 /* composeResources */ = {isa = PBXFileReference; lastKnownFileType = folder; name = composeResources; path = ../crossPlatform/src/commonMain/composeResources; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -220,6 +221,7 @@
 		1C7166CC2E71E186000B4154 = {
 			isa = PBXGroup;
 			children = (
+				1CEC16DA303B1FA100701AE3 /* composeResources */,
 				1C6948312F87637600E2F818 /* AddWidget.MP4 */,
 				1C757C9B2F7672B600130DBA /* HskFlashcardsWidgetExtension.entitlements */,
 				1C7166D72E71E186000B4154 /* hskwidget */,
@@ -325,8 +327,10 @@
 			buildPhases = (
 				1C7166D12E71E186000B4154 /* Sources */,
 				1C7166D22E71E186000B4154 /* Frameworks */,
+				1CEC16DC303B219D00701AE3 /* ShellScript */,
 				1C7166D32E71E186000B4154 /* Resources */,
 				1C757CAA2F7688A800130DBA /* Embed Foundation Extensions */,
+				1CEC16D9303B147F00701AE3 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -501,6 +505,45 @@
 			shellPath = /bin/sh;
 			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\necho \"🔥 KMP SCRIPT IS RUNNING\"\n# Type a script or drag a script file from your workspace to insert its path.\nif [ \"YES\" = \"$OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED\" ]; then\n    echo \"Skipping Gradle build task invocation due to OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED environment variable set to \\\"YES\\\"\"\n    exit 0\nfi\ncd \"$PROJECT_DIR/..\"\n./gradlew :crossPlatform:embedAndSignAppleFrameworkForXcode\n";
 		};
+		1CEC16D9303B147F00701AE3 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${PRODUCT_NAME}",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Info.plist",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/GoogleService-Info.plist",
+				"$(TARGET_BUILD_DIR)/$(EXECUTABLE_PATH)",
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run\"\n";
+		};
+		1CEC16DC303B219D00701AE3 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\n\nSRC=\"${SRCROOT}/../crossPlatform/build/generated/compose/resourceGenerator/preparedResources/commonMain/composeResources\"\nDST=\"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/compose-resources/composeResources/fr.berliat.hskwidget\"\n\nif [ ! -d \"$SRC\" ]; then\n    echo \"ERROR: Compose resources directory does not exist:\"\n    echo \"  $SRC\"\n    exit 1\nfi\n\necho \"Copying Compose resources:\"\necho \"  From: $SRC\"\necho \"  To:   $DST\"\n\nrm -rf \"$DST\"\nmkdir -p \"$DST\"\ncp -R \"$SRC/.\" \"$DST/\"\n";
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -651,6 +694,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(APP_VERSION_CODE)";
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 3LRN28G7B5;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
