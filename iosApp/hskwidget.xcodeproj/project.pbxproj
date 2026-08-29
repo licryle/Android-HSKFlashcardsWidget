@@ -328,9 +328,10 @@
 				1C7166D12E71E186000B4154 /* Sources */,
 				1C7166D22E71E186000B4154 /* Frameworks */,
 				1CEC16DC303B219D00701AE3 /* ShellScript */,
+				1C8A921A304374820078C3C8 /* Run Script */,
 				1C7166D32E71E186000B4154 /* Resources */,
 				1C757CAA2F7688A800130DBA /* Embed Foundation Extensions */,
-				1CEC16D9303B147F00701AE3 /* ShellScript */,
+				1CEC16D9303B147F00701AE3 /* Run Script */,
 			);
 			buildRules = (
 			);
@@ -505,7 +506,25 @@
 			shellPath = /bin/sh;
 			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\necho \"🔥 KMP SCRIPT IS RUNNING\"\n# Type a script or drag a script file from your workspace to insert its path.\nif [ \"YES\" = \"$OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED\" ]; then\n    echo \"Skipping Gradle build task invocation due to OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED environment variable set to \\\"YES\\\"\"\n    exit 0\nfi\ncd \"$PROJECT_DIR/..\"\n./gradlew :crossPlatform:embedAndSignAppleFrameworkForXcode\n";
 		};
-		1CEC16D9303B147F00701AE3 /* ShellScript */ = {
+		1C8A921A304374820078C3C8 /* Run Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nset -e\n\nSRC=\"${SRCROOT}/../hsktextviews/build/generated/compose/resourceGenerator/preparedResources/commonMain/composeResources\"\nDST=\"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/compose-resources/composeResources/fr.berliat.hsktextviews\"\n\nif [ ! -d \"$SRC\" ]; then\n    echo \"ERROR: Compose resources directory does not exist:\"\n    echo \"  $SRC\"\n    exit 1\nfi\n\necho \"Copying Compose resources:\"\necho \"  From: $SRC\"\necho \"  To:   $DST\"\n\nrm -rf \"$DST\"\nmkdir -p \"$DST\"\ncp -R \"$SRC/.\" \"$DST/\"\n";
+		};
+		1CEC16D9303B147F00701AE3 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -519,6 +538,7 @@
 				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/GoogleService-Info.plist",
 				"$(TARGET_BUILD_DIR)/$(EXECUTABLE_PATH)",
 			);
+			name = "Run Script";
 			outputFileListPaths = (
 			);
 			outputPaths = (
