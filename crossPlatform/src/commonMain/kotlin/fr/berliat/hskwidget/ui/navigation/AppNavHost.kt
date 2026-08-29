@@ -29,9 +29,16 @@ import io.github.vinceglb.filekit.absolutePath
 fun AppNavHost(viewModel : AppViewModel) {
     val navController = rememberNavController()
     val isViewModelReady by viewModel.isReady.collectAsState()
+    val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
 
     LaunchedEffect(navController) {
         viewModel.navigationManager.navigationEvents.collect { route ->
+            // Only clear focus if we are navigating to a screen other than the Dictionary.
+            // This prevents the keyboard from dismissing during live search updates or
+            // when navigating to results while typing.
+            if (route !is Screen.Dictionary) {
+                focusManager.clearFocus()
+            }
             navController.navigate(route)
         }
     }

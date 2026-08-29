@@ -51,6 +51,7 @@ import fr.berliat.hskwidget.delete
 import fr.berliat.hskwidget.save
 import fr.berliat.hskwidget.ui.components.OutlinedContainer
 import fr.berliat.hskwidget.ui.components.PrettyCardShapeModifier
+import fr.berliat.hskwidget.ui.dismissKeyboardOnTap
 
 import org.jetbrains.compose.resources.stringResource
 
@@ -143,7 +144,8 @@ fun AnnotateScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(16.dp)
+            .dismissKeyboardOnTap(),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         DetailedWordView(

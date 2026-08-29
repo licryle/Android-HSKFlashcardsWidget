@@ -1,7 +1,5 @@
 package fr.berliat.hskwidget.ui.application
 
-import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.ime
@@ -23,13 +21,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
-import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 
 import fr.berliat.hskwidget.core.SnackbarManager
+import fr.berliat.hskwidget.ui.dismissKeyboardOnTap
 import fr.berliat.hskwidget.ui.application.content.AppBar
 import fr.berliat.hskwidget.ui.application.content.OCRReminder
 import fr.berliat.hskwidget.ui.application.drawer.AppDrawer
@@ -40,15 +36,6 @@ import fr.berliat.hskwidget.ui.navigation.DecoratedScreen
 import fr.berliat.hskwidget.ui.navigation.Screen
 import fr.berliat.hskwidget.ui.theme.AppTheme
 
-fun Modifier.clearFocusOnAnyOutsideTap() = composed {
-    val focusManager = LocalFocusManager.current
-    Modifier.pointerInput(Unit) {
-        awaitEachGesture {
-            awaitFirstDown(pass = PointerEventPass.Initial)
-            focusManager.clearFocus()
-        }
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,6 +46,7 @@ fun AppView(
     val drawerIsOpen = remember { mutableStateOf(false) }
     val drawerState = rememberDrawerState(if (drawerIsOpen.value) DrawerValue.Open else DrawerValue.Closed)
     val snackbarHostState = remember { SnackbarHostState() }
+    val focusManager = LocalFocusManager.current
 
     val mutedOCRReminders = remember { mutableStateOf(listOf<Screen>()) }
 
@@ -69,6 +57,9 @@ fun AppView(
     // Drive drawerIsOpen from drawerState (like a user swipe)
     LaunchedEffect(drawerState.currentValue) {
         drawerIsOpen.value = (drawerState.currentValue == DrawerValue.Open)
+        if (drawerIsOpen.value) {
+            focusManager.clearFocus()
+        }
     }
 
     val currentScreen by viewModel.navigationManager.currentScreen.collectAsState()
@@ -89,8 +80,7 @@ fun AppView(
                     drawerIsOpen.value = false
                 }
             },
-            gesturesEnabled = ! currentScreen.decoratedScreen().disableDrawer,
-            modifier = Modifier.clearFocusOnAnyOutsideTap()
+            gesturesEnabled = ! currentScreen.decoratedScreen().disableDrawer
         ) {
             Scaffold(
                 snackbarHost = {
@@ -108,7 +98,11 @@ fun AppView(
                     )
                 },
                 content = { innerPadding ->
-                    Column(Modifier.padding(innerPadding)) {
+                    Column(
+                        Modifier
+                            .padding(innerPadding)
+                            .dismissKeyboardOnTap()
+                    ) {
                         val ocrScreens = viewModel.navigationManager.getFromBackStack(Screen.OCRDisplay::class)
                         // Show OCR Reminder overlay if OCR in recent stack, not in muted stack
                         if (currentScreen !is Screen.OCRDisplay

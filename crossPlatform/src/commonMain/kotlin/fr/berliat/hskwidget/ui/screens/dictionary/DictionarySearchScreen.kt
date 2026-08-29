@@ -51,6 +51,7 @@ import fr.berliat.hskwidget.dictionary_search_filter_hasannotation_hint
 import fr.berliat.hskwidget.dictionary_search_filter_hsk3definition_hint
 import fr.berliat.hskwidget.filter_alt_off_24px
 import fr.berliat.hskwidget.ui.components.PrettyCardShapeModifier
+import fr.berliat.hskwidget.ui.dismissKeyboardOnTap
 
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -76,6 +77,13 @@ fun DictionarySearchScreen(
     var showWordListDialog by remember { mutableStateOf<ChineseWord?>(null) }
 
     val listState = rememberLazyListState()
+    val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
+
+    LaunchedEffect(listState.isScrollInProgress) {
+        if (listState.isScrollInProgress) {
+            focusManager.clearFocus()
+        }
+    }
 
     val queryHasHanzi = when (searchQuery.query.containsHanzi()) {
         ContainHanziResult.SOME, ContainHanziResult.ALL -> true
@@ -101,7 +109,7 @@ fun DictionarySearchScreen(
         )
     }
 
-    Column(modifier = modifier.fillMaxSize()) {
+    Column(modifier = modifier.fillMaxSize().dismissKeyboardOnTap()) {
         // Filters row
         DictionarySearchFilters(
             showHSK3,

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -68,6 +69,15 @@ fun WordListScreen(
     var confirmDeleteList by remember { mutableStateOf<WordList?>(null) }
     var wordListToRename by remember { mutableStateOf<WordList?>(null) }
 
+    val listState = rememberLazyListState()
+    val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
+
+    androidx.compose.runtime.LaunchedEffect(listState.isScrollInProgress) {
+        if (listState.isScrollInProgress) {
+            focusManager.clearFocus()
+        }
+    }
+
     if (showCreateDialog) {
         WordListCreateRenameDialog(
             viewModel = viewModel,
@@ -106,7 +116,9 @@ fun WordListScreen(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        LazyColumn(modifier = Modifier.fillMaxSize(),
+        LazyColumn(
+            state = listState,
+            modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(8.dp)) {
             itemsIndexed(wordLists) { index, wordList ->
                 WordListRow(
