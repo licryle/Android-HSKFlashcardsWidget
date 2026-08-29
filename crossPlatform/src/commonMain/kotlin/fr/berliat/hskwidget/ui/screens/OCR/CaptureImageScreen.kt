@@ -1,10 +1,14 @@
 package fr.berliat.hskwidget.ui.screens.OCR
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
@@ -35,13 +39,19 @@ import com.kashif.cameraK.enums.*
 import fr.berliat.hskwidget.ui.components.Error
 import fr.berliat.hskwidget.ui.components.ErrorView
 import fr.berliat.hskwidget.ui.components.LoadingProgressView
+import fr.berliat.hskwidget.ui.components.AppSnackbar
 
 import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.core.SnackbarType
 import fr.berliat.hskwidget.ic_launcher
+import fr.berliat.hskwidget.pinch_zoom_out_24px
 import fr.berliat.hskwidget.ocr_capture_btn
 import fr.berliat.hskwidget.ocr_capture_permission_denied
+import fr.berliat.hskwidget.ocr_capture_pinch_hint
 
 import io.github.vinceglb.filekit.PlatformFile
+import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.delay
 
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -108,6 +118,11 @@ fun CaptureImageScreen(
         )
 
         val zoomLevel = remember { mutableStateOf(1f) }
+        val showPinchHint = remember { mutableStateOf(true) }
+        LaunchedEffect(Unit) {
+            delay(3.seconds)
+            showPinchHint.value = false
+        }
 
         CameraKScreen(
             cameraState = cameraKState.value,
@@ -149,12 +164,28 @@ fun CaptureImageScreen(
                         }
                     }
             ) {
-                CaptureButton(
-                    onClick = { viewModel.takePhoto(readyState.controller) },
+                Column(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
-                        .padding(bottom = 50.dp)
-                )
+                        .padding(bottom = 50.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    AnimatedVisibility(
+                        visible = showPinchHint.value,
+                        enter = fadeIn(),
+                        exit = fadeOut()
+                    ) {
+                        AppSnackbar(
+                            message = stringResource(Res.string.ocr_capture_pinch_hint),
+                            type = SnackbarType.INFO,
+                            customIcon = Res.drawable.pinch_zoom_out_24px,
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        )
+                    }
+                    CaptureButton(
+                        onClick = { viewModel.takePhoto(readyState.controller) }
+                    )
+                }
             }
         }
     }

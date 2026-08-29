@@ -21,18 +21,21 @@ import androidx.compose.ui.unit.dp
 import fr.berliat.hskwidget.core.SnackbarType
 import fr.berliat.hskwidget.ui.theme.snackbarStyleFor
 
-import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun SnackWarning(
-    warningString: StringResource,
-    fixitString: StringResource,
-    onFixButtonClick: () -> Unit,
+fun AppSnackbar(
+    message: String,
+    type: SnackbarType,
+    actionLabel: String? = null,
+    onActionClick: (() -> Unit)? = null,
+    customIcon: DrawableResource? = null,
     modifier: Modifier = Modifier
 ) {
-    val style = MaterialTheme.colorScheme.snackbarStyleFor(SnackbarType.WARNING)
+    val style = MaterialTheme.colorScheme.snackbarStyleFor(type)
+    val displayIcon = customIcon ?: style.iconLeft
+
     Surface(
         shape = RoundedCornerShape(16.dp),
         color = style.containerColor,
@@ -40,7 +43,7 @@ fun SnackWarning(
         tonalElevation = 6.dp,
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp, horizontal = 16.dp)
+            .padding(vertical = 8.dp, horizontal = 25.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -48,27 +51,29 @@ fun SnackWarning(
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            style.iconLeft?.let {
+            displayIcon?.let {
                 Icon(
                     painter = painterResource(it),
-                    contentDescription = null,
+                    contentDescription = type.name,
                     tint = style.contentColor,
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(modifier = Modifier.width(12.dp))
             }
             Text(
-                text = stringResource(warningString),
+                text = message,
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.weight(1f)
             )
-            TextButton(onClick = onFixButtonClick) {
-                Text(
-                    text = stringResource(fixitString),
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = style.contentColor
-                )
+            if (actionLabel != null && onActionClick != null) {
+                TextButton(onClick = onActionClick) {
+                    Text(
+                        text = actionLabel,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = style.contentColor
+                    )
+                }
             }
         }
     }

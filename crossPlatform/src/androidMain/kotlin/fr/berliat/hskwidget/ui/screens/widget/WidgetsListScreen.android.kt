@@ -38,7 +38,7 @@ import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.core.SnackbarType
 import fr.berliat.hskwidget.core.Utils.BackgroundRestrictionType
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
-import fr.berliat.hskwidget.ui.components.SnackWarning
+import fr.berliat.hskwidget.ui.components.AppSnackbar
 import fr.berliat.hskwidget.ui.theme.widgetDefaultBox
 
 import kotlinx.coroutines.launch
@@ -137,10 +137,11 @@ actual fun WidgetsListScreen(
         }
 
         bgMsg?.let {
-            SnackWarning(
-                warningString = bgMsg,
-                fixitString = Res.string.disable,
-                onFixButtonClick = viewModel::fixBatteryOptimization
+            AppSnackbar(
+                message = stringResource(it),
+                type = SnackbarType.WARNING,
+                actionLabel = stringResource(Res.string.disable),
+                onActionClick = viewModel::fixBatteryOptimization
             )
         }
 
