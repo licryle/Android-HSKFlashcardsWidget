@@ -7,6 +7,7 @@ import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
@@ -176,7 +177,7 @@ private fun CaptureButton(
         Icon(
             painter = painterResource(Res.drawable.ic_launcher),
             contentDescription = stringResource(Res.string.ocr_capture_btn),
-            modifier = Modifier.size(130.dp),
+            modifier = Modifier.requiredSize(130.dp),
             tint = Color.Unspecified
         )
     }
