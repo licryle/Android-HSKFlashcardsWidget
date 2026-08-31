@@ -106,15 +106,16 @@ fun DetailedWordView (
             else
                 Logging.logAnalyticsEvent(Logging.ANALYTICS_EVENTS.WIDGET_COLLAPSE)
         },
-        shapeModifier = shapeModifier
+        shapeModifier = shapeModifier,
+        modifier = modifier
     ) {
         Column {
             Row(
-                modifier = modifier.fillMaxWidth().height(IntrinsicSize.Max),
+                modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Max),
                 verticalAlignment = Alignment.Top
             ) {
                 Column(
-                    modifier = modifier.fillMaxHeight().wrapContentWidth(),
+                    modifier = Modifier.fillMaxHeight().wrapContentWidth(),
                     verticalArrangement = Arrangement.SpaceBetween,
                 ) {
                     onSpeakClick?.let {
@@ -135,7 +136,7 @@ fun DetailedWordView (
                 }
 
                 val vSpacing = if (nothingMore) Arrangement.Top else Arrangement.SpaceBetween
-                Column(modifier = modifier.weight(1f).fillMaxHeight(),
+                Column(modifier = Modifier.weight(1f).fillMaxHeight(),
                     verticalArrangement = vSpacing) {
                     HSKWordView(
                         hanziText = word.simplified,
@@ -168,7 +169,7 @@ fun DetailedWordView (
                     // Toggle more
                     if (!nothingMore) {
                         Row(horizontalArrangement = Arrangement.Center,
-                            modifier = modifier.fillMaxWidth()) {
+                            modifier = Modifier.fillMaxWidth()) {
                             Icon(
                                 painter = painterResource(
                                     if (isMoreVisible) Res.drawable.keyboard_arrow_up_24px
@@ -181,7 +182,7 @@ fun DetailedWordView (
                 }
 
                 Column(
-                    modifier = modifier.fillMaxHeight().wrapContentWidth(),
+                    modifier = Modifier.fillMaxHeight().wrapContentWidth(),
                     verticalArrangement = Arrangement.SpaceBetween,
                     horizontalAlignment = Alignment.End
                 ) {
@@ -220,9 +221,9 @@ fun DetailedWordView (
             if (isMoreVisible) {
                 // More section
                 Row(
-                    modifier = modifier.padding(10.dp)
+                    modifier = Modifier.padding(10.dp)
                 ) {
-                    Column(modifier = modifier.weight(1f)) {
+                    Column(modifier = Modifier.weight(1f)) {
                         val modality = word.word?.modality ?: Modality.UNKNOWN
                         if (modality != Modality.UNKNOWN) {
                             Text(
@@ -241,7 +242,7 @@ fun DetailedWordView (
                             Text(it, style = MaterialTheme.typography.bodyMedium)
                         }
                     }
-                    Column(modifier = modifier.weight(1f), horizontalAlignment = Alignment.End) {
+                    Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.End) {
                         val wordType = word.word?.wordType ?: WordType.UNKNOWN
                         if (wordType != WordType.UNKNOWN) {
                             Text(
@@ -264,7 +265,7 @@ fun DetailedWordView (
 
                 word.word?.collocations?.takeIf { it.isNotEmpty() }?.let {
                     Row(
-                        modifier = modifier.padding(10.dp)
+                        modifier = Modifier.padding(10.dp)
                     ) {
                         Column {
                             Text(
@@ -277,7 +278,7 @@ fun DetailedWordView (
 
                 word.word?.examples?.takeIf { it.isNotEmpty() }?.let {
                     Row(
-                        modifier = modifier.padding(10.dp)
+                        modifier = Modifier.padding(10.dp)
                     ) {
                         Column {
                             Text(
@@ -289,7 +290,7 @@ fun DetailedWordView (
                 }
 
                 Row(
-                    modifier = modifier.padding(10.dp)
+                    modifier = Modifier.padding(10.dp)
                 ) {
                     Column {
                         Text(

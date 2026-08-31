@@ -51,6 +51,7 @@ import fr.berliat.hskwidget.dictionary_search_filter_hasannotation_hint
 import fr.berliat.hskwidget.dictionary_search_filter_hsk3definition_hint
 import fr.berliat.hskwidget.filter_alt_off_24px
 import fr.berliat.hskwidget.ui.components.PrettyCardShapeModifier
+import fr.berliat.hskwidget.ui.dismissKeyboardOnClick
 import fr.berliat.hskwidget.ui.dismissKeyboardOnTap
 
 import org.jetbrains.compose.resources.painterResource
@@ -197,7 +198,7 @@ private fun DictionarySearchFilters(
             selected = showHSK3,
             onClick = { onShowHSKToggle(!showHSK3) },
             shape = RoundedCornerShape(50),
-            modifier = Modifier.padding(end = 8.dp),
+            modifier = Modifier.padding(end = 8.dp).dismissKeyboardOnClick(),
             label = {
                 Text(
                     text = stringResource(Res.string.dictionary_search_filter_hsk3definition_hint),
@@ -210,6 +211,7 @@ private fun DictionarySearchFilters(
             selected = hasAnnotation,
             onClick = { onHasAnnotationToggle(!hasAnnotation) },
             shape = RoundedCornerShape(50),
+            modifier = Modifier.dismissKeyboardOnClick(),
             label = {
                 Icon(
                     painter = painterResource(Res.drawable.bookmark_heart_24px),

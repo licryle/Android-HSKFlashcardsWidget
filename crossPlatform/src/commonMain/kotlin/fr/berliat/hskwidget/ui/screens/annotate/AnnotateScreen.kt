@@ -51,7 +51,7 @@ import fr.berliat.hskwidget.delete
 import fr.berliat.hskwidget.save
 import fr.berliat.hskwidget.ui.components.OutlinedContainer
 import fr.berliat.hskwidget.ui.components.PrettyCardShapeModifier
-import fr.berliat.hskwidget.ui.dismissKeyboardOnTap
+import fr.berliat.hskwidget.ui.dismissKeyboardOnClick
 
 import org.jetbrains.compose.resources.stringResource
 
@@ -144,8 +144,7 @@ fun AnnotateScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp)
-            .dismissKeyboardOnTap(),
+            .padding(16.dp),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         DetailedWordView(
@@ -157,6 +156,7 @@ fun AnnotateScreen(
             onListsClick = null,
             onPinyinChange = { pinyins = it },
             pinyinEditable = true,
+            modifier = Modifier,
             shapeModifier = PrettyCardShapeModifier.Single
         )
 
@@ -217,6 +217,7 @@ fun AnnotateScreen(
             ) {
                 Switch(
                     checked = isExam,
+                    modifier = Modifier.dismissKeyboardOnClick(),
                     onCheckedChange = { isExam = it }
                 )
             }
@@ -227,22 +228,26 @@ fun AnnotateScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             if (fixedAnnotatedWord.hasAnnotation()) {
-                OutlinedButton(onClick = { confirmDeleteDialog = true }) { Text(stringResource(Res.string.delete)) }
+                OutlinedButton(
+                    onClick = { confirmDeleteDialog = true },
+                    modifier = Modifier.dismissKeyboardOnClick()
+                ) { Text(stringResource(Res.string.delete)) }
             }
 
             Button(
-                onClick = { viewModel.saveWord(
-                    annotatedWord = fixedAnnotatedWord,
-                    pinyins,
-                    notes,
-                    themes,
-                    isExam,
-                    cType = selectedClassType,
-                    cLevel = selectedClassLevel) { word, e ->
+                onClick = {
+                    viewModel.saveWord(
+                        annotatedWord = fixedAnnotatedWord,
+                        pinyins,
+                        notes,
+                        themes,
+                        isExam,
+                        cType = selectedClassType,
+                        cLevel = selectedClassLevel) { word, e ->
                         if (toastAndAssessSuccess(word.simplified, ACTION.UPDATE, e)) onSaveSuccess(word.simplified)
                     }
                 },
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f).dismissKeyboardOnClick()
             ) {
                 Text(stringResource(Res.string.save))
             }

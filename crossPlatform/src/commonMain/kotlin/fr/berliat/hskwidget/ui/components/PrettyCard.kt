@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import fr.berliat.hskwidget.ui.dismissKeyboardOnClick
 
 sealed interface PrettyCardShapeModifier {
     object First: PrettyCardShapeModifier
@@ -44,6 +45,7 @@ fun PrettyCard(
         modifier = modifier
             .fillMaxWidth()
             .wrapContentHeight()
+            .dismissKeyboardOnClick()
             .border(
                 width = 1.5.dp,
                 color = borderColor,
