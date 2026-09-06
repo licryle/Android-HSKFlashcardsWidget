@@ -96,7 +96,7 @@ fun DisplayOCRScreen(
     }
 
     LaunchedEffect(uiState.isSegmenterReady, imageFile) {
-        if (uiState.isSegmenterReady && imageFile != null) {
+        if (uiState.isSegmenterReady && (imageFile != null)) {
             Logger.d(tag = TAG, messageString = "LaunchedEffect triggering recognizeText for ${imageFile.path}")
             viewModel.recognizeText(imageFile)
         }
