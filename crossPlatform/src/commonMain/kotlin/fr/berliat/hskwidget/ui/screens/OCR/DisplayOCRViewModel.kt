@@ -31,6 +31,7 @@ import fr.berliat.hskwidget.ocr_display_word_not_found
 import fr.berliat.hskwidget.ui.theme.AppTypographies
 
 import io.github.vinceglb.filekit.PlatformFile
+import io.github.vinceglb.filekit.path
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -211,13 +212,17 @@ class DisplayOCRViewModel(
     }
 
     fun recognizeText(imagePath: PlatformFile) {
+        Logger.d(tag = TAG, messageString = "recognizeText starting for ${imagePath.path}")
         viewModelScope.launch(AppDispatchers.IO) {
+            _uiState.update { it.copy(isProcessing = true) }
             HSKOCR().process(imagePath, { text ->
-                Logger.d(tag = TAG, messageString = "Recognized text: $text")
+                Logger.d(tag = TAG, messageString = "Recognized text length: ${text?.length ?: 0}")
 
                 if (text == null) {
+                    Logger.w(tag = TAG, messageString = "No text found in image")
                     _error.value = Res.string.ocr_display_no_text_found
                 } else {
+                    Logger.i(tag = TAG, messageString = "Text recognition success. Appending text.")
                     var newText = text
                     if (_uiState.value.text.isNotEmpty()) newText = "\n\n" + text
 
@@ -226,10 +231,9 @@ class DisplayOCRViewModel(
                 }
                 _uiState.update { it.copy(isProcessing = false) }
             }, { e ->
+                Logger.e(tag = TAG, messageString = "Text recognition failed: ${e.message}", throwable = e)
                 _error.value = Res.string.ocr_display_ocr_failed
                 _uiState.update { it.copy(isProcessing = false) }
-
-                Logger.e(tag = TAG, messageString = "Text recognition failed: " + e.message)
 
                 Logging.logAnalyticsError(
                     "OCR_DISPLAY",

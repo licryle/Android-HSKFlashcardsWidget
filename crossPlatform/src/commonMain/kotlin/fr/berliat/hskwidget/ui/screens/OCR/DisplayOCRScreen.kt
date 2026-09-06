@@ -36,7 +36,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 
 import fr.berliat.hsktextviews.HSKTextSegmenter
 import fr.berliat.hsktextviews.views.HSKTextView
@@ -67,9 +66,14 @@ import fr.berliat.hskwidget.ui.components.PrettyCardShapeModifier
 import fr.berliat.hskwidget.ui.theme.AppTypographies
 
 import io.github.vinceglb.filekit.PlatformFile
+import io.github.vinceglb.filekit.path
 
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+
+import co.touchlab.kermit.Logger
+
+private const val TAG = "DisplayOCRScreen"
 
 @Composable
 fun DisplayOCRScreen(
@@ -94,6 +98,7 @@ fun DisplayOCRScreen(
 
     LaunchedEffect(uiState.isSegmenterReady, imageFile) {
         if (uiState.isSegmenterReady && imageFile != null) {
+            Logger.d(tag = TAG, messageString = "LaunchedEffect triggering recognizeText for ${imageFile.path}")
             viewModel.recognizeText(imageFile)
         }
     }
@@ -133,7 +138,10 @@ fun DisplayOCRScreen(
                             endSeparator = if (uiState.separatorEnabled) viewModel.wordSeparator else "",
                             clickedWords = uiState.clickedWords,
                             onTextAnalysisSuccess = { words -> viewModel.augmentWordFrequencyAppeared(words) },
-                            onTextAnalysisFailure = { e -> viewModel.setError(Res.string.ocr_display_text_segmentation_failed) }
+                            onTextAnalysisFailure = { e ->
+                                Logger.e(tag = TAG, messageString = "Text analysis failure: ${e.message}", throwable = e)
+                                viewModel.setError(Res.string.ocr_display_text_segmentation_failed)
+                            }
                         )
 
                         OcrDisplayAdd(

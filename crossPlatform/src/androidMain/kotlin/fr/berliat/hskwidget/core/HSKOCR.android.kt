@@ -25,23 +25,27 @@ actual class HSKOCR actual constructor() {
                                failureCallBack: (Exception) -> Unit) {
         withContext(Dispatchers.Default) {
             try {
-                Logger.d(tag = TAG, messageString = "recognizeText starting")
+                Logger.d(tag = TAG, messageString = "recognizeText starting for path: ${imagePath.path}")
                 val uri = imagePath.path.toUri()
                 val image = if (uri.scheme != null) {
-                    InputImage.fromFilePath(ExpectedUtils.context, imagePath.path.toUri())
+                    Logger.d(tag = TAG, messageString = "Loading image from URI: $uri")
+                    InputImage.fromFilePath(ExpectedUtils.context, uri)
                 } else {
+                    Logger.d(tag = TAG, messageString = "Loading image from file path: ${imagePath.path}")
                     val bitmap = BitmapFactory.decodeFile(imagePath.path)
                     InputImage.fromBitmap(bitmap, 0)
                 }
-                Logger.d(tag = TAG, messageString = "recognizeText loaded image")
+                Logger.d(tag = TAG, messageString = "recognizeText image loaded successfully")
 
                 val options = ChineseTextRecognizerOptions.Builder()
                     .build()
 
                 val recognizer: TextRecognizer = TextRecognition.getClient(options)
 
+                Logger.d(tag = TAG, messageString = "Starting ML Kit text recognition")
                 recognizer.process(image)
                     .addOnSuccessListener({ text ->
+                        Logger.d(tag = TAG, messageString = "ML Kit success: found ${text.textBlocks.size} blocks")
                         googleTextToString(text, successCallback)
                     })
                     .addOnFailureListener(failureCallBack)

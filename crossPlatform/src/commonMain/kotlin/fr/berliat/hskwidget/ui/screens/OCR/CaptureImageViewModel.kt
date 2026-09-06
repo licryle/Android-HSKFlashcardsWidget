@@ -24,9 +24,11 @@ class CaptureImageViewModel(
     val onImageReady: (PlatformFile) -> Unit
 ): ViewModel() {
     fun takePhoto(cameraController: CameraController) {
+        Logger.d(tag = TAG, messageString = "takePhoto triggered")
         viewModelScope.launch(AppDispatchers.IO) {
             when (val result = cameraController.takePictureToFile()) {
                 is ImageCaptureResult.SuccessWithFile -> {
+                    Logger.d(tag = TAG, messageString = "Image capture success: ${result.filePath}")
                     withContext(Dispatchers.Main) {
                         onImageReady(PlatformFile(result.filePath))
                     }
