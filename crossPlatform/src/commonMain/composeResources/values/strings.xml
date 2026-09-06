@@ -389,13 +389,24 @@ padding: 0;
     <string name="about_bug_report_title">File a bug report</string>
     <string name="about_bug_report_intro">If you want to report a bug in the app, you may share additional information via email to the developer. It may contain some Personal Information.</string>
     <string name="dialog_report_bug_text">You will be potentially sharing personal information in the shape of dictionary entries, detailed app use, etc. This information will be used exclusively for debugging and product improvement, then deleted.</string>
-    <string name="about_bug_report_email_template">--- Logs ---
-%5$s
---- End Logs ---
+    <string name="about_bug_report_email_template">Hello,
 
+Thank you for your bug report!
+Please note this may contain private information that we will solely use for bug fixing &amp; product improvement.
+
+Please describe the issue you are facing:
+
+
+
+--- Device Information ---
 App Version: %1$s
 %2$s System Version: %3$s
 Device model: %4$s
+--- End of Device Information ---
+
+--- Logs ---
+%5$s
+--- End of Logs ---
 
 Hello,
 
@@ -403,6 +414,9 @@ Thank you for your bug report!
 Please note this may contain private information that we will solely use for bug fixing &amp; product improvement.
 
 Please describe the issue you are facing:
+
+
+
 </string>
 
 </resources>
