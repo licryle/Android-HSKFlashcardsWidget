@@ -27,6 +27,8 @@ import platform.NaturalLanguage.*
 import platform.UIKit.UIApplication
 import platform.UIKit.UIApplicationOpenSettingsURLString
 import platform.UIKit.UIPasteboard
+import platform.UIKit.UIDevice
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalForeignApi::class)
 actual object ExpectedUtils {
@@ -141,7 +143,7 @@ actual object ExpectedUtils {
                     audioSession.setActive(true, error = null)
                     isAudioSessionSetup = true
                     // Small delay to let the session stabilize
-                    delay(300)
+                    delay(300.milliseconds)
                 }
 
                 // Find a Chinese voice
@@ -162,11 +164,11 @@ actual object ExpectedUtils {
                 withContext(Dispatchers.Main) {
                     if (TTSynthesizer.isSpeaking()) {
                         TTSynthesizer.stopSpeakingAtBoundary(AVSpeechBoundary.AVSpeechBoundaryImmediate)
-                        delay(200)
+                        delay(200.milliseconds)
                     }
 
                     // Safety delay before speaking
-                    delay(200)
+                    delay(200.milliseconds)
                     TTSynthesizer.speakUtterance(utterance)
                 }
             } catch (e: Exception) {
@@ -195,6 +197,10 @@ actual object ExpectedUtils {
     internal actual fun openBatteryOptimizationSettings() {
         // No need in iOS
     }
+
+    internal actual fun getSystemVersion(): String = UIDevice.currentDevice.systemVersion
+    internal actual fun getDeviceModel(): String = UIDevice.currentDevice.model
+    internal actual fun getPlatformName(): String = "iOS"
 }
 
 @OptIn(ExperimentalForeignApi::class)

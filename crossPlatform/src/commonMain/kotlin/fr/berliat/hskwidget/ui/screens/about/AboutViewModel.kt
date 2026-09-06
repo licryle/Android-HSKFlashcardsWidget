@@ -5,10 +5,12 @@ import co.touchlab.kermit.Logger
 import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.about_bug_report_email_template
 import fr.berliat.hskwidget.about_email_noapp
 import fr.berliat.hskwidget.core.AppDispatchers
 import fr.berliat.hskwidget.core.Logging
 import fr.berliat.hskwidget.core.SnackbarType
+import org.jetbrains.compose.resources.getString
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -38,6 +40,26 @@ class AboutViewModel {
 
         if (!Utils.sendEmail("cyrille.berliat+hsk@gmail.com", "About Mandarin Assistant App", "")) {
             HSKAppServices.snackbar.show(SnackbarType.ERROR, Res.string.about_email_noapp)
+        }
+    }
+
+    fun reportBug() {
+        Logging.logAnalyticsScreenView("ReportBug")
+
+        viewModelScope.launch(AppDispatchers.Main) {
+            val logs = Logging.getLogFileContent()
+            val body = getString(
+                Res.string.about_bug_report_email_template,
+                Utils.getAppVersionName(),
+                Utils.getPlatformName(),
+                Utils.getSystemVersion(),
+                Utils.getDeviceModel(),
+                logs
+            )
+
+            if (!Utils.sendEmail("cyrille.berliat+hsk@gmail.com", "Mandarin Assistant Bug Report", body)) {
+                HSKAppServices.snackbar.show(SnackbarType.ERROR, Res.string.about_email_noapp)
+            }
         }
     }
 

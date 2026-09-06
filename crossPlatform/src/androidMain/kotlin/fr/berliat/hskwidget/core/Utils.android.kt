@@ -271,6 +271,11 @@ actual object ExpectedUtils {
         }
     }
 
+    internal actual fun getSystemVersion(): String =
+        "Android ${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT}, Build ${Build.DISPLAY}, Patch ${Build.VERSION.SECURITY_PATCH})"
+    internal actual fun getDeviceModel(): String = "${Build.MANUFACTURER} ${Build.MODEL} (${Build.PRODUCT})"
+    internal actual fun getPlatformName(): String = "Android"
+
     private const val TAG = "Utils"
     const val INTENT_SEARCH_WORD = "INTENT_SEARCH_WORD"
 }

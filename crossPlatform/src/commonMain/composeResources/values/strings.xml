@@ -11,6 +11,7 @@
     <string name="fix_it">Attempt to fix it</string>
     <string name="disable">Disable</string>
     <string name="copied_to_clipboard">Copied %1$s to clipboard</string>
+    <string name="report_bug">Report a bug</string>
 
     <string name="menu">Menu</string>
     <string name="menu_dictionary">Dictionary</string>
@@ -384,5 +385,24 @@ padding: 0;
     <string name="battery_background_restricted">Battery restriction is enabled. Widgets may not refresh reliably.</string>
     <string name="battery_aggressive_manufacturer">Your phone's manufacturer aggressively optimize power/battery. Widgets may not refresh reliably.</string>
     <string name="battery_optimization_fix">Fix</string>
+
+    <string name="about_bug_report_title">File a bug report</string>
+    <string name="about_bug_report_intro">If you want to report a bug in the app, you may share additional information via email to the developer. It may contain some Personal Information.</string>
+    <string name="dialog_report_bug_text">You will be potentially sharing personal information in the shape of dictionary entries, detailed app use, etc. This information will be used exclusively for debugging and product improvement, then deleted.</string>
+    <string name="about_bug_report_email_template">--- Logs ---
+%5$s
+--- End Logs ---
+
+App Version: %1$s
+%2$s System Version: %3$s
+Device model: %4$s
+
+Hello,
+
+Thank you for your bug report!
+Please note this may contain private information that we will solely use for bug fixing &amp; product improvement.
+
+Please describe the issue you are facing:
+</string>
 
 </resources>

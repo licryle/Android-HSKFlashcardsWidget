@@ -100,6 +100,10 @@ object Utils {
 
     fun isBackgroundRestricted(): BackgroundRestrictionType = ExpectedUtils.isBackgroundRestricted()
     fun openBatteryOptimizationSettings() = ExpectedUtils.openBatteryOptimizationSettings()
+
+    fun getSystemVersion(): String = ExpectedUtils.getSystemVersion()
+    fun getDeviceModel(): String = ExpectedUtils.getDeviceModel()
+    fun getPlatformName(): String = ExpectedUtils.getPlatformName()
 }
 
 expect object ExpectedUtils {
@@ -124,6 +128,10 @@ expect object ExpectedUtils {
 
     internal fun isBackgroundRestricted(): BackgroundRestrictionType
     internal fun openBatteryOptimizationSettings()
+
+    internal fun getSystemVersion(): String
+    internal fun getDeviceModel(): String
+    internal fun getPlatformName(): String
 }
 
 fun String.capitalize() =

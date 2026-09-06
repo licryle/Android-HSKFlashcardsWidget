@@ -1,9 +1,69 @@
 package fr.berliat.hskwidget.core
 
+import co.touchlab.kermit.LogWriter
 import co.touchlab.kermit.Logger
+import co.touchlab.kermit.Severity
+import io.github.vinceglb.filekit.PlatformFile
+import io.github.vinceglb.filekit.div
+import io.github.vinceglb.filekit.toKotlinxIoPath
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.io.buffered
+import kotlinx.io.files.SystemFileSystem
+import kotlinx.io.readString
+import kotlinx.io.writeString
 
 object Logging {
+    private var logFile: PlatformFile? = null
+
+    class FileLogWriter(private val file: PlatformFile) : LogWriter() {
+        override fun log(severity: Severity, message: String, tag: String, throwable: Throwable?) {
+            val path = file.toKotlinxIoPath()
+            try {
+                // SystemFileSystem.sink with append=true is supported in newer kotlinx-io
+                // If not, we might need a workaround, but let's try this first.
+                SystemFileSystem.sink(path, append = true).buffered().use { sink ->
+                    sink.writeString("[$severity] $tag: $message\n")
+                    throwable?.let {
+                        sink.writeString(it.stackTraceToString() + "\n")
+                    }
+                }
+            } catch (e: Exception) {
+                // Ignore to avoid infinite loop
+            }
+        }
+    }
+
+    fun setupFileLogging() {
+        try {
+            val file = Utils.getAppDataPath() / "app_logs.txt"
+            logFile = file
+            val path = file.toKotlinxIoPath()
+
+            // Truncate the file on launch
+            SystemFileSystem.sink(path, append = false).buffered().use { sink ->
+                sink.writeString("--- App Launch ---\n")
+            }
+
+            Logger.addLogWriter(FileLogWriter(file))
+        } catch (e: Exception) {
+            Logger.e(tag = "Logging", messageString = "Failed to setup file logging", throwable = e)
+        }
+    }
+
+    fun getLogFileContent(): String {
+        val file = logFile ?: return ""
+        val path = file.toKotlinxIoPath()
+        return try {
+            if (SystemFileSystem.exists(path)) {
+                SystemFileSystem.source(path).buffered().use { it.readString() }
+            } else {
+                ""
+            }
+        } catch (e: Exception) {
+            "Error reading logs: ${e.message}"
+        }
+    }
+
     val GlobalCoroutineExceptionHandler: CoroutineExceptionHandler =
         CoroutineExceptionHandler { context, exception ->
             Logger.e(

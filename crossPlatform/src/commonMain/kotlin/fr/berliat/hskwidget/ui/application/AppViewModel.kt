@@ -59,6 +59,7 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
 	private val pendingActionsMutex = Mutex()
 
     open fun init() {
+        Logging.setupFileLogging()
         HSKAppServices.init(HSKAppServicesPriority.PartialApp)
         // Launch a coroutine that reacts to changes
         viewModelScope.launch(AppDispatchers.IO) {
