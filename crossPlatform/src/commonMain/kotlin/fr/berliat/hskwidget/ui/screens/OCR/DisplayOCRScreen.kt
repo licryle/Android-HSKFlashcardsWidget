@@ -1,27 +1,20 @@
 package fr.berliat.hskwidget.ui.screens.OCR
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -31,11 +24,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.SavedStateHandle
 
 import fr.berliat.hsktextviews.HSKTextSegmenter
 import fr.berliat.hsktextviews.views.HSKTextView
@@ -45,6 +38,7 @@ import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.ui.components.DetailedWordView
+import fr.berliat.hskwidget.ui.components.TextSizeChip
 import fr.berliat.hskwidget.ui.components.Error
 import fr.berliat.hskwidget.ui.components.ErrorView
 import fr.berliat.hskwidget.ui.components.LoadingView
@@ -52,16 +46,12 @@ import fr.berliat.hskwidget.ui.screens.wordlist.WordListSelectionDialog
 import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.core.SnackbarType
 import fr.berliat.hskwidget.ocr_display_add
-import fr.berliat.hskwidget.ocr_display_conf_bigger
-import fr.berliat.hskwidget.ocr_display_conf_smaller
 import fr.berliat.hskwidget.ocr_display_loading
 import fr.berliat.hskwidget.ocr_display_ocr_no_text
 import fr.berliat.hskwidget.ocr_display_pinyins
 import fr.berliat.hskwidget.ocr_display_separator
 import fr.berliat.hskwidget.ocr_display_text_segmentation_failed
 import fr.berliat.hskwidget.photo_camera_24px
-import fr.berliat.hskwidget.text_decrease_24px
-import fr.berliat.hskwidget.text_increase_24px
 import fr.berliat.hskwidget.ui.components.PrettyCardShapeModifier
 import fr.berliat.hskwidget.ui.theme.AppTypographies
 
@@ -78,7 +68,16 @@ private const val TAG = "DisplayOCRScreen"
 @Composable
 fun DisplayOCRScreen(
     modifier: Modifier = Modifier,
-    viewModel: DisplayOCRViewModel = viewModel(factory = DisplayOCRViewModel.FACTORY),
+    viewModel: DisplayOCRViewModel = remember {
+        val database = HSKAppServices.database
+        DisplayOCRViewModel(
+            savedStateHandle = SavedStateHandle(),
+            appPreferences = HSKAppServices.appPreferences,
+            annotatedChineseWordDAO = database.annotatedChineseWordDAO(),
+            chineseWordFrequencyDAO = database.chineseWordFrequencyDAO(),
+            segmenter = HSKAppServices.HSKSegmenter
+        )
+    },
     segmenter : HSKTextSegmenter = HSKAppServices.HSKSegmenter,
     appConfig : AppPreferencesStore = HSKAppServices.appPreferences,
     imageFile: PlatformFile? = null,
@@ -167,6 +166,7 @@ fun DisplayOCRScreen(
                 word = word,
                 showHSK3Definition = appConfig.dictionaryShowHSK3Definition.value,
                 pinyinEditable = false,
+                textSize = uiState.textSize,
                 onFavoriteClick = onFavoriteClick,
                 onSpeakClick = viewModel::speakWord,
                 onCopyClick = viewModel::copyToClipboard,
@@ -197,7 +197,7 @@ private fun OcrDisplayConfig(
             .padding(start = 10.dp, end = 10.dp, top = 0.dp, bottom = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        OcrTextSizeChip(
+        TextSizeChip(
             onDecrease = { viewModel.updateTextSize(-2f) },
             onIncrease = { viewModel.updateTextSize(+2f) },
             modifier = Modifier.padding(end = 8.dp)
@@ -255,68 +255,5 @@ private fun OcrDisplayAdd(
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center
         )
-    }
-}
-
-@Composable
-private fun OcrTextSizeChip(
-    modifier: Modifier = Modifier,
-    onDecrease: () -> Unit,
-    onIncrease: () -> Unit,
-) {
-    val borderWidth = 0.6.dp
-    val horizontalPadding = 13.dp
-    val halfPillWidth = 60.dp
-    val pillHeight = 32.dp
-
-    Surface(
-        modifier = modifier,
-        shape = RoundedCornerShape(50),
-        tonalElevation = 2.dp,
-        color = MaterialTheme.colorScheme.background,
-        border = BorderStroke(borderWidth, MaterialTheme.colorScheme.onSurfaceVariant),
-        shadowElevation = 1.dp
-    ) {
-        Row(
-            modifier = Modifier
-                .height(pillHeight)
-                .wrapContentWidth()
-        ) {
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(topStart = 50.dp, bottomStart = 50.dp))
-                    .clickable { onDecrease() }
-                    .fillMaxHeight()
-                    .width(halfPillWidth)
-                    .padding(horizontal = horizontalPadding, vertical = 5.dp),
-                contentAlignment = Alignment.BottomCenter
-            ) {
-                Icon(
-                    painter = painterResource(Res.drawable.text_decrease_24px),
-                    contentDescription = stringResource(Res.string.ocr_display_conf_smaller),
-                    modifier = Modifier.size(20.dp),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-
-            VerticalDivider(thickness = borderWidth, color = MaterialTheme.colorScheme.onSurfaceVariant)
-
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(topEnd = 50.dp, bottomEnd = 50.dp))
-                    .clickable { onIncrease() }
-                    .fillMaxHeight()
-                    .width(halfPillWidth)
-                    .padding(horizontal = horizontalPadding, vertical = 4.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    painter = painterResource(Res.drawable.text_increase_24px),
-                    contentDescription = stringResource(Res.string.ocr_display_conf_bigger),
-                    modifier = Modifier.size(30.dp),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
     }
 }

@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.ui.components.DetailedWordView
+import fr.berliat.hskwidget.ui.components.TextSizeChip
 import fr.berliat.hskwidget.ui.components.LoadingView
 import fr.berliat.hskwidget.ui.screens.wordlist.WordListSelectionDialog
 
@@ -74,6 +75,7 @@ fun DictionarySearchScreen(
     val wordExists by viewModel.wordExists.collectAsState()
     val showHSK3 by viewModel.showHSK3.collectAsState()
     val hasAnnotationFilter by viewModel.hasAnnotationFilter.collectAsState()
+    val textSize by viewModel.textSize.collectAsState()
 
     var showWordListDialog by remember { mutableStateOf<ChineseWord?>(null) }
 
@@ -116,7 +118,9 @@ fun DictionarySearchScreen(
             showHSK3,
             { viewModel.toggleHSK3(it) },
             hasAnnotationFilter,
-            { viewModel.toggleHasAnnotation(it) }
+            { viewModel.toggleHasAnnotation(it) },
+            { viewModel.updateTextSize(-2f) },
+            { viewModel.updateTextSize(2f) }
         )
 
         // Main content
@@ -140,6 +144,7 @@ fun DictionarySearchScreen(
                             word = word,
                             showHSK3Definition = showHSK3,
                             pinyinEditable = false,
+                            textSize = textSize,
                             onFavoriteClick = { onAnnotate(word.simplified) },
                             onSpeakClick = { viewModel.speakWord(word.simplified) },
                             onCopyClick = { viewModel.copyWord(word.simplified) },
@@ -185,6 +190,8 @@ private fun DictionarySearchFilters(
     onShowHSKToggle: (Boolean) -> Unit,
     hasAnnotation: Boolean,
     onHasAnnotationToggle: (Boolean) -> Unit,
+    onDecreaseTextSize: () -> Unit,
+    onIncreaseTextSize: () -> Unit,
     modifier: Modifier = Modifier) {
     val scrollState = rememberScrollState()
 
@@ -193,6 +200,7 @@ private fun DictionarySearchFilters(
             .fillMaxWidth()
             .horizontalScroll(scrollState)
             .padding(start = 15.dp, end = 15.dp, top = 0.dp, bottom = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         FilterChip(
             selected = showHSK3,
@@ -211,7 +219,7 @@ private fun DictionarySearchFilters(
             selected = hasAnnotation,
             onClick = { onHasAnnotationToggle(!hasAnnotation) },
             shape = RoundedCornerShape(50),
-            modifier = Modifier.dismissKeyboardOnClick(),
+            modifier = Modifier.padding(end = 8.dp).dismissKeyboardOnClick(),
             label = {
                 Icon(
                     painter = painterResource(Res.drawable.bookmark_heart_24px),
@@ -223,6 +231,11 @@ private fun DictionarySearchFilters(
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
+        )
+
+        TextSizeChip(
+            onDecrease = onDecreaseTextSize,
+            onIncrease = onIncreaseTextSize
         )
     }
 }

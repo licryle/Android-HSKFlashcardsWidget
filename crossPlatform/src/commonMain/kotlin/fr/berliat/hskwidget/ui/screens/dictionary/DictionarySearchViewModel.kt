@@ -9,6 +9,9 @@ import fr.berliat.hskwidget.data.dao.AnnotatedChineseWordDAO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -16,6 +19,8 @@ import kotlinx.coroutines.launch
 
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
+import fr.berliat.hskwidget.ui.theme.AppTypographies
+import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.withContext
 
 
@@ -43,6 +48,10 @@ class DictionarySearchViewModel(private val prefsStore: AppPreferencesStore = HS
 
     val hasAnnotationFilter: StateFlow<Boolean> = prefsStore.searchFilterHasAnnotation.asStateFlow()
 
+    val textSize: StateFlow<Float> = prefsStore.dictionaryTextSize.asStateFlow()
+        .map { it.value }
+        .stateIn(CoroutineScope(AppDispatchers.Main), SharingStarted.Eagerly, prefsStore.dictionaryTextSize.value.value)
+
     private var currentPage = 0
     private val itemsPerPage = 30
     private var currentSearchJob: Job? = null
@@ -58,6 +67,14 @@ class DictionarySearchViewModel(private val prefsStore: AppPreferencesStore = HS
         prefsStore.searchFilterHasAnnotation.value = value
 
         Logging.logAnalyticsEvent(if (value) Logging.ANALYTICS_EVENTS.DICT_ANNOTATION_ON else Logging.ANALYTICS_EVENTS.DICT_ANNOTATION_OFF)
+    }
+
+    fun updateTextSize(increment: Float) {
+        val newSize = (prefsStore.dictionaryTextSize.value.value + increment).coerceAtLeast(
+            AppTypographies.smallestHanziFontSize.value)
+        prefsStore.dictionaryTextSize.value = newSize.sp
+
+        Logging.logAnalyticsEvent(Logging.ANALYTICS_EVENTS.DICT_TEXT_SIZE_CHANGE)
     }
 
     fun performSearch() {

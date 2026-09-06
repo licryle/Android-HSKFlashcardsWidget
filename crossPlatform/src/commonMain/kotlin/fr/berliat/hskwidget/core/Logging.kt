@@ -137,6 +137,8 @@ object Logging {
         DICT_HSK3_OFF,
         DICT_ANNOTATION_ON,
         DICT_ANNOTATION_OFF,
+        DICT_TEXT_SIZE_CHANGE,
+        OCR_TEXT_SIZE_CHANGE,
         DICT_SEARCH,
         OCR_CAPTURE,
         OCR_WORD_NOTFOUND,

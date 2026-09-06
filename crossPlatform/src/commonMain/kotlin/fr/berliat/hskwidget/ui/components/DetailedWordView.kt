@@ -16,6 +16,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -65,6 +66,7 @@ fun DetailedWordView (
     pinyinEditable: Boolean,
     shapeModifier: PrettyCardShapeModifier,
     modifier: Modifier = Modifier,
+    textSize: Float = 16f,
     onFavoriteClick: ((AnnotatedChineseWord) -> Unit)? = null,
     onSpeakClick: ((AnnotatedChineseWord) -> Unit)? = null,
     onCopyClick: ((AnnotatedChineseWord) -> Unit)? = null,
@@ -95,6 +97,11 @@ fun DetailedWordView (
         .isEmpty() &&
             (word.word?.modality ?: Modality.UNKNOWN) == Modality.UNKNOWN &&
             (word.word?.wordType ?: WordType.UNKNOWN) == WordType.UNKNOWN
+
+    val hanziFontSize = AppTypographies.hanzi.fontSize.value + (textSize - 16f) * 0.5f
+    val pinyinFontSize = AppTypographies.pinyin.fontSize.value + (textSize - 16f) * 0.5f
+    val bodyLargeStyle = MaterialTheme.typography.bodyLarge.copy(fontSize = textSize.sp)
+    val bodyMediumStyle = MaterialTheme.typography.bodyMedium.copy(fontSize = (textSize - 2f).coerceAtLeast(10f).sp)
 
     PrettyCard(
         onClick = {
@@ -148,20 +155,20 @@ fun DetailedWordView (
                                 onPinyinChange(it)
                             }
                         },
-                        hanziStyle = AppTypographies.hanzi,
-                        pinyinStyle = AppTypographies.pinyin,
-                        clickedHanziStyle = AppTypographies.clickedHanzi,
-                        clickedPinyinStyle = AppTypographies.clickedPinyin,
+                        hanziStyle = AppTypographies.hanzi.copy(fontSize = hanziFontSize.sp),
+                        pinyinStyle = AppTypographies.pinyin.copy(fontSize = pinyinFontSize.sp),
+                        clickedHanziStyle = AppTypographies.clickedHanzi.copy(fontSize = hanziFontSize.sp),
+                        clickedPinyinStyle = AppTypographies.clickedPinyin.copy(fontSize = pinyinFontSize.sp),
                     )
                     // Definition & Annotation
                     Text(
                         definition.ifEmpty { annotation },
-                        style = MaterialTheme.typography.bodyLarge
+                        style = bodyLargeStyle
                     )
                     if (!definition.isEmpty() && annotation.isNotEmpty()) {
                         Text(
                             annotation,
-                            style = MaterialTheme.typography.bodyMedium.copy(fontStyle = Italic),
+                            style = bodyMediumStyle.copy(fontStyle = Italic),
                             color = MaterialTheme.colorScheme.secondary
                         )
                     }
@@ -231,7 +238,7 @@ fun DetailedWordView (
                                 style = AppTypographies.detailCardSubTitle)
                             Text(
                                 modality.toString().capitalize(),
-                                style = MaterialTheme.typography.bodyMedium
+                                style = bodyMediumStyle
                             )
                         }
 
@@ -239,7 +246,7 @@ fun DetailedWordView (
                             Text(
                                 stringResource(Res.string.dictionary_item_synonyms),
                                 style = AppTypographies.detailCardSubTitle)
-                            Text(it, style = MaterialTheme.typography.bodyMedium)
+                            Text(it, style = bodyMediumStyle)
                         }
                     }
                     Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.End) {
@@ -250,7 +257,7 @@ fun DetailedWordView (
                                 style = AppTypographies.detailCardSubTitle)
                             Text(
                                 wordType.toString().capitalize(),
-                                style = MaterialTheme.typography.bodyMedium
+                                style = bodyMediumStyle
                             )
                         }
 
@@ -258,7 +265,7 @@ fun DetailedWordView (
                             Text(
                                 stringResource(Res.string.dictionary_item_antonym),
                                 style = AppTypographies.detailCardSubTitle)
-                            Text(it, style = MaterialTheme.typography.bodyMedium)
+                            Text(it, style = bodyMediumStyle)
                         }
                     }
                 }
@@ -271,7 +278,7 @@ fun DetailedWordView (
                             Text(
                                 stringResource(Res.string.dictionary_item_collocations),
                                 style = AppTypographies.detailCardSubTitle)
-                            Text(it, style = MaterialTheme.typography.bodyMedium)
+                            Text(it, style = bodyMediumStyle)
                         }
                     }
                 }
@@ -284,7 +291,7 @@ fun DetailedWordView (
                             Text(
                                 stringResource(Res.string.dictionary_item_examples),
                                 style = AppTypographies.detailCardSubTitle)
-                            Text(it, style = MaterialTheme.typography.bodyMedium)
+                            Text(it, style = bodyMediumStyle)
                         }
                     }
                 }
@@ -298,7 +305,7 @@ fun DetailedWordView (
                             style = AppTypographies.detailCardSubTitle)
 
                         if (altDef.isNotEmpty()) {
-                            Text(altDef, style = MaterialTheme.typography.bodyMedium)
+                            Text(altDef, style = bodyMediumStyle)
                         }
                     }
                 }

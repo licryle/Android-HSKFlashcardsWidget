@@ -193,6 +193,8 @@ class DisplayOCRViewModel(
 
         Logger.d(tag = TAG, messageString = "updateTextSize to $textSize")
         appPreferences.readerTextSize.value = textSize.sp
+
+        Logging.logAnalyticsEvent(Logging.ANALYTICS_EVENTS.OCR_TEXT_SIZE_CHANGE)
     }
 
     fun toggleShowPinyins(showPinyins: Boolean) {

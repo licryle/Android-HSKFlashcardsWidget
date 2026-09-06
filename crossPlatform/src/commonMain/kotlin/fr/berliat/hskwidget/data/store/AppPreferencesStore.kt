@@ -103,6 +103,9 @@ class AppPreferencesStore private constructor(
     val readerTextSize = registerFloatPref("reader_text_size", 30f.sp,
         PreferenceConverter({ it.sp }, { it.value })
     )
+    val dictionaryTextSize = registerFloatPref("dictionary_text_size", 16f.sp,
+        PreferenceConverter({ it.sp }, { it.value })
+    )
     val searchQuery = registerStringPref("search_query", SearchQuery.fromString(""),
         PreferenceConverter({ SearchQuery.fromString(it) }, { it.toString() }))
 }
