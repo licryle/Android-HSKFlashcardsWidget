@@ -100,8 +100,14 @@ fun DetailedWordView (
 
     val hanziFontSize = AppTypographies.hanzi.fontSize.value + (textSize - 16f) * 0.5f
     val pinyinFontSize = AppTypographies.pinyin.fontSize.value + (textSize - 16f) * 0.5f
-    val bodyLargeStyle = MaterialTheme.typography.bodyLarge.copy(fontSize = textSize.sp)
-    val bodyMediumStyle = MaterialTheme.typography.bodyMedium.copy(fontSize = (textSize - 2f).coerceAtLeast(10f).sp)
+    val bodyLargeStyle = MaterialTheme.typography.bodyLarge.copy(
+        fontSize = textSize.sp,
+        lineHeight = (textSize * 1.05f).sp
+    )
+    val bodyMediumStyle = MaterialTheme.typography.bodyMedium.copy(
+        fontSize = (textSize - 2f).coerceAtLeast(10f).sp,
+        lineHeight = ((textSize - 2f).coerceAtLeast(10f) * 1.05f).sp
+    )
 
     PrettyCard(
         onClick = {
