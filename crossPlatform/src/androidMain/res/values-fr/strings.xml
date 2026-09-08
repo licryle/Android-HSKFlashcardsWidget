@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Mandarin Assistant</string>
+
+    <string name="widget_not_configured">Pas de mot.\nCliquez pour configurer les listes</string>
+    <string name="widget_default_chinese">你好</string>
+    <string name="widget_default_english">Bonjour</string>
+    <string name="widget_default_pinyin">nĭ hăo</string>
+    <string name="widget_default_loading">…Chargement…</string>
+
+    <string name="widget_btn_speak">Écouter ce mot</string>
+    <string name="widget_btn_reload">Nouveau mot</string>
+
+    <string name="widget_description">Lire un mot au hasard parmi les listes configurées.</string>
+</resources>

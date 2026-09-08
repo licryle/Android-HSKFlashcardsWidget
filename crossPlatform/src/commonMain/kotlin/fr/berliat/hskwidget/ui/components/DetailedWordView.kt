@@ -30,9 +30,9 @@ import fr.berliat.hskwidget.core.Logging
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.type.Modality
 import fr.berliat.hskwidget.data.type.WordType
-import fr.berliat.hskwidget.core.capitalize
 import fr.berliat.hskwidget.data.type.HSK_Level
 import fr.berliat.hskwidget.ui.theme.AppTypographies
+import fr.berliat.hskwidget.ui.toRes
 import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.baseline_volume_up_24
 import fr.berliat.hskwidget.bookmark_24px
@@ -243,7 +243,7 @@ fun DetailedWordView (
                                 stringResource(Res.string.dictionary_item_modality),
                                 style = AppTypographies.detailCardSubTitle)
                             Text(
-                                modality.toString().capitalize(),
+                                stringResource(modality.toRes()),
                                 style = bodyMediumStyle
                             )
                         }
@@ -262,7 +262,7 @@ fun DetailedWordView (
                                 stringResource(Res.string.dictionary_item_type),
                                 style = AppTypographies.detailCardSubTitle)
                             Text(
-                                wordType.toString().capitalize(),
+                                stringResource(wordType.toRes()),
                                 style = bodyMediumStyle
                             )
                         }

@@ -1,0 +1,329 @@
+<resources>
+    <string name="app_name">Mandarin Assistant</string>
+    <string name="app_slogan">每次解锁手机时学习</string>
+
+    <string name="delete">删除</string>
+    <string name="proceed">继续</string>
+    <string name="save">保存</string>
+    <string name="cancel">取消</string>
+    <string name="understood">明白</string>
+    <string name="loading">加载中</string>
+    <string name="fix_it">尝试修复</string>
+    <string name="disable">禁用</string>
+    <string name="copied_to_clipboard">已将 %1$s 复制到剪贴板</string>
+    <string name="report_bug">报告错误</string>
+
+    <string name="menu">菜单</string>
+    <string name="menu_dictionary">词典</string>
+    <string name="menu_lists">列表</string>
+    <string name="menu_widgets">小组件</string>
+    <string name="menu_ocr">文字识别</string>
+    <string name="menu_support">支持创作者！</string>
+    <string name="menu_settings">设置</string>
+    <string name="menu_annotate">注释单词</string>
+    <string name="menu_about">关于</string>
+    <string name="menu_ocr_display">OCR: 扫描文本</string>
+
+    <string name="search_hint">搜索拼音、定义、汉字</string>
+    <string name="search_clear">清除搜索</string>
+
+    <string name="nav_header_desc">导航头</string>
+    <string name="nav_host_ocr_reminder_close">关闭 OCR 提醒</string>
+    <string name="nav_host_ocr_reminder_text">点击此处仍可访问扫描的文本。</string>
+
+
+    <string name="about_btn_view_source">查看源代码</string>
+    <string name="about_intro1">Mandarin Assistant HSK Widget %1$s 是 Cyrille Berliat 的一个开源项目，源于学习普通话的个人需求。\n \n如果它对你有用，请考虑支持我和我无数个小时的开发 :)</string>
+    <string name="about_intro2">如果您有任何建议、反馈或问题，请随时给我发邮件。</string>
+    <string name="about_intro3">隐私政策：我使用 Google Analytics 来跟踪使用情况，例如在哪个设备类别（平板电脑、智能手机）上访问哪个选项卡最多。\n不应收集任何个人身份信息 (PII) 数据，也不应将其发送给我或 Google Analytics。
+
+许可证：GNU GPLv3。简而言之，你可以随意使用它，但必须注明对作品的贡献，并在下游使用相同的许可证。
+
+本项目使用了以下优秀项目：
+- 来自 https://www.mdbg.net/chinese/ 的 CC-CEDICT 列表中的完整中英对照
+- 来自 https://github.com/krmanik/HSK-3.0 的 HSK 列表
+- 中文词汇普及程度来自北京语言大学 http://bcc.blcu.edu.cn/
+- 中文词汇元数据（测试版！）是使用 01.AI 的 Yi 1.5 6B - Q6_K LLM 生成的。
+- 中文词汇搭配（测试版！）是使用阿里巴巴的 Qwen2.5 7b - Q4_K_M LLM 生成的。</string>
+    <string name="about_btn_email2">向开发人员发送电子邮件</string>
+    <string name="about_stats_title">统计数据</string>
+    <string name="about_terms_conditions_title"><![CDATA[隐私政策与许可证]]></string>
+    <string name="about_stats">加载中…</string>
+    <string name="about_stats_text">词典中有 %1$s 个词。\n%2$s 个注释。</string>
+    <string name="about_email_noapp">未找到电子邮件客户端。地址已复制到剪贴板。</string>
+
+    <string name="dictionary_search_filter_hsk3definition_hint">显示 HSK3 定义</string>
+    <string name="dictionary_noresult_text">词典中没有 %1$s，要添加注释吗？</string>
+    <string name="dictionary_noresultwithfilter_text">所有单词均被过滤掉。\n请删除列表或“仅限 ♥”等过滤器。</string>
+    <string name="dictionary_noresult_icon">无结果！</string>
+    <string name="dictionary_search_loading">正在加载结果</string>
+    <string name="dictionary_search_filter_hasannotation_hint"> 仅限</string>
+
+    <string name="dictionary_item_toggle">展开/折叠更多信息</string>
+    <string name="dictionary_item_antonym">反义词</string>
+    <string name="dictionary_item_synonyms">同义词</string>
+    <string name="dictionary_item_examples">例句</string>
+    <string name="dictionary_item_collocations">搭配</string>
+    <string name="dictionary_item_altdefinition">定义</string>
+    <string name="dictionary_item_lists">管理此词的列表</string>
+    <string name="dictionary_item_annotate">注释单词</string>
+    <string name="dictionary_item_reload">新词</string>
+    <string name="dictionary_item_modality">用法</string>
+    <string name="dictionary_item_type">类型</string>
+
+    <string name="widget_name">列表中的单词</string>
+    <string name="widget_description">从您配置的列表中随机读取一个单词。</string>
+    <string name="ocr_shortcut_name">拍照/OCR 快捷方式</string>
+    <string name="ocr_shortcut_description">快速拍照以提取中文文本。</string>
+
+    <string name="widget_not_configured">无单词。请配置列表</string>
+
+    <string name="widget_configure">配置小组件</string>
+    <string name="widget_configure_close">配置小组件并关闭应用</string>
+    <string name="widget_configure_new_back">添加新组件并返回</string>
+    <string name="widget_configure_error_no_list">请至少选择 1 个列表</string>
+    <string name="widget_configure_wordlist_title">要包含的词汇列表</string>
+    <string name="widget_configure_wordlist_word_count">%1$d 个词</string>
+    <string name="widget_configure_no_change">无需保存更改</string>
+    <string name="widget_configure_saved">小组件配置已更新</string>
+    <string name="widget_configure_frequency_hint">您希望多久更新一次新词？</string>
+
+    <string name="widget_configure_frequency">刷新频率</string>
+    <string-array name="widget_configure_frequency_options">
+        <item>-1 手动</item>
+        <item>1800000 30 分钟</item>
+        <item>21600000 6 小时</item>
+        <item>43200000 12 小时</item>
+        <item>86400000 1 天</item>
+        <item>604800000 7 天</item>
+    </string-array>
+
+    <string name="widget_demo_word_click">这是一个演示组件，点击它会打开词典</string>
+    <string name="widget_demo_update_click">这是一个演示组件，点击它会更新单词</string>
+
+    <string name="widget_btn_speak">听这个词</string>
+    <string name="widget_btn_copy">复制到剪贴板</string>
+
+    <string name="widget_placeholder_word">你好</string>
+    <string name="widget_placeholder_pinyin">nǐ hǎo</string>
+    <string name="widget_placeholder_definition">你好</string>
+    <string name="widget_placeholder_level">HSK1</string>
+    <string name="widget_placeholder_language">zh</string>
+
+    <string name="widgets_add_widget">添加新组件</string>
+    <string name="widgets_add_widget_instructions">您的启动器不支持自动添加小组件。\n请手动添加 Flashcard 小组件：\n长按主屏幕 → 小组件 → Mandarin Assistant。</string>
+    <string name="widgets_intro"><![CDATA[欢迎使用 Mandarin Assistant HSK Widget！
+
+此应用允许您在手机上设置多个小组件，并选择您想看到的 HSK 单词。
+我们建议根据您的学习路径选择您当前的级别以及低一级或高一级的级别。]]></string>
+    <string name="widgets_intro2"><![CDATA[您可以随时返回此屏幕来设置新组件或重新配置现有组件。]]></string>
+
+    <string name="dialog_tts_error">文字转语音错误</string>
+    <string name="speech_failure_toast_unknown">未知语音错误</string>
+    <string name="speech_failure_toast_muted">取消静音以听到单词</string>
+    <string name="speech_failure_toast_chinese_unsupported">您的文字转语音中缺少“中文（中国）”语音。请安装它。</string>
+    <string name="speech_failure_toast_init">无法初始化文字转语音服务，我们需要在设置中激活、下载或配置它。</string>
+
+    <string name="annotation_edit_notes_hint">输入您的笔记：</string>
+    <string name="annotation_edit_is_exam_hint">考试</string>
+    <string name="annotation_edit_class_level_hint">班级级别</string>
+    <string name="annotation_edit_class_type_hint">班级类型</string>
+    <string name="annotation_edit_delete_success">%1$s 已成功删除</string>
+    <string name="annotation_edit_delete_failure">无法删除 %1$s：%2$s</string>
+    <string name="annotation_edit_save_success">%1$s 已成功保存</string>
+    <string name="annotation_edit_save_failure">无法保存 %1$s：%2$s</string>
+    <string name="annotation_edit_delete_confirm_title">确认删除</string>
+    <string name="annotation_edit_delete_confirm_message">您确定要*删除*此注释吗？</string>
+
+    <string name="wordlist_create_new_list_button">创建个人列表</string>
+    <string name="wordlist_delete_button">删除列表</string>
+    <string name="wordlist_delete_confirmation">您确定要删除个人列表“%1$s”吗？</string>
+    <string name="wordlist_word_count">%1$d 个词</string>
+    <string name="wordlist_name">单词列表</string>
+    <string name="wordlist_consult_button">查阅</string>
+    <string name="wordlist_create_button">创建列表</string>
+    <string name="wordlist_list_name">个人列表名称</string>
+    <string name="wordlist_select_lists">选择个人列表</string>
+    <string name="wordlist_list_none">您没有可添加此单词的个人列表，请先创建一个个人列表。</string>
+    <string name="wordlist_lists_updated_toast">个人列表已成功更新</string>
+    <string name="wordlist_createddate">创建日期：%1$s</string>
+    <string name="wordlist_editeddate" >修改日期：%1$s</string>
+    <string name="wordlist_rename_button">重命名列表</string>
+    <string name="wordlist_list_name_dupe">此列表名称已存在，请使用其他名称。</string>
+
+    <string name="ocr_capture_btn">拍照进行 OCR</string>
+    <string name="ocr_capture_permission_denied">请允许相机和文件访问权限</string>
+    <string name="ocr_capture_error_processed">拍摄图像时出错</string>
+    <string name="ocr_capture_pinch_hint">捏合以放大/缩小</string>
+
+    <string name="ocr_display_loading">正在处理您的图像</string>
+    <string name="ocr_display_add">分析更多文本并添加在下方</string>
+    <string name="ocr_display_conf_smaller">减小文字大小</string>
+    <string name="ocr_display_conf_bigger">增大文字大小</string>
+    <string name="ocr_display_pinyins">显示拼音</string>
+    <string name="ocr_display_separator">单词间距</string>
+    <string name="ocr_display_smallest_text">最小可用文本</string>
+    <string name="ocr_display_word_not_found">找不到单词，已复制到剪贴板</string>
+    <string name="ocr_display_no_text_found">未找到文本</string>
+    <string name="ocr_display_text_segmentation_failed">文本分段失败</string>
+    <string name="ocr_display_ocr_failed">文本识别失败</string>
+    <string name="ocr_display_ocr_no_text">没有要显示的文本</string>
+
+    <string name="config_backup_title">从本地文件备份/恢复</string>
+    <string name="config_backup_activate">激活备份</string>
+    <string name="config_backup_frequency">备份频率</string>
+    <string name="config_backup_frequency_options">应用启动时</string>
+    <string name="config_backup_frequency_manual">手动</string>
+    <string name="config_backup_location">备份目录</string>
+    <string name="config_backup_directory_choose">选择目录</string>
+    <string name="config_backup_directory_failed_selection">不允许在任何文件夹中执行本地备份，正在取消</string>
+    <string name="config_backup_icon_alt">数据库上传</string>
+    <string name="config_backup_max_number">要保留的备份数量</string>
+    <string name="config_backup_max_number_hint">最大文件数</string>
+    <string-array name="config_backup_max_locally">
+        <item>2 (~100MB)</item>
+        <item>5 (~250MB)</item>
+        <item>10 (~500MB)</item>
+    </string-array>
+
+
+    <string name="dbrestore_start">数据库恢复已开始</string>
+    <string name="dbrestore_failure_fileformat">该文件似乎不是此应用的备份文件</string>
+    <string name="dbrestore_failure_import">恢复失败：%1$s</string>
+    <string name="dbrestore_failure_nofileselected">未选择文件：恢复已取消</string>
+    <string name="dbrestore_success">数据库已成功恢复</string>
+
+    <string name="dbbackup_success">已成功备份数据库</string>
+    <string name="dbbackup_failure_write">无法备份数据库</string>
+    <string name="dbbackup_failure_folderpermission">正在取消备份：文件夹无写入权限</string>
+
+    <string name="database_update_start">正在更新基础词典，备份将延迟。</string>
+    <string name="database_update_success">已更新基础词典</string>
+    <string name="database_update_failure">更新基础词典时出错：%1$s</string>
+    <string name="database_update_list_system">正在填充“在考试中”和“已注释单词”列表。</string>
+
+    <string name="config_restore_file">从文件恢复</string>
+    <string name="config_restore_file_choose">选择文件</string>
+
+    <string name="config_language">界面语言</string>
+
+    <string name="config_backup_cloud_title">从 Google 备份/恢复</string>
+    <string name="config_backup_cloud_account">Google 账号</string>
+    <string name="config_backup_cloud_account_notconfigured">已登出</string>
+    <string name="config_backup_cloud_lastone">最后一次成功备份</string>
+    <string name="config_backup_cloud_lastone_never">从不</string>
+    <string name="config_backup_cloud_backupnow">立即备份</string>
+    <string name="config_backup_cloud_restorenow">立即恢复</string>
+
+    <string name="googledrive_backup_start_title">备份中</string>
+    <string name="googledrive_backup_start_message">正在准备备份。</string>
+    <string name="googledrive_backup_success_title">备份完成</string>
+    <string name="googledrive_backup_success_message">备份成功，时间为 %1$s。</string>
+    <string name="googledrive_backup_cancel_title">备份已取消</string>
+    <string name="googledrive_backup_cancel_message">备份已取消。</string>
+    <string name="googledrive_backup_progress_message">正在备份：%1$s MB / %2$s MB。</string>
+    <string name="googledrive_backup_denied_scope">Google 授权未获得保障</string>
+    <string name="googledrive_backup_failed_title">备份失败</string>
+    <string name="googledrive_backup_failed_message">备份失败，错误信息为：%1$s。</string>
+    <string name="googledrive_backup_nogoogleapi">此设备上没有可用的 Google API</string>
+    <string name="googledrive_backup_noaccountselected">未选择 Google 账号，正在取消。</string>
+    <string name="googledrive_restore_start_title">恢复启动中</string>
+    <string name="googledrive_restore_start_message">从 Google Drive 恢复已开始。</string>
+    <string name="googledrive_restore_success_title">恢复下载完成</string>
+    <string name="googledrive_restore_success_message">来自 Google Drive 的文件已在 %1$s 下载。</string>
+    <string name="googledrive_restore_confirm_overwrite">您即将删除本地数据并将其替换为来自 %1$s 的备份。\n\n此操作不可撤销。是否继续？</string>
+    <string name="googledrive_restore_cancel_title">恢复已取消</string>
+    <string name="googledrive_restore_cancel_message">恢复已取消。</string>
+    <string name="googledrive_restore_progress_message">正在恢复：%1$s MB / %2$s MB。</string>
+    <string name="googledrive_restore_failed_title">恢复失败</string>
+    <string name="googledrive_restore_failed_message">从 Google Drive 恢复失败，错误信息为：%1$s。</string>
+
+    <string name="config_anki_title">Anki 集成</string>
+    <string name="config_anki_activate">激活 Anki 集成</string>
+    <string name="config_anki_integration">自动在 Anki 中保存列表和相应的笔记。\n开启后，将从头开始执行完整同步。</string>
+
+    <string name="anki_not_installed"><![CDATA[未安装 AnkiDroid，或运行的版本非常旧 (<2.5)]]></string>
+    <string name="anki_permission_denied">调用 AnkiDroid API 的权限被拒绝。</string>
+    <string name="anki_must_start">尝试在后台启动 Anki</string>
+    <string name="anki_operation_success">已成功将更改应用于 Anki</string>
+    <string name="anki_operation_failed">未能将更改应用于 Anki：%s</string>
+    <string name="anki_operation_cancelled">您取消了与 Anki 的同步</string>
+
+    <string name="anki_sync_start_message">正在准备将列表完整导入 Anki。</string>
+    <string name="anki_sync_progress_message" formatted="false">正在将第 %3$d/%2$d 个词同步到 AnkiDroid：%1$s</string>
+    <string name="anki_sync_notification_name">Anki 同步进度</string>
+    <string name="anki_sync_notification_description">为您提供 Anki 同步的进度通知。</string>
+
+    <string name="anki_sync_start_title">Anki 导入中</string>
+    <string name="anki_sync_cancelled_title">Anki 导入已取消</string>
+    <string name="anki_sync_cancelled_message">Anki 导入已取消。</string>
+    <string name="anki_sync_success_title">Anki 导入完成</string>
+    <string name="anki_sync_success_message">已成功在 %1$s 将所有卡片导入 Anki。</string>
+    <string name="anki_sync_failure_title">Anki 导入失败</string>
+    <string name="anki_sync_failure_message">Anki 导入失败，请尝试禁用/启用。\n错误：%1$s。</string>
+
+    <string name="widget_config_title">小组件配置</string>
+    <string name="widget_config_description">选择要在小组件中显示的列表。</string>
+    <string name="widget_config_selected_lists">已选列表</string>
+
+    <string name="battery_background_restricted">已启用电池限制。小组件可能无法可靠刷新。</string>
+    <string name="battery_aggressive_manufacturer">您的手机制造商会激进地优化功耗/电池。小组件可能无法可靠刷新。</string>
+    <string name="battery_optimization_fix">修复</string>
+
+    <string name="about_bug_report_title">提交错误报告</string>
+    <string name="about_bug_report_intro">如果您想报告应用中的错误，您可以通过电子邮件向开发人员分享更多信息。它可能包含一些个人信息。</string>
+    <string name="dialog_report_bug_text">您可能会分享词典条目、详细的应用使用情况等个人信息。此信息将专门用于调试和产品改进，然后删除。</string>
+    <string name="about_bug_report_email_template">您好，
+
+感谢您的错误报告！
+请注意，这可能包含我们仅用于修复错误和改进产品的私人信息。
+
+请描述您面临的问题：
+
+
+
+--- 设备信息 ---
+应用版本：%1$s
+%2$s 系统版本：%3$s
+设备型号：%4$s
+--- 设备信息结束 ---
+
+--- 日志 ---
+%5$s
+--- 日志结束 ---
+</string>
+
+    <string name="generic_not_applicable">N/A</string>
+    <string name="generic_other">其他</string>
+
+    <string name="enum_class_type_speaking">口语</string>
+    <string name="enum_class_type_writing">写作</string>
+    <string name="enum_class_type_reading">精读</string>
+    <string name="enum_class_type_listening">听力</string>
+    <string name="enum_class_type_fast_reading">阅读</string>
+
+    <string name="enum_class_level_elementary_1">初一</string>
+    <string name="enum_class_level_elementary_2">初二</string>
+    <string name="enum_class_level_elementary_3">初三</string>
+    <string name="enum_class_level_elementary_4">初四</string>
+    <string name="enum_class_level_intermediate_1">中一</string>
+    <string name="enum_class_level_intermediate_2">中二</string>
+    <string name="enum_class_level_intermediate_3">中三</string>
+    <string name="enum_class_level_advanced_1">高一</string>
+    <string name="enum_class_level_advanced_2">高二</string>
+    <string name="enum_class_level_advanced_3">高三</string>
+
+    <string name="enum_word_type_noun">名词</string>
+    <string name="enum_word_type_verb">动词</string>
+    <string name="enum_word_type_adjective">形容词</string>
+    <string name="enum_word_type_adverb">副词</string>
+    <string name="enum_word_type_conjunction">连词</string>
+    <string name="enum_word_type_preposition">介词</string>
+    <string name="enum_word_type_interjection">感叹词</string>
+    <string name="enum_word_type_idiom">成语</string>
+
+    <string name="enum_modality_oral">口语</string>
+    <string name="enum_modality_written">书面</string>
+    <string name="enum_modality_oral_written">口语和书面</string>
+
+</resources>

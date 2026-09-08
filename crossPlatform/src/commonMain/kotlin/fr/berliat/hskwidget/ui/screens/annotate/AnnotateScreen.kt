@@ -18,7 +18,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults.contentPaddingWithoutLabel
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,6 +51,7 @@ import fr.berliat.hskwidget.save
 import fr.berliat.hskwidget.ui.components.OutlinedContainer
 import fr.berliat.hskwidget.ui.components.PrettyCardShapeModifier
 import fr.berliat.hskwidget.ui.dismissKeyboardOnClick
+import fr.berliat.hskwidget.ui.toRes
 
 import org.jetbrains.compose.resources.stringResource
 
@@ -76,8 +76,6 @@ fun AnnotateScreen(
     var isExam by remember { mutableStateOf(false) }
     var selectedClassType by remember { mutableStateOf(viewModel.lastAnnotatedClassType.value) }
     var selectedClassLevel by remember { mutableStateOf(viewModel.lastAnnotatedClassLevel.value) }
-
-    val showHSK3Definition by viewModel.showHSK3Definition.collectAsState()
 
     var confirmDeleteDialog by remember { mutableStateOf(false) }
 
@@ -174,12 +172,6 @@ fun AnnotateScreen(
             modifier = modifier.fillMaxWidth()
                 .height(IntrinsicSize.Min)
         ) {
-            val labelProvider: (ClassType) -> String = if (showHSK3Definition) {
-                { it.type }
-            } else {
-                { it.name }
-            }
-
             val littlePadding = contentPaddingWithoutLabel(8.dp, 4.dp, 8.dp, 4.dp)
             val switchPadding = contentPaddingWithoutLabel(8.dp, 4.dp, 8.dp, 0.dp)
 
@@ -188,23 +180,17 @@ fun AnnotateScreen(
                 options = ClassType.entries,
                 selected = selectedClassType,
                 onSelected = { selectedClassType = it },
-                labelProvider = labelProvider,
+                labelProvider = { stringResource(it.toRes()) },
                 contentPadding = littlePadding,
                 modifier = Modifier.weight(1f).fillMaxHeight(),
             )
-
-            val labelProvider2: (ClassLevel) -> String = if (showHSK3Definition) {
-                { it.lvl }
-            } else {
-                { it.name }
-            }
 
             DropdownSelector(
                 label = stringResource(Res.string.annotation_edit_class_level_hint),
                 options = ClassLevel.entries,
                 selected = selectedClassLevel,
                 onSelected = { selectedClassLevel = it },
-                labelProvider = labelProvider2,
+                labelProvider = { stringResource(it.toRes()) },
                 contentPadding = littlePadding,
                 modifier = Modifier.weight(1f).fillMaxHeight().padding(start = 3.dp, end = 3.dp),
             )

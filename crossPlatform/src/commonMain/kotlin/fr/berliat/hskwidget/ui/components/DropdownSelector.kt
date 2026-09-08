@@ -27,7 +27,7 @@ fun <T> DropdownSelector(
     options: List<T>,
     selected: T,
     onSelected: (T) -> Unit,
-    labelProvider: (T) -> String = { it.toString() },
+    labelProvider: @Composable (T) -> String = { it.toString() },
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = contentPaddingWithoutLabel(16.dp, 16.dp, 16.dp, 16.dp)
 ) {
@@ -41,7 +41,7 @@ fun <T> DropdownSelector(
         modifier = modifier.fillMaxWidth().dismissKeyboardOnClick()
     ) {
         PaddedOutlinedTextField(
-            value = labelProvider.invoke(selected),
+            value = labelProvider(selected),
             onValueChange = {},
             readOnly = true,
             textStyle = textStyle,
@@ -60,7 +60,7 @@ fun <T> DropdownSelector(
         ) {
             options.forEach { option ->
                 DropdownMenuItem(
-                    text = { Text(labelProvider.invoke(option)) },
+                    text = { Text(labelProvider(option)) },
                     onClick = {
                         onSelected(option)
                         expanded = false

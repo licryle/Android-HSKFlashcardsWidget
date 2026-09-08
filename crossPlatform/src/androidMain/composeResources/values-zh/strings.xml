@@ -1,0 +1,21 @@
+<resources>
+    <string name="support_devintro">大家好，我是 Cyrille，一名来自法国的独立开发者。\n\n在学习中文的过程中，我意识到我需要这样一个应用，而现有的应用都不能满足我的需求。\n\n所以现在，我很乐意免费与大家分享这个作品。\n\n如果您觉得它也有用，请考虑参与我的羊角面包基金，或者免费留下好评！\n\n评价、反馈和鼓励对我的帮助极大！</string>
+    <string name="support_purchase_tier1">购买青铜级 🥐 支持 (1 美元)</string>
+    <string name="support_purchase_tier2">购买白银级 🥐 支持 (3 美元)</string>
+    <string name="support_purchase_tier3">购买黄金级 🥐 支持 (6 美元)</string>
+    <string name="support_total_support">到目前为止，您已支持此应用 %.2f 美元。</string>
+    <string name="support_status">感谢您的 🥐 %s 羊角面包 🥐 支持！</string>
+    <string name="support_status_tier1">青铜</string>
+    <string name="support_status_tier2">白银</string>
+    <string name="support_status_tier3">黄金</string>
+    <string name="support_status_tier4">铂金</string>
+    <string name="support_status_tpl">%s 🥐 支持者</string>
+    <string name="support_payment_success">非常感谢您的支持，您太棒了！</string>
+    <string name="support_payment_failed">付款已取消或失败</string>
+    <string name="support_status_nosupport">目前还没有支持过…</string>
+    <string name="support_total_error">获取您的购买历史记录时出错。</string>
+    <string name="support_status_error">错误</string>
+    <string name="support_review_btn">在 Google Play 上免费评价此应用</string>
+    <string name="support_review_failed">无法连接到 Google 评价服务器。</string>
+    <string name="support_reviewed">谢谢！如果您点击多次，对话框将不会出现。</string>
+</resources>

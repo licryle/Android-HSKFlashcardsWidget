@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">汉语助手</string>
+
+    <string name="widget_not_configured">无单词。\n点击配置列表</string>
+    <string name="widget_default_chinese">你好</string>
+    <string name="widget_default_english">你好</string>
+    <string name="widget_default_pinyin">nĭ hăo</string>
+    <string name="widget_default_loading">…加载中…</string>
+
+    <string name="widget_btn_speak">听这个词</string>
+    <string name="widget_btn_reload">新词</string>
+
+    <string name="widget_description">从您配置的列表中随机读取一个单词。</string>
+</resources>

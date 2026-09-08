@@ -1,0 +1,21 @@
+<resources>
+    <string name="support_devintro">Bonjour à tous, ici Cyrille, je suis un développeur indépendant originaire de France.\n\nEn apprenant le chinois, j'ai réalisé que j'avais besoin d'une telle application et aucune de celles existantes ne comblait mes besoins.\n\nNous y voilà donc, je partage joyeusement et gratuitement cette création avec vous.\n\nSi vous la trouvez également utile, n'hésitez pas à participer à mon fonds croissant, ou à laisser un avis gratuitement !\n\nLes avis, les retours et les encouragements aident énormément !</string>
+    <string name="support_purchase_tier1">Acheter le niveau de soutien Bronze 🥐 pour 1 US$</string>
+    <string name="support_purchase_tier2">Acheter le niveau de soutien Argent 🥐 pour 3 US$</string>
+    <string name="support_purchase_tier3">Acheter le niveau de soutien Or 🥐 pour 6 US$</string>
+    <string name="support_total_support">Vous avez soutenu cette application avec %.2f US$ (jusqu'à présent).</string>
+    <string name="support_status">Merci pour le soutien 🥐 %s croissant 🥐 !</string>
+    <string name="support_status_tier1">Bronze</string>
+    <string name="support_status_tier2">Argent</string>
+    <string name="support_status_tier3">Or</string>
+    <string name="support_status_tier4">Platine</string>
+    <string name="support_status_tpl">Soutien %s 🥐</string>
+    <string name="support_payment_success">Merci beaucoup pour votre soutien !</string>
+    <string name="support_payment_failed">Paiement annulé ou échoué</string>
+    <string name="support_status_nosupport">Pas encore de soutien… pour l'instant !</string>
+    <string name="support_total_error">Une erreur est survenue lors de la récupération de votre historique d'achat.</string>
+    <string name="support_status_error">Erreur</string>
+    <string name="support_review_btn">Évaluer l'application sur Google Play (gratuit)</string>
+    <string name="support_review_failed">Impossible de se connecter au serveur Google Reviews.</string>
+    <string name="support_reviewed">Merci ! Si vous cliquez plus d'une fois, le dialogue n'apparaîtra pas.</string>
+</resources>

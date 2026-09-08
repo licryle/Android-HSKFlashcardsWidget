@@ -33,7 +33,7 @@
 
 
     <string name="about_btn_view_source">View source code</string>
-    <string name="about_intro1">HSK Flashcard Widget %1$s is an open source project by Cyrille Berliat that stems from a personal need to learn Mandarin. \n \nIf it's useful to you, please consider supporting me and my countless hours of development :)</string>
+    <string name="about_intro1">Mandarin Assistant HSK Widget %1$s is an open source project by Cyrille Berliat that stems from a personal need to learn Mandarin. \n \nIf it's useful to you, please consider supporting me and my countless hours of development :)</string>
     <string name="about_intro2">If you have any suggestions, feedback or issues, feel free to email me.</string>
     <string name="about_intro3">Privacy policy: I use Google Analytics to track usage, such as which tab is visited the most on which device class (Tablet, Smartphone). \nNo Personal Identifiable Information (PII) data should be collected nor sent to me or Google Analytics.
 
@@ -112,7 +112,7 @@ This project uses the awesome projects of:
 
     <string name="widgets_add_widget">Add a new widget</string>
     <string name="widgets_add_widget_instructions">Your launcher does not support automatically adding widgets.\nPlease add the Flashcard widget manually:\nLong press on the home screen → Widgets → Mandarin Assistant.</string>
-    <string name="widgets_intro"><![CDATA[Welcome to HSK Flashcard Widget!
+    <string name="widgets_intro"><![CDATA[Welcome to Mandarin Assistant HSK Widget!
 
 This app enables you to set up as many widgets on your phone, and select which HSK words you want to see.
 We recommend to choose the level you're at plus the one below, or above depending on your learning path.]]></string>
@@ -204,6 +204,8 @@ We recommend to choose the level you're at plus the one below, or above dependin
 
     <string name="config_restore_file">Restore from file</string>
     <string name="config_restore_file_choose">Choose file</string>
+
+    <string name="config_language">Interface language</string>
 
     <string name="config_backup_cloud_title">Backup/Restore from Google</string>
     <string name="config_backup_cloud_account">Google Account</string>
@@ -418,5 +420,38 @@ Please describe the issue you are facing:
 
 
 </string>
+
+    <string name="generic_not_applicable">N/A</string>
+    <string name="generic_other">Other</string>
+
+    <string name="enum_class_type_speaking">Speaking</string>
+    <string name="enum_class_type_writing">Writing</string>
+    <string name="enum_class_type_reading">Reading</string>
+    <string name="enum_class_type_listening">Listening</string>
+    <string name="enum_class_type_fast_reading">Fast Reading</string>
+
+    <string name="enum_class_level_elementary_1">Elementary 1</string>
+    <string name="enum_class_level_elementary_2">Elementary 2</string>
+    <string name="enum_class_level_elementary_3">Elementary 3</string>
+    <string name="enum_class_level_elementary_4">Elementary 4</string>
+    <string name="enum_class_level_intermediate_1">Intermediate 1</string>
+    <string name="enum_class_level_intermediate_2">Intermediate 2</string>
+    <string name="enum_class_level_intermediate_3">Intermediate 3</string>
+    <string name="enum_class_level_advanced_1">Advanced 1</string>
+    <string name="enum_class_level_advanced_2">Advanced 2</string>
+    <string name="enum_class_level_advanced_3">Advanced 3</string>
+
+    <string name="enum_word_type_noun">Noun</string>
+    <string name="enum_word_type_verb">Verb</string>
+    <string name="enum_word_type_adjective">Adjective</string>
+    <string name="enum_word_type_adverb">Adverb</string>
+    <string name="enum_word_type_conjunction">Conjunction</string>
+    <string name="enum_word_type_preposition">Preposition</string>
+    <string name="enum_word_type_interjection">Interjection</string>
+    <string name="enum_word_type_idiom">Idiom</string>
+
+    <string name="enum_modality_oral">Oral</string>
+    <string name="enum_modality_written">Written</string>
+    <string name="enum_modality_oral_written">Oral &amp; Written</string>
 
 </resources>

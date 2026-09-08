@@ -1,0 +1,330 @@
+<resources>
+    <string name="app_name">Mandarin Assistant</string>
+    <string name="app_slogan">Étudiez à chaque déverrouillage</string>
+
+    <string name="delete">Supprimer</string>
+    <string name="proceed">Continuer</string>
+    <string name="save">Enregistrer</string>
+    <string name="cancel">Annuler</string>
+    <string name="understood">D'accord</string>
+    <string name="loading">Chargement</string>
+    <string name="fix_it">Essayer de réparer</string>
+    <string name="disable">Désactiver</string>
+    <string name="copied_to_clipboard">%1$s copié dans le presse-papier</string>
+    <string name="report_bug">Signaler un bug</string>
+
+    <string name="menu">Menu</string>
+    <string name="menu_dictionary">Dictionnaire</string>
+    <string name="menu_lists">Listes</string>
+    <string name="menu_widgets">Widgets</string>
+    <string name="menu_ocr">OCR</string>
+    <string name="menu_support">Soutenir le créateur !</string>
+    <string name="menu_settings">Paramètres</string>
+    <string name="menu_annotate">Annoter un mot</string>
+    <string name="menu_about">À propos</string>
+    <string name="menu_ocr_display">OCR: Texte scanné</string>
+
+    <string name="search_hint">Rechercher par pinyin, définition, hanzi</string>
+    <string name="search_clear">Effacer la recherche</string>
+
+    <string name="nav_header_desc">En-tête de navigation</string>
+    <string name="nav_host_ocr_reminder_close">Fermer le rappel OCR</string>
+    <string name="nav_host_ocr_reminder_text">Votre texte scanné est toujours accessible en cliquant ici.</string>
+
+
+    <string name="about_btn_view_source">Voir le code source</string>
+    <string name="about_intro1">Mandarin Assistant HSK Widget %1$s est un projet open source de Cyrille Berliat qui découle d'un besoin personnel d'apprendre le mandarin. \n \nSi cela vous est utile, n'hésitez pas à me soutenir et à soutenir mes innombrables heures de développement :)</string>
+    <string name="about_intro2">Si vous avez des suggestions, des retours ou des problèmes, n'hésitez pas à m'envoyer un e-mail.</string>
+    <string name="about_intro3">Politique de confidentialité : J'utilise Google Analytics pour suivre l'utilisation, comme quel onglet est visité le plus sur quelle classe d'appareil (Tablette, Smartphone). \nAucune donnée d'information personnellement identifiable (PII) ne devrait être collectée ni envoyée à moi ou à Google Analytics.
+
+Licence : GNU GPLv3. En résumé, vous pouvez en faire ce que vous voulez, mais vous devez créditer le travail et utiliser la même licence en aval.
+
+Ce projet utilise les formidables projets de :
+- Traductions CN-EN du dictionnaire CC-CEDICT de https://www.mdbg.net/chinese/
+- Liste HSK de https://github.com/krmanik/HSK-3.0
+- La popularité des mots en chinois provient de l'Université de la langue et de la culture de Pékin à http://bcc.blcu.edu.cn/
+- Les métadonnées des mots en chinois (BETA !) ont été générées à l'aide du LLM Yi 1.5 6B - Q6_K de 01.AI.
+- Les collocations de mots en chinois (BETA !) ont été générées à l'aide du LLM Qwen2.5 7b - Q4_K_M d'Alibaba.</string>
+    <string name="about_btn_email2">Envoyer un e-mail au développeur</string>
+    <string name="about_stats_title">Statistiques</string>
+    <string name="about_terms_conditions_title"><![CDATA[Politique de confidentialité et licences]]></string>
+    <string name="about_stats">Chargement…</string>
+    <string name="about_stats_text">%1$s mots dans le dictionnaire.\n%2$s annotations.</string>
+    <string name="about_email_noapp">Aucun client e-mail trouvé. Adresse copiée dans le presse-papier.</string>
+
+    <string name="dictionary_search_filter_hsk3definition_hint">Afficher la définition HSK3</string>
+    <string name="dictionary_noresult_text">%1$s n'est pas dans le dictionnaire, ajouter une annotation ?</string>
+    <string name="dictionary_noresultwithfilter_text">Tous les mots sont filtrés.\nSupprimez les filtres comme les listes ou le "♥ uniquement".</string>
+    <string name="dictionary_noresult_icon">Aucun résultat !</string>
+    <string name="dictionary_search_loading">Chargement des résultats</string>
+    <string name="dictionary_search_filter_hasannotation_hint"> uniquement</string>
+
+    <string name="dictionary_item_toggle">Montrer/Cacher plus d'infos</string>
+    <string name="dictionary_item_antonym">Antonyme</string>
+    <string name="dictionary_item_synonyms">Synonyme(s)</string>
+    <string name="dictionary_item_examples">Exemple(s)</string>
+    <string name="dictionary_item_collocations">Collocations</string>
+    <string name="dictionary_item_altdefinition">Définition</string>
+    <string name="dictionary_item_lists">Gérer les listes pour ce mot</string>
+    <string name="dictionary_item_annotate">Annoter un mot</string>
+    <string name="dictionary_item_reload">Nouveau mot</string>
+    <string name="dictionary_item_modality">Usage</string>
+    <string name="dictionary_item_type">Type</string>
+
+    <string name="widget_name">Mots de la liste</string>
+    <string name="widget_description">Lire un mot au hasard parmi les listes configurées.</string>
+    <string name="ocr_shortcut_name">Raccourci Photo/OCR</string>
+    <string name="ocr_shortcut_description">Prendre rapidement une photo pour extraire du texte mandarin.</string>
+
+    <string name="widget_not_configured">Aucun mot. Configurez la ou les listes</string>
+
+    <string name="widget_configure">Configurer le widget</string>
+    <string name="widget_configure_close">Configurer le widget et fermer l'application</string>
+    <string name="widget_configure_new_back">Ajouter un nouveau widget et revenir en arrière</string>
+    <string name="widget_configure_error_no_list">Sélectionnez au moins 1 liste</string>
+    <string name="widget_configure_wordlist_title">Liste de vocabulaire à inclure</string>
+    <string name="widget_configure_wordlist_word_count">%1$d mots</string>
+    <string name="widget_configure_no_change">Aucun changement à enregistrer</string>
+    <string name="widget_configure_saved">Configuration du widget mise à jour</string>
+    <string name="widget_configure_frequency_hint">Fréquence des nouveaux mots ?</string>
+
+    <string name="widget_configure_frequency">Fréquence de rafraîchissement</string>
+    <string-array name="widget_configure_frequency_options">
+        <item>-1 Manuel</item>
+        <item>1800000 30 min</item>
+        <item>21600000 6 heures</item>
+        <item>43200000 12 heures</item>
+        <item>86400000 1 jour</item>
+        <item>604800000 7 jours</item>
+    </string-array>
+
+    <string name="widget_demo_word_click">Ceci est un widget de démonstration, cela ouvrirait le dictionnaire</string>
+    <string name="widget_demo_update_click">Ceci est un widget de démonstration, cela mettrait à jour le mot</string>
+
+    <string name="widget_btn_speak">Écouter ce mot</string>
+    <string name="widget_btn_copy">Copier dans le presse-papier</string>
+
+    <string name="widget_placeholder_word">你好</string>
+    <string name="widget_placeholder_pinyin">nǐ hǎo</string>
+    <string name="widget_placeholder_definition">Bonjour</string>
+    <string name="widget_placeholder_level">HSK1</string>
+    <string name="widget_placeholder_language">fr</string>
+
+    <string name="widgets_add_widget">Ajouter un nouveau widget</string>
+    <string name="widgets_add_widget_instructions">Votre lanceur ne supporte pas l'ajout automatique de widgets.\nVeuillez ajouter le widget Flashcard manuellement :\nAppui long sur l'écran d'accueil → Widgets → Mandarin Assistant.</string>
+    <string name="widgets_intro"><![CDATA[Bienvenue sur Mandarin Assistant HSK Widget !
+
+Cette application vous permet de configurer autant de widgets sur votre téléphone, et de sélectionner les mots HSK que vous souhaitez voir.
+Nous vous recommandons de choisir le niveau où vous en êtes plus celui du dessous, ou du dessus selon votre parcours d'apprentissage.]]></string>
+    <string name="widgets_intro2"><![CDATA[Vous pouvez revenir à cet écran à tout moment pour configurer un nouveau widget, ou reconfigurer ceux existants.]]></string>
+
+    <string name="dialog_tts_error">Erreur de synthèse vocale</string>
+    <string name="speech_failure_toast_unknown">Erreur de synthèse vocale inconnue</string>
+    <string name="speech_failure_toast_muted">Désactivez le mode muet pour entendre le mot</string>
+    <string name="speech_failure_toast_chinese_unsupported">La voix "Chinois (Chine)" est manquante dans votre synthèse vocale. Veuillez l'installer.</string>
+    <string name="speech_failure_toast_init">Échec de l'initialisation du service de synthèse vocale, nous devons l'activer, le télécharger ou le configurer dans les paramètres.</string>
+
+    <string name="annotation_edit_notes_hint">Entrez vos notes :</string>
+    <string name="annotation_edit_is_exam_hint">Examen</string>
+    <string name="annotation_edit_class_level_hint">Niveau de classe</string>
+    <string name="annotation_edit_class_type_hint">Type de classe</string>
+    <string name="annotation_edit_delete_success">%1$s supprimé avec succès</string>
+    <string name="annotation_edit_delete_failure">Impossible de supprimer %1$s : %2$s</string>
+    <string name="annotation_edit_save_success">%1$s enregistré avec succès</string>
+    <string name="annotation_edit_save_failure">Impossible d'enregistrer %1$s : %2$s</string>
+    <string name="annotation_edit_delete_confirm_title">Confirmer la suppression</string>
+    <string name="annotation_edit_delete_confirm_message">Êtes-vous sûr de vouloir *supprimer* cette annotation ?</string>
+
+    <string name="wordlist_create_new_list_button">Créer une liste personnelle</string>
+    <string name="wordlist_delete_button">Supprimer la liste</string>
+    <string name="wordlist_delete_confirmation">Êtes-vous sûr de vouloir supprimer la liste personnelle \"%1$s\" ?</string>
+    <string name="wordlist_word_count">%1$d mots</string>
+    <string name="wordlist_name">Liste de mots</string>
+    <string name="wordlist_consult_button">Consulter</string>
+    <string name="wordlist_create_button">Créer une liste</string>
+    <string name="wordlist_list_name">Nom de la liste personnelle</string>
+    <string name="wordlist_select_lists">Sélectionner la ou les listes personnelles</string>
+    <string name="wordlist_list_none">Vous n'avez pas de listes personnelles pour ajouter ce mot, créez d'abord une liste personnelle.</string>
+    <string name="wordlist_lists_updated_toast">Listes personnelles mises à jour avec succès</string>
+    <string name="wordlist_createddate">Créé le : %1$s</string>
+    <string name="wordlist_editeddate" >Modifié le : %1$s</string>
+    <string name="wordlist_rename_button">Renommer la liste</string>
+    <string name="wordlist_list_name_dupe">Ce nom de liste existe déjà, utilisez-en un autre.</string>
+
+    <string name="ocr_capture_btn">Capturer une image pour l'OCR</string>
+    <string name="ocr_capture_permission_denied">Veuillez autoriser l'accès à l'appareil photo et aux fichiers</string>
+    <string name="ocr_capture_error_processed">Une erreur s'est produite lors de la capture de l'image</string>
+    <string name="ocr_capture_pinch_hint">Pincez pour zoomer/dézoomer</string>
+
+    <string name="ocr_display_loading">Traitement de votre image</string>
+    <string name="ocr_display_add">Analyser plus de texte et ajouter ci-dessous</string>
+    <string name="ocr_display_conf_smaller">Diminuer la taille du texte</string>
+    <string name="ocr_display_conf_bigger">Augmenter la taille du texte</string>
+    <string name="ocr_display_pinyins">Afficher les pinyins</string>
+    <string name="ocr_display_separator">Espacer les mots</string>
+    <string name="ocr_display_smallest_text">Texte le plus petit disponible</string>
+    <string name="ocr_display_word_not_found">Mot non trouvé, copié dans le presse-papier</string>
+    <string name="ocr_display_no_text_found">Aucun texte trouvé</string>
+    <string name="ocr_display_text_segmentation_failed">Échec de la segmentation du texte</string>
+    <string name="ocr_display_ocr_failed">Échec de la reconnaissance de texte</string>
+    <string name="ocr_display_ocr_no_text">Aucun texte à afficher</string>
+
+    <string name="config_backup_title">Sauvegarde/Restauration depuis un fichier local</string>
+    <string name="config_backup_activate">Activer la sauvegarde</string>
+    <string name="config_backup_frequency">Fréquence de sauvegarde</string>
+    <string name="config_backup_frequency_options">Au démarrage de l'application</string>
+    <string name="config_backup_frequency_manual">Manuel</string>
+    <string name="config_backup_location">Répertoire de sauvegarde</string>
+    <string name="config_backup_directory_choose">Choisir le répertoire</string>
+    <string name="config_backup_directory_failed_selection">Aucun dossier autorisé pour effectuer la sauvegarde locale, annulation</string>
+    <string name="config_backup_icon_alt">Téléchargement de la base de données</string>
+    <string name="config_backup_max_number">Nombre de sauvegardes à conserver</string>
+    <string name="config_backup_max_number_hint">Max fichiers</string>
+    <string-array name="config_backup_max_locally">
+        <item>2 (~100 Mo)</item>
+        <item>5 (~250 Mo)</item>
+        <item>10 (~500 Mo)</item>
+    </string-array>
+
+
+    <string name="dbrestore_start">Restauration de la base de données commencée</string>
+    <string name="dbrestore_failure_fileformat">Le fichier ne semble pas être une sauvegarde pour cette application</string>
+    <string name="dbrestore_failure_import">Restauration échouée : %1$s</string>
+    <string name="dbrestore_failure_nofileselected">Aucun fichier sélectionné : restauration annulée</string>
+    <string name="dbrestore_success">Base de données restaurée avec succès</string>
+
+    <string name="dbbackup_success">Base de données sauvegardée avec succès</string>
+    <string name="dbbackup_failure_write">Impossible de sauvegarder la base de données</string>
+    <string name="dbbackup_failure_folderpermission">Annulation de la sauvegarde : aucune autorisation d'écriture sur le dossier</string>
+
+    <string name="database_update_start">Mise à jour du dictionnaire de base, la sauvegarde sera retardée.</string>
+    <string name="database_update_success">Dictionnaire de base mis à jour</string>
+    <string name="database_update_failure">Erreur lors de la mise à jour du dictionnaire de base : %1$s</string>
+    <string name="database_update_list_system">Remplissage des listes "À l'examen" et "Mots annotés".</string>
+
+    <string name="config_restore_file">Restaurer depuis un fichier</string>
+    <string name="config_restore_file_choose">Choisir un fichier</string>
+
+    <string name="config_language">Langue de l'interface</string>
+
+    <string name="config_backup_cloud_title">Sauvegarde/Restauration depuis Google</string>
+    <string name="config_backup_cloud_account">Compte Google</string>
+    <string name="config_backup_cloud_account_notconfigured">Déconnecté</string>
+    <string name="config_backup_cloud_lastone">Dernière sauvegarde réussie</string>
+    <string name="config_backup_cloud_lastone_never">Jamais</string>
+    <string name="config_backup_cloud_backupnow">Sauvegarder maintenant</string>
+    <string name="config_backup_cloud_restorenow">Restaurer maintenant</string>
+
+    <string name="googledrive_backup_start_title">Sauvegarde en cours</string>
+    <string name="googledrive_backup_start_message">Préparation de la sauvegarde.</string>
+    <string name="googledrive_backup_success_title">Sauvegarde terminée</string>
+    <string name="googledrive_backup_success_message">Sauvegarde réussie à %1$s.</string>
+    <string name="googledrive_backup_cancel_title">Sauvegarde annulée</string>
+    <string name="googledrive_backup_cancel_message">Sauvegarde annulée.</string>
+    <string name="googledrive_backup_progress_message">Sauvegarde en cours : %1$s Mo / %2$s Mo.</string>
+    <string name="googledrive_backup_denied_scope">Autorisation Google non obtenue</string>
+    <string name="googledrive_backup_failed_title">Sauvegarde échouée</string>
+    <string name="googledrive_backup_failed_message">La sauvegarde a échoué avec le message d'erreur : %1$s.</string>
+    <string name="googledrive_backup_nogoogleapi">Aucune API Google disponible sur cet appareil</string>
+    <string name="googledrive_backup_noaccountselected">Aucun compte Google n'a été sélectionné, annulation.</string>
+    <string name="googledrive_restore_start_title">Démarrage de la restauration</string>
+    <string name="googledrive_restore_start_message">Restauration depuis Google Drive commencée.</string>
+    <string name="googledrive_restore_success_title">Téléchargement de la restauration terminé</string>
+    <string name="googledrive_restore_success_message">Fichiers de Google Drive téléchargés à %1$s.</string>
+    <string name="googledrive_restore_confirm_overwrite">Vous êtes sur le point de supprimer vos données locales et de les remplacer par une sauvegarde de %1$s.\n\nC'est irrévocable. Continuer ?</string>
+    <string name="googledrive_restore_cancel_title">Restauration annulée</string>
+    <string name="googledrive_restore_cancel_message">Restauration annulée.</string>
+    <string name="googledrive_restore_progress_message">Restauration en cours : %1$s Mo / %2$s Mo.</string>
+    <string name="googledrive_restore_failed_title">Restauration échouée</string>
+    <string name="googledrive_restore_failed_message">La restauration depuis Google Drive a échoué avec le message d'erreur : %1$s.</string>
+
+    <string name="config_anki_title">Intégration Anki</string>
+    <string name="config_anki_activate">Activer l'intégration Anki</string>
+    <string name="config_anki_integration">Enregistrer automatiquement les listes et les notes correspondantes dans Anki.
+Lors de l'activation, effectue une synchronisation complète à partir de zéro.</string>
+
+    <string name="anki_not_installed"><![CDATA[AnkiDroid n'est pas installé, ou utilise une version très ancienne (<2.5)]]></string>
+    <string name="anki_permission_denied">Permission d'appeler l'API AnkiDroid refusée.</string>
+    <string name="anki_must_start">Tentative de démarrage d'Anki en arrière-plan</string>
+    <string name="anki_operation_success">Modifications appliquées avec succès à Anki</string>
+    <string name="anki_operation_failed">Échec de l'application des modifications à Anki : %s</string>
+    <string name="anki_operation_cancelled">Vous avez annulé la synchronisation avec Anki</string>
+
+    <string name="anki_sync_start_message">Préparation d'une importation complète des listes vers Anki.</string>
+    <string name="anki_sync_progress_message" formatted="false">Synchronisation du mot %3$d/%2$d vers AnkiDroid : %1$s</string>
+    <string name="anki_sync_notification_name">Progression de la synchronisation Anki</string>
+    <string name="anki_sync_notification_description">Fournit une notification de progression pour la synchronisation Anki.</string>
+
+    <string name="anki_sync_start_title">Importation Anki en cours</string>
+    <string name="anki_sync_cancelled_title">Importation Anki annulée</string>
+    <string name="anki_sync_cancelled_message">L'importation Anki a été annulée.</string>
+    <string name="anki_sync_success_title">Importation Anki terminée</string>
+    <string name="anki_sync_success_message">Toutes les cartes ont été importées avec succès dans Anki à %1$s.</string>
+    <string name="anki_sync_failure_title">Importation Anki échouée</string>
+    <string name="anki_sync_failure_message">L'importation Anki a échoué, essayez de désactiver/réactiver.\nErreur : %1$s.</string>
+
+    <string name="widget_config_title">Configuration du widget</string>
+    <string name="widget_config_description">Sélectionnez les listes à afficher dans le widget.</string>
+    <string name="widget_config_selected_lists">Listes sélectionnées</string>
+
+    <string name="battery_background_restricted">La restriction de batterie est activée. Les widgets peuvent ne pas se rafraîchir de manière fiable.</string>
+    <string name="battery_aggressive_manufacturer">Le fabricant de votre téléphone optimise l'énergie/la batterie de manière agressive. Les widgets peuvent ne pas se rafraîchir de manière fiable.</string>
+    <string name="battery_optimization_fix">Réparer</string>
+
+    <string name="about_bug_report_title">Envoyer un rapport de bug</string>
+    <string name="about_bug_report_intro">Si vous souhaitez signaler un bug dans l'application, vous pouvez partager des informations supplémentaires par e-mail au développeur. Il peut contenir des informations personnelles.</string>
+    <string name="dialog_report_bug_text">Vous partagerez potentiellement des informations personnelles sous forme d'entrées de dictionnaire, d'utilisation détaillée de l'application, etc. Ces informations seront utilisées exclusivement pour le débogage et l'amélioration du produit, puis supprimées.</string>
+    <string name="about_bug_report_email_template">Bonjour,
+
+Merci pour votre rapport de bug !
+Veuillez noter que cela peut contenir des informations privées que nous utiliserons uniquement pour la correction de bugs et l'amélioration du produit.
+
+Veuillez décrire le problème que vous rencontrez :
+
+
+
+--- Informations sur l'appareil ---
+Version de l'application : %1$s
+%2$s Version du système : %3$s
+Modèle de l'appareil : %4$sº
+--- Fin des informations sur l'appareil ---
+
+--- Journaux ---
+%5$s
+--- Fin des journaux ---
+</string>
+
+    <string name="generic_not_applicable">N/A</string>
+    <string name="generic_other">Autre</string>
+
+    <string name="enum_class_type_speaking">Expression orale</string>
+    <string name="enum_class_type_writing">Expression écrite</string>
+    <string name="enum_class_type_reading">Lecture intensive</string>
+    <string name="enum_class_type_listening">Compréhension orale</string>
+    <string name="enum_class_type_fast_reading">Compréhension écrite</string>
+
+    <string name="enum_class_level_elementary_1">Élémentaire 1</string>
+    <string name="enum_class_level_elementary_2">Élémentaire 2</string>
+    <string name="enum_class_level_elementary_3">Élémentaire 3</string>
+    <string name="enum_class_level_elementary_4">Élémentaire 4</string>
+    <string name="enum_class_level_intermediate_1">Intermédiaire 1</string>
+    <string name="enum_class_level_intermediate_2">Intermédiaire 2</string>
+    <string name="enum_class_level_intermediate_3">Intermédiaire 3</string>
+    <string name="enum_class_level_advanced_1">Avancé 1</string>
+    <string name="enum_class_level_advanced_2">Avancé 2</string>
+    <string name="enum_class_level_advanced_3">Avancé 3</string>
+
+    <string name="enum_word_type_noun">Nom</string>
+    <string name="enum_word_type_verb">Verbe</string>
+    <string name="enum_word_type_adjective">Adjectif</string>
+    <string name="enum_word_type_adverb">Adverbe</string>
+    <string name="enum_word_type_conjunction">Conjonction</string>
+    <string name="enum_word_type_preposition">Préposition</string>
+    <string name="enum_word_type_interjection">Interjection</string>
+    <string name="enum_word_type_idiom">Idiome</string>
+
+    <string name="enum_modality_oral">Oral</string>
+    <string name="enum_modality_written">Écrit</string>
+    <string name="enum_modality_oral_written">Oral &amp; Écrit</string>
+
+</resources>

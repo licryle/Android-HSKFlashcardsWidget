@@ -27,6 +27,10 @@ fun ConfigScreen(
             .padding(16.dp)
             .fillMaxSize()
             .verticalScroll(scrollState)) {
+        LanguageSelectionView(modifier)
+
+        AppDivider()
+
         BackupDiskView(modifier, viewModel = viewModel.backupDiskViewModel)
 
         AppDivider()
