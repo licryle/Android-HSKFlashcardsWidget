@@ -1,4 +1,4 @@
-# Privacy Policy for HSK Flashcard Widget
+# Privacy Policy for Mandarin Assistant HSK Widget
 
 ## Privacy Policy
 Last updated: September 29, 2023
@@ -18,9 +18,9 @@ For the purposes of this Privacy Policy:
 
 - **Affiliate** means an entity that controls, is controlled by or is under common control with a party, where "control" means ownership of 50% or more of the shares, equity interest or other securities entitled to vote for election of directors or other managing authority.
 
-- **Application** refers to HSK Flashcard Widget, the software program provided by the Company.
+- **Application** refers to Mandarin Assistant HSK Widget, the software program provided by the Company.
 
-- **Company** (referred to as either "the Company", "We", "Us" or "Our" in this Agreement) refers to HSK Flashcard Widget.
+- **Company** (referred to as either "the Company", "We", "Us" or "Our" in this Agreement) refers to Mandarin Assistant HSK Widget.
 
 - **Country** refers to: France
 
