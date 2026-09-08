@@ -22,6 +22,18 @@
 - Not sure what word to use? Focus on your annotated (Hearted) words  
 - Already at an intermediate level? Flip definitions to **HSK3** instead of English  
 
+## Licenses
+
+License: GNU GPLv3.
+In a nutshell, you can do whatever you want with it, but must display credit for the work and use the same license downstream.
+
+This project uses the awesome projects of:
+- Full CN-EN from CC-CEDICT list from https://www.mdbg.net/chinese/
+- HSK list from https://github.com/krmanik/HSK-3.0
+- Words popularity in Chinese comes from the Beijing Language and Culture University at http://bcc.blcu.edu.cn/
+- Words metadata in Chinese (BETA!) was generated using Yi 1.5 6B - Q6_K LLM from 01.AI.
+- Words collocations in Chinese (BETA!) was generated using Qwen2.5 7b - Q4_K_M LLM from Alibaba.
+
 ---
 
 **Currently supports Simplified Chinese and English only.**

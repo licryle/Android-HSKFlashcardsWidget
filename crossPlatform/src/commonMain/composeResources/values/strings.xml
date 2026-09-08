@@ -42,7 +42,7 @@ License: GNU GPLv3. In a nutshell, you can do whatever you want with it, but mus
 This project uses the awesome projects of:
 - Full CN-EN from CC-CEDICT list from https://www.mdbg.net/chinese/
 - HSK list from https://github.com/krmanik/HSK-3.0
-- Words popularity in Chinese comes from the Beijing Langauge and Culture University at http://bcc.blcu.edu.cn/
+- Words popularity in Chinese comes from the Beijing Language and Culture University at http://bcc.blcu.edu.cn/
 - Words metadata in Chinese (BETA!) was generated using Yi 1.5 6B - Q6_K LLM from 01.AI.
 - Words collocations in Chinese (BETA!) was generated using Qwen2.5 7b - Q4_K_M LLM from Alibaba.</string>
     <string name="about_btn_email2">Email the developer</string>
