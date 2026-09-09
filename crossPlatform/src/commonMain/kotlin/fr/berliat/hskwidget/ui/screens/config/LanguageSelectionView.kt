@@ -18,11 +18,11 @@ fun LanguageSelectionView(
 ) {
     var currentLanguage by remember { mutableStateOf(LocaleManager.getCurrentLanguage()) }
     var expanded by remember { mutableStateOf(false) }
-    
+
     val languages = mapOf<String?, String>(
         null to "System",
         "en" to "English",
-        "fr" to "Français",
+        //"fr" to "Français",
         "zh-Hans" to "简体中文"
     )
 
@@ -41,7 +41,7 @@ fun LanguageSelectionView(
             ) {
                 OutlinedTextField(
                     readOnly = true,
-                    value = languages.getValue(LocaleManager.getCurrentLanguage()),
+                    value = languages[currentLanguage] ?: languages[null] ?: "",
                     textStyle = MaterialTheme.typography.bodyMedium,
                     onValueChange = {},
                     modifier = Modifier
