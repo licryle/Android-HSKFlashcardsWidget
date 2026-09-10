@@ -28,16 +28,39 @@ private const val select_right_join =
             " ON a.a_simplified = w.simplified" +
             " "
 
+private const val order_by_logic =
+    "ORDER BY ( " +
+            "  (CASE WHEN searchable_text || ' ' || a_searchable_text LIKE '%' || :str " +
+            "          OR searchable_text || ' ' || a_searchable_text LIKE '%' || :str || ' %' " +
+            "          OR searchable_text || ' ' || a_searchable_text LIKE '%' || :str || ':%' " +
+            "          OR searchable_text || ' ' || a_searchable_text LIKE '%' || :str || ';%' " +
+            "          OR searchable_text || ' ' || a_searchable_text LIKE '%' || :str || char(10) || '%' " +
+            "          OR searchable_text || ' ' || a_searchable_text LIKE '%' || :str || '/%' " +
+            "          OR searchable_text || ' ' || a_searchable_text LIKE '%' || :str || ')%' " +
+            "          OR searchable_text || ' ' || a_searchable_text LIKE '%' || :str || '-%' " +
+            "          OR searchable_text || ' ' || a_searchable_text LIKE '%' || :str || '.%' THEN 5 ELSE 0 END) + " +
+            "  (CASE WHEN searchable_text || ' ' || a_searchable_text LIKE :str || '%' " +
+            "          OR searchable_text || ' ' || a_searchable_text LIKE '% ' || :str || '%' " +
+            "          OR searchable_text || ' ' || a_searchable_text LIKE ':%' || :str || '%' " +
+            "          OR searchable_text || ' ' || a_searchable_text LIKE ';%' || :str || '%' " +
+            "          OR searchable_text || ' ' || a_searchable_text LIKE '%' || char(10) || :str || '%' " +
+            "          OR searchable_text || ' ' || a_searchable_text LIKE '%/' || :str || '%' " +
+            "          OR searchable_text || ' ' || a_searchable_text LIKE '%(' || :str || '%' " +
+            "          OR searchable_text || ' ' || a_searchable_text LIKE '%-' || :str || '%' THEN 10 ELSE 0 END)" +
+    ") DESC, popularity DESC, is_first_seen_null, first_seen DESC "
+
 @Dao
 interface AnnotatedChineseWordDAO {
-    @Query("$select_left_join WHERE a.a_searchable_text LIKE '%' || :str || '%'" +
+    @Query("SELECT * FROM (" +
+            "$select_left_join WHERE a.a_searchable_text LIKE '%' || :str || '%'" +
             " AND (0=:hasAnnotation OR (1=:hasAnnotation AND a.first_seen IS NOT NULL))" +
             " AND (a.is_exam=:atExam OR :atExam IS NULL)" +
             " UNION " +
             "$select_right_join WHERE w.searchable_text LIKE '%' || :str || '%'" +
             " AND (0=:hasAnnotation OR (1=:hasAnnotation AND a.first_seen IS NOT NULL))" +
             " AND (a.is_exam=:atExam OR :atExam IS NULL)" +
-            " ORDER BY is_first_seen_null, a.first_seen DESC, w.popularity DESC " +
+            ") " +
+            order_by_logic +
             " LIMIT :pageSize OFFSET (:page * :pageSize)")
     @RewriteQueriesToDropUnusedColumns
     suspend fun searchFromStrLike(str: String?, hasAnnotation: Boolean, atExam: Boolean? = null, page: Int = 0, pageSize: Int = 30): List<AnnotatedChineseWord>
