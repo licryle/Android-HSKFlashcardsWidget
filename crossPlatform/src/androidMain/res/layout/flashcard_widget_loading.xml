@@ -28,6 +28,7 @@
 
     <TextView
         android:id="@+id/flashcard_loading_text"
+        style="@style/Widget.HSKFlashCardsWidget.Text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/widget_default_loading"

@@ -1,7 +1,4 @@
 <resources>
-
-
-
     <style name="Widget.HSKFlashcardsWidget.AppWidget" parent="android:Widget">
     </style>
 
@@ -14,7 +11,11 @@
     <style name="Widget.HSKFlashcardsWidget.AppWidget.InnerView" parent="android:Widget">
         <item name="android:padding">?attr/appWidgetPadding</item>
         <item name="android:background">@drawable/app_widget_inner_view_background</item>
-        <item name="android:textColor">?android:attr/textColorPrimary</item>
+        <item name="android:textColor">@color/widget_on_background</item>
+    </style>
+
+    <style name="Widget.HSKFlashCardsWidget.Text" parent="android:Widget">
+        <item name="android:textColor">@color/widget_on_background</item>
     </style>
 
     <style name="Widget.HSKFlashCardsWidget.Label" parent="android:Widget">

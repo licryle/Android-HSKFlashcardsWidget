@@ -11,7 +11,7 @@
 
     <style name="Theme.HSKFlashcardsWidget.AppWidgetContainerParent" parent="@android:style/Theme.DeviceDefault">
         <!-- Radius of the outer bound of widgets to make the rounded corners -->
-        <item name="appWidgetRadius">16dp</item>
+        <item name="appWidgetRadius">24dp</item>
         <!--
         Radius of the inner view's bound of widgets to make the rounded corners.
         It needs to be 8dp or less than the value of appWidgetRadius
@@ -21,5 +21,7 @@
 
     <style name="Theme.HSKFlashcardsWidget.AppWidgetContainer" parent="Theme.HSKFlashcardsWidget.AppWidgetContainerParent">
         <item name="appWidgetPadding">16dp</item>
+        <item name="android:colorBackground">@color/widget_background</item>
+        <item name="android:textColorPrimary">@color/widget_on_background</item>
     </style>
 </resources>

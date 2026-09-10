@@ -2,4 +2,5 @@
     <color name="widget_primary">@color/md_theme_dark_primary</color>
     <color name="widget_on_primary">@color/md_theme_dark_onPrimary</color>
     <color name="widget_background">@color/md_theme_dark_background</color>
+    <color name="widget_on_background">@color/md_theme_dark_onBackground</color>
 </resources>

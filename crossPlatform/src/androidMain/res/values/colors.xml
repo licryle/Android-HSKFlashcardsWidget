@@ -66,4 +66,5 @@
     <color name="widget_primary">@color/md_theme_light_primary</color>
     <color name="widget_on_primary">@color/md_theme_light_onPrimary</color>
     <color name="widget_background">@color/md_theme_light_background</color>
+    <color name="widget_on_background">@color/md_theme_light_onBackground</color>
 </resources>

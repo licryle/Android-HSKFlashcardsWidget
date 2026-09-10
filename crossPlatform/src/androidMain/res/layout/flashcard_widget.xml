@@ -59,6 +59,7 @@
 
             <TextView
                 android:id="@+id/flashcard_pinyin"
+                style="@style/Widget.HSKFlashCardsWidget.Text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="-5dp"
@@ -70,6 +71,7 @@
 
             <TextView
                 android:id="@+id/flashcard_chinese"
+                style="@style/Widget.HSKFlashCardsWidget.Text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/widget_default_chinese"
@@ -80,6 +82,7 @@
 
             <TextView
                 android:id="@+id/flashcard_definition"
+                style="@style/Widget.HSKFlashCardsWidget.Text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="0dp"
