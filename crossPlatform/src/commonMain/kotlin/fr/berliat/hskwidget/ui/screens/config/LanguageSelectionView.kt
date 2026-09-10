@@ -14,20 +14,18 @@ import org.jetbrains.compose.resources.stringResource
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LanguageSelectionView(
-    modifier: Modifier = Modifier
+    languages: Map<String?, String>,
+    modifier: Modifier = Modifier,
+    onLanguageChange: (String?) -> Unit = {}
 ) {
     var currentLanguage by remember { mutableStateOf(LocaleManager.getCurrentLanguage()) }
     var expanded by remember { mutableStateOf(false) }
 
-    val languages = mapOf<String?, String>(
-        null to "System",
-        "en" to "English",
-        //"fr" to "Français",
-        "zh-Hans" to "简体中文"
-    )
-
-    Row(verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
         Text(stringResource(Res.string.config_language),
             style = MaterialTheme.typography.bodyMedium)
 
@@ -65,6 +63,7 @@ fun LanguageSelectionView(
                                 LocaleManager.setLanguage(code)
                                 currentLanguage = code
                                 expanded = false
+                                onLanguageChange(code)
                             }
                         )
                     }

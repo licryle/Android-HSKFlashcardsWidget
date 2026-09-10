@@ -23,24 +23,40 @@ fun ConfigScreen(
     ) }
 ) {
     val scrollState = rememberScrollState()
-    Column(modifier = Modifier
+    var refreshKey by remember { mutableStateOf(0) }
+
+    val languages = mapOf<String?, String>(
+        null to "System",
+        "en" to "English",
+        //"fr" to "Français",
+        "zh-Hans" to "简体中文"
+    )
+
+    Column(
+        modifier = modifier
             .padding(16.dp)
             .fillMaxSize()
-            .verticalScroll(scrollState)) {
-        LanguageSelectionView(modifier)
+            .verticalScroll(scrollState)
+    ) {
+        key(refreshKey) {
+            LanguageSelectionView(
+                languages = languages,
+                onLanguageChange = { _ -> refreshKey++ }
+            )
 
-        AppDivider()
-
-        BackupDiskView(modifier, viewModel = viewModel.backupDiskViewModel)
-
-        AppDivider()
-
-        BackupCloudView(modifier, viewModel = viewModel.backupCloudViewModel)
-
-        if (viewModel.ankiSyncViewModel.isAvailableOnThisPlatform) {
             AppDivider()
 
-            AnkiSyncView(modifier, viewModel = viewModel.ankiSyncViewModel)
+            BackupDiskView(viewModel = viewModel.backupDiskViewModel)
+
+            AppDivider()
+
+            BackupCloudView(viewModel = viewModel.backupCloudViewModel)
+
+            if (viewModel.ankiSyncViewModel.isAvailableOnThisPlatform) {
+                AppDivider()
+
+                AnkiSyncView(viewModel = viewModel.ankiSyncViewModel)
+            }
         }
     }
 }
