@@ -168,6 +168,19 @@ actual class WidgetController(
 
                         setTextViewText(R.id.flashcard_pinyin, word.pinyins.toString())
                         setTextViewText(R.id.flashcard_hsklevel, word.hskLevel.toString())
+
+                        // Responsive Visibility Logic
+                        val options = appWidgetManager.getAppWidgetOptions(widgetId)
+                        val minWidth = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH)
+                        val minHeight = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT)
+
+                        // Hide the top row entirely if it's too short vertically
+                        val showHeader = minHeight > 80
+                        // Hide side icons if it's too narrow
+                        val showIcons = minWidth > 110 && showHeader
+
+                        setViewVisibility(R.id.flashcard_action_bar, if (showIcons) View.VISIBLE else View.GONE)
+                        
                         setViewVisibility(R.id.flashcard_hsklevel,
                             if (word.hskLevel == HSK_Level.NOT_HSK) View.GONE else View.VISIBLE)
                     }

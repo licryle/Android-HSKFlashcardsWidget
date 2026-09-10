@@ -35,10 +35,14 @@ open class CommonWidgetController(
     val wordListDAO = HSKAppServices.database.wordListDAO()
     val annotatedWordDAO = HSKAppServices.database.annotatedChineseWordDAO()
 
+    var currentWord : AnnotatedChineseWord? = null
+
 
     fun speakWord() {
         Utils.playWordInBackground(simplified.value)
     }
+
+    suspend fun redraw() = updateDesktopWidget(currentWord)
 
     suspend fun updateWord() = withContext(AppDispatchers.IO) {
         val allowedListIds = getAllowedLists().map { it.wordList.id }
@@ -52,6 +56,7 @@ open class CommonWidgetController(
 
         // Persist it in preferences for cross-App convenience
         widgetStore.currentWord.value = newWord?.simplified ?: ""
+        currentWord = newWord
         updateDesktopWidget(newWord)
     }
 

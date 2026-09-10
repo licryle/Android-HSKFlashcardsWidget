@@ -256,6 +256,12 @@ actual class FlashcardWidgetProvider actual constructor()
         Log.i(TAG, "onAppWidgetOptionsChanged")
         super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions)
         Logging.logAnalyticsWidgetAction(Logging.ANALYTICS_EVENTS.WIGDET_RESIZE, appWidgetId)
+
+        context?.let {
+            scope.launch(AppDispatchers.IO) {
+                getWidgetController(appWidgetId).redraw()
+            }
+        }
     }
 
     override fun onEnabled(context: Context) {
