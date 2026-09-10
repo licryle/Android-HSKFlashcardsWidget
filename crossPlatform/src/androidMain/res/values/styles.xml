@@ -17,13 +17,17 @@
         <item name="android:textColor">?android:attr/textColorPrimary</item>
     </style>
 
-    <style name="Widget.HSKFlashCardsWidget.Icons" parent="android:Widget">
-        <item name="android:tint">@color/widget_on_primary</item>
+    <style name="Widget.HSKFlashCardsWidget.Label" parent="android:Widget">
         <item name="android:textColor">@color/widget_on_primary</item>
         <item name="android:background">@color/widget_primary</item>
         <item name="android:layout_margin">0dp</item>
+        <item name="android:padding">3dp</item>
+    </style>
+
+    <style name="Widget.HSKFlashCardsWidget.Icons" parent="Widget.HSKFlashCardsWidget.Label">
+        <item name="android:tint">@color/widget_on_primary</item>
+        <item name="android:background">@drawable/widget_icon_background</item>
         <item name="android:layout_height">30dp</item>
         <item name="android:layout_width">30dp</item>
-        <item name="android:padding">3dp</item>
     </style>
 </resources>

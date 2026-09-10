@@ -21,8 +21,6 @@
                 style="@style/Widget.HSKFlashCardsWidget.Icons"
                 android:layout_gravity="start"
                 android:contentDescription="@string/widget_btn_reload"
-                android:foreground="@drawable/round_foreground"
-                android:foregroundTint="?android:attr/colorBackground"
                 android:src="@drawable/baseline_refresh_24" />
             <!--app:shapeAppearanceOverlay="@style/roundedImageView"-->
 
@@ -38,7 +36,7 @@
                     android:layout_height="wrap_content"
                     android:text="HSK1"
                     android:layout_gravity="center"
-                    style="@style/Widget.HSKFlashCardsWidget.Icons"
+                    style="@style/Widget.HSKFlashCardsWidget.Label"
                     android:textSize="11sp" />
             </LinearLayout>
 
@@ -48,8 +46,6 @@
                 style="@style/Widget.HSKFlashCardsWidget.Icons"
                 android:layout_gravity="end"
                 android:contentDescription="@string/widget_btn_speak"
-                android:foreground="@drawable/round_foreground"
-                android:foregroundTint="?android:attr/colorBackground"
                 android:src="@drawable/baseline_volume_up_24" />
             <!--app:shapeAppearanceOverlay="@style/roundedImageView"-->
         </LinearLayout>
