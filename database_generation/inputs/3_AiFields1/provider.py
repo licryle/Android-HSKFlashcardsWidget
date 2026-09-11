@@ -100,9 +100,6 @@ class AiFieldsProvider(Provider):
                     word = res.pop('word', None)
                     if not word: continue
                     
-                    # Wrap definition in the expected JSON locale map
-                    res['definition'] = json.dumps({DEFINITION_AI_LOCALE: res.get('definition', '')}, ensure_ascii=False)
-                    
                     # Convert empty strings to None (NULL) for better database state
                     for key in res:
                         if isinstance(res[key], str) and not res[key].strip():
@@ -126,8 +123,12 @@ class AiFieldsProvider(Provider):
         return {
             "chinese_word": {
                 "type": ProviderType.COLUMN,
-                "columns": ["definition", "examples", "modality", "type", "synonyms", "antonym"],
+                "columns": ["examples", "modality", "type", "synonyms", "antonym"],
                 "index": "simplified"
+            },
+            "word_definition": {
+                "type": ProviderType.TABLE,
+                "columns": ["simplified", "language", "definition"]
             }
         }
 
@@ -142,8 +143,17 @@ class AiFieldsProvider(Provider):
         columns = [desc[0] for desc in cursor.description]
         for row in cursor.fetchall():
             record = dict(zip(columns, row))
+            hsk3_definition = record.pop("definition", None)
             for k, v in record.items():
                 if k != "simplified" and v == "":
                     record[k] = None
             yield ("chinese_word", record)
+            if hsk3_definition:
+                # This cache contains exactly one definition language.  Locale maps were
+                # only needed while definitions lived in chinese_word.
+                yield ("word_definition", {
+                    "simplified": record["simplified"],
+                    "language": DEFINITION_AI_LOCALE,
+                    "definition": hsk3_definition
+                })
         conn.close()

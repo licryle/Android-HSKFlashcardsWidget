@@ -191,8 +191,15 @@ class LanguageFrenchProvider(Provider):
         conn = self._get_cache_conn()
         cursor = conn.cursor()
 
-        # Step 1: seed the cache from the local French dictionary, if present.
-        cfdict_queue = self._load_cfdict_word_map()
+        # CEDICT is the authoritative source for chinese_word.  CFDICT has additional
+        # headwords, but definitions for those cannot satisfy the foreign key and must
+        # never enter the cache used for the generated application database.
+        cedict_queue = self._load_cedict_word_map()
+        base_words = {item['word'] for item in cedict_queue}
+
+        # Step 1: seed only French entries that have a base-dictionary parent.
+        cfdict_queue = [item for item in self._load_cfdict_word_map()
+                        if item['word'] in base_words]
         if cfdict_queue:
             self.logger.info(f"LanguageFrenchProvider: seeding {len(cfdict_queue)} French entries from CFDICT.")
             for item in cfdict_queue:
@@ -205,8 +212,7 @@ class LanguageFrenchProvider(Provider):
                 )
             conn.commit()
 
-        # Step 2: build the CEDICT queue for the English anchor, then compare against cache words.
-        cedict_queue = self._load_cedict_word_map()
+        # Step 2: use the CEDICT queue for the English anchor, then compare against cache words.
         cursor.execute("SELECT simplified FROM chinese_word")
         cached_words = {row[0] for row in cursor.fetchall()}
 
@@ -229,7 +235,7 @@ class LanguageFrenchProvider(Provider):
                 for res in ai_results:
                     word = res.get('word')
                     fr = res.get('fr')
-                    if not word or not fr:
+                    if not word or word not in base_words or not fr:
                         continue
 
                     # Keep the JSON locale map shape consistent with the rest of the repository.
@@ -250,10 +256,9 @@ class LanguageFrenchProvider(Provider):
 
     def schema(self) -> Dict[str, Dict[str, Any]]:
         return {
-            "chinese_word": {
-                "type": ProviderType.COLUMN,
-                "columns": ["definition"],
-                "index": "simplified"
+            "word_definition": {
+                "type": ProviderType.TABLE,
+                "columns": ["simplified", "language", "definition"]
             }
         }
 
@@ -261,14 +266,23 @@ class LanguageFrenchProvider(Provider):
         if not os.path.exists(FRENCH_CACHE_DB):
             return
 
+        # The cache can predate this constraint.  Filter again at assembly time rather
+        # than allowing stale CFDict-only cache rows to break database generation.
+        base_words = {item['word'] for item in self._load_cedict_word_map()}
         conn = sqlite3.connect(FRENCH_CACHE_DB)
         cursor = conn.cursor()
         cursor.execute("SELECT simplified, definition FROM chinese_word")
         for row in cursor.fetchall():
             simplified, definition_json = row
+            if simplified not in base_words:
+                continue
             # The cache DB stores per-word {"fr": ...} JSON. Feed that to the orchestrator.
-            yield ("chinese_word", {
+            definition = json.loads(definition_json).get("fr")
+            if not definition:
+                continue
+            yield ("word_definition", {
                 "simplified": simplified,
-                "definition": definition_json
+                "language": "fr",
+                "definition": definition
             })
         conn.close()

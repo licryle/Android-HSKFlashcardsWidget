@@ -4,6 +4,8 @@ import sqlite3
 import importlib.util
 import logging
 import sys
+import shutil
+import tempfile
 from datetime import datetime
 from typing import List, Dict, Any, Set, Iterator, Tuple, Optional
 from .base_provider import Provider, ProviderType
@@ -17,6 +19,7 @@ class Orchestrator:
         self.schema_data = self._load_schema()
         self.table_definitions = self._parse_room_entities()
         self.column_defaults: Dict[str, Dict[str, Any]] = {}
+        self.previous_database_path: Optional[str] = None
         self._setup_logging()
 
     def _setup_logging(self):
@@ -56,6 +59,9 @@ class Orchestrator:
         
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
+        # sqlite3 leaves foreign-key enforcement disabled by default.  Keep generation
+        # subject to the same relational guarantees as the Room database it produces.
+        cursor.execute("PRAGMA foreign_keys = ON")
         
         for entity in self.schema_data['database']['entities']:
             create_sql = entity['createSql'].replace('${TABLE_NAME}', entity['tableName'])
@@ -170,7 +176,14 @@ class Orchestrator:
                     cols = list(data_to_insert.keys())
                     placeholders = ', '.join(['?'] * len(cols))
                     sql = f"INSERT OR REPLACE INTO {table_name} ({', '.join(cols)}) VALUES ({placeholders})"
-                    cursor.execute(sql, list(data_to_insert.values()))
+                    
+
+                    try:
+                        cursor.execute(sql, list(data_to_insert.values()))
+                    except:
+                        print(f"\033[91mError inserting into {table_name} from provider {p_name}\033[0m")
+                        print(f"SQL:\n{sql}")
+                        print(f"Data: {data_to_insert}")
                 
                 elif info['type'] == ProviderType.COLUMN:
                     index_col = info['index']
@@ -208,10 +221,26 @@ class Orchestrator:
                     logging.shutdown()
                     sys.exit(1)
 
+        # Stage 0 needs the previous generated database before create_database replaces it.
+        # Keep the snapshot outside the output directory and remove it after assembly.
+        if os.path.exists(self.db_path):
+            fd, snapshot_path = tempfile.mkstemp(prefix="mandarin_assistant_previous_", suffix=".db")
+            os.close(fd)
+            shutil.copy2(self.db_path, snapshot_path)
+            self.previous_database_path = snapshot_path
+            for provider in self.providers:
+                provider.previous_database_path = snapshot_path
+            self.logger.info(f"Preserved previous dictionary snapshot: {snapshot_path}")
+
         self.create_database()
         conn = sqlite3.connect(self.db_path)
         try:
+            # PRAGMA settings are connection-local, so enable this again for provider inserts.
+            conn.execute("PRAGMA foreign_keys = ON")
             self._assemble_data(conn)
         finally:
             conn.close()
+            if self.previous_database_path and os.path.exists(self.previous_database_path):
+                os.remove(self.previous_database_path)
+                self.previous_database_path = None
         self.logger.info("Database generation complete.")
