@@ -54,6 +54,7 @@ import fr.berliat.hskwidget.filter_alt_off_24px
 import fr.berliat.hskwidget.ui.components.PrettyCardShapeModifier
 import fr.berliat.hskwidget.ui.dismissKeyboardOnClick
 import fr.berliat.hskwidget.ui.dismissKeyboardOnTap
+import fr.berliat.hskwidget.ui.horizontalScrollbar
 
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -198,6 +199,7 @@ private fun DictionarySearchFilters(
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .horizontalScrollbar(scrollState)
             .horizontalScroll(scrollState)
             .padding(start = 15.dp, end = 15.dp, top = 0.dp, bottom = 4.dp),
         verticalAlignment = Alignment.CenterVertically

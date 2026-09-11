@@ -53,6 +53,7 @@ import fr.berliat.hskwidget.ocr_display_separator
 import fr.berliat.hskwidget.ocr_display_text_segmentation_failed
 import fr.berliat.hskwidget.photo_camera_24px
 import fr.berliat.hskwidget.ui.components.PrettyCardShapeModifier
+import fr.berliat.hskwidget.ui.horizontalScrollbar
 import fr.berliat.hskwidget.ui.theme.AppTypographies
 
 import io.github.vinceglb.filekit.PlatformFile
@@ -193,6 +194,7 @@ private fun OcrDisplayConfig(
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .horizontalScrollbar(scrollState)
             .horizontalScroll(scrollState)
             .padding(start = 10.dp, end = 10.dp, top = 0.dp, bottom = 4.dp),
         verticalAlignment = Alignment.CenterVertically
