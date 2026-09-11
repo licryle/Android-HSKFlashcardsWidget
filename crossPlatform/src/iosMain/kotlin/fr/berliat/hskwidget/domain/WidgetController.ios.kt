@@ -7,7 +7,7 @@ import fr.berliat.hskwidget.data.store.WidgetPreferencesStore
 actual class WidgetController(widgetStore: WidgetPreferencesStore, database: ChineseWordsDatabase) : CommonWidgetController(
     widgetStore, database
 ) {
-    override suspend fun updateDesktopWidget(word: AnnotatedChineseWord?) {
+    override suspend fun redrawWidget(word: AnnotatedChineseWord?) {
         WidgetProvider.triggerReload()
     }
 }

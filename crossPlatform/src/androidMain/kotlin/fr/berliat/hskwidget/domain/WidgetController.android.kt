@@ -108,7 +108,7 @@ actual class WidgetController(
         context.startActivity(confIntent)
     }
 
-    override suspend fun updateDesktopWidget(word: AnnotatedChineseWord?) {
+    override suspend fun redrawWidget(word: AnnotatedChineseWord?) {
         withContext(Dispatchers.IO) {
             val context = contextProvider.invoke()
             val appWidgetManager = AppWidgetManager.getInstance(context)

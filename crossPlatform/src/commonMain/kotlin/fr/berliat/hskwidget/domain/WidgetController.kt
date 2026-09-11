@@ -42,7 +42,7 @@ open class CommonWidgetController(
         Utils.playWordInBackground(simplified.value)
     }
 
-    suspend fun redraw() = updateDesktopWidget(currentWord)
+    suspend fun redraw() = redrawWidget(currentWord)
 
     suspend fun updateWord() = withContext(AppDispatchers.IO) {
         val allowedListIds = getAllowedLists().map { it.wordList.id }
@@ -57,10 +57,10 @@ open class CommonWidgetController(
         // Persist it in preferences for cross-App convenience
         widgetStore.currentWord.value = newWord?.simplified ?: ""
         currentWord = newWord
-        updateDesktopWidget(newWord)
+        redrawWidget(newWord)
     }
 
-    protected open suspend fun updateDesktopWidget(word: AnnotatedChineseWord?) {}
+    protected open suspend fun redrawWidget(word: AnnotatedChineseWord?) {}
 
     fun openDictionary() {
         val query = SearchQuery.fromString(simplified.value).copy(

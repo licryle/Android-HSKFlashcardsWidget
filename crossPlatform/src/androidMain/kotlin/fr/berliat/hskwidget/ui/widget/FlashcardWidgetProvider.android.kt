@@ -129,6 +129,21 @@ actual class FlashcardWidgetProvider actual constructor()
             widgetIds)
     }
 
+    actual fun redrawAllFlashCardWidgets() {
+        val context = contextProvider.invoke()
+        val widgetIds = Companion.getWidgetIds()
+        scope.launch(AppDispatchers.IO) {
+            if (!isInitialized) init { context }
+
+            for (appWidgetId in widgetIds) {
+                // Switch to the IO dispatcher to perform background work
+                withContext(Dispatchers.IO) {
+                    getWidgetController(appWidgetId).redraw()
+                }
+            }
+        }
+    }
+
     override fun onUpdate(
         context: Context,
         appWidgetManager: AppWidgetManager,

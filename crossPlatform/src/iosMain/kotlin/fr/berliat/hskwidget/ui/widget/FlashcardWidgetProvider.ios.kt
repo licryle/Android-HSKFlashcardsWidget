@@ -8,6 +8,10 @@ actual class FlashcardWidgetProvider actual constructor() {
         WidgetProvider.triggerReload()
     }
 
+    actual fun redrawAllFlashCardWidgets() {
+        WidgetProvider.triggerReload()
+    }
+
     actual suspend fun getWidgetIds(): List<Int> {
         return WidgetProvider.delegate?.awaitWidgetIds() ?: emptyList()
     }
