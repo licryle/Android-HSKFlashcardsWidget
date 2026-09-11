@@ -117,4 +117,3 @@ serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref 
 buildKonfig = { id = "com.codingfeline.buildkonfig", version.ref = "buildKonfig" }
 androidKMP = { id = "com.android.kotlin.multiplatform.library", version.ref = "androidGradlePlugin" }
 skie = { id = "co.touchlab.skie", version.ref = "skie" }
-androidKotlinMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "androidGradlePlugin" }
