@@ -13,12 +13,12 @@ import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LanguageSelectionView(
-    languages: Map<String?, String>,
+fun LocaleSelectionView(
+    localeManager: LocaleManager,
     modifier: Modifier = Modifier,
     onLanguageChange: (String?) -> Unit = {}
 ) {
-    var currentLanguage by remember { mutableStateOf(LocaleManager.getCurrentLanguage()) }
+    var currentLanguage by remember { mutableStateOf(localeManager.getCurrentLocale()) }
     var expanded by remember { mutableStateOf(false) }
 
     Row(
@@ -39,7 +39,7 @@ fun LanguageSelectionView(
             ) {
                 OutlinedTextField(
                     readOnly = true,
-                    value = languages[currentLanguage] ?: languages[null] ?: "",
+                    value = localeManager.supportedLocales[localeManager.getCurrentLocale()] ?: "Error",
                     textStyle = MaterialTheme.typography.bodyMedium,
                     onValueChange = {},
                     modifier = Modifier
@@ -56,11 +56,11 @@ fun LanguageSelectionView(
                 ExposedDropdownMenu(
                     expanded = expanded,
                     onDismissRequest = { expanded = false }) {
-                    languages.forEach { (code, name) ->
+                    localeManager.supportedLocales.forEach { (code, name) ->
                         DropdownMenuItem(
                             text = { Text(name, style = MaterialTheme.typography.bodyMedium) },
                             onClick = {
-                                LocaleManager.setLanguage(code)
+                                LocaleManager.setLocale(code)
                                 currentLanguage = code
                                 expanded = false
                                 onLanguageChange(code)

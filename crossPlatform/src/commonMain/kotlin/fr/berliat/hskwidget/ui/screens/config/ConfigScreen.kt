@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 import fr.berliat.hskwidget.core.HSKAppServices
+import fr.berliat.hskwidget.core.LocaleManager
 import fr.berliat.hskwidget.ui.components.AppDivider
 import fr.berliat.hskwidget.ui.screens.config.ankiSync.AnkiSyncView
 import fr.berliat.hskwidget.ui.screens.config.backupCloud.BackupCloudView
@@ -25,13 +26,6 @@ fun ConfigScreen(
     val scrollState = rememberScrollState()
     var refreshKey by remember { mutableStateOf(0) }
 
-    val languages = mapOf<String?, String>(
-        null to "System",
-        "en" to "English",
-        //"fr" to "Français",
-        "zh-Hans" to "简体中文"
-    )
-
     Column(
         modifier = modifier
             .padding(16.dp)
@@ -39,8 +33,8 @@ fun ConfigScreen(
             .verticalScroll(scrollState)
     ) {
         key(refreshKey) {
-            LanguageSelectionView(
-                languages = languages,
+            LocaleSelectionView(
+                localeManager = LocaleManager,
                 onLanguageChange = { _ -> refreshKey++ }
             )
 

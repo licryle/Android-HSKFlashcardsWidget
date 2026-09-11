@@ -58,6 +58,10 @@
     <string name="dictionary_noresult_icon">无结果！</string>
     <string name="dictionary_search_loading">正在加载结果</string>
     <string name="dictionary_search_filter_hasannotation_hint"> 仅限</string>
+    <string name="dictionary_filter_language_label">APP的言语</string>
+    <string name="locale_en">英语</string>
+    <string name="locale_fr">法语</string>
+    <string name="locale_cn_hsk3">HSK 3.0</string>
 
     <string name="dictionary_item_toggle">展开/折叠更多信息</string>
     <string name="dictionary_item_antonym">反义词</string>

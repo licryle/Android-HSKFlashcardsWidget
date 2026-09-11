@@ -2,8 +2,8 @@ package fr.berliat.hskwidget.core
 
 import platform.Foundation.NSUserDefaults
 
-actual object LocaleManager {
-    actual fun setLanguage(languageCode: String?) {
+internal actual object PlatformLocaleManager {
+    actual fun setLocale(languageCode: String?) {
         if (languageCode == null) {
             NSUserDefaults.standardUserDefaults.removeObjectForKey("AppleLanguages")
         } else {
@@ -11,7 +11,7 @@ actual object LocaleManager {
         }
     }
 
-    actual fun getCurrentLanguage(): String? {
+    actual fun getCurrentLocale(): String? {
         val languages = NSUserDefaults.standardUserDefaults.objectForKey("AppleLanguages") as? List<*>
         return languages?.firstOrNull() as? String
     }
