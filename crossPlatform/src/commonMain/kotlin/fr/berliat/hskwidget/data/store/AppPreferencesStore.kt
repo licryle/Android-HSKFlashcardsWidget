@@ -4,6 +4,7 @@ import androidx.compose.ui.unit.sp
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
 
+import fr.berliat.hskwidget.core.Locale
 import fr.berliat.hskwidget.data.type.ClassLevel
 import fr.berliat.hskwidget.data.type.ClassType
 import fr.berliat.hskwidget.domain.SearchQuery
@@ -105,6 +106,9 @@ class AppPreferencesStore private constructor(
     )
     val dictionaryTextSize = registerFloatPref("dictionary_text_size", 16f.sp,
         PreferenceConverter({ it.sp }, { it.value })
+    )
+    val dictionaryLocale = registerStringPref("dictionary_locale", null,
+        PreferenceConverter({ code -> if (code.isEmpty()) null else Locale.fromCode(code) }, { locale -> locale?.code ?: "" })
     )
     val searchQuery = registerStringPref("search_query", SearchQuery.fromString(""),
         PreferenceConverter({ SearchQuery.fromString(it) }, { it.toString() }))

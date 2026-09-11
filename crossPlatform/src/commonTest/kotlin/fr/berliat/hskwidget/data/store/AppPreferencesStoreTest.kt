@@ -4,6 +4,7 @@ import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import fr.berliat.hskwidget.core.Locale
 import fr.berliat.hskwidget.data.type.ClassLevel
 import fr.berliat.hskwidget.data.type.ClassType
 import fr.berliat.hskwidget.domain.SearchQuery
@@ -85,5 +86,24 @@ class AppPreferencesStoreTest {
         val savedString = fakeDataStore.latestPreferences[stringPreferencesKey("search_query")]
         assertEquals(query.toString(), savedString)
         assertEquals(query.query, store.searchQuery.value.query)
+    }
+
+    @Test
+    fun testDictionaryLocaleConverter() = runTest(UnconfinedTestDispatcher()) {
+        val store = AppPreferencesStore.getInstance(fakeDataStore, scope = backgroundScope)
+        
+        // Test non-null
+        store.dictionaryLocale.value = Locale.FRENCH
+        advanceUntilIdle()
+        var savedString = fakeDataStore.latestPreferences[stringPreferencesKey("dictionary_locale")]
+        assertEquals("fr", savedString)
+        assertEquals(Locale.FRENCH, store.dictionaryLocale.value)
+
+        // Test null
+        store.dictionaryLocale.value = null
+        advanceUntilIdle()
+        savedString = fakeDataStore.latestPreferences[stringPreferencesKey("dictionary_locale")]
+        assertEquals("", savedString)
+        assertEquals(null, store.dictionaryLocale.value)
     }
 }
