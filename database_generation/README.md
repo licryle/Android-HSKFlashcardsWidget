@@ -63,3 +63,10 @@ Data is managed by modular providers in the `inputs/` directory:
 *   `lib/base_provider.py`: Abstract base class and types for data providers.
 *   `flake.nix`: Nix flake defining the reproducible development environment.
 *   `requirements.txt`: Python dependencies (for non-Nix users).
+
+
+## License
+The base dictionary is [CE-DICT](https://cc-cedict.org/editor/editor.php?handler=Download), which is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.
+
+This work is licensed under a [Creative Commons Attribution-ShareAlike 4.0 International License](https://creativecommons.org/licenses/by-sa/4.0/).
+It more or less means that you are allowed to use this data for both non-commercial and commercial purposes provided that you: mention where you got the data from (attribution) and that in case you improve / add to the data you will share these changes under the same license (share alike).
