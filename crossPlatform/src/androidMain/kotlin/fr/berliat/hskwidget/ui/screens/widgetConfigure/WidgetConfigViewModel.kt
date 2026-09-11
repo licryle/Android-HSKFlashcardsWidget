@@ -5,11 +5,13 @@ import androidx.lifecycle.viewModelScope
 
 import fr.berliat.hskwidget.core.AppDispatchers
 import fr.berliat.hskwidget.core.HSKAppServices
+import fr.berliat.hskwidget.core.Locale
 import fr.berliat.hskwidget.core.Logging
 import fr.berliat.hskwidget.data.dao.WidgetListDAO
 import fr.berliat.hskwidget.data.dao.WordListDAO
 import fr.berliat.hskwidget.data.model.WidgetListEntry
 import fr.berliat.hskwidget.data.model.WordListWithCount
+import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.data.store.WidgetPreferencesStoreProvider
 import fr.berliat.hskwidget.domain.getWidgetControllerInstance
@@ -27,6 +29,7 @@ class WidgetConfigViewModel(
     private val database: ChineseWordsDatabase = HSKAppServices.database,
     private val widgetListDAO: WidgetListDAO = HSKAppServices.database.widgetListDAO(),
     private val wordListDAO: WordListDAO = HSKAppServices.database.wordListDAO(),
+    private val prefsStore: AppPreferencesStore = HSKAppServices.appPreferences,
     private val onSuccessfulSave: (() -> Unit)? = null
 ) : ViewModel() {
     private val _allLists = MutableStateFlow<List<WordListWithCount>>(emptyList())
@@ -37,6 +40,8 @@ class WidgetConfigViewModel(
 
     private val _refreshInterval = MutableStateFlow(-1L)
     val refreshInterval: StateFlow<Long> = _refreshInterval.asStateFlow()
+
+    val dictionaryLocale: StateFlow<Locale?> = prefsStore.dictionaryLocale.asStateFlow()
 
     init {
         loadSettings()

@@ -1,5 +1,6 @@
 package fr.berliat.hskwidget.ui.screens.dictionary
 
+import fr.berliat.hskwidget.core.Locale
 import fr.berliat.hskwidget.core.AppDispatchers
 import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.core.HSKAppServices
@@ -20,12 +21,14 @@ import kotlinx.coroutines.launch
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.ui.theme.AppTypographies
+import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.withContext
 
 
 class DictionarySearchViewModel(private val prefsStore: AppPreferencesStore = HSKAppServices.appPreferences,
-                          private val annotatedChineseWordDAO: AnnotatedChineseWordDAO = HSKAppServices.database.annotatedChineseWordDAO()
+                          private val annotatedChineseWordDAO: AnnotatedChineseWordDAO = HSKAppServices.database.annotatedChineseWordDAO(),
+                          private val widgetProvider: FlashcardWidgetProvider = FlashcardWidgetProvider()
 ) {
     val searchQuery = prefsStore.searchQuery.asStateFlow()
 
@@ -47,6 +50,12 @@ class DictionarySearchViewModel(private val prefsStore: AppPreferencesStore = HS
     val showHSK3: StateFlow<Boolean> = prefsStore.dictionaryShowHSK3Definition.asStateFlow()
 
     val hasAnnotationFilter: StateFlow<Boolean> = prefsStore.searchFilterHasAnnotation.asStateFlow()
+
+    val dictionaryLocale: StateFlow<Locale> = prefsStore.dictionaryLocale.asStateFlow()
+        .map { Locale.resolve(it) }
+        .stateIn(CoroutineScope(AppDispatchers.Main), SharingStarted.Eagerly, Locale.resolve(prefsStore.dictionaryLocale.value))
+
+    val dictionaryLocalePreference: StateFlow<Locale?> = prefsStore.dictionaryLocale.asStateFlow()
 
     val textSize: StateFlow<Float> = prefsStore.dictionaryTextSize.asStateFlow()
         .map { it.value }
@@ -75,6 +84,12 @@ class DictionarySearchViewModel(private val prefsStore: AppPreferencesStore = HS
         prefsStore.dictionaryTextSize.value = newSize.sp
 
         Logging.logAnalyticsEvent(Logging.ANALYTICS_EVENTS.DICT_TEXT_SIZE_CHANGE)
+    }
+
+    fun updateDictionaryLocale(locale: Locale?) {
+        prefsStore.dictionaryLocale.value = locale
+        performSearch()
+        widgetProvider.redrawAllFlashCardWidgets()
     }
 
     fun performSearch() {

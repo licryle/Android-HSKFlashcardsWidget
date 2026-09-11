@@ -7,6 +7,7 @@ import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
 
 import fr.berliat.hskwidget.core.HSKAppServices
+import fr.berliat.hskwidget.core.Locale
 import fr.berliat.hskwidget.ui.components.LoadingView
 import fr.berliat.hskwidget.ui.components.WidgetEmptyWordView
 import fr.berliat.hskwidget.ui.components.WidgetWordView
@@ -14,6 +15,7 @@ import fr.berliat.hskwidget.ui.components.WidgetWordView
 @Composable
 fun WidgetView(
     widgetId: Int,
+    dictionaryLocale: Locale? = Locale.ENGLISH,
     modifier: Modifier = Modifier
 ) {
     // Initialize store + suspend singleton ViewModel
@@ -34,6 +36,7 @@ fun WidgetView(
         } else {
             WidgetWordView(
                 word = word,
+                dictionaryLocale = dictionaryLocale,
                 onClickUpdate = viewModel::updateWord,
                 onClickSpeak = viewModel::speakWord,
                 onClickWord = viewModel::openDictionary,

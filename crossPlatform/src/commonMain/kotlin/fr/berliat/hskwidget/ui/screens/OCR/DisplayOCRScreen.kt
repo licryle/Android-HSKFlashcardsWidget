@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.SavedStateHandle
 
+import fr.berliat.hskwidget.core.Locale
 import fr.berliat.hsktextviews.HSKTextSegmenter
 import fr.berliat.hsktextviews.views.HSKTextView
 import fr.berliat.hsktextviews.views.ShowPinyins
@@ -165,9 +166,9 @@ fun DisplayOCRScreen(
         uiState.selectedWord?.let { word ->
             DetailedWordView(
                 word = word,
-                showHSK3Definition = appConfig.dictionaryShowHSK3Definition.value,
                 pinyinEditable = false,
                 textSize = uiState.textSize,
+                dictionaryLocale = Locale.resolve(appConfig.dictionaryLocale.value),
                 onFavoriteClick = onFavoriteClick,
                 onSpeakClick = viewModel::speakWord,
                 onCopyClick = viewModel::copyToClipboard,

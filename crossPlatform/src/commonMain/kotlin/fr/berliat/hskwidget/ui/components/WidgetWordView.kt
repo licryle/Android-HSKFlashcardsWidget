@@ -31,6 +31,7 @@ import fr.berliat.hskwidget.widget_btn_speak
 fun WidgetWordView(
     word: AnnotatedChineseWord,
     modifier: Modifier = Modifier,
+    dictionaryLocale: Locale? = Locale.ENGLISH,
     onClickUpdate: () -> Unit = {},
     onClickSpeak: () -> Unit = {},
     onClickWord: () -> Unit = {}
@@ -99,7 +100,7 @@ fun WidgetWordView(
             )
 
             Text(
-                text = word.word?.definition[Locale.ENGLISH] ?: word.annotation?.notes ?: "",
+                text = word.word?.definition[dictionaryLocale ?: Locale.ENGLISH] ?: word.annotation?.notes ?: "",
                 fontSize = 15.sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(0.dp)

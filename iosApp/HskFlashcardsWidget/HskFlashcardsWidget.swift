@@ -37,7 +37,8 @@ struct Provider: AppIntentTimelineProvider {
                     let pinyinList = word.pinyins as! [crossPlatform.Pinyin]
                     let pinyinStr = pinyinList.map { $0.syllable }.joined(separator: " ")
                     let definitionMap = word.word?.definition ?? [:]
-                    let definition = (definitionMap[crossPlatform.Locale.english] as? String) ?? (word.annotation?.notes as? String) ?? ""
+                    let dictionaryLocale = crossPlatform.Locale.companion.resolve(preferred: services.appPreferences.dictionaryLocale.value)
+                    let definition = (definitionMap[dictionaryLocale] as? String) ?? (word.annotation?.notes as? String) ?? ""
                     let levelStr = word.hskLevel.name
                     
                     return HskEntry(

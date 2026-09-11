@@ -41,6 +41,8 @@ License: GNU GPLv3. In a nutshell, you can do whatever you want with it, but mus
 
 This project uses the awesome projects of:
 - Full CN-EN from CC-CEDICT list from https://www.mdbg.net/chinese/
+- CN-FR from CFDICT list from https://chine.in/mandarin/dictionnaire/CFDICT/ (partial dict of 56k entries)
+- The rest of the CN-FR dictionary is generated using Qwen2.5 7b - Q4_K_M LLM from Alibaba to have the same coverage of entries as CC-CEDICT
 - HSK list from https://github.com/krmanik/HSK-3.0
 - Words popularity in Chinese comes from the Beijing Language and Culture University at http://bcc.blcu.edu.cn/
 - Words metadata in Chinese (BETA!) was generated using Yi 1.5 6B - Q6_K LLM from 01.AI.
@@ -52,19 +54,22 @@ This project uses the awesome projects of:
     <string name="about_stats_text">%1$s words in dictionary.\n%2$s annotations.</string>
     <string name="about_email_noapp">No email client found. Address copied to clipboard.</string>
 
-    <string name="dictionary_search_filter_hsk3definition_hint">Show HSK3 Definition</string>
     <string name="dictionary_noresult_text">%1$s not in dictionary, add annotation?</string>
     <string name="dictionary_noresultwithfilter_text">All words are filtered out.\nRemove filters like the lists, or the "♥ only".</string>
     <string name="dictionary_noresult_icon">No result!</string>
     <string name="dictionary_search_loading">Loading results</string>
     <string name="dictionary_search_filter_hasannotation_hint"> only</string>
+    <string name="dictionary_filter_language_label">App language</string>
+    <string name="locale_en">English</string>
+    <string name="locale_fr">Français</string>
+    <string name="locale_cn_hsk3">HSK 3.0</string>
 
     <string name="dictionary_item_toggle">Expand/Fold more info</string>
     <string name="dictionary_item_antonym">Antonym</string>
     <string name="dictionary_item_synonyms">Synonym(s)</string>
     <string name="dictionary_item_examples">Example(s)</string>
     <string name="dictionary_item_collocations">Collocations</string>
-    <string name="dictionary_item_altdefinition">Definition</string>
+    <string name="dictionary_item_altdefinition">Alternative definition</string>
     <string name="dictionary_item_lists">Manage lists for this word</string>
     <string name="dictionary_item_annotate">Annotate a word</string>
     <string name="dictionary_item_reload">New word</string>

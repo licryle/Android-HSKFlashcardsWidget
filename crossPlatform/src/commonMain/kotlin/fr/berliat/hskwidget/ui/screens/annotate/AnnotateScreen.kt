@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+import fr.berliat.hskwidget.core.Locale
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.type.ClassLevel
 import fr.berliat.hskwidget.data.type.ClassType
@@ -149,11 +150,11 @@ fun AnnotateScreen(
             word = annotatedWord!!,
             onSpeakClick = { viewModel.speakWord(annotatedWord!!.simplified) },
             onCopyClick = { viewModel.copyWord(annotatedWord!!.simplified) },
-            showHSK3Definition = false,
             onFavoriteClick = null,
             onListsClick = null,
             onPinyinChange = { pinyins = it },
             pinyinEditable = true,
+            dictionaryLocale = Locale.resolve(HSKAppServices.appPreferences.dictionaryLocale.value),
             modifier = Modifier,
             shapeModifier = PrettyCardShapeModifier.Single
         )

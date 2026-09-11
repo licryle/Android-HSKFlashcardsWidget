@@ -41,6 +41,8 @@ Licence : GNU GPLv3. En résumé, vous pouvez en faire ce que vous voulez, mais 
 
 Ce projet utilise les formidables projets de :
 - Traductions CN-EN du dictionnaire CC-CEDICT de https://www.mdbg.net/chinese/
+- Traductions CN-FR à partir de la liste CFDICT de https://chine.in/mandarin/dictionnaire/CFDICT/ (dictionnaire partiel de 56k entrées)
+- Le reste du dictionnaire CN-FR est généré à l’aide du LLM Qwen2.5 7b - Q4_K_M d’Alibaba afin d’avoir la même couverture d’entrées que le CC-CEDICT
 - Liste HSK de https://github.com/krmanik/HSK-3.0
 - La popularité des mots en chinois provient de l'Université de la langue et de la culture de Pékin à http://bcc.blcu.edu.cn/
 - Les métadonnées des mots en chinois (BETA !) ont été générées à l'aide du LLM Yi 1.5 6B - Q6_K de 01.AI.
@@ -52,19 +54,22 @@ Ce projet utilise les formidables projets de :
     <string name="about_stats_text">%1$s mots dans le dictionnaire.\n%2$s annotations.</string>
     <string name="about_email_noapp">Aucun client e-mail trouvé. Adresse copiée dans le presse-papier.</string>
 
-    <string name="dictionary_search_filter_hsk3definition_hint">Afficher la définition HSK3</string>
     <string name="dictionary_noresult_text">%1$s n'est pas dans le dictionnaire, ajouter une annotation ?</string>
     <string name="dictionary_noresultwithfilter_text">Tous les mots sont filtrés.\nSupprimez les filtres comme les listes ou le "♥ uniquement".</string>
     <string name="dictionary_noresult_icon">Aucun résultat !</string>
     <string name="dictionary_search_loading">Chargement des résultats</string>
     <string name="dictionary_search_filter_hasannotation_hint"> uniquement</string>
+    <string name="dictionary_filter_language_label">Langue de l'app</string>
+    <string name="locale_en">English</string>
+    <string name="locale_fr">Français</string>
+    <string name="locale_cn_hsk3">HSK 3.0</string>
 
     <string name="dictionary_item_toggle">Montrer/Cacher plus d'infos</string>
     <string name="dictionary_item_antonym">Antonyme</string>
     <string name="dictionary_item_synonyms">Synonyme(s)</string>
     <string name="dictionary_item_examples">Exemple(s)</string>
     <string name="dictionary_item_collocations">Collocations</string>
-    <string name="dictionary_item_altdefinition">Définition</string>
+    <string name="dictionary_item_altdefinition">Définition alternative</string>
     <string name="dictionary_item_lists">Gérer les listes pour ce mot</string>
     <string name="dictionary_item_annotate">Annoter un mot</string>
     <string name="dictionary_item_reload">Nouveau mot</string>

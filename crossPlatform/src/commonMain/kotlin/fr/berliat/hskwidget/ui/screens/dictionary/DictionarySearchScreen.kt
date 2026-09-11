@@ -32,11 +32,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+import fr.berliat.hskwidget.core.Locale
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.ui.components.DetailedWordView
 import fr.berliat.hskwidget.ui.components.TextSizeChip
 import fr.berliat.hskwidget.ui.components.LoadingView
+import fr.berliat.hskwidget.ui.components.LanguageFilterChip
 import fr.berliat.hskwidget.ui.screens.wordlist.WordListSelectionDialog
 
 import fr.berliat.hskwidget.Res
@@ -49,12 +51,12 @@ import fr.berliat.hskwidget.dictionary_noresult_icon
 import fr.berliat.hskwidget.dictionary_noresult_text
 import fr.berliat.hskwidget.dictionary_noresultwithfilter_text
 import fr.berliat.hskwidget.dictionary_search_filter_hasannotation_hint
-import fr.berliat.hskwidget.dictionary_search_filter_hsk3definition_hint
 import fr.berliat.hskwidget.filter_alt_off_24px
 import fr.berliat.hskwidget.ui.components.PrettyCardShapeModifier
 import fr.berliat.hskwidget.ui.dismissKeyboardOnClick
 import fr.berliat.hskwidget.ui.dismissKeyboardOnTap
 import fr.berliat.hskwidget.ui.horizontalScrollbar
+import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
 
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -65,7 +67,8 @@ fun DictionarySearchScreen(
     modifier: Modifier = Modifier,
     viewModel: DictionarySearchViewModel = remember { DictionarySearchViewModel(
         prefsStore = HSKAppServices.appPreferences,
-        annotatedChineseWordDAO = HSKAppServices.database.annotatedChineseWordDAO()
+        annotatedChineseWordDAO = HSKAppServices.database.annotatedChineseWordDAO(),
+        widgetProvider = FlashcardWidgetProvider()
     ) }
 ) {
     val searchQuery by viewModel.searchQuery.collectAsState()
@@ -74,9 +77,10 @@ fun DictionarySearchScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val isLoadingMore by viewModel.isLoadingMore.collectAsState()
     val wordExists by viewModel.wordExists.collectAsState()
-    val showHSK3 by viewModel.showHSK3.collectAsState()
     val hasAnnotationFilter by viewModel.hasAnnotationFilter.collectAsState()
     val textSize by viewModel.textSize.collectAsState()
+    val dictionaryLocale by viewModel.dictionaryLocale.collectAsState()
+    val dictionaryLocalePreference by viewModel.dictionaryLocalePreference.collectAsState()
 
     var showWordListDialog by remember { mutableStateOf<ChineseWord?>(null) }
 
@@ -116,12 +120,12 @@ fun DictionarySearchScreen(
     Column(modifier = modifier.fillMaxSize().dismissKeyboardOnTap()) {
         // Filters row
         DictionarySearchFilters(
-            showHSK3,
-            { viewModel.toggleHSK3(it) },
             hasAnnotationFilter,
             { viewModel.toggleHasAnnotation(it) },
             { viewModel.updateTextSize(-2f) },
-            { viewModel.updateTextSize(2f) }
+            { viewModel.updateTextSize(2f) },
+            dictionaryLocale = dictionaryLocalePreference,
+            onLocaleSelected = { viewModel.updateDictionaryLocale(it) }
         )
 
         // Main content
@@ -143,9 +147,9 @@ fun DictionarySearchScreen(
                     itemsIndexed(results) { index, word ->
                         DetailedWordView(
                             word = word,
-                            showHSK3Definition = showHSK3,
                             pinyinEditable = false,
                             textSize = textSize,
+                            dictionaryLocale = dictionaryLocale,
                             onFavoriteClick = { onAnnotate(word.simplified) },
                             onSpeakClick = { viewModel.speakWord(word.simplified) },
                             onCopyClick = { viewModel.copyWord(word.simplified) },
@@ -187,12 +191,12 @@ fun DictionarySearchScreen(
 
 @Composable
 private fun DictionarySearchFilters(
-    showHSK3: Boolean,
-    onShowHSKToggle: (Boolean) -> Unit,
     hasAnnotation: Boolean,
     onHasAnnotationToggle: (Boolean) -> Unit,
     onDecreaseTextSize: () -> Unit,
     onIncreaseTextSize: () -> Unit,
+    dictionaryLocale: Locale?,
+    onLocaleSelected: (Locale?) -> Unit,
     modifier: Modifier = Modifier) {
     val scrollState = rememberScrollState()
 
@@ -204,17 +208,11 @@ private fun DictionarySearchFilters(
             .padding(start = 15.dp, end = 15.dp, top = 0.dp, bottom = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        FilterChip(
-            selected = showHSK3,
-            onClick = { onShowHSKToggle(!showHSK3) },
-            shape = RoundedCornerShape(50),
-            modifier = Modifier.padding(end = 8.dp).dismissKeyboardOnClick(),
-            label = {
-                Text(
-                    text = stringResource(Res.string.dictionary_search_filter_hsk3definition_hint),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
+        LanguageFilterChip(
+            selectedLocale = dictionaryLocale,
+            supportedLocales = Locale.entries.filter { it.flag != null },
+            includeNullLocale = true,
+            onLocaleSelected = onLocaleSelected
         )
 
         FilterChip(

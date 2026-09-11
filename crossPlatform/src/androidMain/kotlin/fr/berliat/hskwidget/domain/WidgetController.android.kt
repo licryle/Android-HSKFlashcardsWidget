@@ -14,6 +14,7 @@ import android.widget.RemoteViews
 
 import fr.berliat.hskwidget.R
 import fr.berliat.hskwidget.core.ExpectedUtils
+import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.core.Locale
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
@@ -161,9 +162,10 @@ actual class WidgetController(
                         )
 
                         setTextViewText(R.id.flashcard_chinese, word.simplified)
+                        val dictionaryLocale = Locale.resolve(HSKAppServices.appPreferences.dictionaryLocale.value)
                         setTextViewText(
                             R.id.flashcard_definition,
-                            word.word?.definition[Locale.ENGLISH] ?: word.annotation?.notes
+                            word.word?.definition[dictionaryLocale] ?: word.annotation?.notes ?: ""
                         )
 
                         setTextViewText(R.id.flashcard_pinyin, word.pinyins.toString())

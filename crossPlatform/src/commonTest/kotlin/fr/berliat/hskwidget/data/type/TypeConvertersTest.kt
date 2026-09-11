@@ -17,7 +17,7 @@ class TypeConvertersTest {
     fun testDefinitionsConverter() {
         val definitions = mapOf(
             Locale.ENGLISH to "hello",
-            Locale.CHINESE to "你好"
+            Locale.CN_HSK3 to "你好"
         )
         val stringValue = DefinitionsConverter.fromStringMap(definitions)
         assertNotNull(stringValue)

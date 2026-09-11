@@ -74,7 +74,7 @@ fun WidgetConfigWithPreviewScreen(
             .padding(top = 15.dp)
     ) {
         Box(widgetDefaultBox.align(Alignment.CenterHorizontally)) {
-            WidgetView(widgetId = widgetId)
+            WidgetView(widgetId = widgetId, dictionaryLocale = viewModel.dictionaryLocale.value)
         }
 
         Spacer(modifier = modifier.height(10.dp))

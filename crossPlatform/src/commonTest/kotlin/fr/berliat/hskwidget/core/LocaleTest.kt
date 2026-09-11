@@ -9,11 +9,8 @@ class LocaleTest {
     @Test
     fun testFromCode() {
         assertEquals(Locale.ENGLISH, Locale.fromCode("en"))
-        assertEquals(Locale.CHINESE, Locale.fromCode("zh"))
         assertEquals(Locale.FRENCH, Locale.fromCode("fr"))
-        assertEquals(Locale.SPANISH, Locale.fromCode("es"))
         assertEquals(Locale.CN_HSK3, Locale.fromCode("zh_CN_HSK03"))
-        assertEquals(Locale.SIMPLIFIED_CHINESE, Locale.fromCode("zh_CN"))
         assertEquals(null, Locale.fromCode("unknown"))
     }
 
@@ -40,5 +37,17 @@ class LocaleTest {
     fun testDeserializationDefault() {
         val json = Json
         assertEquals(Locale.ENGLISH, json.decodeFromString(LocaleSerializer, "\"unknown\""))
+    }
+
+    @Test
+    fun testResolve() {
+        // Test explicit preference
+        assertEquals(Locale.FRENCH, Locale.resolve(Locale.FRENCH))
+        assertEquals(Locale.ENGLISH, Locale.resolve(Locale.ENGLISH))
+
+        // Test fallback to system/default (smoke test as system depends on platform)
+        val resolved = Locale.resolve(null)
+        // At least it should return a non-null Locale
+        kotlin.test.assertNotNull(resolved)
     }
 }

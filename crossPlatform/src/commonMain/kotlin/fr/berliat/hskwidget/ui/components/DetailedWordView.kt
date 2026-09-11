@@ -62,11 +62,11 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun DetailedWordView (
     word: AnnotatedChineseWord,
-    showHSK3Definition: Boolean,
     pinyinEditable: Boolean,
     shapeModifier: PrettyCardShapeModifier,
     modifier: Modifier = Modifier,
     textSize: Float = 16f,
+    dictionaryLocale: Locale = Locale.ENGLISH,
     onFavoriteClick: ((AnnotatedChineseWord) -> Unit)? = null,
     onSpeakClick: ((AnnotatedChineseWord) -> Unit)? = null,
     onCopyClick: ((AnnotatedChineseWord) -> Unit)? = null,
@@ -74,19 +74,16 @@ fun DetailedWordView (
     onPinyinChange: (String) -> Unit = {}
 ) {
     // Compute definition / annotation / alt definition
-    var definition = word.word?.definition?.get(Locale.ENGLISH) ?: ""
+    var definition = word.word?.definition?.get(dictionaryLocale) ?: ""
     var annotation = word.annotation?.notes ?: ""
     if (definition.isEmpty()) {
-        definition = word.annotation?.notes ?: ""
+        definition = annotation
         annotation = ""
     }
-    var altDef = word.word?.definition?.get(Locale.CN_HSK3) ?: ""
-
-    if (showHSK3Definition && altDef.isNotEmpty()) {
-        val tmp = altDef
-        altDef = definition
-        definition = tmp
-    }
+    var altDef = if (dictionaryLocale != Locale.CN_HSK3)
+        word.word?.definition?.get(Locale.CN_HSK3) ?: ""
+    else
+        word.word?.definition?.get(Locale.getDefault()) ?: ""
 
     // Pinyins
     var pinyins = word.word?.pinyins.toString().ifEmpty { word.annotation?.pinyins?.toString() ?: "" }
