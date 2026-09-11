@@ -70,3 +70,12 @@ The base dictionary is [CE-DICT](https://cc-cedict.org/editor/editor.php?handler
 
 This work is licensed under a [Creative Commons Attribution-ShareAlike 4.0 International License](https://creativecommons.org/licenses/by-sa/4.0/).
 It more or less means that you are allowed to use this data for both non-commercial and commercial purposes provided that you: mention where you got the data from (attribution) and that in case you improve / add to the data you will share these changes under the same license (share alike).
+
+All sources:
+- Full CN-EN from CC-CEDICT list from https://www.mdbg.net/chinese/
+- CN-FR from CFDICT list from https://chine.in/mandarin/dictionnaire/CFDICT/ (partial dict of 56k entries)
+- The rest of the CN-FR dictionary is generated using Qwen2.5 7b - Q4_K_M LLM from Alibaba to have the same coverage of entries as CC-CEDICT
+- HSK list from https://github.com/krmanik/HSK-3.0
+- Words popularity in Chinese comes from the Beijing Language and Culture University at http://bcc.blcu.edu.cn/
+- Words metadata in Chinese (BETA!) was generated using Yi 1.5 6B - Q6_K LLM from 01.AI.
+- Words collocations in Chinese (BETA!) was generated using Qwen2.5 7b - Q4_K_M LLM from Alibaba.

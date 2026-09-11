@@ -25,10 +25,12 @@
 ## Licenses
 
 License: GNU GPLv3.
-In a nutshell, you can do whatever you want with it, but must display credit for the work and use the same license downstream.
+In a nutshell, you can do whatever you want with it, but must display credit for the work and use the same license downstream, meaning your work must also be open sourced.
 
 This project uses the awesome projects of:
 - Full CN-EN from CC-CEDICT list from https://www.mdbg.net/chinese/
+- CN-FR from CFDICT list from https://chine.in/mandarin/dictionnaire/CFDICT/ (partial dict of 56k entries)
+- The rest of the CN-FR dictionary is generated using Qwen2.5 7b - Q4_K_M LLM from Alibaba to have the same coverage of entries as CC-CEDICT
 - HSK list from https://github.com/krmanik/HSK-3.0
 - Words popularity in Chinese comes from the Beijing Language and Culture University at http://bcc.blcu.edu.cn/
 - Words metadata in Chinese (BETA!) was generated using Yi 1.5 6B - Q6_K LLM from 01.AI.
