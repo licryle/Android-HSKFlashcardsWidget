@@ -13,12 +13,14 @@ import fr.berliat.hskwidget.ui.components.AppDivider
 import fr.berliat.hskwidget.ui.screens.config.ankiSync.AnkiSyncView
 import fr.berliat.hskwidget.ui.screens.config.backupCloud.BackupCloudView
 import fr.berliat.hskwidget.ui.screens.config.backupDisk.BackupDiskView
+import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
 
 @Composable
 fun ConfigScreen(
     modifier: Modifier = Modifier,
     viewModel: ConfigViewModel = remember { ConfigViewModel(
         appConfig = HSKAppServices.appPreferences,
+        widgetProvider = FlashcardWidgetProvider(),
         ankiDelegate = HSKAppServices.ankiDelegate,
         gDriveBackup = HSKAppServices.gDriveBackup
     ) }
@@ -35,7 +37,11 @@ fun ConfigScreen(
         key(refreshKey) {
             LocaleSelectionView(
                 localeManager = LocaleManager,
-                onLanguageChange = { _ -> refreshKey++ }
+                onLocaleChange = { _ -> run {
+                        refreshKey++
+                        viewModel.onLanguageChange()
+                    }
+                }
             )
 
             AppDivider()

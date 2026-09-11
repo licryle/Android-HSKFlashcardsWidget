@@ -16,7 +16,7 @@ import org.jetbrains.compose.resources.stringResource
 fun LocaleSelectionView(
     localeManager: LocaleManager,
     modifier: Modifier = Modifier,
-    onLanguageChange: (String?) -> Unit = {}
+    onLocaleChange: (String?) -> Unit = {}
 ) {
     var currentLanguage by remember { mutableStateOf(localeManager.getCurrentLocale()) }
     var expanded by remember { mutableStateOf(false) }
@@ -63,7 +63,7 @@ fun LocaleSelectionView(
                                 LocaleManager.setLocale(code)
                                 currentLanguage = code
                                 expanded = false
-                                onLanguageChange(code)
+                                onLocaleChange(code)
                             }
                         )
                     }
