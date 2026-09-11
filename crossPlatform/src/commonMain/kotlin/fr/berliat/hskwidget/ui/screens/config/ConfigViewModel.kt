@@ -19,7 +19,9 @@ class ConfigViewModel(
     gDriveBackup: GoogleDriveBackup
 ): ViewModel() {
     fun onLanguageChange() {
-        // Todo: for future use
+        if (appConfig.dictionaryLocale.value == null) {
+            widgetProvider.redrawAllFlashCardWidgets()
+        }
     }
 
     val backupDiskViewModel = BackupDiskViewModel()
