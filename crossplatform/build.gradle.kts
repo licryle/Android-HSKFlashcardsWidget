@@ -7,12 +7,12 @@ val isMac = OperatingSystem.current().isMacOsX
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.serialization)
-    alias(libs.plugins.androidLibrary)
     alias(libs.plugins.composePlugin)
     alias(libs.plugins.kotlinCompose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
     alias(libs.plugins.buildKonfig)
+    alias(libs.plugins.androidKotlinMultiplatformLibrary)
 }
 
 group = "fr.berliat.hskwidget"
@@ -39,11 +39,27 @@ buildkonfig {
 }
 
 kotlin {
-    androidTarget {
-        compilations.all {
-            compileTaskProvider.configure {
-                compilerOptions.jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+    android {
+        namespace = "fr.berliat.hskwidget"
+        compileSdk = 37
+        minSdk = 26
+
+        androidResources {
+            enable = true
+        }
+
+        packaging {
+            resources {
+                excludes += "/META-INF/{AL2.0,LGPL2.1}"
+                excludes += "META-INF/INDEX.LIST"
+                excludes += "META-INF/DEPENDENCIES"
             }
+        }
+
+        compilerOptions {
+            jvmTarget.set(
+                org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21
+            )
         }
     }
 
@@ -160,36 +176,6 @@ kotlin {
             target.compilations["main"].defaultSourceSet.dependsOn(iosMain)
             target.compilations["test"].defaultSourceSet.dependsOn(iosTest)
         }
-    }
-}
-
-android {
-    namespace = "fr.berliat.hskwidget"
-    compileSdk = 37
-
-    defaultConfig {
-        minSdk = 26
-    }
-
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-            excludes += "META-INF/INDEX.LIST"
-            excludes += "META-INF/DEPENDENCIES"
-        }
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
-    }
-
-    kotlin {
-        jvmToolchain(21)
-    }
-
-    buildFeatures {
-        compose = true
     }
 }
 
