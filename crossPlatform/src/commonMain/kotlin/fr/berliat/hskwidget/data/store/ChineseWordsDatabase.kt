@@ -21,12 +21,14 @@ import fr.berliat.hskwidget.data.dao.ChineseWordDAO
 import fr.berliat.hskwidget.data.dao.ChineseWordFrequencyDAO
 import fr.berliat.hskwidget.data.dao.WidgetListDAO
 import fr.berliat.hskwidget.data.dao.WordListDAO
+import fr.berliat.hskwidget.data.dao.WordDefinitionDAO
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWordAnnotation
 import fr.berliat.hskwidget.data.model.ChineseWordFrequency
 import fr.berliat.hskwidget.data.model.WidgetListEntry
 import fr.berliat.hskwidget.data.model.WordList
 import fr.berliat.hskwidget.data.model.WordListEntry
+import fr.berliat.hskwidget.data.model.WordDefinition
 import fr.berliat.hskwidget.data.type.AnnotatedChineseWordsConverter
 import fr.berliat.hskwidget.data.type.DefinitionsConverter
 import fr.berliat.hskwidget.data.type.InstantConverter
@@ -36,7 +38,7 @@ import fr.berliat.hskwidget.data.type.Pinyins
 import fr.berliat.hskwidget.data.type.WordTypeConverter
 
 @Database(
-    entities = [ChineseWordAnnotation::class, ChineseWord::class, ChineseWordFrequency::class,
+    entities = [ChineseWordAnnotation::class, ChineseWord::class, WordDefinition::class, ChineseWordFrequency::class,
         WordList::class, WordListEntry::class, WidgetListEntry::class],
     version = ChineseWordsDatabase.DATABASE_VERSION, exportSchema = true)
 @TypeConverters(
@@ -51,11 +53,12 @@ import fr.berliat.hskwidget.data.type.WordTypeConverter
 @ConstructedBy(ChineseWordsDatabaseConstructor::class)
 abstract class ChineseWordsDatabase: RoomDatabase() {
     companion object {
-        const val DATABASE_VERSION = 2
+        const val DATABASE_VERSION = 3
     }
     abstract fun annotatedChineseWordDAO(): AnnotatedChineseWordDAO
     abstract fun chineseWordAnnotationDAO(): ChineseWordAnnotationDAO
     abstract fun chineseWordDAO(): ChineseWordDAO
+    abstract fun wordDefinitionDAO(): WordDefinitionDAO
     abstract fun chineseWordFrequencyDAO(): ChineseWordFrequencyDAO
     abstract fun wordListDAO(): WordListDAO
     abstract fun widgetListDAO(): WidgetListDAO

@@ -61,7 +61,6 @@ data class AnnotatedChineseWord (
 
         if (hasAnnotation()) {
             return ChineseWord(simplified, "",
-                mapOf(Pair<Locale,String>(Locale.ENGLISH, annotation?.notes ?: "")),
                 HSK_Level.NOT_HSK,
                 Pinyins(""),
                 0,

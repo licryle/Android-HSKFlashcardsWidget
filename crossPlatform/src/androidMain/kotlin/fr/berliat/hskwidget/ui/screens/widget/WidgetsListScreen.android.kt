@@ -115,12 +115,13 @@ actual fun WidgetsListScreen(
                     AnnotatedChineseWord(
                         word = ChineseWord(
                             simplified = placeholderWord,
-                            definition = mapOf((Locale.fromCode(placeholderLanguage) ?: Locale.getDefault()) to placeholderDefinition),
                             hskLevel = HSK_Level.valueOf(placeholderHSKLevel),
                             pinyins = Pinyins.fromString(placeholderPinyin),
                             traditional = placeholderWord,
                             popularity = null
-                        ),
+                        ).also { word ->
+                            word.definition = mapOf((Locale.fromCode(placeholderLanguage) ?: Locale.getDefault()) to placeholderDefinition)
+                        },
                         annotation = null,
                     ),
                     onClickWord = { HSKAppServices.snackbar.show(SnackbarType.INFO, Res.string.widget_demo_word_click) },

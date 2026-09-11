@@ -76,13 +76,56 @@ class DatabaseHelper private constructor() {
             }
         }
 
+        /**
+         * Dictionary data is supplied by the versioned asset.  Definitions are deliberately
+         * not migrated from the old bundled dictionary: only user-owned tables are retained.
+         */
+        val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(connection: SQLiteConnection) {
+                connection.execSQL("""
+                    CREATE TABLE IF NOT EXISTS `chinese_word_new` (
+                        `simplified` TEXT NOT NULL,
+                        `traditional` TEXT,
+                        `hsk_level` TEXT,
+                        `pinyins` TEXT,
+                        `popularity` INTEGER,
+                        `examples` TEXT DEFAULT '',
+                        `collocations` TEXT DEFAULT '',
+                        `modality` TEXT DEFAULT 'N/A',
+                        `type` TEXT DEFAULT 'N/A',
+                        `synonyms` TEXT DEFAULT '',
+                        `antonym` TEXT DEFAULT '',
+                        PRIMARY KEY(`simplified`)
+                    )
+                """.trimIndent())
+                connection.execSQL("""
+                    INSERT INTO `chinese_word_new`
+                    (`simplified`, `traditional`, `hsk_level`, `pinyins`, `popularity`, `examples`, `collocations`, `modality`, `type`, `synonyms`, `antonym`)
+                    SELECT `simplified`, `traditional`, `hsk_level`, `pinyins`, `popularity`, `examples`, `collocations`, `modality`, `type`, `synonyms`, `antonym`
+                    FROM `chinese_word`
+                """.trimIndent())
+                connection.execSQL("DROP TABLE `chinese_word`")
+                connection.execSQL("ALTER TABLE `chinese_word_new` RENAME TO `chinese_word`")
+                connection.execSQL("""
+                    CREATE TABLE IF NOT EXISTS `word_definition` (
+                        `simplified` TEXT NOT NULL,
+                        `language` TEXT NOT NULL,
+                        `definition` TEXT NOT NULL,
+                        PRIMARY KEY(`simplified`, `language`),
+                        FOREIGN KEY(`simplified`) REFERENCES `chinese_word`(`simplified`) ON UPDATE NO ACTION ON DELETE CASCADE
+                    )
+                """.trimIndent())
+                connection.execSQL("CREATE INDEX IF NOT EXISTS `index_word_definition_language_definition` ON `word_definition` (`language`, `definition`)")
+            }
+        }
+
         private fun buildDatabase(databaseBuilder: DatabaseBuilderWithPath): ChineseWordsDatabase {
             val sqlDriver = BundledSQLiteDriver()
             Logger.d(tag=TAG, messageString = "buildDatabase entering - ${databaseBuilder.file}")
             val finalBuilder = databaseBuilder.builder
                 .setDriver(sqlDriver)
                 .setQueryCoroutineContext(AppDispatchers.IO)
-                .addMigrations(MIGRATION_1_2)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
 
             val db = finalBuilder.build()
             db._databaseFile = databaseBuilder.file
@@ -212,6 +255,9 @@ class DatabaseHelper private constructor() {
         // Inserting All succeeds, but corrupts the database. Thank you Room.
         updateWith.chineseWordDAO().getAll().chunked(5000).forEach { chunk ->
             liveDatabase.chineseWordDAO().upsertAll(chunk)
+        }
+        updateWith.wordDefinitionDAO().getAll().chunked(5000).forEach { chunk ->
+            liveDatabase.wordDefinitionDAO().upsertAll(chunk)
         }
 
         Logger.i(tag = TAG, messageString = "Database update done")
