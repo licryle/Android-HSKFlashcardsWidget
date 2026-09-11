@@ -10,7 +10,7 @@ class LocaleTest {
     fun testFromCode() {
         assertEquals(Locale.ENGLISH, Locale.fromCode("en"))
         assertEquals(Locale.FRENCH, Locale.fromCode("fr"))
-        assertEquals(Locale.CN_HSK3, Locale.fromCode("zh_CN_HSK03"))
+        assertEquals(Locale.CN_HSK3, Locale.fromCode("zh-CN-HSK03"))
         assertEquals(null, Locale.fromCode("unknown"))
     }
 
@@ -23,14 +23,14 @@ class LocaleTest {
     fun testSerialization() {
         val json = Json
         assertEquals("\"en\"", json.encodeToString(LocaleSerializer, Locale.ENGLISH))
-        assertEquals("\"zh_CN_HSK03\"", json.encodeToString(LocaleSerializer, Locale.CN_HSK3))
+        assertEquals("\"zh-CN-HSK03\"", json.encodeToString(LocaleSerializer, Locale.CN_HSK3))
     }
 
     @Test
     fun testDeserialization() {
         val json = Json
         assertEquals(Locale.ENGLISH, json.decodeFromString(LocaleSerializer, "\"en\""))
-        assertEquals(Locale.CN_HSK3, json.decodeFromString(LocaleSerializer, "\"zh_CN_HSK03\""))
+        assertEquals(Locale.CN_HSK3, json.decodeFromString(LocaleSerializer, "\"zh-CN-HSK03\""))
     }
 
     @Test

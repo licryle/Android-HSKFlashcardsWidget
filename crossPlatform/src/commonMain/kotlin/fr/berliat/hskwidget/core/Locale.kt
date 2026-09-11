@@ -24,18 +24,15 @@ enum class Locale(
 ) {
     ENGLISH("en", Res.string.locale_en, Res.drawable.flag_en),
     FRENCH("fr", Res.string.locale_fr, Res.drawable.flag_fr),
-    CN_HSK3("zh_CN_HSK03", Res.string.locale_cn_hsk3, Res.drawable.flag_cn);
+    CN_HSK3("zh-CN-HSK03", Res.string.locale_cn_hsk3, Res.drawable.flag_cn);
 
     companion object {
         // Get enum from string code
         fun fromCode(code: String): Locale? {
             val lang = code.split("-")[0] // for now, I won't translate with variants
 
-            // Todo - some day I need to clean that I misused "_" instead of "-" in locales in the dictionary
             return entries.firstOrNull {
-                it.code == lang
-                    || it.code.split("-")[0] == lang
-                    || it.code.split("_")[0] == lang
+                it.code == lang || it.code.split("-")[0] == lang
             }
         }
 
