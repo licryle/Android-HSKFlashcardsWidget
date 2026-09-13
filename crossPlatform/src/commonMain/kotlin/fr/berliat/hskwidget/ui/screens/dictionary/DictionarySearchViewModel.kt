@@ -47,8 +47,6 @@ class DictionarySearchViewModel(private val prefsStore: AppPreferencesStore = HS
     private val _wordExists = MutableStateFlow<Boolean?>(null)
     val wordExists: StateFlow<Boolean?> = _wordExists.asStateFlow()
 
-    val showHSK3: StateFlow<Boolean> = prefsStore.dictionaryShowHSK3Definition.asStateFlow()
-
     val hasAnnotationFilter: StateFlow<Boolean> = prefsStore.searchFilterHasAnnotation.asStateFlow()
 
     val dictionaryLocale: StateFlow<Locale> = prefsStore.dictionaryLocale.asStateFlow()
@@ -65,12 +63,6 @@ class DictionarySearchViewModel(private val prefsStore: AppPreferencesStore = HS
     private val itemsPerPage = 30
     private var currentSearchJob: Job? = null
     private var currentWordCheckJob: Job? = null
-
-    fun toggleHSK3(value: Boolean) {
-        prefsStore.dictionaryShowHSK3Definition.value = value
-
-        Logging.logAnalyticsEvent(if (value) Logging.ANALYTICS_EVENTS.DICT_HSK3_ON else Logging.ANALYTICS_EVENTS.DICT_HSK3_OFF)
-    }
 
     fun toggleHasAnnotation(value: Boolean) {
         prefsStore.searchFilterHasAnnotation.value = value
