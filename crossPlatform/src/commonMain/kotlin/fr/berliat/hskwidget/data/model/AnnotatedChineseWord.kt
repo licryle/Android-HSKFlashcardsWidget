@@ -1,6 +1,8 @@
 package fr.berliat.hskwidget.data.model
 
 import androidx.room.Embedded
+import doist.x.normalize.Form
+import doist.x.normalize.normalize
 import fr.berliat.hskwidget.core.Locale
 import fr.berliat.hskwidget.data.type.HSK_Level
 import fr.berliat.hskwidget.data.type.Pinyins
@@ -68,5 +70,32 @@ data class AnnotatedChineseWord (
         }
 
         return null
+    }
+
+    fun matches(query: String, locale: Locale): Boolean {
+        if (query.isEmpty()) return true
+        val normalizedQuery = query.normalizeForSearch()
+
+        // Simplified
+        if (simplified.normalizeForSearch().contains(normalizedQuery)) return true
+
+        // Traditional
+        if (word?.traditional?.normalizeForSearch()?.contains(normalizedQuery) == true) return true
+
+        // Pinyin
+        if (pinyins.toString().normalizeForSearch().contains(normalizedQuery)) return true
+
+        // Definition
+        if (word?.definition?.get(locale)?.normalizeForSearch()?.contains(normalizedQuery) == true) return true
+
+        // Notes and Themes
+        if (annotation?.notes?.normalizeForSearch()?.contains(normalizedQuery) == true) return true
+        if (annotation?.themes?.normalizeForSearch()?.contains(normalizedQuery) == true) return true
+
+        return false
+    }
+
+    private fun String.normalizeForSearch(): String {
+        return this.normalize(Form.NFD).replace("\\p{Mn}+".toRegex(), "").lowercase()
     }
 }

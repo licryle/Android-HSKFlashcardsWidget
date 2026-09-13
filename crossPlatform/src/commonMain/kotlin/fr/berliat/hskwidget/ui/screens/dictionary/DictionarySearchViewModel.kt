@@ -139,11 +139,12 @@ class DictionarySearchViewModel(private val prefsStore: AppPreferencesStore = HS
         val searchQuery = searchQuery.value
         val listName = searchQuery.inListName
         val annotatedOnly = prefsStore.searchFilterHasAnnotation.value
+        val locale = Locale.resolve(prefsStore.dictionaryLocale.value)
 
         val results = if (listName != null) {
             // Search within the specified word list
             annotatedChineseWordDAO.searchFromWordList(listName, annotatedOnly && !searchQuery.ignoreAnnotation, currentPage, itemsPerPage)
-                .filter { it.toString().contains(searchQuery.query) }
+                .filter { it.matches(searchQuery.query, locale) }
         } else {
             annotatedChineseWordDAO.searchFromStrLike(searchQuery.query, locale, annotatedOnly && !searchQuery.ignoreAnnotation, atExam = null, currentPage, itemsPerPage)
         }
