@@ -30,6 +30,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 import fr.berliat.hskwidget.Res
+import fr.berliat.hskwidget.domain.SearchQuery
 import fr.berliat.hskwidget.menu
 import fr.berliat.hskwidget.menu_24px
 import fr.berliat.hskwidget.menu_ocr
@@ -38,6 +39,7 @@ import fr.berliat.hskwidget.search_hint
 
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,8 +56,10 @@ fun AppBar(
     // Update localText only when searchQuery changes externally (or to sync after debounce)
     LaunchedEffect(searchQuery) {
         if (searchQuery != lastRemoteValue) {
-            val newText = searchQuery.toString()
-            if (localText.text != newText) {
+            // Only update local text if it doesn't represent the same query semantically,
+            // otherwise it would mess with user input
+            if (SearchQuery.fromString(localText.text) != searchQuery) {
+                val newText = searchQuery.toString()
                 localText = TextFieldValue(newText, selection = TextRange(newText.length))
             }
             lastRemoteValue = searchQuery
@@ -69,7 +73,7 @@ fun AppBar(
         localText = newValue
         debounceJob?.cancel()
         debounceJob = coroutineScope.launch {
-            delay(300) // 300ms debounce
+            delay(300.milliseconds) // 300ms debounce
             val currentText = localText.text
             if (currentText != searchQuery.toString()) {
                 onSearch(currentText)
