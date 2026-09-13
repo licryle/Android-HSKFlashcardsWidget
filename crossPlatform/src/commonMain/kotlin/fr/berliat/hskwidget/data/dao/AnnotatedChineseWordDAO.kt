@@ -68,7 +68,8 @@ interface AnnotatedChineseWordDAO {
     suspend fun getRandomWordFromLists(listIds: List<Long>, bannedWords: Array<String>): AnnotatedChineseWord? =
         getRandomWordFromListsRow(listIds, bannedWords)?.let { hydrate(listOf(it)).first() }
 
-    @Query("SELECT a.a_simplified, COALESCE(w.simplified, a.a_simplified) simplified, a.a_searchable_text, " +
+    @Query("SELECT * FROM (" +
+            "SELECT a.a_simplified, COALESCE(w.simplified, a.a_simplified) simplified, a.a_searchable_text, " +
             " a.a_pinyins, a.notes, a.class_type, a.class_level, a.themes, a.first_seen, a.is_exam," +
             " w.traditional, w.hsk_level, w.pinyins, w.popularity, " +
             " w.modality, w.examples, w.type, w.synonyms, w.antonym, w.collocations, " +
@@ -78,6 +79,7 @@ interface AnnotatedChineseWordDAO {
             " LEFT JOIN chinese_word AS w ON a.a_simplified = w.simplified " +
             " WHERE wl.name = :listName " +
             " AND (0=:hasAnnotation OR (1=:hasAnnotation AND a.first_seen IS NOT NULL)) " +
+            " AND (a.a_searchable_text LIKE '%' || :str || '%' OR a.a_simplified LIKE '%' || :str || '%')" +
             " UNION " +
             " SELECT COALESCE(a.a_simplified, w.simplified) a_simplified, w.simplified, " +
             " COALESCE(a.a_searchable_text, '') a_searchable_text, " +
@@ -90,13 +92,18 @@ interface AnnotatedChineseWordDAO {
             " LEFT JOIN chinese_word_annotation AS a ON a.a_simplified = w.simplified " +
             " WHERE wl.name = :listName " +
             " AND (0=:hasAnnotation OR (1=:hasAnnotation AND a.first_seen IS NOT NULL)) " +
-            " ORDER BY is_first_seen_null, a.first_seen DESC, w.popularity DESC " +
+            " AND (w.simplified LIKE '%' || :str || '%' OR COALESCE(w.traditional, '') LIKE '%' || :str || '%' OR COALESCE(w.pinyins, '') LIKE '%' || :str || '%'" +
+            " OR a.a_searchable_text LIKE '%' || :str || '%'" +
+            " OR EXISTS (SELECT 1 FROM word_definition d WHERE d.simplified = w.simplified AND d.language = :language AND d.definition LIKE '%' || :str || '%'))" +
+            ") " +
+            order_by_logic +
             " LIMIT :pageSize OFFSET (:page * :pageSize)")
     @RewriteQueriesToDropUnusedColumns
-    suspend fun searchFromWordListRows(listName: String, hasAnnotation: Boolean, page: Int = 0, pageSize: Int = 30): List<AnnotatedChineseWord>
+    suspend fun searchFromWordListRows(listName: String, str: String, language: String, hasAnnotation: Boolean, page: Int = 0, pageSize: Int = 30): List<AnnotatedChineseWord>
 
-    suspend fun searchFromWordList(listName: String, hasAnnotation: Boolean, page: Int = 0, pageSize: Int = 30): List<AnnotatedChineseWord> =
-        hydrate(searchFromWordListRows(listName, hasAnnotation, page, pageSize))
+    @Transaction
+    suspend fun searchFromWordList(listName: String, str: String, language: Locale, hasAnnotation: Boolean, page: Int = 0, pageSize: Int = 30): List<AnnotatedChineseWord> =
+        hydrate(searchFromWordListRows(listName, str, language.code, hasAnnotation, page, pageSize))
 
     suspend fun getAllAnnotated(): List<AnnotatedChineseWord> {
         return searchFromStrLike("", Locale.ENGLISH, hasAnnotation = true, atExam = null, 0, Int.MAX_VALUE)
