@@ -30,23 +30,31 @@ private const val select_right_join =
 
 private const val order_by_logic =
     "ORDER BY ( " +
-            "  (CASE WHEN simplified || ' ' || COALESCE(traditional, '') || ' ' || COALESCE(pinyins, '') || ' ' || a_searchable_text LIKE '%' || :str THEN 5 ELSE 0 END) + " +
-            "  (CASE WHEN simplified || ' ' || COALESCE(traditional, '') || ' ' || COALESCE(pinyins, '') || ' ' || a_searchable_text LIKE :str || '%' THEN 10 ELSE 0 END)" +
+            "  (CASE WHEN simplified = :str THEN 100 ELSE 0 END) + " +
+            "  (CASE WHEN simplified LIKE :str || '%' THEN 20 ELSE 0 END) + " +
+            "  (CASE WHEN traditional LIKE :str || '%' THEN 15 ELSE 0 END) + " +
+            "  (CASE WHEN pinyins LIKE :str || '%' THEN 15 ELSE 0 END) + " +
+            "  (CASE WHEN a_searchable_text LIKE :str || '%' THEN 10 ELSE 0 END) + " +
+            "  (CASE WHEN simplified LIKE '%' || :str THEN 5 ELSE 0 END) " +
     ") DESC, popularity DESC, is_first_seen_null, first_seen DESC "
 
 @Dao
 interface AnnotatedChineseWordDAO {
     @Query("SELECT * FROM (" +
-            "$select_left_join WHERE (a.a_searchable_text LIKE '%' || :str || '%'" +
-            " OR a.a_simplified LIKE '%' || :str || '%')" +
-            " AND (0=:hasAnnotation OR (1=:hasAnnotation AND a.first_seen IS NOT NULL))" +
-            " AND (a.is_exam=:atExam OR :atExam IS NULL)" +
-            " UNION " +
-            "$select_right_join WHERE (w.simplified LIKE '%' || :str || '%' OR COALESCE(w.traditional, '') LIKE '%' || :str || '%' OR COALESCE(w.pinyins, '') LIKE '%' || :str || '%'" +
-            " OR a.a_searchable_text LIKE '%' || :str || '%'" +
-            " OR EXISTS (SELECT 1 FROM word_definition d WHERE d.simplified = w.simplified AND d.language = :language AND d.definition LIKE '%' || :str || '%'))" +
-            " AND (0=:hasAnnotation OR (1=:hasAnnotation AND a.first_seen IS NOT NULL))" +
-            " AND (a.is_exam=:atExam OR :atExam IS NULL)" +
+            "  $select_left_join WHERE (" +
+            "    a.a_simplified LIKE '%' || :str || '%' OR a.a_searchable_text LIKE '%' || :str || '%' OR " +
+            "    w.simplified LIKE '%' || :str || '%' OR w.traditional LIKE '%' || :str || '%' OR w.pinyins LIKE '%' || :str || '%' OR " +
+            "    EXISTS (SELECT 1 FROM word_definition d WHERE d.simplified = w.simplified AND d.language = :language AND d.definition LIKE '%' || :str || '%')" +
+            "  ) " +
+            "  AND (0=:hasAnnotation OR (1=:hasAnnotation AND a.first_seen IS NOT NULL))" +
+            "  AND (a.is_exam=:atExam OR :atExam IS NULL)" +
+            "  UNION ALL " +
+            "  $select_right_join WHERE a.a_simplified IS NULL AND (" +
+            "    w.simplified LIKE '%' || :str || '%' OR w.traditional LIKE '%' || :str || '%' OR w.pinyins LIKE '%' || :str || '%' OR " +
+            "    EXISTS (SELECT 1 FROM word_definition d WHERE d.simplified = w.simplified AND d.language = :language AND d.definition LIKE '%' || :str || '%')" +
+            "  ) " +
+            "  AND (0=:hasAnnotation)" +
+            "  AND (:atExam IS NULL)" +
             ") " +
             order_by_logic +
             " LIMIT :pageSize OFFSET (:page * :pageSize)")
@@ -59,8 +67,8 @@ interface AnnotatedChineseWordDAO {
 
     @Query("SELECT * FROM (" +
            "       $select_left_join WHERE a.a_simplified IN (SELECT simplified FROM word_list_entry WHERE list_id IN (:listIds) AND simplified NOT IN (:bannedWords))" +
-           " UNION " +
-           "$select_right_join WHERE w.simplified IN (SELECT simplified FROM word_list_entry WHERE list_id IN (:listIds) AND simplified NOT IN (:bannedWords))" +
+           " UNION ALL " +
+           "$select_right_join WHERE a.a_simplified IS NULL AND w.simplified IN (SELECT simplified FROM word_list_entry WHERE list_id IN (:listIds) AND simplified NOT IN (:bannedWords))" +
            ") ORDER BY RANDOM() LIMIT 1")
     @RewriteQueriesToDropUnusedColumns
     suspend fun getRandomWordFromListsRow(listIds: List<Long>, bannedWords: Array<String>): AnnotatedChineseWord?
@@ -79,8 +87,8 @@ interface AnnotatedChineseWordDAO {
             " LEFT JOIN chinese_word AS w ON a.a_simplified = w.simplified " +
             " WHERE wl.name = :listName " +
             " AND (0=:hasAnnotation OR (1=:hasAnnotation AND a.first_seen IS NOT NULL)) " +
-            " AND (a.a_searchable_text LIKE '%' || :str || '%' OR a.a_simplified LIKE '%' || :str || '%')" +
-            " UNION " +
+            " AND (a.a_simplified LIKE '%' || :str || '%' OR a.a_searchable_text LIKE '%' || :str || '%' OR w.simplified LIKE '%' || :str || '%' OR w.traditional LIKE '%' || :str || '%' OR w.pinyins LIKE '%' || :str || '%' OR EXISTS (SELECT 1 FROM word_definition d WHERE d.simplified = w.simplified AND d.language = :language AND d.definition LIKE '%' || :str || '%'))" +
+            " UNION ALL " +
             " SELECT COALESCE(a.a_simplified, w.simplified) a_simplified, w.simplified, " +
             " COALESCE(a.a_searchable_text, '') a_searchable_text, " +
             " a.a_pinyins, a.notes, a.class_type, a.class_level, a.themes, a.first_seen, a.is_exam," +
@@ -90,10 +98,9 @@ interface AnnotatedChineseWordDAO {
             " FROM chinese_word AS w  INNER JOIN word_list_entry AS wle ON w.simplified = wle.simplified " +
             " INNER JOIN word_list AS wl ON wl.id = wle.list_id " +
             " LEFT JOIN chinese_word_annotation AS a ON a.a_simplified = w.simplified " +
-            " WHERE wl.name = :listName " +
-            " AND (0=:hasAnnotation OR (1=:hasAnnotation AND a.first_seen IS NOT NULL)) " +
-            " AND (w.simplified LIKE '%' || :str || '%' OR COALESCE(w.traditional, '') LIKE '%' || :str || '%' OR COALESCE(w.pinyins, '') LIKE '%' || :str || '%'" +
-            " OR a.a_searchable_text LIKE '%' || :str || '%'" +
+            " WHERE wl.name = :listName AND a.a_simplified IS NULL " +
+            " AND (0=:hasAnnotation) " +
+            " AND (w.simplified LIKE '%' || :str || '%' OR w.traditional LIKE '%' || :str || '%' OR w.pinyins LIKE '%' || :str || '%'" +
             " OR EXISTS (SELECT 1 FROM word_definition d WHERE d.simplified = w.simplified AND d.language = :language AND d.definition LIKE '%' || :str || '%'))" +
             ") " +
             order_by_logic +
