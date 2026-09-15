@@ -89,13 +89,6 @@ class LanguageFrenchProvider(Provider):
     def _get_cache_conn(self):
         os.makedirs(os.path.dirname(FRENCH_CACHE_DB), exist_ok=True)
         conn = sqlite3.connect(FRENCH_CACHE_DB)
-        cursor = conn.cursor()
-        cursor.execute('''CREATE TABLE IF NOT EXISTS `chinese_word` (
-                            `simplified` TEXT NOT NULL,
-                            `definition` TEXT NOT NULL,
-                            PRIMARY KEY(`simplified`)
-                        )''')
-        conn.commit()
         return conn
 
     def _parse_cedict_entry(self, line: str) -> Dict[str, str]:

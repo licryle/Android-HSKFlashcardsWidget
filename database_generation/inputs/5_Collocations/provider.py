@@ -39,13 +39,6 @@ class CollocationsProvider(Provider):
     def _get_cache_conn(self):
         os.makedirs(os.path.dirname(COLLOCATIONS_CACHE_DB), exist_ok=True)
         conn = sqlite3.connect(COLLOCATIONS_CACHE_DB)
-        cursor = conn.cursor()
-        cursor.execute('''CREATE TABLE IF NOT EXISTS `chinese_word` (
-                            `simplified` TEXT NOT NULL,
-                            `collocations` TEXT,
-                            PRIMARY KEY(`simplified`)
-                        )''')
-        conn.commit()
         return conn
 
     def update(self):

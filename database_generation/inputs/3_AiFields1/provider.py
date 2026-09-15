@@ -52,18 +52,6 @@ class AiFieldsProvider(Provider):
     def _get_cache_conn(self):
         cache_db = os.path.join(os.path.dirname(__file__), "ai_fields_cache.db")
         conn = sqlite3.connect(cache_db)
-        cursor = conn.cursor()
-        cursor.execute('''CREATE TABLE IF NOT EXISTS `chinese_word` (
-                            `simplified` TEXT NOT NULL,
-                            `definition` TEXT NOT NULL,
-                            `modality` TEXT,
-                            `examples` TEXT,
-                            `type` TEXT,
-                            `synonyms` TEXT,
-                            `antonym` TEXT,
-                            PRIMARY KEY(`simplified`)
-                        )''')
-        conn.commit()
         return conn
 
     def update(self):
