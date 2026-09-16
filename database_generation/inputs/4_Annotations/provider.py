@@ -87,7 +87,10 @@ class AnnotationsProvider(Provider):
                 except (ValueError, TypeError):
                     first_seen = 0
 
-                searchable_text = unidecode(pinyins).replace(" ", "") + ' ' + notes + ' ' + themes + ' ' + simplified
+                toneless = unidecode(pinyins)
+                concatenated = toneless.replace(" ", "")
+                hanzi_split = " ".join(simplified)
+                searchable_text = f"{simplified} {hanzi_split} {notes} {themes} {toneless} {concatenated}".lower()
 
                 yield ("chinese_word_annotation", {
                     "a_simplified": simplified,

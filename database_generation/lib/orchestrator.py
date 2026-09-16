@@ -70,10 +70,16 @@ class Orchestrator:
             for index in entity.get('indices', []):
                 index_sql = index['createSql'].replace('${TABLE_NAME}', entity['tableName'])
                 cursor.execute(index_sql)
+
+            for trigger in entity.get('contentSyncTriggers', []):
+                cursor.execute(trigger)
         
         for query in self.schema_data['database']['setupQueries']:
             cursor.execute(query)
-            
+
+        version = self.schema_data['database']['version']
+        cursor.execute(f"PRAGMA user_version = {version}")
+    
         conn.commit()
         conn.close()
         self.logger.info("Database schema created.")
@@ -238,9 +244,51 @@ class Orchestrator:
             # PRAGMA settings are connection-local, so enable this again for provider inserts.
             conn.execute("PRAGMA foreign_keys = ON")
             self._assemble_data(conn)
+            self._post_process(conn)
         finally:
             conn.close()
             if self.previous_database_path and os.path.exists(self.previous_database_path):
                 os.remove(self.previous_database_path)
                 self.previous_database_path = None
         self.logger.info("Database generation complete.")
+
+    def _post_process(self, conn: sqlite3.Connection):
+        from unidecode import unidecode
+        self.logger.info("Post-processing: generating searchable_text...")
+        cursor = conn.cursor()
+        
+        # Update chinese_word
+        cursor.execute("SELECT simplified, traditional, pinyins, examples, collocations, synonyms, antonym FROM chinese_word")
+        words = cursor.fetchall()
+        for row in words:
+            simplified, traditional, pinyins, examples, collocations, synonyms, antonym = row
+            
+            # Fetch definitions
+            cursor.execute("SELECT definition FROM word_definition WHERE simplified = ?", (simplified,))
+            definitions = " ".join([r[0] for r in cursor.fetchall()])
+            
+            toneless = unidecode(pinyins or "")
+            concatenated = toneless.replace(" ", "")
+            hanzi_split = " ".join(list(simplified))
+            
+            parts = [simplified, traditional, hanzi_split, toneless, concatenated, definitions, examples, collocations, synonyms, antonym]
+            searchable_text = " ".join([str(p) for p in parts if p]).lower()
+            
+            cursor.execute("UPDATE chinese_word SET searchable_text = ? WHERE simplified = ?", (searchable_text, simplified))
+        
+        # Update chinese_word_annotation
+        cursor.execute("SELECT a_simplified, a_pinyins, notes, themes FROM chinese_word_annotation")
+        annotations = cursor.fetchall()
+        for row in annotations:
+            a_simplified, a_pinyins, notes, themes = row
+            
+            toneless = unidecode(a_pinyins or "")
+            concatenated = toneless.replace(" ", "")
+            hanzi_split = " ".join(list(a_simplified))
+            
+            parts = [a_simplified, hanzi_split, toneless, concatenated, notes, themes]
+            searchable_text = " ".join([str(p) for p in parts if p]).lower()
+            
+            cursor.execute("UPDATE chinese_word_annotation SET a_searchable_text = ? WHERE a_simplified = ?", (searchable_text, a_simplified))
+            
+        conn.commit()

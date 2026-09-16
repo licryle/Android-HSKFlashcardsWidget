@@ -24,6 +24,9 @@ import fr.berliat.hskwidget.data.dao.WordListDAO
 import fr.berliat.hskwidget.data.dao.WordDefinitionDAO
 import fr.berliat.hskwidget.data.model.ChineseWord
 import fr.berliat.hskwidget.data.model.ChineseWordAnnotation
+import fr.berliat.hskwidget.data.model.ChineseWordFTS
+import fr.berliat.hskwidget.data.model.WordDefinitionFTS
+import fr.berliat.hskwidget.data.model.ChineseWordAnnotationFTS
 import fr.berliat.hskwidget.data.model.ChineseWordFrequency
 import fr.berliat.hskwidget.data.model.WidgetListEntry
 import fr.berliat.hskwidget.data.model.WordList
@@ -39,7 +42,8 @@ import fr.berliat.hskwidget.data.type.WordTypeConverter
 
 @Database(
     entities = [ChineseWordAnnotation::class, ChineseWord::class, WordDefinition::class, ChineseWordFrequency::class,
-        WordList::class, WordListEntry::class, WidgetListEntry::class],
+        WordList::class, WordListEntry::class, WidgetListEntry::class,
+        ChineseWordFTS::class, WordDefinitionFTS::class, ChineseWordAnnotationFTS::class],
     version = ChineseWordsDatabase.DATABASE_VERSION, exportSchema = true)
 @TypeConverters(
     Pinyins::class,

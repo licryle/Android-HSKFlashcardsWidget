@@ -7,7 +7,6 @@ import kotlinx.datetime.Instant
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
-import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
@@ -27,9 +26,7 @@ class ChineseWordAnnotationTest {
             firstSeen = firstSeen,
             isExam = true
         )
-        annotation.a_searchable_text = "nihao greeting"
-
-        assertEquals("你好", annotation.simplified)
+        assertEquals(true, annotation.isExam)
         assertEquals(pinyins, annotation.pinyins)
         assertEquals("important note", annotation.notes)
         assertEquals(ClassType.Speaking, annotation.classType)
@@ -37,7 +34,6 @@ class ChineseWordAnnotationTest {
         assertEquals("greeting", annotation.themes)
         assertEquals(firstSeen, annotation.firstSeen)
         assertEquals(true, annotation.isExam)
-        assertEquals("nihao greeting", annotation.a_searchable_text)
     }
 
     @Test
@@ -73,41 +69,24 @@ class ChineseWordAnnotationTest {
     }
 
     @Test
-    fun testUpdateSearchable() {
+    fun testWithSearchableText() {
         val annotation = ChineseWordAnnotation(
             simplified = "你好",
             pinyins = Pinyins("nǐ hǎo"),
-            notes = "important note",
-            classType = ClassType.Speaking,
-            level = ClassLevel.Elementary1,
-            themes = "greeting",
-            firstSeen = Instant.fromEpochMilliseconds(0),
-            isExam = true
-        )
-        
-        annotation.updateSearchable()
-        
-        assertTrue(annotation.a_searchable_text.contains("nihao"))
-        assertTrue(annotation.a_searchable_text.contains("important note"))
-        assertTrue(annotation.a_searchable_text.contains("greeting"))
-        assertTrue(annotation.a_searchable_text.contains("你好"))
-    }
-
-    @Test
-    fun testUpdateSearchableWithNullPinyins() {
-        val annotation = ChineseWordAnnotation(
-            simplified = "你好",
-            pinyins = null,
-            notes = "note",
-            classType = null,
-            level = null,
-            themes = "theme",
+            notes = "Greeting",
+            classType = ClassType.NotFromClass,
+            level = ClassLevel.NotFromClass,
+            themes = "Social",
             firstSeen = null,
-            isExam = null
-        )
-        
-        annotation.updateSearchable()
-        
-        assertFalse(annotation.a_searchable_text.contains("null"), "a_searchable_text should not contain the word 'null' when pinyins is null")
+            isExam = false
+        ).withSearchableText()
+
+        val st = annotation.searchableText
+        assertTrue(st.contains("你好"))
+        assertTrue(st.contains("你 好"))
+        assertTrue(st.contains("ni hao"))
+        assertTrue(st.contains("nihao"))
+        assertTrue(st.contains("greeting"))
+        assertTrue(st.contains("social"))
     }
 }

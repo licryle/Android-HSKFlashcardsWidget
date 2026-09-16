@@ -8,10 +8,10 @@ import fr.berliat.hskwidget.core.Locale
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 
 private const val select_left_join =
-    "SELECT a.a_simplified, COALESCE(w.simplified, a.a_simplified) simplified, a.a_searchable_text, " +
-            " a.a_pinyins, a.notes, a.class_type, a.class_level, a.themes, a.first_seen, a.is_exam," +
+    "SELECT a.a_simplified, COALESCE(w.simplified, a.a_simplified) simplified, " +
+            " a.a_pinyins, a.notes, a.class_type, a.class_level, a.themes, a.first_seen, a.is_exam, a.a_searchable_text, " +
             " w.traditional, w.hsk_level, w.pinyins, w.popularity, " +
-            " w.modality, w.examples, w.type, w.synonyms, w.antonym, w.collocations, " +
+            " w.modality, w.examples, w.type, w.synonyms, w.antonym, w.collocations, w.searchable_text, " +
             " (a.first_seen IS NULL) AS is_first_seen_null " +
             " FROM chinese_word_annotation AS a LEFT JOIN chinese_word AS w" +
             " ON a.a_simplified = w.simplified" +
@@ -19,10 +19,9 @@ private const val select_left_join =
 
 private const val select_right_join =
     "SELECT COALESCE(a.a_simplified, w.simplified) a_simplified, w.simplified, " +
-            " COALESCE(a.a_searchable_text, '') a_searchable_text, " +
-            " a.a_pinyins, a.notes, a.class_type, a.class_level, a.themes, a.first_seen, a.is_exam," +
+            " a.a_pinyins, a.notes, a.class_type, a.class_level, a.themes, a.first_seen, a.is_exam, a.a_searchable_text, " +
             " w.traditional, w.hsk_level, w.pinyins, w.popularity, " +
-            " w.modality, w.examples, w.type, w.synonyms, w.antonym, w.collocations, " +
+            " w.modality, w.examples, w.type, w.synonyms, w.antonym, w.collocations, w.searchable_text, " +
             " (a.first_seen IS NULL) AS is_first_seen_null " +
             " FROM chinese_word AS w LEFT JOIN chinese_word_annotation AS a" +
             " ON a.a_simplified = w.simplified" +
@@ -31,27 +30,37 @@ private const val select_right_join =
 private const val order_by_logic =
     "ORDER BY ( " +
             "  (CASE WHEN simplified = :str THEN 100 ELSE 0 END) + " +
-            "  (CASE WHEN simplified LIKE :str || '%' THEN 20 ELSE 0 END) + " +
-            "  (CASE WHEN traditional LIKE :str || '%' THEN 15 ELSE 0 END) + " +
-            "  (CASE WHEN pinyins LIKE :str || '%' THEN 15 ELSE 0 END) + " +
-            "  (CASE WHEN a_searchable_text LIKE :str || '%' THEN 10 ELSE 0 END) + " +
-            "  (CASE WHEN simplified LIKE '%' || :str THEN 5 ELSE 0 END) " +
+            "  (CASE WHEN simplified LIKE :str || '%' THEN 50 ELSE 0 END) + " +
+            "  (CASE WHEN traditional LIKE :str || '%' THEN 50 ELSE 0 END) + " +
+            "  (CASE WHEN searchable_text = :str THEN 100 ELSE 0 END) + " +
+            "  (CASE WHEN searchable_text LIKE :str || '%' THEN 50 ELSE 0 END) + " +
+            "  (CASE WHEN a_searchable_text = :str THEN 100 ELSE 0 END) + " +
+            "  (CASE WHEN a_searchable_text LIKE :str || '%' THEN 50 ELSE 0 END) + " +
+            "  (CASE WHEN notes LIKE :str || '%' OR notes LIKE '% ' || :str || '%' OR notes LIKE '%;' || :str || '%' THEN 50 ELSE 0 END) + " +
+            "  (CASE WHEN simplified LIKE '%' || :str || '%' THEN 10 ELSE 0 END) + " +
+            "  (CASE WHEN searchable_text LIKE '%' || :str || '%' THEN 10 ELSE 0 END) + " +
+            "  (CASE WHEN a_searchable_text LIKE '%' || :str || '%' THEN 10 ELSE 0 END) " +
     ") DESC, popularity DESC, is_first_seen_null, first_seen DESC "
 
 @Dao
 interface AnnotatedChineseWordDAO {
     @Query("SELECT * FROM (" +
             "  $select_left_join WHERE (" +
-            "    a.a_simplified LIKE '%' || :str || '%' OR a.a_searchable_text LIKE '%' || :str || '%' OR " +
-            "    w.simplified LIKE '%' || :str || '%' OR w.traditional LIKE '%' || :str || '%' OR w.pinyins LIKE '%' || :str || '%' OR " +
-            "    EXISTS (SELECT 1 FROM word_definition d WHERE d.simplified = w.simplified AND d.language = :language AND d.definition LIKE '%' || :str || '%')" +
+            "    :str = '' OR a.a_simplified IN (" +
+            "      SELECT simplified FROM chinese_word_fts WHERE searchable_text MATCH :str || '*' " +
+            "      UNION SELECT simplified FROM word_definition_fts WHERE definition MATCH :str || '*' AND language = :language " +
+            "      UNION SELECT a_simplified AS simplified FROM chinese_word_annotation_fts WHERE a_searchable_text MATCH :str || '*' " +
+            "    )" +
             "  ) " +
             "  AND (0=:hasAnnotation OR (1=:hasAnnotation AND a.first_seen IS NOT NULL))" +
             "  AND (a.is_exam=:atExam OR :atExam IS NULL)" +
             "  UNION ALL " +
             "  $select_right_join WHERE a.a_simplified IS NULL AND (" +
-            "    w.simplified LIKE '%' || :str || '%' OR w.traditional LIKE '%' || :str || '%' OR w.pinyins LIKE '%' || :str || '%' OR " +
-            "    EXISTS (SELECT 1 FROM word_definition d WHERE d.simplified = w.simplified AND d.language = :language AND d.definition LIKE '%' || :str || '%')" +
+            "    :str = '' OR w.simplified IN (" +
+            "      SELECT simplified FROM chinese_word_fts WHERE searchable_text MATCH :str || '*' " +
+            "      UNION SELECT simplified FROM word_definition_fts WHERE definition MATCH :str || '*' AND language = :language " +
+            "      UNION SELECT a_simplified AS simplified FROM chinese_word_annotation_fts WHERE a_searchable_text MATCH :str || '*' " +
+            "    )" +
             "  ) " +
             "  AND (0=:hasAnnotation)" +
             "  AND (:atExam IS NULL)" +
@@ -61,9 +70,37 @@ interface AnnotatedChineseWordDAO {
     @RewriteQueriesToDropUnusedColumns
     suspend fun searchFromStrLikeRows(str: String?, language: String, hasAnnotation: Boolean, atExam: Boolean? = null, page: Int = 0, pageSize: Int = 30): List<AnnotatedChineseWord>
 
+    @Query("SELECT * FROM (" +
+            "  $select_left_join WHERE (" +
+            "    :str = '' OR a.a_simplified LIKE :str || '%' OR simplified LIKE :str || '%' OR a_searchable_text LIKE :str || '%' OR searchable_text LIKE :str || '%'" +
+            "    OR notes LIKE '%' || :str || '%' OR traditional LIKE '%' || :str || '%'" +
+            "  ) " +
+            "  AND (0=:hasAnnotation OR (1=:hasAnnotation AND a.first_seen IS NOT NULL))" +
+            "  AND (a.is_exam=:atExam OR :atExam IS NULL)" +
+            "  UNION ALL " +
+            "  $select_right_join WHERE a.a_simplified IS NULL AND (" +
+            "    :str = '' OR w.simplified LIKE :str || '%' OR searchable_text LIKE :str || '%'" +
+            "    OR traditional LIKE '%' || :str || '%'" +
+            "  ) " +
+            "  AND (0=:hasAnnotation)" +
+            "  AND (:atExam IS NULL)" +
+            ") " +
+            order_by_logic +
+            " LIMIT :pageSize OFFSET (:page * :pageSize)")
+    @RewriteQueriesToDropUnusedColumns
+    suspend fun searchFromStrLikeSimpleRows(str: String?, hasAnnotation: Boolean, atExam: Boolean? = null, page: Int = 0, pageSize: Int = 30): List<AnnotatedChineseWord>
+
     @Transaction
-    suspend fun searchFromStrLike(str: String?, language: Locale, hasAnnotation: Boolean, atExam: Boolean? = null, page: Int = 0, pageSize: Int = 30): List<AnnotatedChineseWord> =
-        hydrate(searchFromStrLikeRows(str, language.code, hasAnnotation, atExam, page, pageSize))
+    suspend fun searchFromStrLike(str: String?, language: Locale, hasAnnotation: Boolean, atExam: Boolean? = null, page: Int = 0, pageSize: Int = 30): List<AnnotatedChineseWord> {
+        val query = str?.trim() ?: ""
+        
+        // Use FTS search as primary (much faster)
+        val ftsResults = searchFromStrLikeRows(query, language.code, hasAnnotation, atExam, page, pageSize)
+        if (ftsResults.isNotEmpty()) return hydrate(ftsResults)
+        
+        // Fallback to simple LIKE if FTS returns nothing (e.g. index out of sync)
+        return hydrate(searchFromStrLikeSimpleRows(query, hasAnnotation, atExam, page, pageSize))
+    }
 
     @Query("SELECT * FROM (" +
            "       $select_left_join WHERE a.a_simplified IN (SELECT simplified FROM word_list_entry WHERE list_id IN (:listIds) AND simplified NOT IN (:bannedWords))" +
@@ -77,31 +114,37 @@ interface AnnotatedChineseWordDAO {
         getRandomWordFromListsRow(listIds, bannedWords)?.let { hydrate(listOf(it)).first() }
 
     @Query("SELECT * FROM (" +
-            "SELECT a.a_simplified, COALESCE(w.simplified, a.a_simplified) simplified, a.a_searchable_text, " +
-            " a.a_pinyins, a.notes, a.class_type, a.class_level, a.themes, a.first_seen, a.is_exam," +
+            "SELECT a.a_simplified, COALESCE(w.simplified, a.a_simplified) simplified, " +
+            " a.a_pinyins, a.notes, a.class_type, a.class_level, a.themes, a.first_seen, a.is_exam, a.a_searchable_text, " +
             " w.traditional, w.hsk_level, w.pinyins, w.popularity, " +
-            " w.modality, w.examples, w.type, w.synonyms, w.antonym, w.collocations, " +
+            " w.modality, w.examples, w.type, w.synonyms, w.antonym, w.collocations, w.searchable_text, " +
             " (a.first_seen IS NULL) AS is_first_seen_null " +
             " FROM chinese_word_annotation AS a INNER JOIN word_list_entry AS wle ON a.a_simplified = wle.simplified " +
             " INNER JOIN word_list AS wl ON wl.id = wle.list_id " +
             " LEFT JOIN chinese_word AS w ON a.a_simplified = w.simplified " +
             " WHERE wl.name = :listName " +
             " AND (0=:hasAnnotation OR (1=:hasAnnotation AND a.first_seen IS NOT NULL)) " +
-            " AND (a.a_simplified LIKE '%' || :str || '%' OR a.a_searchable_text LIKE '%' || :str || '%' OR w.simplified LIKE '%' || :str || '%' OR w.traditional LIKE '%' || :str || '%' OR w.pinyins LIKE '%' || :str || '%' OR EXISTS (SELECT 1 FROM word_definition d WHERE d.simplified = w.simplified AND d.language = :language AND d.definition LIKE '%' || :str || '%'))" +
+            " AND (:str = '' OR a.a_simplified IN (" +
+            "      SELECT simplified FROM chinese_word_fts WHERE searchable_text MATCH :str || '*' " +
+            "      UNION SELECT simplified FROM word_definition_fts WHERE definition MATCH :str || '*' AND language = :language " +
+            "      UNION SELECT a_simplified AS simplified FROM chinese_word_annotation_fts WHERE a_searchable_text MATCH :str || '*' " +
+            "    ))" +
             " UNION ALL " +
             " SELECT COALESCE(a.a_simplified, w.simplified) a_simplified, w.simplified, " +
-            " COALESCE(a.a_searchable_text, '') a_searchable_text, " +
-            " a.a_pinyins, a.notes, a.class_type, a.class_level, a.themes, a.first_seen, a.is_exam," +
+            " a.a_pinyins, a.notes, a.class_type, a.class_level, a.themes, a.first_seen, a.is_exam, a.a_searchable_text, " +
             " w.traditional, w.hsk_level, w.pinyins, w.popularity, " +
-            " w.modality, w.examples, w.type, w.synonyms, w.antonym, w.collocations, " +
+            " w.modality, w.examples, w.type, w.synonyms, w.antonym, w.collocations, w.searchable_text, " +
             " (a.first_seen IS NULL) AS is_first_seen_null " +
             " FROM chinese_word AS w  INNER JOIN word_list_entry AS wle ON w.simplified = wle.simplified " +
             " INNER JOIN word_list AS wl ON wl.id = wle.list_id " +
             " LEFT JOIN chinese_word_annotation AS a ON a.a_simplified = w.simplified " +
             " WHERE wl.name = :listName AND a.a_simplified IS NULL " +
             " AND (0=:hasAnnotation) " +
-            " AND (w.simplified LIKE '%' || :str || '%' OR w.traditional LIKE '%' || :str || '%' OR w.pinyins LIKE '%' || :str || '%'" +
-            " OR EXISTS (SELECT 1 FROM word_definition d WHERE d.simplified = w.simplified AND d.language = :language AND d.definition LIKE '%' || :str || '%'))" +
+            " AND (:str = '' OR w.simplified IN (" +
+            "      SELECT simplified FROM chinese_word_fts WHERE searchable_text MATCH :str || '*' " +
+            "      UNION SELECT simplified FROM word_definition_fts WHERE definition MATCH :str || '*' AND language = :language " +
+            "      UNION SELECT a_simplified AS simplified FROM chinese_word_annotation_fts WHERE a_searchable_text MATCH :str || '*' " +
+            "    ))" +
             ") " +
             order_by_logic +
             " LIMIT :pageSize OFFSET (:page * :pageSize)")

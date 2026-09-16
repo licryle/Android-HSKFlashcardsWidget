@@ -1,8 +1,8 @@
 package fr.berliat.hskwidget.data.dao
 
 import androidx.room.Dao
-import androidx.room.Insert
 import androidx.room.Delete
+import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import fr.berliat.hskwidget.data.model.ChineseWordAnnotation
@@ -17,23 +17,10 @@ interface ChineseWordAnnotationDAO {
     suspend fun findBySimplified(simplified: String): ChineseWordAnnotation
 
     @Insert
-    suspend fun _insertAll(annotations: List<ChineseWordAnnotation>)
-
-    suspend fun insertAll(annotations: List<ChineseWordAnnotation>) {
-        annotations.forEach {
-            it.updateSearchable()
-        }
-
-        _insertAll(annotations)
-    }
+    suspend fun insertAll(annotations: List<ChineseWordAnnotation>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun _insertOrUpdate(annotation: ChineseWordAnnotation)
-
-    suspend fun insertOrUpdate(annotation: ChineseWordAnnotation) {
-        annotation.updateSearchable()
-        _insertOrUpdate(annotation)
-    }
+    suspend fun insertOrUpdate(annotation: ChineseWordAnnotation)
 
     @Delete
     suspend fun delete(annotation: ChineseWordAnnotation)

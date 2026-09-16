@@ -27,7 +27,8 @@ data class ChineseWord(
     @ColumnInfo(name = "modality", defaultValue = "N/A") val modality: Modality? = Modality.UNKNOWN,
     @ColumnInfo(name = "type", defaultValue = "N/A") val wordType: WordType? = WordType.UNKNOWN,
     @ColumnInfo(name = "synonyms", defaultValue = "") val synonyms: String? = "",
-    @ColumnInfo(name = "antonym", defaultValue = "") val antonym: String? = ""
+    @ColumnInfo(name = "antonym", defaultValue = "") val antonym: String? = "",
+    @ColumnInfo(name = "searchable_text", defaultValue = "") val searchableText: String = ""
 ) {
     /** Hydrated by read DAOs; never persisted in chinese_word. */
     @Ignore var definition: Map<fr.berliat.hskwidget.core.Locale, String> = emptyMap()

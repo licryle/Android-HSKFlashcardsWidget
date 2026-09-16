@@ -90,6 +90,7 @@ class DictionarySearchViewModel(private val prefsStore: AppPreferencesStore = HS
         currentSearchJob = CoroutineScope(AppDispatchers.IO).launch {
             _isLoading.value = true
             currentPage = 0
+
             val results = fetchResultsForPage()
 
             withContext(Dispatchers.Main) {
@@ -162,9 +163,5 @@ class DictionarySearchViewModel(private val prefsStore: AppPreferencesStore = HS
 
     fun listsAssociationChanged() {
         if (searchQuery.value.inListName != null) performSearch()
-    }
-
-    companion object {
-        private const val TAG = "DictionarySearchViewModel"
     }
 }

@@ -68,7 +68,7 @@ class AnnotateViewModel(
             themes = themes,
             firstSeen = firstSeen,  // Handle date logic
             isExam = isExam
-        )
+        ).withSearchableText()
 
         val annotatedWord = AnnotatedChineseWord(annotatedWord.word, updatedAnnotation)
         updateAnnotation(annotatedWord) { err -> callback?.invoke(annotatedWord, err) }

@@ -13,7 +13,7 @@ class BaseDictProvider(Provider):
         return {
             "chinese_word": {
                 "type": ProviderType.TABLE,
-                "columns": ["simplified", "traditional", "pinyins", "hsk_level"]
+                "columns": ["simplified", "traditional", "pinyins", "hsk_level", "searchable_text"]
             },
             "word_definition": {
                 "type": ProviderType.TABLE,
@@ -51,7 +51,16 @@ class BaseDictProvider(Provider):
                 record = self._extract_entry(line)
                 if record:
                     cedict_words.add(record["simplified"])
-                    yield ("chinese_word", {key: value for key, value in record.items() if key != "_definition"})
+                    
+                    toneless = unidecode(record["pinyins"])
+                    concatenated = toneless.replace(" ", "")
+                    hanzi_split = " ".join(list(record["simplified"]))
+                    searchable_text = f"{record['simplified']} {hanzi_split} {record['_definition']} {toneless} {concatenated}".lower()
+                    
+                    word_record = {key: value for key, value in record.items() if key != "_definition"}
+                    word_record["searchable_text"] = searchable_text
+                    
+                    yield ("chinese_word", word_record)
                     yield ("word_definition", {
                         "simplified": record["simplified"],
                         "language": "en",
@@ -69,7 +78,7 @@ class BaseDictProvider(Provider):
             columns = {row[1] for row in conn.execute("PRAGMA table_info(chinese_word)")}
             word_columns = [
                 "simplified", "traditional", "hsk_level", "pinyins", "popularity",
-                "examples", "collocations", "modality", "type", "synonyms", "antonym"
+                "examples", "collocations", "modality", "type", "synonyms", "antonym", "searchable_text"
             ]
             available_columns = [column for column in word_columns if column in columns]
             if "simplified" not in available_columns:

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 3,
-    "identityHash": "a92d1f6d964fdfdc0d621f9aeb7849dc",
+    "identityHash": "a7ed8acc62bd0bffba11eab9b68ad499",
     "entities": [
       {
         "tableName": "chinese_word_annotation",
@@ -50,7 +50,7 @@
             "affinity": "INTEGER"
           },
           {
-            "fieldPath": "a_searchable_text",
+            "fieldPath": "searchableText",
             "columnName": "a_searchable_text",
             "affinity": "TEXT",
             "notNull": true,
@@ -62,22 +62,11 @@
           "columnNames": [
             "a_simplified"
           ]
-        },
-        "indices": [
-          {
-            "name": "index_chinese_word_annotation_a_searchable_text",
-            "unique": false,
-            "columnNames": [
-              "a_searchable_text"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_chinese_word_annotation_a_searchable_text` ON `${TABLE_NAME}` (`a_searchable_text`)"
-          }
-        ]
+        }
       },
       {
         "tableName": "chinese_word",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`simplified` TEXT NOT NULL, `traditional` TEXT, `hsk_level` TEXT, `pinyins` TEXT, `popularity` INTEGER, `examples` TEXT DEFAULT '', `collocations` TEXT DEFAULT '', `modality` TEXT DEFAULT 'N/A', `type` TEXT DEFAULT 'N/A', `synonyms` TEXT DEFAULT '', `antonym` TEXT DEFAULT '', PRIMARY KEY(`simplified`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`simplified` TEXT NOT NULL, `traditional` TEXT, `hsk_level` TEXT, `pinyins` TEXT, `popularity` INTEGER, `examples` TEXT DEFAULT '', `collocations` TEXT DEFAULT '', `modality` TEXT DEFAULT 'N/A', `type` TEXT DEFAULT 'N/A', `synonyms` TEXT DEFAULT '', `antonym` TEXT DEFAULT '', `searchable_text` TEXT NOT NULL DEFAULT '', PRIMARY KEY(`simplified`))",
         "fields": [
           {
             "fieldPath": "simplified",
@@ -139,6 +128,13 @@
             "fieldPath": "antonym",
             "columnName": "antonym",
             "affinity": "TEXT",
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "searchableText",
+            "columnName": "searchable_text",
+            "affinity": "TEXT",
+            "notNull": true,
             "defaultValue": "''"
           }
         ],
@@ -416,11 +412,149 @@
             ]
           }
         ]
+      },
+      {
+        "tableName": "chinese_word_fts",
+        "createSql": "CREATE VIRTUAL TABLE IF NOT EXISTS `${TABLE_NAME}` USING FTS4(`searchable_text` TEXT NOT NULL, `simplified` TEXT NOT NULL, `traditional` TEXT, tokenize=unicode61, content=`chinese_word`)",
+        "fields": [
+          {
+            "fieldPath": "searchableText",
+            "columnName": "searchable_text",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "simplified",
+            "columnName": "simplified",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "traditional",
+            "columnName": "traditional",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": []
+        },
+        "ftsVersion": "FTS4",
+        "ftsOptions": {
+          "tokenizer": "unicode61",
+          "tokenizerArgs": [],
+          "contentTable": "chinese_word",
+          "languageIdColumnName": "",
+          "matchInfo": "FTS4",
+          "notIndexedColumns": [],
+          "prefixSizes": [],
+          "preferredOrder": "ASC"
+        },
+        "contentSyncTriggers": [
+          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_chinese_word_fts_BEFORE_UPDATE BEFORE UPDATE ON `chinese_word` BEGIN DELETE FROM `chinese_word_fts` WHERE `docid`=OLD.`rowid`; END",
+          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_chinese_word_fts_BEFORE_DELETE BEFORE DELETE ON `chinese_word` BEGIN DELETE FROM `chinese_word_fts` WHERE `docid`=OLD.`rowid`; END",
+          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_chinese_word_fts_AFTER_UPDATE AFTER UPDATE ON `chinese_word` BEGIN INSERT INTO `chinese_word_fts`(`docid`, `searchable_text`, `simplified`, `traditional`) VALUES (NEW.`rowid`, NEW.`searchable_text`, NEW.`simplified`, NEW.`traditional`); END",
+          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_chinese_word_fts_AFTER_INSERT AFTER INSERT ON `chinese_word` BEGIN INSERT INTO `chinese_word_fts`(`docid`, `searchable_text`, `simplified`, `traditional`) VALUES (NEW.`rowid`, NEW.`searchable_text`, NEW.`simplified`, NEW.`traditional`); END"
+        ]
+      },
+      {
+        "tableName": "word_definition_fts",
+        "createSql": "CREATE VIRTUAL TABLE IF NOT EXISTS `${TABLE_NAME}` USING FTS4(`simplified` TEXT NOT NULL, `language` TEXT NOT NULL, `definition` TEXT NOT NULL, tokenize=unicode61, content=`word_definition`)",
+        "fields": [
+          {
+            "fieldPath": "simplified",
+            "columnName": "simplified",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "language",
+            "columnName": "language",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "definition",
+            "columnName": "definition",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": []
+        },
+        "ftsVersion": "FTS4",
+        "ftsOptions": {
+          "tokenizer": "unicode61",
+          "tokenizerArgs": [],
+          "contentTable": "word_definition",
+          "languageIdColumnName": "",
+          "matchInfo": "FTS4",
+          "notIndexedColumns": [],
+          "prefixSizes": [],
+          "preferredOrder": "ASC"
+        },
+        "contentSyncTriggers": [
+          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_word_definition_fts_BEFORE_UPDATE BEFORE UPDATE ON `word_definition` BEGIN DELETE FROM `word_definition_fts` WHERE `docid`=OLD.`rowid`; END",
+          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_word_definition_fts_BEFORE_DELETE BEFORE DELETE ON `word_definition` BEGIN DELETE FROM `word_definition_fts` WHERE `docid`=OLD.`rowid`; END",
+          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_word_definition_fts_AFTER_UPDATE AFTER UPDATE ON `word_definition` BEGIN INSERT INTO `word_definition_fts`(`docid`, `simplified`, `language`, `definition`) VALUES (NEW.`rowid`, NEW.`simplified`, NEW.`language`, NEW.`definition`); END",
+          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_word_definition_fts_AFTER_INSERT AFTER INSERT ON `word_definition` BEGIN INSERT INTO `word_definition_fts`(`docid`, `simplified`, `language`, `definition`) VALUES (NEW.`rowid`, NEW.`simplified`, NEW.`language`, NEW.`definition`); END"
+        ]
+      },
+      {
+        "tableName": "chinese_word_annotation_fts",
+        "createSql": "CREATE VIRTUAL TABLE IF NOT EXISTS `${TABLE_NAME}` USING FTS4(`a_searchable_text` TEXT NOT NULL, `a_simplified` TEXT NOT NULL, `notes` TEXT, `themes` TEXT, tokenize=unicode61, content=`chinese_word_annotation`)",
+        "fields": [
+          {
+            "fieldPath": "searchableText",
+            "columnName": "a_searchable_text",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "simplified",
+            "columnName": "a_simplified",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "themes",
+            "columnName": "themes",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": []
+        },
+        "ftsVersion": "FTS4",
+        "ftsOptions": {
+          "tokenizer": "unicode61",
+          "tokenizerArgs": [],
+          "contentTable": "chinese_word_annotation",
+          "languageIdColumnName": "",
+          "matchInfo": "FTS4",
+          "notIndexedColumns": [],
+          "prefixSizes": [],
+          "preferredOrder": "ASC"
+        },
+        "contentSyncTriggers": [
+          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_chinese_word_annotation_fts_BEFORE_UPDATE BEFORE UPDATE ON `chinese_word_annotation` BEGIN DELETE FROM `chinese_word_annotation_fts` WHERE `docid`=OLD.`rowid`; END",
+          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_chinese_word_annotation_fts_BEFORE_DELETE BEFORE DELETE ON `chinese_word_annotation` BEGIN DELETE FROM `chinese_word_annotation_fts` WHERE `docid`=OLD.`rowid`; END",
+          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_chinese_word_annotation_fts_AFTER_UPDATE AFTER UPDATE ON `chinese_word_annotation` BEGIN INSERT INTO `chinese_word_annotation_fts`(`docid`, `a_searchable_text`, `a_simplified`, `notes`, `themes`) VALUES (NEW.`rowid`, NEW.`a_searchable_text`, NEW.`a_simplified`, NEW.`notes`, NEW.`themes`); END",
+          "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_chinese_word_annotation_fts_AFTER_INSERT AFTER INSERT ON `chinese_word_annotation` BEGIN INSERT INTO `chinese_word_annotation_fts`(`docid`, `a_searchable_text`, `a_simplified`, `notes`, `themes`) VALUES (NEW.`rowid`, NEW.`a_searchable_text`, NEW.`a_simplified`, NEW.`notes`, NEW.`themes`); END"
+        ]
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a92d1f6d964fdfdc0d621f9aeb7849dc')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a7ed8acc62bd0bffba11eab9b68ad499')"
     ]
   }
 }

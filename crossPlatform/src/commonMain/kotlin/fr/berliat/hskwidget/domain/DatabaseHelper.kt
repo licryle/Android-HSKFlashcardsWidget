@@ -95,17 +95,42 @@ class DatabaseHelper private constructor() {
                         `type` TEXT DEFAULT 'N/A',
                         `synonyms` TEXT DEFAULT '',
                         `antonym` TEXT DEFAULT '',
+                        `searchable_text` TEXT NOT NULL DEFAULT '',
                         PRIMARY KEY(`simplified`)
                     )
                 """.trimIndent())
                 connection.execSQL("""
                     INSERT INTO `chinese_word_new`
-                    (`simplified`, `traditional`, `hsk_level`, `pinyins`, `popularity`, `examples`, `collocations`, `modality`, `type`, `synonyms`, `antonym`)
-                    SELECT `simplified`, `traditional`, `hsk_level`, `pinyins`, `popularity`, `examples`, `collocations`, `modality`, `type`, `synonyms`, `antonym`
+                    (`simplified`, `traditional`, `hsk_level`, `pinyins`, `popularity`, `examples`, `collocations`, `modality`, `type`, `synonyms`, `antonym`, `searchable_text`)
+                    SELECT `simplified`, `traditional`, `hsk_level`, `pinyins`, `popularity`, `examples`, `collocations`, `modality`, `type`, `synonyms`, `antonym`, ''
                     FROM `chinese_word`
                 """.trimIndent())
                 connection.execSQL("DROP TABLE `chinese_word`")
                 connection.execSQL("ALTER TABLE `chinese_word_new` RENAME TO `chinese_word`")
+
+                connection.execSQL("""
+                    CREATE TABLE IF NOT EXISTS `chinese_word_annotation_new` (
+                        `a_simplified` TEXT NOT NULL,
+                        `a_pinyins` TEXT,
+                        `notes` TEXT,
+                        `class_type` TEXT,
+                        `class_level` TEXT,
+                        `themes` TEXT,
+                        `first_seen` INTEGER,
+                        `is_exam` INTEGER,
+                        `a_searchable_text` TEXT NOT NULL DEFAULT '',
+                        PRIMARY KEY(`a_simplified`)
+                    )
+                """.trimIndent())
+                connection.execSQL("""
+                    INSERT INTO `chinese_word_annotation_new`
+                    (`a_simplified`, `a_pinyins`, `notes`, `class_type`, `class_level`, `themes`, `first_seen`, `is_exam`, `a_searchable_text`)
+                    SELECT `a_simplified`, `a_pinyins`, `notes`, `class_type`, `class_level`, `themes`, `first_seen`, `is_exam`, ''
+                    FROM `chinese_word_annotation`
+                """.trimIndent())
+                connection.execSQL("DROP TABLE `chinese_word_annotation`")
+                connection.execSQL("ALTER TABLE `chinese_word_annotation_new` RENAME TO `chinese_word_annotation`")
+
                 connection.execSQL("""
                     CREATE TABLE IF NOT EXISTS `word_definition` (
                         `simplified` TEXT NOT NULL,
@@ -116,6 +141,36 @@ class DatabaseHelper private constructor() {
                     )
                 """.trimIndent())
                 connection.execSQL("CREATE INDEX IF NOT EXISTS `index_word_definition_language_definition` ON `word_definition` (`language`, `definition`)")
+
+                // Recreate FTS tables and triggers to ensure they are linked to the new content tables
+                connection.execSQL("DROP TABLE IF EXISTS `chinese_word_fts`")
+                connection.execSQL("CREATE VIRTUAL TABLE `chinese_word_fts` USING FTS4(`simplified` TEXT NOT NULL, `traditional` TEXT, `searchable_text` TEXT, content=`chinese_word`, tokenize=unicode61)")
+                connection.execSQL("INSERT INTO `chinese_word_fts`(`docid`, `simplified`, `traditional`, `searchable_text`) SELECT `rowid`, `simplified`, `traditional`, `searchable_text` FROM `chinese_word`")
+
+                connection.execSQL("DROP TABLE IF EXISTS `word_definition_fts`")
+                connection.execSQL("CREATE VIRTUAL TABLE `word_definition_fts` USING FTS4(`simplified` TEXT NOT NULL, `language` TEXT NOT NULL, `definition` TEXT NOT NULL, content=`word_definition`, tokenize=unicode61)")
+                connection.execSQL("INSERT INTO `word_definition_fts`(`docid`, `simplified`, `language`, `definition`) SELECT `rowid`, `simplified`, `language`, `definition` FROM `word_definition`")
+
+                connection.execSQL("DROP TABLE IF EXISTS `chinese_word_annotation_fts`")
+                connection.execSQL("CREATE VIRTUAL TABLE `chinese_word_annotation_fts` USING FTS4(`a_simplified` TEXT NOT NULL, `notes` TEXT, `themes` TEXT, `a_searchable_text` TEXT, content=`chinese_word_annotation`, tokenize=unicode61)")
+                connection.execSQL("INSERT INTO `chinese_word_annotation_fts`(`docid`, `a_simplified`, `notes`, `themes`, `a_searchable_text`) SELECT `rowid`, `a_simplified`, `notes`, `themes`, `a_searchable_text` FROM `chinese_word_annotation`")
+
+                // Re-register Room's FTS sync triggers
+                val triggers = listOf(
+                    "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_chinese_word_fts_BEFORE_UPDATE BEFORE UPDATE ON `chinese_word` BEGIN DELETE FROM `chinese_word_fts` WHERE `docid`=OLD.`rowid`; END",
+                    "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_chinese_word_fts_BEFORE_DELETE BEFORE DELETE ON `chinese_word` BEGIN DELETE FROM `chinese_word_fts` WHERE `docid`=OLD.`rowid`; END",
+                    "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_chinese_word_fts_AFTER_UPDATE AFTER UPDATE ON `chinese_word` BEGIN INSERT INTO `chinese_word_fts`(`docid`, `simplified`, `traditional`, `searchable_text`) VALUES (NEW.`rowid`, NEW.`simplified`, NEW.`traditional`, NEW.`searchable_text`); END",
+                    "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_chinese_word_fts_AFTER_INSERT AFTER INSERT ON `chinese_word` BEGIN INSERT INTO `chinese_word_fts`(`docid`, `simplified`, `traditional`, `searchable_text`) VALUES (NEW.`rowid`, NEW.`simplified`, NEW.`traditional`, NEW.`searchable_text`); END",
+                    "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_word_definition_fts_BEFORE_UPDATE BEFORE UPDATE ON `word_definition` BEGIN DELETE FROM `word_definition_fts` WHERE `docid`=OLD.`rowid`; END",
+                    "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_word_definition_fts_BEFORE_DELETE BEFORE DELETE ON `word_definition` BEGIN DELETE FROM `word_definition_fts` WHERE `docid`=OLD.`rowid`; END",
+                    "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_word_definition_fts_AFTER_UPDATE AFTER UPDATE ON `word_definition` BEGIN INSERT INTO `word_definition_fts`(`docid`, `simplified`, `language`, `definition`) VALUES (NEW.`rowid`, NEW.`simplified`, NEW.`language`, NEW.`definition`); END",
+                    "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_word_definition_fts_AFTER_INSERT AFTER INSERT ON `word_definition` BEGIN INSERT INTO `word_definition_fts`(`docid`, `simplified`, `language`, `definition`) VALUES (NEW.`rowid`, NEW.`simplified`, NEW.`language`, NEW.`definition`); END",
+                    "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_chinese_word_annotation_fts_BEFORE_UPDATE BEFORE UPDATE ON `chinese_word_annotation` BEGIN DELETE FROM `chinese_word_annotation_fts` WHERE `docid`=OLD.`rowid`; END",
+                    "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_chinese_word_annotation_fts_BEFORE_DELETE BEFORE DELETE ON `chinese_word_annotation` BEGIN DELETE FROM `chinese_word_annotation_fts` WHERE `docid`=OLD.`rowid`; END",
+                    "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_chinese_word_annotation_fts_AFTER_UPDATE AFTER UPDATE ON `chinese_word_annotation` BEGIN INSERT INTO `chinese_word_annotation_fts`(`docid`, `a_simplified`, `notes`, `themes`, `a_searchable_text`) VALUES (NEW.`rowid`, NEW.`a_simplified`, NEW.`notes`, NEW.`themes`, NEW.`a_searchable_text`); END",
+                    "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_chinese_word_annotation_fts_AFTER_INSERT AFTER INSERT ON `chinese_word_annotation` BEGIN INSERT INTO `chinese_word_annotation_fts`(`docid`, `a_simplified`, `notes`, `themes`, `a_searchable_text`) VALUES (NEW.`rowid`, NEW.`a_simplified`, NEW.`notes`, NEW.`themes`, NEW.`a_searchable_text`); END"
+                )
+                triggers.forEach { connection.execSQL(it) }
             }
         }
 

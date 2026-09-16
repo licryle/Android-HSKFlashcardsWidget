@@ -123,6 +123,7 @@ kotlin {
                 implementation(libs.navigation.compose)
                 implementation(project(":hsktextviews"))
                 implementation(project(":googledrivebackup"))
+                implementation(project(":pinyin4kot"))
             }
         }
 
