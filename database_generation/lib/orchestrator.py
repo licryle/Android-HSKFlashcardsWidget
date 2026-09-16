@@ -271,7 +271,7 @@ class Orchestrator:
             concatenated = toneless.replace(" ", "")
             hanzi_split = " ".join(list(simplified))
             
-            parts = [simplified, traditional, hanzi_split, toneless, concatenated, definitions, examples, collocations, synonyms, antonym]
+            parts = [simplified, traditional, hanzi_split, toneless, concatenated, examples, collocations, synonyms, antonym]
             searchable_text = " ".join([str(p) for p in parts if p]).lower()
             
             cursor.execute("UPDATE chinese_word SET searchable_text = ? WHERE simplified = ?", (searchable_text, simplified))
