@@ -1,6 +1,6 @@
 package fr.berliat.hskwidget.data.model
 
-import androidx.room.Embedded
+import androidx.room3.Embedded
 import fr.berliat.hskwidget.data.type.HSK_Level
 import fr.berliat.hskwidget.data.type.Pinyins
 import kotlinx.serialization.Serializable

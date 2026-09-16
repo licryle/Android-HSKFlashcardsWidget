@@ -1,11 +1,11 @@
 package fr.berliat.hskwidget.data.model
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.Fts4
-import androidx.room.FtsOptions
+import androidx.room3.ColumnInfo
+import androidx.room3.Entity
+import androidx.room3.Fts5
+import androidx.room3.FtsOptions
 
-@Fts4(contentEntity = ChineseWord::class, tokenizer = FtsOptions.TOKENIZER_UNICODE61)
+@Fts5(contentEntity = ChineseWord::class, tokenizer = FtsOptions.TOKENIZER_UNICODE61)
 @Entity(tableName = "chinese_word_fts")
 data class ChineseWordFTS(
     @ColumnInfo(name = "searchable_text") val searchableText: String,
@@ -13,7 +13,7 @@ data class ChineseWordFTS(
     val traditional: String?,
 )
 
-@Fts4(contentEntity = WordDefinition::class, tokenizer = FtsOptions.TOKENIZER_UNICODE61)
+@Fts5(contentEntity = WordDefinition::class, tokenizer = FtsOptions.TOKENIZER_UNICODE61)
 @Entity(tableName = "word_definition_fts")
 data class WordDefinitionFTS(
     val simplified: String,
@@ -21,7 +21,7 @@ data class WordDefinitionFTS(
     val definition: String
 )
 
-@Fts4(contentEntity = ChineseWordAnnotation::class, tokenizer = FtsOptions.TOKENIZER_UNICODE61)
+@Fts5(contentEntity = ChineseWordAnnotation::class, tokenizer = FtsOptions.TOKENIZER_UNICODE61)
 @Entity(tableName = "chinese_word_annotation_fts")
 data class ChineseWordAnnotationFTS(
     @ColumnInfo(name = "a_searchable_text") val searchableText: String,

@@ -1,6 +1,5 @@
 package fr.berliat.hskwidget.data.model
 
-import fr.berliat.hskwidget.core.Locale
 import fr.berliat.hskwidget.data.type.HSK_Level
 import fr.berliat.hskwidget.data.type.Modality
 import fr.berliat.hskwidget.data.type.Pinyins
@@ -8,7 +7,6 @@ import fr.berliat.hskwidget.data.type.WordType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
-import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 

@@ -121,6 +121,7 @@ kotlin {
                 implementation(libs.filekit.dialogs.compose)
                 implementation(libs.camerak)
                 implementation(libs.navigation.compose)
+                implementation(project(":pinyin4kot"))
                 implementation(project(":hsktextviews"))
                 implementation(project(":googledrivebackup"))
                 implementation(project(":pinyin4kot"))
@@ -194,7 +195,7 @@ compose.resources {
     generateResClass = always
 }
 
-room {
+room3 {
     schemaDirectory("$projectDir/schemas")
 }
 

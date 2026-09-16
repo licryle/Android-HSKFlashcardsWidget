@@ -1,9 +1,9 @@
 package fr.berliat.hskwidget.data.model
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.Ignore
-import androidx.room.PrimaryKey
+import androidx.room3.ColumnInfo
+import androidx.room3.Entity
+import androidx.room3.Ignore
+import androidx.room3.PrimaryKey
 
 import fr.berliat.hskwidget.data.type.HSK_Level
 import fr.berliat.hskwidget.data.type.Modality
@@ -31,7 +31,8 @@ data class ChineseWord(
     @ColumnInfo(name = "searchable_text", defaultValue = "") val searchableText: String = ""
 ) {
     /** Hydrated by read DAOs; never persisted in chinese_word. */
-    @Ignore var definition: Map<fr.berliat.hskwidget.core.Locale, String> = emptyMap()
+    @Ignore
+    var definition: Map<fr.berliat.hskwidget.core.Locale, String> = emptyMap()
 
     init {
         if (simplified.isBlank()) {

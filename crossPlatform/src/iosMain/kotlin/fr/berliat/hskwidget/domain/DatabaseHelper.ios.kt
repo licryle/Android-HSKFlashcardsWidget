@@ -1,6 +1,6 @@
 package fr.berliat.hskwidget.domain
 
-import androidx.room.Room
+import androidx.room3.Room
 
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.createDirectories

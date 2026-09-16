@@ -1,8 +1,8 @@
 package fr.berliat.hskwidget.data.dao
 
-import androidx.room.Dao
-import androidx.room.Query
-import androidx.room.Upsert
+import androidx.room3.Dao
+import androidx.room3.Query
+import androidx.room3.Upsert
 import fr.berliat.hskwidget.data.model.WordDefinition
 
 @Dao

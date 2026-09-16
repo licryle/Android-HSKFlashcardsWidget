@@ -291,4 +291,10 @@ class Orchestrator:
             
             cursor.execute("UPDATE chinese_word_annotation SET a_searchable_text = ? WHERE a_simplified = ?", (searchable_text, a_simplified))
             
+        # Rebuild FTS indexes to ensure they are in sync and not corrupted by REPLACE operations during assembly
+        self.logger.info("Rebuilding FTS5 indexes...")
+        cursor.execute("INSERT INTO chinese_word_fts(chinese_word_fts) VALUES('rebuild')")
+        cursor.execute("INSERT INTO word_definition_fts(word_definition_fts) VALUES('rebuild')")
+        cursor.execute("INSERT INTO chinese_word_annotation_fts(chinese_word_annotation_fts) VALUES('rebuild')")
+
         conn.commit()

@@ -1,7 +1,9 @@
 package fr.berliat.hskwidget.domain
 
-import androidx.room.RoomDatabase
-import androidx.room.migration.Migration
+import androidx.room3.RoomDatabase
+import androidx.room3.executeSQL
+import androidx.room3.useWriterConnection
+import androidx.room3.migration.Migration
 import androidx.sqlite.SQLiteConnection
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import androidx.sqlite.execSQL
@@ -71,7 +73,7 @@ class DatabaseHelper private constructor() {
         }
 
         val MIGRATION_1_2 = object : Migration(1, 2) {
-            override fun migrate(connection: SQLiteConnection) {
+            override suspend fun migrate(connection: SQLiteConnection) {
                 connection.execSQL("ALTER TABLE chinese_word ADD COLUMN collocations TEXT DEFAULT ''")
             }
         }
@@ -81,7 +83,7 @@ class DatabaseHelper private constructor() {
          * not migrated from the old bundled dictionary: only user-owned tables are retained.
          */
         val MIGRATION_2_3 = object : Migration(2, 3) {
-            override fun migrate(connection: SQLiteConnection) {
+            override suspend fun migrate(connection: SQLiteConnection) {
                 connection.execSQL("""
                     CREATE TABLE IF NOT EXISTS `chinese_word_new` (
                         `simplified` TEXT NOT NULL,
@@ -144,31 +146,31 @@ class DatabaseHelper private constructor() {
 
                 // Recreate FTS tables and triggers to ensure they are linked to the new content tables
                 connection.execSQL("DROP TABLE IF EXISTS `chinese_word_fts`")
-                connection.execSQL("CREATE VIRTUAL TABLE `chinese_word_fts` USING FTS4(`simplified` TEXT NOT NULL, `traditional` TEXT, `searchable_text` TEXT, content=`chinese_word`, tokenize=unicode61)")
-                connection.execSQL("INSERT INTO `chinese_word_fts`(`docid`, `simplified`, `traditional`, `searchable_text`) SELECT `rowid`, `simplified`, `traditional`, `searchable_text` FROM `chinese_word`")
+                connection.execSQL("CREATE VIRTUAL TABLE `chinese_word_fts` USING FTS5(`searchable_text`, `simplified`, `traditional`, tokenize=`unicode61`, content=`chinese_word`)")
+                connection.execSQL("INSERT INTO `chinese_word_fts`(`rowid`, `searchable_text`, `simplified`, `traditional`) SELECT `rowid`, `searchable_text`, `simplified`, `traditional` FROM `chinese_word`")
 
                 connection.execSQL("DROP TABLE IF EXISTS `word_definition_fts`")
-                connection.execSQL("CREATE VIRTUAL TABLE `word_definition_fts` USING FTS4(`simplified` TEXT NOT NULL, `language` TEXT NOT NULL, `definition` TEXT NOT NULL, content=`word_definition`, tokenize=unicode61)")
-                connection.execSQL("INSERT INTO `word_definition_fts`(`docid`, `simplified`, `language`, `definition`) SELECT `rowid`, `simplified`, `language`, `definition` FROM `word_definition`")
+                connection.execSQL("CREATE VIRTUAL TABLE `word_definition_fts` USING FTS5(`simplified`, `language`, `definition`, tokenize=`unicode61`, content=`word_definition`)")
+                connection.execSQL("INSERT INTO `word_definition_fts`(`rowid`, `simplified`, `language`, `definition`) SELECT `rowid`, `simplified`, `language`, `definition` FROM `word_definition`")
 
                 connection.execSQL("DROP TABLE IF EXISTS `chinese_word_annotation_fts`")
-                connection.execSQL("CREATE VIRTUAL TABLE `chinese_word_annotation_fts` USING FTS4(`a_simplified` TEXT NOT NULL, `notes` TEXT, `themes` TEXT, `a_searchable_text` TEXT, content=`chinese_word_annotation`, tokenize=unicode61)")
-                connection.execSQL("INSERT INTO `chinese_word_annotation_fts`(`docid`, `a_simplified`, `notes`, `themes`, `a_searchable_text`) SELECT `rowid`, `a_simplified`, `notes`, `themes`, `a_searchable_text` FROM `chinese_word_annotation`")
+                connection.execSQL("CREATE VIRTUAL TABLE `chinese_word_annotation_fts` USING FTS5(`a_searchable_text`, `a_simplified`, `notes`, `themes`, tokenize=`unicode61`, content=`chinese_word_annotation`)")
+                connection.execSQL("INSERT INTO `chinese_word_annotation_fts`(`rowid`, `a_searchable_text`, `a_simplified`, `notes`, `themes`) SELECT `rowid`, `a_searchable_text`, `a_simplified`, `notes`, `themes` FROM `chinese_word_annotation`")
 
                 // Re-register Room's FTS sync triggers
                 val triggers = listOf(
-                    "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_chinese_word_fts_BEFORE_UPDATE BEFORE UPDATE ON `chinese_word` BEGIN DELETE FROM `chinese_word_fts` WHERE `docid`=OLD.`rowid`; END",
-                    "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_chinese_word_fts_BEFORE_DELETE BEFORE DELETE ON `chinese_word` BEGIN DELETE FROM `chinese_word_fts` WHERE `docid`=OLD.`rowid`; END",
-                    "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_chinese_word_fts_AFTER_UPDATE AFTER UPDATE ON `chinese_word` BEGIN INSERT INTO `chinese_word_fts`(`docid`, `simplified`, `traditional`, `searchable_text`) VALUES (NEW.`rowid`, NEW.`simplified`, NEW.`traditional`, NEW.`searchable_text`); END",
-                    "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_chinese_word_fts_AFTER_INSERT AFTER INSERT ON `chinese_word` BEGIN INSERT INTO `chinese_word_fts`(`docid`, `simplified`, `traditional`, `searchable_text`) VALUES (NEW.`rowid`, NEW.`simplified`, NEW.`traditional`, NEW.`searchable_text`); END",
-                    "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_word_definition_fts_BEFORE_UPDATE BEFORE UPDATE ON `word_definition` BEGIN DELETE FROM `word_definition_fts` WHERE `docid`=OLD.`rowid`; END",
-                    "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_word_definition_fts_BEFORE_DELETE BEFORE DELETE ON `word_definition` BEGIN DELETE FROM `word_definition_fts` WHERE `docid`=OLD.`rowid`; END",
-                    "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_word_definition_fts_AFTER_UPDATE AFTER UPDATE ON `word_definition` BEGIN INSERT INTO `word_definition_fts`(`docid`, `simplified`, `language`, `definition`) VALUES (NEW.`rowid`, NEW.`simplified`, NEW.`language`, NEW.`definition`); END",
-                    "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_word_definition_fts_AFTER_INSERT AFTER INSERT ON `word_definition` BEGIN INSERT INTO `word_definition_fts`(`docid`, `simplified`, `language`, `definition`) VALUES (NEW.`rowid`, NEW.`simplified`, NEW.`language`, NEW.`definition`); END",
-                    "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_chinese_word_annotation_fts_BEFORE_UPDATE BEFORE UPDATE ON `chinese_word_annotation` BEGIN DELETE FROM `chinese_word_annotation_fts` WHERE `docid`=OLD.`rowid`; END",
-                    "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_chinese_word_annotation_fts_BEFORE_DELETE BEFORE DELETE ON `chinese_word_annotation` BEGIN DELETE FROM `chinese_word_annotation_fts` WHERE `docid`=OLD.`rowid`; END",
-                    "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_chinese_word_annotation_fts_AFTER_UPDATE AFTER UPDATE ON `chinese_word_annotation` BEGIN INSERT INTO `chinese_word_annotation_fts`(`docid`, `a_simplified`, `notes`, `themes`, `a_searchable_text`) VALUES (NEW.`rowid`, NEW.`a_simplified`, NEW.`notes`, NEW.`themes`, NEW.`a_searchable_text`); END",
-                    "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_chinese_word_annotation_fts_AFTER_INSERT AFTER INSERT ON `chinese_word_annotation` BEGIN INSERT INTO `chinese_word_annotation_fts`(`docid`, `a_simplified`, `notes`, `themes`, `a_searchable_text`) VALUES (NEW.`rowid`, NEW.`a_simplified`, NEW.`notes`, NEW.`themes`, NEW.`a_searchable_text`); END"
+                    "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_chinese_word_fts_BEFORE_UPDATE BEFORE UPDATE ON `chinese_word` BEGIN DELETE FROM `chinese_word_fts` WHERE `rowid`=OLD.`rowid`; END",
+                    "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_chinese_word_fts_BEFORE_DELETE BEFORE DELETE ON `chinese_word` BEGIN DELETE FROM `chinese_word_fts` WHERE `rowid`=OLD.`rowid`; END",
+                    "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_chinese_word_fts_AFTER_UPDATE AFTER UPDATE ON `chinese_word` BEGIN INSERT INTO `chinese_word_fts`(`rowid`, `searchable_text`, `simplified`, `traditional`) VALUES (NEW.`rowid`, NEW.`searchable_text`, NEW.`simplified`, NEW.`traditional`); END",
+                    "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_chinese_word_fts_AFTER_INSERT AFTER INSERT ON `chinese_word` BEGIN INSERT INTO `chinese_word_fts`(`rowid`, `searchable_text`, `simplified`, `traditional`) VALUES (NEW.`rowid`, NEW.`searchable_text`, NEW.`simplified`, NEW.`traditional`); END",
+                    "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_word_definition_fts_BEFORE_UPDATE BEFORE UPDATE ON `word_definition` BEGIN DELETE FROM `word_definition_fts` WHERE `rowid`=OLD.`rowid`; END",
+                    "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_word_definition_fts_BEFORE_DELETE BEFORE DELETE ON `word_definition` BEGIN DELETE FROM `word_definition_fts` WHERE `rowid`=OLD.`rowid`; END",
+                    "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_word_definition_fts_AFTER_UPDATE AFTER UPDATE ON `word_definition` BEGIN INSERT INTO `word_definition_fts`(`rowid`, `simplified`, `language`, `definition`) VALUES (NEW.`rowid`, NEW.`simplified`, NEW.`language`, NEW.`definition`); END",
+                    "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_word_definition_fts_AFTER_INSERT AFTER INSERT ON `word_definition` BEGIN INSERT INTO `word_definition_fts`(`rowid`, `simplified`, `language`, `definition`) VALUES (NEW.`rowid`, NEW.`simplified`, NEW.`language`, NEW.`definition`); END",
+                    "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_chinese_word_annotation_fts_BEFORE_UPDATE BEFORE UPDATE ON `chinese_word_annotation` BEGIN DELETE FROM `chinese_word_annotation_fts` WHERE `rowid`=OLD.`rowid`; END",
+                    "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_chinese_word_annotation_fts_BEFORE_DELETE BEFORE DELETE ON `chinese_word_annotation` BEGIN DELETE FROM `chinese_word_annotation_fts` WHERE `rowid`=OLD.`rowid`; END",
+                    "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_chinese_word_annotation_fts_AFTER_UPDATE AFTER UPDATE ON `chinese_word_annotation` BEGIN INSERT INTO `chinese_word_annotation_fts`(`rowid`, `a_searchable_text`, `a_simplified`, `notes`, `themes`) VALUES (NEW.`rowid`, NEW.`a_searchable_text`, NEW.`a_simplified`, NEW.`notes`, NEW.`themes`); END",
+                    "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_chinese_word_annotation_fts_AFTER_INSERT AFTER INSERT ON `chinese_word_annotation` BEGIN INSERT INTO `chinese_word_annotation_fts`(`rowid`, `a_searchable_text`, `a_simplified`, `notes`, `themes`) VALUES (NEW.`rowid`, NEW.`a_searchable_text`, NEW.`a_simplified`, NEW.`notes`, NEW.`themes`); END"
                 )
                 triggers.forEach { connection.execSQL(it) }
             }
@@ -181,6 +183,20 @@ class DatabaseHelper private constructor() {
                 .setDriver(sqlDriver)
                 .setQueryCoroutineContext(AppDispatchers.IO)
                 .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+                .addCallback(object : RoomDatabase.Callback() {
+                    override suspend fun onOpen(connection: SQLiteConnection) {
+                        // Rebuild FTS indexes on open to fix any corruption in the pre-populated asset
+                        // or from previous sync issues. FTS5 'rebuild' is efficient and safe.
+                        try {
+                            connection.execSQL("INSERT INTO chinese_word_fts(chinese_word_fts) VALUES('rebuild')")
+                            connection.execSQL("INSERT INTO word_definition_fts(word_definition_fts) VALUES('rebuild')")
+                            connection.execSQL("INSERT INTO chinese_word_annotation_fts(chinese_word_annotation_fts) VALUES('rebuild')")
+                            Logger.i(tag=TAG, messageString = "FTS5 indexes rebuilt successfully")
+                        } catch (e: Exception) {
+                            Logger.e(tag=TAG, messageString = "Failed to rebuild FTS5 indexes: ${e.message}")
+                        }
+                    }
+                })
 
             val db = finalBuilder.build()
             db._databaseFile = databaseBuilder.file
@@ -313,6 +329,13 @@ class DatabaseHelper private constructor() {
         }
         updateWith.wordDefinitionDAO().getAll().chunked(5000).forEach { chunk ->
             liveDatabase.wordDefinitionDAO().upsertAll(chunk)
+        }
+
+        // Rebuild FTS indexes after bulk update to ensure sync and fix any corruption
+        liveDatabase.useWriterConnection { connection ->
+            connection.executeSQL("INSERT INTO chinese_word_fts(chinese_word_fts) VALUES('rebuild')")
+            connection.executeSQL("INSERT INTO word_definition_fts(word_definition_fts) VALUES('rebuild')")
+            connection.executeSQL("INSERT INTO chinese_word_annotation_fts(chinese_word_annotation_fts) VALUES('rebuild')")
         }
 
         Logger.i(tag = TAG, messageString = "Database update done")

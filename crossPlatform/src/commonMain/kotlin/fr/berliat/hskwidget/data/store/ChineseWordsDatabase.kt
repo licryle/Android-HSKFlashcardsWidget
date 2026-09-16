@@ -1,12 +1,12 @@
 package fr.berliat.hskwidget.data.store
 
-import androidx.room.ConstructedBy
-import androidx.room.Database
-import androidx.room.RoomDatabase
-import androidx.room.RoomDatabaseConstructor
-import androidx.room.TypeConverters
-import androidx.room.execSQL
-import androidx.room.useWriterConnection
+import androidx.room3.ColumnTypeConverters
+import androidx.room3.ConstructedBy
+import androidx.room3.Database
+import androidx.room3.RoomDatabase
+import androidx.room3.RoomDatabaseConstructor
+import androidx.room3.executeSQL
+import androidx.room3.useWriterConnection
 
 import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.PlatformFile
@@ -45,7 +45,7 @@ import fr.berliat.hskwidget.data.type.WordTypeConverter
         WordList::class, WordListEntry::class, WidgetListEntry::class,
         ChineseWordFTS::class, WordDefinitionFTS::class, ChineseWordAnnotationFTS::class],
     version = ChineseWordsDatabase.DATABASE_VERSION, exportSchema = true)
-@TypeConverters(
+@ColumnTypeConverters(
     Pinyins::class,
     WordTypeConverter::class,
     ModalityConverter::class,
@@ -74,7 +74,7 @@ abstract class ChineseWordsDatabase: RoomDatabase() {
     suspend fun snapshotToFile(): PlatformFile? = try {
         // Flush live WAL to the main file
         this.useWriterConnection { connection ->
-            connection.execSQL("PRAGMA wal_checkpoint(truncate)")
+            connection.executeSQL("PRAGMA wal_checkpoint(truncate)")
         }
 
         val mainFile = this.databaseFile

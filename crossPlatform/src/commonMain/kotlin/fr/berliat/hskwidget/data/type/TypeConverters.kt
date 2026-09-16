@@ -1,6 +1,6 @@
 package fr.berliat.hskwidget.data.type
 
-import androidx.room.TypeConverter
+import androidx.room3.ColumnTypeConverter
 import fr.berliat.hskwidget.core.Locale
 import fr.berliat.hskwidget.core.LocaleSerializer
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
@@ -14,7 +14,7 @@ import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
 
 object DefinitionsConverter {
-    @TypeConverter
+    @ColumnTypeConverter
     fun fromStringMap(value: Map<Locale, String>?): String? {
         if (value == null) return null
         return Json.encodeToString(
@@ -23,7 +23,7 @@ object DefinitionsConverter {
         )
     }
 
-    @TypeConverter
+    @ColumnTypeConverter
     fun fromString(s: String?): Map<Locale, String>? {
         if (s == null)
             return mapOf()
@@ -36,25 +36,25 @@ object DefinitionsConverter {
 }
 
 object WordTypeConverter {
-    @TypeConverter
+    @ColumnTypeConverter
     fun fromType(value: String?): WordType =
         value?.let { WordType.from(it) } ?: WordType.UNKNOWN
 
-    @TypeConverter
+    @ColumnTypeConverter
     fun toType(wordType: WordType): String = wordType.wordType
 }
 
 object ModalityConverter {
-    @TypeConverter
+    @ColumnTypeConverter
     fun fromModality(value: String?): Modality =
         value?.let { Modality.from(it) } ?: Modality.UNKNOWN
 
-    @TypeConverter
+    @ColumnTypeConverter
     fun toModality(modality: Modality): String = modality.mod
 }
 
 object AnnotatedChineseWordsConverter {
-    @TypeConverter
+    @ColumnTypeConverter
     fun fromMapToList(m: Map<ChineseWordAnnotation, List<ChineseWord>>): List<AnnotatedChineseWord> {
         val words = mutableSetOf<AnnotatedChineseWord>()
 
@@ -65,7 +65,7 @@ object AnnotatedChineseWordsConverter {
         return words.toList()
     }
 
-    @TypeConverter
+    @ColumnTypeConverter
     fun fromMapToFirst(m: Map<ChineseWordAnnotation, List<ChineseWord>>): AnnotatedChineseWord? {
         val words = fromMapToList(m)
 
@@ -75,7 +75,7 @@ object AnnotatedChineseWordsConverter {
         return words.first()
     }
 
-    @TypeConverter
+    @ColumnTypeConverter
     fun fromListToMap(l: List<Map<ChineseWordAnnotation, List<ChineseWord>>>): Map<String, AnnotatedChineseWord> {
         val words = mutableMapOf<String, AnnotatedChineseWord>()
 
@@ -89,24 +89,24 @@ object AnnotatedChineseWordsConverter {
 }
 
 object InstantConverter {
-    @TypeConverter
+    @ColumnTypeConverter
     fun toInstant(epochMillis: Long?): Instant? {
         return epochMillis?.let { Instant.fromEpochMilliseconds(epochMillis) }
     }
 
-    @TypeConverter
+    @ColumnTypeConverter
     fun fromInstant(instant: Instant?): Long? {
         return instant?.toEpochMilliseconds()
     }
 }
 
 class ListTypeConverter {
-    @TypeConverter
+    @ColumnTypeConverter
     fun fromListType(value: WordList.ListType): String {
         return value.type
     }
 
-    @TypeConverter
+    @ColumnTypeConverter
     fun toListType(value: String): WordList.ListType {
         return WordList.ListType.entries.first { it.type.equals(value, ignoreCase = true) }
     }

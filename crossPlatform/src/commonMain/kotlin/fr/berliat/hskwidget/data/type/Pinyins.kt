@@ -1,6 +1,6 @@
 package fr.berliat.hskwidget.data.type
 
-import androidx.room.TypeConverter
+import androidx.room3.ColumnTypeConverter
 import kotlinx.serialization.Serializable
 import kotlin.jvm.JvmStatic
 
@@ -14,7 +14,7 @@ class Pinyins(
     override fun toString(): String = toString(this)
 
     companion object {
-        @TypeConverter
+        @ColumnTypeConverter
         @JvmStatic
         fun fromString(value: String?): Pinyins {
             if (value.isNullOrBlank()) return Pinyins()
@@ -36,7 +36,7 @@ class Pinyins(
             return Pinyins(pinyins)
         }
 
-        @TypeConverter
+        @ColumnTypeConverter
         @JvmStatic
         fun toString(pinyins: Pinyins?): String {
             if (pinyins == null) return ""
