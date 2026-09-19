@@ -15,4 +15,7 @@ interface WordDefinitionDAO {
 
     @Query("SELECT * FROM word_definition WHERE simplified IN (:simplifiedWords)")
     suspend fun getForWords(simplifiedWords: List<String>): List<WordDefinition>
+
+    @Query("SELECT COUNT(*) FROM word_definition")
+    suspend fun getCount(): Int
 }

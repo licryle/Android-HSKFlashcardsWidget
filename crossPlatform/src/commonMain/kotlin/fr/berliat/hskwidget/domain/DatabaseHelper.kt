@@ -27,6 +27,8 @@ import io.github.vinceglb.filekit.name
 import io.github.vinceglb.filekit.path
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -36,9 +38,14 @@ data class DatabaseBuilderWithPath(
     val builder: RoomDatabase.Builder<ChineseWordsDatabase>
 )
 
+class DatabaseUpdatingException(message: String) : Exception(message)
+
 class DatabaseHelper private constructor() {
-    val liveDatabase
-        get() = _db!!
+    val liveDatabase: ChineseWordsDatabase
+        get() {
+            if (updateProgress.value != null) throw DatabaseUpdatingException("Database is currently being updated from asset.")
+            return _db!!
+        }
 
     private var _db: ChineseWordsDatabase? = null
     lateinit var DATABASE_LIVE_PATH : PlatformFile
@@ -47,6 +54,9 @@ class DatabaseHelper private constructor() {
         private set
 
     companion object {
+        private val _updateProgress = MutableStateFlow<Float?>(null)
+        val updateProgress = _updateProgress.asStateFlow()
+
         private var INSTANCE: DatabaseHelper? = null
         private val mutex = Mutex()
         const val DATABASE_FILENAME = "Mandarin_Assistant.db"
@@ -316,47 +326,66 @@ class DatabaseHelper private constructor() {
 
     suspend fun replaceWordsDataInDB(updateWith: ChineseWordsDatabase)
             = withContext(AppDispatchers.IO) {
-        Logger.d(tag = TAG, messageString = "Initiating Database Update: reading file")
-        val importedWordsCount = updateWith.chineseWordDAO().getCount()
-        if (importedWordsCount == 0) {
-            Logger.i(tag = TAG, messageString = "Update file is empty or incompatible, aborting")
-            throw IllegalStateException("Database is empty")
-        }
+        try {
+            Logger.d(tag = TAG, messageString = "Initiating Database Update: reading file")
+            val wordsCount = updateWith.chineseWordDAO().getCount()
+            val definitionsCount = updateWith.wordDefinitionDAO().getCount()
+            val totalCount = wordsCount + definitionsCount
 
-        // Inserting All succeeds, but corrupts the database. Thank you Room.
-        updateWith.chineseWordDAO().getAll().chunked(5000).forEach { chunk ->
-            liveDatabase.chineseWordDAO().upsertAll(chunk)
-        }
-        updateWith.wordDefinitionDAO().getAll().chunked(5000).forEach { chunk ->
-            liveDatabase.wordDefinitionDAO().upsertAll(chunk)
-        }
+            if (totalCount == 0) {
+                Logger.i(tag = TAG, messageString = "Update file is empty or incompatible, aborting")
+                throw IllegalStateException("Database is empty")
+            }
 
-        // Rebuild FTS indexes after bulk update to ensure sync and fix any corruption
-        liveDatabase.useWriterConnection { connection ->
-            connection.executeSQL("INSERT INTO chinese_word_fts(chinese_word_fts) VALUES('rebuild')")
-            connection.executeSQL("INSERT INTO word_definition_fts(word_definition_fts) VALUES('rebuild')")
-            connection.executeSQL("INSERT INTO chinese_word_annotation_fts(chinese_word_annotation_fts) VALUES('rebuild')")
-        }
+            _updateProgress.value = 0f
+            var processedCount = 0
 
-        Logger.i(tag = TAG, messageString = "Database update done")
+            // Inserting All succeeds, but corrupts the database. Thank you Room.
+            updateWith.chineseWordDAO().getAll().chunked(5000).forEach { chunk ->
+                _db!!.chineseWordDAO().upsertAll(chunk)
+                processedCount += chunk.size
+                _updateProgress.value = (processedCount.toFloat() / totalCount.toFloat()) * 100f
+            }
+            updateWith.wordDefinitionDAO().getAll().chunked(5000).forEach { chunk ->
+                _db!!.wordDefinitionDAO().upsertAll(chunk)
+                processedCount += chunk.size
+                _updateProgress.value = (processedCount.toFloat() / totalCount.toFloat()) * 100f
+            }
+
+            // Rebuild FTS indexes after bulk update to ensure sync and fix any corruption
+            _db!!.useWriterConnection { connection ->
+                connection.executeSQL("INSERT INTO chinese_word_fts(chinese_word_fts) VALUES('rebuild')")
+                connection.executeSQL("INSERT INTO word_definition_fts(word_definition_fts) VALUES('rebuild')")
+                connection.executeSQL("INSERT INTO chinese_word_annotation_fts(chinese_word_annotation_fts) VALUES('rebuild')")
+            }
+
+            Logger.i(tag = TAG, messageString = "Database update done")
+        } finally {
+            _updateProgress.value = null
+        }
     }
 
     suspend fun updateLiveDatabaseFromAsset(successCallback: () -> Unit, failureCallback: (e: Exception) -> Unit)
             = withContext(AppDispatchers.IO) {
-        try {
-            val assetDbStream = createRoomDatabaseFromAsset()
-            replaceWordsDataInDB(assetDbStream)
-            assetDbStream.close()
-
-            withContext(Dispatchers.Main) {
-                successCallback()
+        mutex.withLock {
+            try {
+                val assetDb = createRoomDatabaseFromAsset()
+                try {
+                    replaceWordsDataInDB(assetDb)
+                    withContext(Dispatchers.Main) {
+                        successCallback()
+                    }
+                } finally {
+                    assetDb.close()
+                }
+            } catch (e: Exception) {
+                Logger.e(tag = TAG, messageString = "Failed to update database from asset: ${e.message}")
+                withContext(Dispatchers.Main) {
+                    failureCallback(e)
+                }
+            } finally {
+                cleanTempDatabaseFiles()
             }
-        } catch (e: Exception) {
-            withContext(Dispatchers.Main) {
-                failureCallback(e)
-            }
-        } finally {
-            cleanTempDatabaseFiles()
         }
     }
 }

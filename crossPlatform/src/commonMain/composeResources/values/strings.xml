@@ -198,6 +198,7 @@ We recommend to choose the level you're at plus the one below, or above dependin
     <string name="dbrestore_failure_nofileselected">No file selected: restoration cancelled</string>
     <string name="dbrestore_success">Database successfully restored</string>
 
+    <string name="database_updating_progress">Updating dictionary… %1$d%</string>
     <string name="dbbackup_success">Successfully backed-up the database</string>
     <string name="dbbackup_failure_write">Couldn't back-up the database</string>
     <string name="dbbackup_failure_folderpermission">Cancelling back-up: no write permission on folder</string>

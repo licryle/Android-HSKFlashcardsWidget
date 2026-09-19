@@ -39,6 +39,7 @@ import fr.berliat.hskwidget.ui.components.DetailedWordView
 import fr.berliat.hskwidget.ui.components.TextSizeChip
 import fr.berliat.hskwidget.ui.components.LoadingView
 import fr.berliat.hskwidget.ui.components.LanguageFilterChip
+import fr.berliat.hskwidget.ui.components.DbUpdateView
 import fr.berliat.hskwidget.ui.screens.wordlist.WordListSelectionDialog
 
 import fr.berliat.hskwidget.Res
@@ -51,6 +52,7 @@ import fr.berliat.hskwidget.dictionary_noresult_icon
 import fr.berliat.hskwidget.dictionary_noresult_text
 import fr.berliat.hskwidget.dictionary_noresultwithfilter_text
 import fr.berliat.hskwidget.dictionary_search_filter_hasannotation_hint
+import fr.berliat.hskwidget.domain.DatabaseHelper
 import fr.berliat.hskwidget.filter_alt_off_24px
 import fr.berliat.hskwidget.ui.components.PrettyCardShapeModifier
 import fr.berliat.hskwidget.ui.dismissKeyboardOnClick
@@ -75,6 +77,7 @@ fun DictionarySearchScreen(
     val results by viewModel.searchResults.collectAsState()
     val hasMoreResults by viewModel.hasMoreResults.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
+    val updateProgress by DatabaseHelper.updateProgress.collectAsState()
     val isLoadingMore by viewModel.isLoadingMore.collectAsState()
     val wordExists by viewModel.wordExists.collectAsState()
     val hasAnnotationFilter by viewModel.hasAnnotationFilter.collectAsState()
@@ -130,7 +133,9 @@ fun DictionarySearchScreen(
 
         // Main content
         Box(modifier = Modifier.fillMaxSize()) {
-            if (isLoading) {
+            if (updateProgress != null) {
+                DbUpdateView(progress = updateProgress)
+            } else if (isLoading) {
                 LoadingView(loadingText = Res.string.dictionary_search_loading)
             } else if (results.isEmpty()) {
                 DictionarySearchNoResult(

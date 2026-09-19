@@ -198,6 +198,7 @@ Nous vous recommandons de choisir le niveau où vous en êtes plus celui du dess
     <string name="dbrestore_failure_nofileselected">Aucun fichier sélectionné : restauration annulée</string>
     <string name="dbrestore_success">Base de données restaurée avec succès</string>
 
+    <string name="database_updating_progress">Mise à jour du dictionnaire… %1$d%</string>
     <string name="dbbackup_success">Base de données sauvegardée avec succès</string>
     <string name="dbbackup_failure_write">Impossible de sauvegarder la base de données</string>
     <string name="dbbackup_failure_folderpermission">Annulation de la sauvegarde : aucune autorisation d'écriture sur le dossier</string>
