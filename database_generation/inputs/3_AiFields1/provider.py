@@ -16,7 +16,7 @@ You are a precise Chinese language assistant helping learners learn using mostly
 <|user|>
 Analyze the following Chinese words. For each word, return an object with these fields:
 
-1. "word": The original word.
+1. "word": The original word FROM THE LIST BELOW. Do NOT change it to traditional characters or a different word.
 2. "definition": HSK3-level definitions. If multiple, separate with \\n.
 3. "examples": One example sentence per definition, separated with \\n. Use HSK3 vocabulary.
 4. "modality": EXACTLY ONE of ["ORAL", "WRITTEN", "ORAL_WRITTEN", "N/A"].
@@ -26,7 +26,7 @@ Analyze the following Chinese words. For each word, return an object with these 
 
 CRITICAL: 
 - Output MUST be a valid JSON array. 
-- No trailing commas in objects.
+- Use ONLY SIMPLIFIED CHINESE. Do NOT return traditional characters.
 - No markdown formatting (no ```json).
 - Fields "modality" and "type" must be a single string from the allowed list, NOT a list or multiple strings.
 
@@ -84,8 +84,8 @@ class AiFieldsProvider(Provider):
             
             if ai_results:
                 for res in ai_results:
-                    word = res.pop('word', None)
-                    if not word: continue
+                    raw_word = res.pop('word', None)
+                    if not raw_word: continue
                     
                     word = raw_word.strip()
                     definition = res.pop('definition', None)
@@ -152,6 +152,9 @@ class AiFieldsProvider(Provider):
         cache_db = os.path.join(os.path.dirname(__file__), "ai_fields_cache.db")
         if not os.path.exists(cache_db):
             return
+
+        words_to_process = load_cedict_simplified_words(CEDICT_FILE)
+        allowed_words = set(words_to_process)
 
         conn = sqlite3.connect(cache_db)
         cursor = conn.cursor()

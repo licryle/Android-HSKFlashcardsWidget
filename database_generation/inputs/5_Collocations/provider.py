@@ -74,6 +74,10 @@ class CollocationsProvider(Provider):
                         # 1. Trim strings on each line
                         lines = [line.strip() for line in collocations_raw.split('\n') if line.strip()]
                         
+                        # Strict validation: collocations cannot contain non-Chinese characters (e.g., Latin letters)
+                        import re
+                        lines = [line for line in lines if not re.search(r'[a-zA-Z]', line)]
+                        
                         # 3. Remove any string that doesn't contain the original word
                         lines = [line for line in lines if word in line]
                         
