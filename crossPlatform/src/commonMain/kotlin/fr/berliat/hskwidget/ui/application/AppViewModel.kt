@@ -100,7 +100,7 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
 
         handleDbOperations()
 
-        if (didUpdateApp()) handleAppUpdate()
+        if (didUpdateApp() || databaseUpdateUnfinished()) handleAppUpdate()
 
         executePendingActions()
     }
@@ -144,17 +144,16 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
                 }
             }
 
-            if (shouldUpdateDatabaseFromAsset(actualVersion)) {
-                HSKAppServices.snackbar.show(SnackbarType.INFO, Res.string.database_update_start)
+            // Update from Database asset
+            HSKAppServices.snackbar.show(SnackbarType.INFO, Res.string.database_update_start)
 
-                DatabaseHelper.getInstance().updateLiveDatabaseFromAsset({
-                    HSKAppServices.snackbar.show(SnackbarType.SUCCESS, Res.string.database_update_success)
-                }, { e ->
-                    HSKAppServices.snackbar.show(SnackbarType.ERROR, Res.string.database_update_failure, listOf(e.message ?: ""))
+            DatabaseHelper.getInstance().updateLiveDatabaseFromAsset({
+                HSKAppServices.snackbar.show(SnackbarType.SUCCESS, Res.string.database_update_success)
+            }, { e ->
+                HSKAppServices.snackbar.show(SnackbarType.ERROR, Res.string.database_update_failure, listOf(e.message ?: ""))
 
-                    Logging.logAnalyticsError(TAG, "UpdateDatabaseFromAssetFailure", e.message ?: "")
-                })
-            }
+                Logging.logAnalyticsError(TAG, "UpdateDatabaseFromAssetFailure", e.message ?: "")
+            })
 
             if (actualVersion < 47 && Utils.getAppVersion() >= 47) {
                 HSKAppServices.snackbar.show(SnackbarType.INFO, Res.string.database_update_list_system)
@@ -171,22 +170,16 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
         return appConfig.appVersionCode.value != Utils.getAppVersion()
     }
 
+    fun databaseUpdateUnfinished(): Boolean {
+        return appConfig.dictionaryImportProgress.value != -1
+    }
+
     private fun handleDbOperations() {
         viewModelScope.launch(AppDispatchers.IO) {
             DatabaseHelper.cleanTempDatabaseFiles()
         }
 
         handleBackupDisk()
-    }
-
-    fun shouldUpdateDatabaseFromAsset(appVersion: Int): Boolean {
-        if (appVersion == 0) return false // first launch, nothing to update
-
-        val updateDbVersions = listOf(32, 37, 48, 64)
-
-        return updateDbVersions.any { updateVersion ->
-            appVersion < updateVersion && Utils.getAppVersion() >= updateVersion
-        }
     }
 
     private fun handleBackupDisk() {

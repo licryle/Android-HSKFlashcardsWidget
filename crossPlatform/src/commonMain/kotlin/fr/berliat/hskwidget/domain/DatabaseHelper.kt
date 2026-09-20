@@ -357,10 +357,11 @@ class DatabaseHelper private constructor() {
                 return@withContext
             }
 
-            // Persistence for resume
+            // No import in queue, Persistence for resume
             if (appConfig.dictionaryImportProgress.value == -1) {
                 appConfig.dictionaryImportBaselineVersion.value = baselineVersion
                 appConfig.dictionaryLastImportedAssetVersion.value = currentAppVersion
+                appConfig.dictionaryImportProgress.value = 0
             }
 
             var processedCount = appConfig.dictionaryImportProgress.value.coerceAtLeast(0)
