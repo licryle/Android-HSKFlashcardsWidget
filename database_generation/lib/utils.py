@@ -1,6 +1,7 @@
+import os
 import re
 import json
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional, List, Iterator
 from unidecode import unidecode
 
 # Shared Mappings
@@ -21,6 +22,43 @@ TYPE_MAPPING = {
     "连词": "CONJUNCTION", "介词": "PREPOSITION", "感叹词": "INTERJECTION",
     "成语": "IDIOM", "俗话": "IDIOM", "不适用": "N/A", "未知": "N/A", "": "N/A"
 }
+
+def parse_cedict_line(line: str) -> Optional[Dict[str, str]]:
+    """Parses a single CEDICT line into a dictionary with simplified, traditional, pinyin, and english fields."""
+    # Matches: traditional simplified [pinyin] /definitions/
+    regex = r'^(\S+) (\S+) \[([^\]]+)\] /(.+)/$'
+    match = re.match(regex, line.strip())
+    if match:
+        traditional, simplified, pinyin, english = match.groups()
+        return {
+            "traditional": traditional,
+            "simplified": simplified,
+            "pinyin": pinyin,
+            "english": english
+        }
+    return None
+
+def load_cedict_simplified_words(cedict_path: str) -> List[str]:
+    """Returns a deduplicated list of simplified words from CEDICT, preserving order."""
+    words = []
+    if os.path.exists(cedict_path):
+        with open(cedict_path, 'r', encoding='utf-8') as f:
+            for line in f:
+                if line.startswith('#'): continue
+                entry = parse_cedict_line(line)
+                if entry:
+                    words.append(entry['simplified'])
+    return list(dict.fromkeys(words))
+
+def iter_cedict(cedict_path: str) -> Iterator[Dict[str, str]]:
+    """Iterates over CEDICT entries as dictionaries."""
+    if os.path.exists(cedict_path):
+        with open(cedict_path, 'r', encoding='utf-8') as f:
+            for line in f:
+                if line.startswith('#'): continue
+                entry = parse_cedict_line(line)
+                if entry:
+                    yield entry
 
 def convert_pinyin_with_tones(pinyin_string: str) -> str:
     """Converts numbered pinyin (e.g., ni3 hao3) to diacritic pinyin (nǐ hǎo)."""

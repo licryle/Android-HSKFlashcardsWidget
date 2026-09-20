@@ -7,7 +7,8 @@ import logging
 from typing import Dict, Any, Iterator, Tuple, List
 
 from lib.utils_ai import call_llm_api
-from lib import Provider, ProviderType, BATCH_SIZE, API_ENDPOINT, MODEL_NAME, DEFINITION_AI_LOCALE, HSK_FILES
+from lib import Provider, ProviderType, BATCH_SIZE, API_ENDPOINT, MODEL_NAME, DEFINITION_AI_LOCALE, HSK_FILES, load_cedict_simplified_words
+from lib.conf import CEDICT_FILE
 
 def generate_prompt(words: List[str]) -> str:
     return f"""<|system|>
@@ -56,14 +57,12 @@ class AiFieldsProvider(Provider):
 
     def update(self):
         """Fetches missing AI fields from the LLM and stores them in the local cache DB."""
-        words_to_process = []
-        for hsk_file in HSK_FILES:
-            if os.path.exists(hsk_file):
-                with open(hsk_file, 'r', encoding='utf-8') as f:
-                    words_to_process.extend([line.strip() for line in f if line.strip()])
+        words_to_process = load_cedict_simplified_words(CEDICT_FILE)
 
         conn = self._get_cache_conn()
         cursor = conn.cursor()
+        
+        # Check against metadata cache
         cursor.execute("SELECT simplified FROM chinese_word")
         cached_words = {row[0] for row in cursor.fetchall()}
         
@@ -88,7 +87,32 @@ class AiFieldsProvider(Provider):
                     word = res.pop('word', None)
                     if not word: continue
                     
-                    # Convert empty strings to None (NULL) for better database state
+                    word = raw_word.strip()
+                    definition = res.pop('definition', None)
+
+                    # Strict Validation: The word MUST be in our current batch.
+                    # This prevents traditional characters or garbage from being cached.
+                    if word not in batch:
+                        # Try to find the closest match in the batch (case-insensitive and trimmed)
+                        match = None
+                        for w in batch:
+                            if w.strip() == word:
+                                match = w
+                                break
+                        
+                        if match:
+                            word = match
+                        else:
+                            self.logger.warning(f"AiFieldsProvider: Discarding AI result for '{word}' - not in requested batch.")
+                            continue
+                    
+                    # Strict validation: definition and examples cannot contain non-Chinese characters (e.g., Latin letters)
+                    import re
+                    if (definition and re.search(r'[a-zA-Z]', definition)) or (res.get('examples') and re.search(r'[a-zA-Z]', res['examples'])):
+                        self.logger.warning(f"AiFieldsProvider: Discarding AI result for '{word}' - definition or examples contain non-Chinese characters.")
+                        continue
+                    
+                    # Convert empty strings to None (NULL) for metadata
                     for key in res:
                         if isinstance(res[key], str) and not res[key].strip():
                             res[key] = None
@@ -97,6 +121,10 @@ class AiFieldsProvider(Provider):
                     placeholders = ', '.join(['?'] * len(cols))
                     vals = [word] + list(res.values())
                     cursor.execute(f"INSERT OR REPLACE INTO chinese_word ({', '.join(cols)}) VALUES ({placeholders})", vals)
+                    
+                    if definition:
+                        cursor.execute("INSERT OR REPLACE INTO word_definition (simplified, definition) VALUES (?, ?)", (word, definition))
+
                 conn.commit()
                 self.logger.info(f"AiFieldsProvider: Progress {i + len(batch)}/{len(missing_words)}")
             else:
@@ -127,21 +155,25 @@ class AiFieldsProvider(Provider):
 
         conn = sqlite3.connect(cache_db)
         cursor = conn.cursor()
+        
+        # Metadata
         cursor.execute("SELECT * FROM chinese_word")
         columns = [desc[0] for desc in cursor.description]
         for row in cursor.fetchall():
             record = dict(zip(columns, row))
-            hsk3_definition = record.pop("definition", None)
-            for k, v in record.items():
-                if k != "simplified" and v == "":
-                    record[k] = None
-            yield ("chinese_word", record)
-            if hsk3_definition:
-                # This cache contains exactly one definition language.  Locale maps were
-                # only needed while definitions lived in chinese_word.
+            # Final validation: only yield if word is in our base dictionary
+            if record['simplified'] in allowed_words:
+                yield ("chinese_word", record)
+            
+        # Definitions
+        cursor.execute("SELECT simplified, definition FROM word_definition")
+        for row in cursor.fetchall():
+            simplified, definition = row
+            if simplified in allowed_words:
                 yield ("word_definition", {
-                    "simplified": record["simplified"],
+                    "simplified": simplified,
                     "language": DEFINITION_AI_LOCALE,
-                    "definition": hsk3_definition
+                    "definition": definition
                 })
+            
         conn.close()

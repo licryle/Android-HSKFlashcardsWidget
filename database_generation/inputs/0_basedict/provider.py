@@ -3,7 +3,7 @@ import re
 import json
 import sqlite3
 from typing import List, Dict, Optional, Any, Iterator, Tuple
-from lib import Provider, ProviderType, convert_pinyin_with_tones, unidecode
+from lib import Provider, ProviderType, convert_pinyin_with_tones, unidecode, iter_cedict
 
 class BaseDictProvider(Provider):
     def update(self):
@@ -21,51 +21,38 @@ class BaseDictProvider(Provider):
             }
         }
 
-    def _extract_entry(self, entry: str) -> Optional[Dict[str, Any]]:
-        regex = r'^(\S+) (\S+) \[([^\]]+)\] /(.+)/$'
-        match = re.match(regex, entry)
-        if match:
-            traditional, simplified, pinyins_raw, definition_raw = match.groups()
-            pinyins = convert_pinyin_with_tones(pinyins_raw)
-            return {
-                "simplified": simplified,
-                "traditional": traditional,
-                "pinyins": pinyins,
-                "hsk_level": "NOT_HSK",
-                "_definition": definition_raw
-            }
-        return None
-
     def data(self) -> Iterator[Tuple[str, Dict[str, Any]]]:
         cedict_path = os.path.join(os.path.dirname(__file__), "cedict_ts.u8")
         if not os.path.exists(cedict_path):
             return
 
         cedict_words = set()
-        with open(cedict_path, 'r', encoding='utf-8') as f:
-            for line in f:
-                line = line.strip()
-                if not line or line[0] == '#':
-                    continue
-                
-                record = self._extract_entry(line)
-                if record:
-                    cedict_words.add(record["simplified"])
-                    
-                    toneless = unidecode(record["pinyins"])
-                    concatenated = toneless.replace(" ", "")
-                    hanzi_split = " ".join(list(record["simplified"]))
-                    searchable_text = f"{record['simplified']} {hanzi_split} {record['_definition']} {toneless} {concatenated}".lower()
-                    
-                    word_record = {key: value for key, value in record.items() if key != "_definition"}
-                    word_record["searchable_text"] = searchable_text
-                    
-                    yield ("chinese_word", word_record)
-                    yield ("word_definition", {
-                        "simplified": record["simplified"],
-                        "language": "en",
-                        "definition": record["_definition"]
-                    })
+        for entry in iter_cedict(cedict_path):
+            simplified = entry["simplified"]
+            traditional = entry["traditional"]
+            pinyins_raw = entry["pinyin"]
+            definition_raw = entry["english"]
+            
+            pinyins = convert_pinyin_with_tones(pinyins_raw)
+            cedict_words.add(simplified)
+            
+            toneless = unidecode(pinyins)
+            concatenated = toneless.replace(" ", "")
+            hanzi_split = " ".join(list(simplified))
+            searchable_text = f"{simplified} {hanzi_split} {definition_raw} {toneless} {concatenated}".lower()
+            
+            yield ("chinese_word", {
+                "simplified": simplified,
+                "traditional": traditional,
+                "pinyins": pinyins,
+                "hsk_level": "NOT_HSK",
+                "searchable_text": searchable_text
+            })
+            yield ("word_definition", {
+                "simplified": simplified,
+                "language": "en",
+                "definition": definition_raw
+            })
 
         # CEDICT occasionally removes headwords. Preserve records from the previous
         # generated dictionary so an update never turns existing definitions into

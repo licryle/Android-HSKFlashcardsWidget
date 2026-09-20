@@ -7,7 +7,7 @@ import re
 from typing import Dict, Any, Iterator, Tuple, List
 
 from lib.utils_ai import call_llm_api
-from lib import Provider, ProviderType, BATCH_SIZE, API_ENDPOINT, MODEL_NAME
+from lib import Provider, ProviderType, BATCH_SIZE, API_ENDPOINT, MODEL_NAME, iter_cedict, parse_cedict_line
 
 # Keep the same directory-based cache convention used by the other AI-backed providers.
 FRENCH_CACHE_DB = os.path.join(os.path.dirname(__file__), 'language_french_cache.db')
@@ -16,12 +16,7 @@ CFDICT_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), 'cfdict.u8
 
 
 def generate_prompt(items: List[Dict[str, str]]) -> str:
-    """Prompt the LLM with richer examples and a Chinese-first French glossing rule.
-
-    The English gloss should act as the lexical anchor only. The source Chinese entry remains
-    the meaning authority, so French should be driven by the Chinese word, not a literal
-    English-to-French glossing pass.
-    """
+    """Prompt the LLM with richer examples and a Chinese-first French glossing rule."""
     lines = []
     for item in items:
         word = item['word']
@@ -91,25 +86,8 @@ class LanguageFrenchProvider(Provider):
         conn = sqlite3.connect(FRENCH_CACHE_DB)
         return conn
 
-    def _parse_cedict_entry(self, line: str) -> Dict[str, str]:
-        """Extract the simplified word and the English gloss from a CEDICT-style line."""
-        match = re.match(r'^([^\s]+)\s+([^\s]+)\s+\[([^\]]+)\]\s+/(.+)/$', line.strip())
-        if not match:
-            return {}
-
-        traditional, simplified, pinyin, english = match.groups()
-        return {
-            'word': simplified,
-            'english': english,
-        }
-
     def _load_cfdict_word_map(self) -> List[Dict[str, str]]:
-        """Read the CFDICT French file. It is the first translation lookup layer.
-
-        Each line is a CEDICT-like record, but the glosses are written in French instead of
-        English. We normalize those lines into a (simplified word -> French gloss) queue
-        and seed the cache DB before any LLM pass.
-        """
+        """Read the CFDICT French file. It is the first translation lookup layer."""
         queue: List[Dict[str, str]] = []
         if not os.path.exists(CFDICT_FILE):
             return queue
@@ -117,18 +95,15 @@ class LanguageFrenchProvider(Provider):
         seen = set()
         with open(CFDICT_FILE, 'r', encoding='utf-8') as f:
             for line in f:
-                line = line.strip()
-                if not line or line.startswith('#'):
+                if line.startswith('#'):
                     continue
 
-                # Same structure as the language dictionary files: traditional simplified [pinyin] /French gloss/
-                match = re.match(r'^([^\s]+)\s+([^\s]+)\s+\[([^\]]+)\]\s+/(.+)/$', line)
-                if not match:
+                entry = parse_cedict_line(line)
+                if not entry:
                     continue
 
-                traditional, simplified, pinyin, french = match.groups()
-                # Split the slash-delimited glosses into a single French gloss string.
-                # Preserve the slash-separated sense list as a human-readable French sentence.
+                simplified = entry['simplified']
+                french = entry['english']
                 parts = [part.strip() for part in french.split('/') if part.strip()]
                 fr = '; '.join(parts)
                 if not fr:
@@ -137,60 +112,33 @@ class LanguageFrenchProvider(Provider):
                 if simplified in seen:
                     continue
                 seen.add(simplified)
-                queue.append({
-                    'word': simplified,
-                    'fr': fr,
-                })
+                queue.append({'word': simplified, 'fr': fr})
 
         return queue
 
     def _load_cedict_word_map(self) -> List[Dict[str, str]]:
-        """Read the English CEDICT file and build the LLM fallback queue.
-
-        The queue is a list of source Chinese words and English glosses used only for
-        the words that are not already covered by the CFDICT cache.
-        """
+        """Read the English CEDICT file and build the LLM fallback queue."""
         queue: List[Dict[str, str]] = []
-        if not os.path.exists(CEDICT_FILE):
-            return queue
-
         seen = set()
-        with open(CEDICT_FILE, 'r', encoding='utf-8') as f:
-            for line in f:
-                line = line.strip()
-                if not line or line.startswith('#'):
-                    continue
-                row = self._parse_cedict_entry(line)
-                if not row:
-                    continue
-                word = row['word']
-                if word in seen:
-                    continue
-                seen.add(word)
-                queue.append({
-                    'word': word,
-                    'english': row['english'],
-                })
-
+        for entry in iter_cedict(CEDICT_FILE):
+            word = entry['simplified']
+            if word in seen:
+                continue
+            seen.add(word)
+            queue.append({
+                'word': word,
+                'english': entry['english'],
+            })
         return queue
 
     def update(self):
-        """Populate the French cache in the requested sequence:
-
-        1. Seed the cache from the CFDICT file when a French definition exists.
-        2. Use the CEDICT word stream to build the LLM fallback queue.
-        3. Call the LLM only for the queued words that remain absent from the cache.
-        """
+        """Populate the French cache in the requested sequence."""
         conn = self._get_cache_conn()
         cursor = conn.cursor()
 
-        # CEDICT is the authoritative source for chinese_word.  CFDICT has additional
-        # headwords, but definitions for those cannot satisfy the foreign key and must
-        # never enter the cache used for the generated application database.
         cedict_queue = self._load_cedict_word_map()
         base_words = {item['word'] for item in cedict_queue}
 
-        # Step 1: seed only French entries that have a base-dictionary parent.
         cfdict_queue = [item for item in self._load_cfdict_word_map()
                         if item['word'] in base_words]
         if cfdict_queue:
@@ -205,7 +153,6 @@ class LanguageFrenchProvider(Provider):
                 )
             conn.commit()
 
-        # Step 2: use the CEDICT queue for the English anchor, then compare against cache words.
         cursor.execute("SELECT simplified FROM chinese_word")
         cached_words = {row[0] for row in cursor.fetchall()}
 
@@ -217,7 +164,6 @@ class LanguageFrenchProvider(Provider):
 
         self.logger.info(f"LanguageFrenchProvider: found {len(missing)} words missing from cache for LLM generation.")
 
-        # Step 3: generate only the words absent from the CFDICT cache.
         for i in range(0, len(missing), BATCH_SIZE):
             batch = missing[i:i + BATCH_SIZE]
             prompt = generate_prompt(batch)
@@ -231,7 +177,6 @@ class LanguageFrenchProvider(Provider):
                     if not word or word not in base_words or not fr:
                         continue
 
-                    # Keep the JSON locale map shape consistent with the rest of the repository.
                     definition_json = json.dumps({'fr': fr}, ensure_ascii=False)
                     cursor.execute(
                         "INSERT OR REPLACE INTO chinese_word (simplified, definition) VALUES (?, ?)",
@@ -259,8 +204,6 @@ class LanguageFrenchProvider(Provider):
         if not os.path.exists(FRENCH_CACHE_DB):
             return
 
-        # The cache can predate this constraint.  Filter again at assembly time rather
-        # than allowing stale CFDict-only cache rows to break database generation.
         base_words = {item['word'] for item in self._load_cedict_word_map()}
         conn = sqlite3.connect(FRENCH_CACHE_DB)
         cursor = conn.cursor()
@@ -269,7 +212,6 @@ class LanguageFrenchProvider(Provider):
             simplified, definition_json = row
             if simplified not in base_words:
                 continue
-            # The cache DB stores per-word {"fr": ...} JSON. Feed that to the orchestrator.
             definition = json.loads(definition_json).get("fr")
             if not definition:
                 continue
