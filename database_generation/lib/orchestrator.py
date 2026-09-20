@@ -9,7 +9,8 @@ import tempfile
 from datetime import datetime
 from typing import List, Dict, Any, Set, Iterator, Tuple, Optional
 from .base_provider import Provider, ProviderType
-from .utils import merge_json_strings, get_app_version
+from .utils import merge_json_strings, get_app_version, load_cedict_simplified_words
+from .conf import CEDICT_FILE, DEFINITION_AI_LOCALE
 
 class Orchestrator:
     def __init__(self, schema_path: str, db_path: str):
@@ -336,7 +337,18 @@ class Orchestrator:
             logging.shutdown()
             sys.exit(1)
 
-    def run(self, run_update: bool):
+    def run(self, run_update: bool, report_only: bool = False):
+        if report_only:
+            if not os.path.exists(self.db_path):
+                self.logger.error(f"Database file not found for report: {self.db_path}")
+                return
+            conn = sqlite3.connect(self.db_path)
+            try:
+                self._generate_report(conn)
+            finally:
+                conn.close()
+            return
+
         if run_update:
             for provider in self.providers:
                 p_name = provider.__class__.__name__
@@ -366,6 +378,7 @@ class Orchestrator:
             conn.execute("PRAGMA foreign_keys = ON")
             self._assemble_data(conn)
             self._post_process(conn)
+            self._generate_report(conn)
         finally:
             conn.close()
             if self.previous_database_path and os.path.exists(self.previous_database_path):
@@ -429,3 +442,106 @@ class Orchestrator:
         cursor.execute("INSERT INTO chinese_word_annotation_fts(chinese_word_annotation_fts) VALUES('rebuild')")
 
         conn.commit()
+
+    def _generate_report(self, conn: sqlite3.Connection):
+        self.logger.info("Generating summary report...")
+
+        cedict_words = set(load_cedict_simplified_words(CEDICT_FILE))
+        cedict_count = len(cedict_words)
+
+        cursor = conn.cursor()
+
+        # 1. Total words in chinese_word
+        cursor.execute("SELECT simplified FROM chinese_word")
+        db_words = {row[0] for row in cursor.fetchall()}
+        db_count = len(db_words)
+
+        in_cedict_count = len(db_words.intersection(cedict_words))
+        out_cedict_count = db_count - in_cedict_count
+
+        def pct_in(count, total_or_ref):
+            return f"{count} ({count / total_or_ref * 100:.1f}%)" if total_or_ref > 0 else f"{count} (0.0%)"
+
+        report = []
+        report.append("\n" + "=" * 95)
+        report.append(f"{'DICTIONARY GENERATION SUMMARY REPORT':^95}")
+        report.append("=" * 95)
+        report.append(f"{'Category':<35} | {'Total':<15} | {'In CEDict (% of Ref)':<20} | {'Out of CEDict':<15}")
+        report.append("-" * 95)
+
+        report.append(f"{'CEDict Reference':<35} | {cedict_count:<15} | {'-':<20} | {'-':<15}")
+        report.append(
+            f"{'Database (chinese_word)':<35} | {db_count:<15} | {pct_in(in_cedict_count, cedict_count):<20} | {str(out_cedict_count):<15}")
+        report.append("-" * 95)
+
+        # Languages
+        langs = [
+            ("English", "en"),
+            ("French", "fr"),
+            ("HSK3", DEFINITION_AI_LOCALE)
+        ]
+
+        for name, code in langs:
+            cursor.execute("SELECT simplified FROM word_definition WHERE language = ?", (code,))
+            lang_words = {row[0] for row in cursor.fetchall()}
+            total = len(lang_words)
+            in_c = len(lang_words.intersection(cedict_words))
+            out_c = total - in_c
+            report.append(
+                f"{f'Lang: {name}':<35} | {total:<15} | {pct_in(in_c, cedict_count):<20} | {str(out_c):<15}")
+
+        report.append("-" * 95)
+
+        # Columns
+        cols = ["examples", "modality", "type", "synonyms", "antonym", "collocations"]
+        for col in cols:
+            cursor.execute(
+                f"SELECT simplified FROM chinese_word WHERE {col} IS NOT NULL AND {col} != '' AND {col} != 'N/A'")
+            col_words = {row[0] for row in cursor.fetchall()}
+            total = len(col_words)
+            in_c = len(col_words.intersection(cedict_words))
+            out_c = total - in_c
+            report.append(
+                f"{f'Field: {col}':<35} | {total:<15} | {pct_in(in_c, cedict_count):<20} | {str(out_c):<15}")
+
+        report.append("-" * 95)
+
+        # 2. Breakdown per version
+        report.append(f"{'VERSION BREAKDOWN REPORT':^95}")
+        report.append("-" * 95)
+        report.append(f"{'Version':<35} | {'Count (% of Total)':<20} | {'In CEDict':<18} | {'Out of CEDict':<15}")
+        report.append("-" * 95)
+
+        cursor.execute("SELECT version, simplified FROM chinese_word")
+        version_map = {}
+        for v, word in cursor.fetchall():
+            if v not in version_map:
+                version_map[v] = []
+            version_map[v].append(word)
+
+        # Print all versions total line first
+        all_v_words = []
+        for words in version_map.values():
+            all_v_words.extend(words)
+        total_all_v = len(all_v_words)
+        in_c_all = len(set(all_v_words).intersection(cedict_words))
+        out_c_all = total_all_v - in_c_all
+        
+        report.append(
+            f"{'All versions':<35} | {f'{total_all_v} (100.0%)':<20} | {str(in_c_all):<18} | {str(out_c_all):<15}")
+        report.append("-" * 95)
+
+        for v in sorted(version_map.keys()):
+            v_words = version_map[v]
+            total = len(v_words)
+            in_c = len(set(v_words).intersection(cedict_words))
+            out_c = total - in_c
+            
+            count_str = f"{total} ({total / total_all_v * 100:.1f}%)" if total_all_v > 0 else f"{total} (0.0%)"
+            report.append(
+                f"{str(v):<35} | {count_str:<20} | {str(in_c):<18} | {str(out_c):<15}")
+
+        report.append("=" * 95 + "\n")
+
+        for line in report:
+            self.logger.info(line)

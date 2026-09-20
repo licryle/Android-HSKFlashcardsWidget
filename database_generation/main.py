@@ -14,12 +14,15 @@ def main():
                         default="inputs",
                         help="Directory containing data providers")
     
+    parser.add_argument('--report-only', action='store_true', help="Only output the summary report without generating database")
+    
     args = parser.parse_args()
     
     orch = Orchestrator(args.schema, args.db)
-    orch.discover_providers(args.inputs)
-    orch.validate_providers()
-    orch.run(args.update)
+    if not args.report_only:
+        orch.discover_providers(args.inputs)
+        orch.validate_providers()
+    orch.run(args.update, report_only=args.report_only)
 
 if __name__ == "__main__":
     main()
