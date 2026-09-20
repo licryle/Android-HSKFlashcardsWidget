@@ -38,7 +38,7 @@ class ConfigViewModel(
                 HSKAppServices.snackbar.show(SnackbarType.SUCCESS, Res.string.database_update_success)
             }, { e ->
                 HSKAppServices.snackbar.show(SnackbarType.ERROR, Res.string.database_update_failure, listOf(e.message ?: ""))
-            })
+            }, force = true)
         }
     }
 

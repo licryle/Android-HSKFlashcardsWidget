@@ -1,5 +1,6 @@
 package fr.berliat.hskwidget.data.model
 
+import androidx.room3.ColumnInfo
 import androidx.room3.Entity
 import androidx.room3.ForeignKey
 import androidx.room3.Index
@@ -19,5 +20,6 @@ import androidx.room3.Index
 data class WordDefinition(
     val simplified: String,
     val language: String,
-    val definition: String
+    val definition: String,
+    @ColumnInfo(name = "version", defaultValue = "0") val version: Int = 0
 )

@@ -12,6 +12,7 @@ import co.touchlab.kermit.Logger
 
 import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.core.AppDispatchers
+import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 
 import io.github.vinceglb.filekit.FileKit
@@ -108,13 +109,14 @@ class DatabaseHelper private constructor() {
                         `synonyms` TEXT DEFAULT '',
                         `antonym` TEXT DEFAULT '',
                         `searchable_text` TEXT NOT NULL DEFAULT '',
+                        `version` INTEGER NOT NULL DEFAULT 0,
                         PRIMARY KEY(`simplified`)
                     )
                 """.trimIndent())
                 connection.execSQL("""
                     INSERT INTO `chinese_word_new`
-                    (`simplified`, `traditional`, `hsk_level`, `pinyins`, `popularity`, `examples`, `collocations`, `modality`, `type`, `synonyms`, `antonym`, `searchable_text`)
-                    SELECT `simplified`, `traditional`, `hsk_level`, `pinyins`, `popularity`, `examples`, `collocations`, `modality`, `type`, `synonyms`, `antonym`, ''
+                    (`simplified`, `traditional`, `hsk_level`, `pinyins`, `popularity`, `examples`, `collocations`, `modality`, `type`, `synonyms`, `antonym`, `searchable_text`, `version`)
+                    SELECT `simplified`, `traditional`, `hsk_level`, `pinyins`, `popularity`, `examples`, `collocations`, `modality`, `type`, `synonyms`, `antonym`, '', 48
                     FROM `chinese_word`
                 """.trimIndent())
                 connection.execSQL("DROP TABLE `chinese_word`")
@@ -148,6 +150,7 @@ class DatabaseHelper private constructor() {
                         `simplified` TEXT NOT NULL,
                         `language` TEXT NOT NULL,
                         `definition` TEXT NOT NULL,
+                        `version` INTEGER NOT NULL DEFAULT 0,
                         PRIMARY KEY(`simplified`, `language`),
                         FOREIGN KEY(`simplified`) REFERENCES `chinese_word`(`simplified`) ON UPDATE NO ACTION ON DELETE CASCADE
                     )
@@ -324,32 +327,66 @@ class DatabaseHelper private constructor() {
         finalFile.delete()
     }
 
-    suspend fun replaceWordsDataInDB(updateWith: ChineseWordsDatabase)
+    suspend fun replaceWordsDataInDB(updateWith: ChineseWordsDatabase, force: Boolean = false)
             = withContext(AppDispatchers.IO) {
-        try {
-            Logger.d(tag = TAG, messageString = "Initiating Database Update: reading file")
-            val wordsCount = updateWith.chineseWordDAO().getCount()
-            val definitionsCount = updateWith.wordDefinitionDAO().getCount()
-            val totalCount = wordsCount + definitionsCount
+        val appConfig = HSKAppServices.appPreferences
+        val currentAppVersion = Utils.getAppVersion()
+        val chunkSize = 5000
 
-            if (totalCount == 0) {
-                Logger.i(tag = TAG, messageString = "Update file is empty or incompatible, aborting")
-                throw IllegalStateException("Database is empty")
+        try {
+            Logger.d(tag = TAG, messageString = "Initiating Database Update")
+
+            // Determine baseline
+            val baselineVersion = if (force) {
+                -1
+            } else if (appConfig.dictionaryImportProgress.value != -1) {
+                // Resume case
+                appConfig.dictionaryImportBaselineVersion.value
+            } else {
+                appConfig.dictionaryLastImportedAssetVersion.value
             }
 
-            _updateProgress.value = 0f
-            var processedCount = 0
+            val wordsToUpdateCount = updateWith.chineseWordDAO().getCountNewerThan(baselineVersion)
+            val defsToUpdateCount = updateWith.wordDefinitionDAO().getCountNewerThan(baselineVersion)
+            val totalToUpdate = wordsToUpdateCount + defsToUpdateCount
 
-            // Inserting All succeeds, but corrupts the database. Thank you Room.
-            updateWith.chineseWordDAO().getAll().chunked(5000).forEach { chunk ->
+            if (totalToUpdate == 0) {
+                Logger.i(tag = TAG, messageString = "Database is already up to date")
+                appConfig.dictionaryLastImportedAssetVersion.value = currentAppVersion
+                appConfig.dictionaryImportProgress.value = -1
+                return@withContext
+            }
+
+            // Persistence for resume
+            if (appConfig.dictionaryImportProgress.value == -1) {
+                appConfig.dictionaryImportBaselineVersion.value = baselineVersion
+                appConfig.dictionaryLastImportedAssetVersion.value = currentAppVersion
+            }
+
+            var processedCount = appConfig.dictionaryImportProgress.value.coerceAtLeast(0)
+            _updateProgress.value = (processedCount.toFloat() / totalToUpdate.toFloat()) * 100f
+
+            // Process Chinese Words
+            while (processedCount < wordsToUpdateCount) {
+                val chunk = updateWith.chineseWordDAO().getPageNewerThan(baselineVersion, chunkSize, processedCount)
+                if (chunk.isEmpty()) break
+                
                 _db!!.chineseWordDAO().upsertAll(chunk)
                 processedCount += chunk.size
-                _updateProgress.value = (processedCount.toFloat() / totalCount.toFloat()) * 100f
+                appConfig.dictionaryImportProgress.value = processedCount
+                _updateProgress.value = (processedCount.toFloat() / totalToUpdate.toFloat()) * 100f
             }
-            updateWith.wordDefinitionDAO().getAll().chunked(5000).forEach { chunk ->
+
+            // Process Definitions
+            while (processedCount < totalToUpdate) {
+                val offset = processedCount - wordsToUpdateCount
+                val chunk = updateWith.wordDefinitionDAO().getPageNewerThan(baselineVersion, chunkSize, offset)
+                if (chunk.isEmpty()) break
+
                 _db!!.wordDefinitionDAO().upsertAll(chunk)
                 processedCount += chunk.size
-                _updateProgress.value = (processedCount.toFloat() / totalCount.toFloat()) * 100f
+                appConfig.dictionaryImportProgress.value = processedCount
+                _updateProgress.value = (processedCount.toFloat() / totalToUpdate.toFloat()) * 100f
             }
 
             // Rebuild FTS indexes after bulk update to ensure sync and fix any corruption
@@ -359,19 +396,23 @@ class DatabaseHelper private constructor() {
                 connection.executeSQL("INSERT INTO chinese_word_annotation_fts(chinese_word_annotation_fts) VALUES('rebuild')")
             }
 
+            // Reset progress on success
+            appConfig.dictionaryImportProgress.value = -1
             Logger.i(tag = TAG, messageString = "Database update done")
+        } catch (e: Exception) {
+            throw e
         } finally {
             _updateProgress.value = null
         }
     }
 
-    suspend fun updateLiveDatabaseFromAsset(successCallback: () -> Unit, failureCallback: (e: Exception) -> Unit)
+    suspend fun updateLiveDatabaseFromAsset(successCallback: () -> Unit, failureCallback: (e: Exception) -> Unit, force: Boolean = false)
             = withContext(AppDispatchers.IO) {
         mutex.withLock {
             try {
                 val assetDb = createRoomDatabaseFromAsset()
                 try {
-                    replaceWordsDataInDB(assetDb)
+                    replaceWordsDataInDB(assetDb, force)
                     withContext(Dispatchers.Main) {
                         successCallback()
                     }

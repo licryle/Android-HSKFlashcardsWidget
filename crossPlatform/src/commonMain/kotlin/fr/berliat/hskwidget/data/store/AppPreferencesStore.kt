@@ -78,6 +78,9 @@ class AppPreferencesStore private constructor(
     // --- Int preferences ---
     val appVersionCode = registerIntPref("appVersionCode", 0)
     val dbBackUpDiskMaxFiles = registerIntPref("database_backup_disk_max_files", 2)
+    val dictionaryLastImportedAssetVersion = registerIntPref("dictionary_last_imported_asset_version", 48)
+    val dictionaryImportProgress = registerIntPref("dictionary_import_progress", -1)
+    val dictionaryImportBaselineVersion = registerIntPref("dictionary_import_baseline_version", 0)
 
     // --- Long preferences ---
     val ankiModelId = registerLongPref("anki_model_id", -1L)

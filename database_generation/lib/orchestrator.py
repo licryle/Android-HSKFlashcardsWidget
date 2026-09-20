@@ -9,7 +9,7 @@ import tempfile
 from datetime import datetime
 from typing import List, Dict, Any, Set, Iterator, Tuple, Optional
 from .base_provider import Provider, ProviderType
-from .utils import merge_json_strings
+from .utils import merge_json_strings, get_app_version
 
 class Orchestrator:
     def __init__(self, schema_path: str, db_path: str):
@@ -20,6 +20,7 @@ class Orchestrator:
         self.table_definitions = self._parse_room_entities()
         self.column_defaults: Dict[str, Dict[str, Any]] = {}
         self.previous_database_path: Optional[str] = None
+        self.app_version = get_app_version()
         self._setup_logging()
 
     def _setup_logging(self):
@@ -47,7 +48,10 @@ class Orchestrator:
         for entity in self.schema_data['database']['entities']:
             table_name = entity['tableName']
             fields = {field['columnName']: field for field in entity['fields']}
-            entities[table_name] = fields
+            entities[table_name] = {
+                'fields': fields,
+                'primaryKey': entity['primaryKey']['columnNames']
+            }
         return entities
 
     def create_database(self):
@@ -125,7 +129,7 @@ class Orchestrator:
                     else:
                         table_owners[table] = (p_name, provider_cols)
 
-                valid_cols = self.table_definitions[table].keys()
+                valid_cols = self.table_definitions[table]['fields'].keys()
                 for col in info['columns']:
                     if col not in valid_cols:
                         errors.append(f"Provider {p_name} targets unknown column '{col}' in table '{table}'")
@@ -146,8 +150,21 @@ class Orchestrator:
     def _assemble_data(self, conn: sqlite3.Connection):
         cursor = conn.cursor()
         
+        prev_conn = None
+        if self.previous_database_path:
+            prev_conn = sqlite3.connect(self.previous_database_path)
+            prev_conn.row_factory = sqlite3.Row
+
+        def normalize(v):
+            """Treats NULL, empty strings, and 'N/A' as equivalent."""
+            if v is None or v == '' or v == 'N/A':
+                return ''
+            return str(v).strip()
+
         table_providers = [p for p in self.providers if any(s['type'] == ProviderType.TABLE for s in p.schema().values())]
         column_providers = [p for p in self.providers if p not in table_providers]
+
+        assembly_errors = []
 
         for provider in table_providers + column_providers:
             p_name = provider.__class__.__name__
@@ -159,10 +176,37 @@ class Orchestrator:
                     continue
                 
                 info = p_schema[table_name]
+                table_def = self.table_definitions[table_name]
                 
+                # Global Cleanup: Trim simplified and filter out LLM artifacts/garbage
+                is_garbage = False
+                for key in ['simplified', 'a_simplified']:
+                    if key in record and isinstance(record[key], str):
+                        val = record[key].strip()
+                        record[key] = val
+                        # Explicit filter for LLM tags and artifacts
+                        if not val or any(tag in val for tag in ['tool_call', '<|', '|>', '</']):
+                            msg = f"Garbage record detected in {table_name} from {p_name}: '{val}'"
+                            self.logger.error(msg)
+                            assembly_errors.append(msg)
+                            is_garbage = True
+                            break
+                if is_garbage:
+                    continue
+
+                # Foreign Key Safeguard: Ensure parent word exists for child tables
+                if table_name in ['word_definition', 'chinese_word_annotation']:
+                    pk_val = record.get('simplified') or record.get('a_simplified')
+                    cursor.execute("SELECT 1 FROM chinese_word WHERE simplified = ?", (pk_val,))
+                    if not cursor.fetchone():
+                        msg = f"FK violation: {table_name} refers to '{pk_val}' which is missing in chinese_word (Provider: {p_name})"
+                        self.logger.error(msg)
+                        assembly_errors.append(msg)
+                        continue
+
                 if info['type'] == ProviderType.TABLE:
                     data_to_insert = record.copy()
-                    table_fields = self.table_definitions[table_name]
+                    table_fields = table_def['fields']
                     for col_name, field_info in table_fields.items():
                         if col_name not in data_to_insert:
                             default_val = field_info.get('defaultValue')
@@ -179,15 +223,55 @@ class Orchestrator:
                             elif not field_info.get('notNull', False):
                                 data_to_insert[col_name] = None
                     
+                    # Versioning Logic
+                    version = self.app_version
+                    if prev_conn and table_name in ['chinese_word', 'word_definition']:
+                        pk_cols = table_def['primaryKey']
+                        where_clause = " AND ".join([f"{col} = ?" for col in pk_cols])
+                        pk_values = [data_to_insert[col] for col in pk_cols]
+                        prev_cursor = prev_conn.cursor()
+                        
+                        try:
+                            prev_cursor.execute(f"SELECT * FROM {table_name} WHERE {where_clause}", pk_values)
+                            prev_row = prev_cursor.fetchone()
+                            if prev_row:
+                                prev_data = {key: prev_row[key] for key in prev_row.keys()}
+                                is_identical = True
+                                for col, val in data_to_insert.items():
+                                    if col in ['version', 'searchable_text', 'definition']:
+                                        continue
+                                    
+                                    if normalize(prev_data.get(col)) != normalize(val):
+                                        is_identical = False
+                                        break
+                                
+                                if is_identical:
+                                    # Preserve old version, or use 48 as legacy baseline
+                                    version = prev_data.get('version') or 48
+                            
+                            elif table_name == 'word_definition':
+                                # Schema 2 -> 3 Transition: Compare against definition column in old chinese_word table
+                                prev_cursor.execute("SELECT definition FROM chinese_word WHERE simplified = ?", (data_to_insert['simplified'],))
+                                legacy_row = prev_cursor.fetchone()
+                                if legacy_row:
+                                    old_def = legacy_row[0]
+                                    if old_def == data_to_insert['definition']:
+                                        version = 48
+                                    
+                        except sqlite3.OperationalError:
+                            pass # Table might not exist in prev DB
+                    
+                    if 'version' in table_fields:
+                        data_to_insert['version'] = version
+
                     cols = list(data_to_insert.keys())
                     placeholders = ', '.join(['?'] * len(cols))
                     sql = f"INSERT OR REPLACE INTO {table_name} ({', '.join(cols)}) VALUES ({placeholders})"
                     
-
                     try:
                         cursor.execute(sql, list(data_to_insert.values()))
-                    except:
-                        print(f"\033[91mError inserting into {table_name} from provider {p_name}\033[0m")
+                    except Exception as e:
+                        print(f"\033[91mError inserting into {table_name} from provider {p_name}: {e}\033[0m")
                         print(f"SQL:\n{sql}")
                         print(f"Data: {data_to_insert}")
                 
@@ -206,14 +290,51 @@ class Orchestrator:
                             current_def = row[0]
                             record['definition'] = merge_json_strings(current_def, record['definition'])
 
-                    set_clause = ', '.join([f"{c} = ?" for c in update_cols])
+                    # Check for changes to trigger version update
+                    version_to_set = self.app_version
+                    if prev_conn and table_name in ['chinese_word', 'word_definition']:
+                        prev_cursor = prev_conn.cursor()
+                        prev_cursor.execute(f"SELECT * FROM {table_name} WHERE {index_col} = ?", (record[index_col],))
+                        prev_row = prev_cursor.fetchone()
+                        if prev_row:
+                            prev_data = {key: prev_row[key] for key in prev_row.keys()}
+                            changed = False
+                            for col in update_cols:
+                                if col == 'version': continue
+                                
+                                if normalize(prev_data.get(col)) != normalize(record[col]):
+                                    changed = True
+                                    break
+                            
+                            if not changed:
+                                version_to_set = prev_data.get('version') or 48
+                    
+                    if 'version' in table_def['fields']:
+                        record['version'] = version_to_set
+                    
+                    # Finalize columns for update
+                    final_update_cols = [c for c in record.keys() if c != index_col]
+                    set_clause = ', '.join([f"{c} = ?" for c in final_update_cols])
                     sql = f"UPDATE {table_name} SET {set_clause} WHERE {index_col} = ?"
                     
-                    values = [record[c] for c in update_cols]
+                    values = [record[c] for c in final_update_cols]
                     values.append(record[index_col])
                     cursor.execute(sql, values)
             
             conn.commit()
+        
+        if prev_conn:
+            prev_conn.close()
+
+        if assembly_errors:
+            self.logger.critical(f"Database assembly failed with {len(assembly_errors)} errors.")
+            for err in assembly_errors[:10]: # Log first 10
+                self.logger.error(f"  - {err}")
+            if len(assembly_errors) > 10:
+                self.logger.error(f"  ... and {len(assembly_errors) - 10} more.")
+            
+            logging.shutdown()
+            sys.exit(1)
 
     def run(self, run_update: bool):
         if run_update:
@@ -258,10 +379,10 @@ class Orchestrator:
         cursor = conn.cursor()
         
         # Update chinese_word
-        cursor.execute("SELECT simplified, traditional, pinyins, examples, collocations, synonyms, antonym FROM chinese_word")
+        cursor.execute("SELECT simplified, traditional, pinyins, examples, collocations, synonyms, antonym, searchable_text, version FROM chinese_word")
         words = cursor.fetchall()
         for row in words:
-            simplified, traditional, pinyins, examples, collocations, synonyms, antonym = row
+            simplified, traditional, pinyins, examples, collocations, synonyms, antonym, old_searchable_text, old_version = row
             
             # Fetch definitions
             cursor.execute("SELECT definition FROM word_definition WHERE simplified = ?", (simplified,))
@@ -272,24 +393,34 @@ class Orchestrator:
             hanzi_split = " ".join(list(simplified))
             
             parts = [simplified, traditional, hanzi_split, toneless, concatenated, examples, collocations, synonyms, antonym]
-            searchable_text = " ".join([str(p) for p in parts if p]).lower()
+            new_searchable_text = " ".join([str(p) for p in parts if p]).lower()
             
-            cursor.execute("UPDATE chinese_word SET searchable_text = ? WHERE simplified = ?", (searchable_text, simplified))
+            if new_searchable_text != old_searchable_text:
+                # Only bump version if it's already "new" data or if we specifically want to force 
+                # a refresh of the searchable index for legacy data.
+                # Given we just moved to versioning, we'll only bump if the record was already marked 
+                # as changed in this build (self.app_version) to avoid invalidating the "legacy 48" status.
+                version_to_set = old_version
+                if old_version == self.app_version:
+                    version_to_set = self.app_version
+                
+                cursor.execute("UPDATE chinese_word SET searchable_text = ?, version = ? WHERE simplified = ?", (new_searchable_text, version_to_set, simplified))
         
         # Update chinese_word_annotation
-        cursor.execute("SELECT a_simplified, a_pinyins, notes, themes FROM chinese_word_annotation")
+        cursor.execute("SELECT a_simplified, a_pinyins, notes, themes, a_searchable_text FROM chinese_word_annotation")
         annotations = cursor.fetchall()
         for row in annotations:
-            a_simplified, a_pinyins, notes, themes = row
+            a_simplified, a_pinyins, notes, themes, old_searchable_text = row
             
             toneless = unidecode(a_pinyins or "")
             concatenated = toneless.replace(" ", "")
             hanzi_split = " ".join(list(a_simplified))
             
             parts = [a_simplified, hanzi_split, toneless, concatenated, notes, themes]
-            searchable_text = " ".join([str(p) for p in parts if p]).lower()
+            new_searchable_text = " ".join([str(p) for p in parts if p]).lower()
             
-            cursor.execute("UPDATE chinese_word_annotation SET a_searchable_text = ? WHERE a_simplified = ?", (searchable_text, a_simplified))
+            if new_searchable_text != old_searchable_text:
+                cursor.execute("UPDATE chinese_word_annotation SET a_searchable_text = ? WHERE a_simplified = ?", (new_searchable_text, a_simplified))
             
         # Rebuild FTS indexes to ensure they are in sync and not corrupted by REPLACE operations during assembly
         self.logger.info("Rebuilding FTS5 indexes...")

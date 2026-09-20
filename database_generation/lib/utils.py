@@ -56,5 +56,19 @@ def merge_json_strings(current_json: Optional[str], new_json_data: str) -> str:
         
         current_data.update(new_data)
         return json.dumps(current_data, ensure_ascii=False)
-    except:
+    except Exception:
         return new_json_data
+
+def get_app_version(toml_path: str = "../gradle/libs.versions.toml") -> int:
+    """Parses app-versionCode from libs.versions.toml."""
+    try:
+        if not os.path.exists(toml_path):
+            return 0
+        with open(toml_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+            match = re.search(r'app-versionCode\s*=\s*"(\d+)"', content)
+            if match:
+                return int(match.group(1))
+    except Exception:
+        pass
+    return 0
