@@ -506,40 +506,58 @@ class Orchestrator:
 
         report.append("-" * 95)
 
-        # 2. Breakdown per version
-        report.append(f"{'VERSION BREAKDOWN REPORT':^95}")
+        # 2. Breakdown per version (counting total rows across both tables)
+        report.append(f"{'VERSION BREAKDOWN REPORT (chinese_word + word_definition Rows)':^95}")
         report.append("-" * 95)
-        report.append(f"{'Version':<35} | {'Count (% of Total)':<20} | {'In CEDict':<18} | {'Out of CEDict':<15}")
+        report.append(f"{'Version':<35} | {'Count (% of Total)':<20}")
         report.append("-" * 95)
 
+        # Count chinese_word rows per version
         cursor.execute("SELECT version, simplified FROM chinese_word")
-        version_map = {}
+        cw_version_counts = {}
         for v, word in cursor.fetchall():
-            if v not in version_map:
-                version_map[v] = []
-            version_map[v].append(word)
+            if v not in cw_version_counts:
+                cw_version_counts[v] = 0
+            cw_version_counts[v] += 1
 
-        # Print all versions total line first
-        all_v_words = []
-        for words in version_map.values():
-            all_v_words.extend(words)
-        total_all_v = len(all_v_words)
-        in_c_all = len(set(all_v_words).intersection(cedict_words))
-        out_c_all = total_all_v - in_c_all
+        # Count word_definition rows per version. 
+        # Since word_definition doesn't have a version column, we map it via chinese_word's version.
+        cursor.execute("SELECT wd.simplified FROM word_definition wd")
+        wd_words = cursor.fetchall()
+        
+        # Build a mapping from word to its version in chinese_word
+        cursor.execute("SELECT simplified, version FROM chinese_word")
+        word_to_version = {row[0]: row[1] for row in cursor.fetchall()}
+
+        wd_version_counts = {}
+        for (word,) in wd_words:
+            v = word_to_version.get(word)
+            if v not in wd_version_counts:
+                wd_version_counts[v] = 0
+            wd_version_counts[v] += 1
+
+        # Combine versions
+        all_versions = set(cw_version_counts.keys()).union(set(wd_version_counts.keys()))
+        
+        # Calculate total across all versions (total rows in chinese_word + total rows in word_definition)
+        total_all_v = 0
+        for val in cw_version_counts.values():
+            total_all_v += val
+        for val in wd_version_counts.values():
+            total_all_v += val
         
         report.append(
-            f"{'All versions':<35} | {f'{total_all_v} (100.0%)':<20} | {str(in_c_all):<18} | {str(out_c_all):<15}")
+            f"{'All versions':<35} | {f'{total_all_v} (100.0%)':<20}")
         report.append("-" * 95)
 
-        for v in sorted(version_map.keys()):
-            v_words = version_map[v]
-            total = len(v_words)
-            in_c = len(set(v_words).intersection(cedict_words))
-            out_c = total - in_c
+        for v in sorted(all_versions, key=lambda x: str(x)):
+            cw_cnt = cw_version_counts.get(v, 0)
+            wd_cnt = wd_version_counts.get(v, 0)
+            v_total_rows = cw_cnt + wd_cnt
             
-            count_str = f"{total} ({total / total_all_v * 100:.1f}%)" if total_all_v > 0 else f"{total} (0.0%)"
+            count_str = f"{v_total_rows} ({v_total_rows / total_all_v * 100:.1f}%)" if total_all_v > 0 else f"{v_total_rows} (0.0%)"
             report.append(
-                f"{str(v):<35} | {count_str:<20} | {str(in_c):<18} | {str(out_c):<15}")
+                f"{str(v):<35} | {count_str:<20}")
 
         report.append("=" * 95 + "\n")
 
