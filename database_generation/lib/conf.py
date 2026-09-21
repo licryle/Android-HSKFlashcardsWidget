@@ -20,7 +20,6 @@ ANNOTATIONS_FILE = os.path.join(ANNOTATIONS_DIR, 'annotations.csv')
 DB_FILE = 'output/Mandarin_Assistant.db'
 AI_CACHE_DB = os.path.join(AI_FIELDS_DIR, 'ai_fields_cache.db')
 COLLOCATIONS_CACHE_DB = os.path.join(COLLOCATIONS_DIR, 'collocations_cache.db')
-FRENCH_CACHE_DB = os.path.join(LANGUAGE_FRENCH_DIR, 'language_french_cache.db')
 
 # HSK Submodule
 HSK_SUBMODULE_PATH = os.path.join(HSK_DIR, 'new_hsk')
