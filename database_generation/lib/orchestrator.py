@@ -9,7 +9,7 @@ import tempfile
 from datetime import datetime
 from typing import List, Dict, Any, Set, Iterator, Tuple, Optional
 from .base_provider import Provider, ProviderType
-from .utils import merge_json_strings, get_app_version, load_cedict_simplified_words
+from .utils import merge_json_strings, get_app_version, load_cedict_simplified_words, extract_bracketed_pinyins, plain_definition_text
 from .conf import CEDICT_FILE, DEFINITION_AI_LOCALE
 
 class Orchestrator:
@@ -397,15 +397,26 @@ class Orchestrator:
         for row in words:
             simplified, traditional, pinyins, examples, collocations, synonyms, antonym, old_searchable_text, old_version = row
             
-            # Fetch definitions
+            # Fetch definitions (all languages)
             cursor.execute("SELECT definition FROM word_definition WHERE simplified = ?", (simplified,))
-            definitions = " ".join([r[0] for r in cursor.fetchall()])
+            definition_rows = [r[0] for r in cursor.fetchall()]
+            definitions = " ".join([plain_definition_text(d) for d in definition_rows if d])
             
-            toneless = unidecode(pinyins or "")
-            concatenated = toneless.replace(" ", "")
+            # Index every reading: the display pinyins plus any [pinyin]
+            # prefixes stored in formatted multi-reading definitions.
+            variants = []
+            if pinyins and pinyins not in variants:
+                variants.append(pinyins)
+            for definition_row in definition_rows:
+                for reading in extract_bracketed_pinyins(definition_row):
+                    if reading not in variants:
+                        variants.append(reading)
+            toneless_parts = [unidecode(variant) for variant in variants]
+            toneless = " ".join(toneless_parts)
+            concatenated = " ".join([part.replace(" ", "") for part in toneless_parts])
             hanzi_split = " ".join(list(simplified))
             
-            parts = [simplified, traditional, hanzi_split, toneless, concatenated, examples, collocations, synonyms, antonym]
+            parts = [simplified, traditional, hanzi_split, toneless, concatenated, definitions, examples, collocations, synonyms, antonym]
             new_searchable_text = " ".join([str(p) for p in parts if p]).lower()
             
             if new_searchable_text != old_searchable_text:

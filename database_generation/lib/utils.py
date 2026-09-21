@@ -83,6 +83,91 @@ def convert_pinyin_with_tones(pinyin_string: str) -> str:
 
     return ' '.join(replace_tone(m) for m in pinyin_pattern.finditer(pinyin_string))
 
+def _group_cedict_entries(entries: List[tuple]) -> Dict[str, List[str]]:
+    """Groups (pinyin_with_tones, english_raw) by pinyin, splitting '/' glosses.
+
+    Preserves CEDICT order and drops exact duplicate glosses within a reading.
+    """
+    grouped: Dict[str, List[str]] = {}
+    for pinyin, english_raw in entries:
+        glosses = [g.strip() for g in (english_raw or "").split("/") if g.strip()]
+        if not glosses:
+            continue
+        if pinyin not in grouped:
+            grouped[pinyin] = []
+        for gloss in glosses:
+            if gloss not in grouped[pinyin]:
+                grouped[pinyin].append(gloss)
+    return grouped
+
+def format_cedict_definition(entries: List[tuple]) -> str:
+    """Formats grouped CEDICT definitions for a single simplified headword.
+
+    entries: list of (pinyin_with_tones, english_raw) in CEDICT order,
+        where english_raw uses '/' as gloss separator.
+    Returns a newline-separated definition string:
+    - single pinyin + single gloss -> "gloss"
+    - single pinyin + N glosses -> "1. gloss1\\n2. gloss2..."
+    - multiple pinyins -> "[pinyin] gloss" per line, with "1. / 2. ..."
+      numbering when that pinyin has multiple glosses.
+    """
+    grouped = _group_cedict_entries(entries)
+
+    if not grouped:
+        return ""
+
+    if len(grouped) == 1:
+        glosses = next(iter(grouped.values()))
+        if len(glosses) == 1:
+            return glosses[0]
+        return "\n".join(f"{i + 1}. {gloss}" for i, gloss in enumerate(glosses))
+
+    lines = []
+    for pinyin, glosses in grouped.items():
+        if len(glosses) == 1:
+            lines.append(f"[{pinyin}] {glosses[0]}")
+        else:
+            for i, gloss in enumerate(glosses):
+                lines.append(f"[{pinyin}] {i + 1}. {gloss}")
+    return "\n".join(lines)
+
+def build_cedict_searchable_text(simplified: str, entries: List[tuple]) -> str:
+    """Builds aggregated search-index text for a single simplified headword.
+
+    Covers every reading (toneless + concatenated forms) and every gloss in
+    plain form: no [pinyin] prefixes, no numbering.
+    """
+    grouped = _group_cedict_entries(entries)
+    variants = list(grouped.keys())
+    glosses = [gloss for gloss_list in grouped.values() for gloss in gloss_list]
+    toneless_parts = [unidecode(variant) for variant in variants]
+    concatenated_parts = [toneless.replace(" ", "") for toneless in toneless_parts]
+    hanzi_split = " ".join(list(simplified))
+    parts = [simplified, hanzi_split] + glosses + toneless_parts + concatenated_parts
+    return " ".join([str(part) for part in parts if part]).lower()
+
+_BRACKET_RE = re.compile(r"\[([^\[\]]+)\]")
+_PINYIN_LIKE_RE = re.compile(r"[a-zA-ZāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜüÜ ]+")
+
+def extract_bracketed_pinyins(definition: Optional[str]) -> List[str]:
+    """Extracts [pinyin] reading prefixes from a formatted definition.
+
+    Only returns candidates that look like pinyin (letters/tone marks/spaces,
+    no digits or CJK), so gloss-internal references like [jun4] are ignored.
+    """
+    readings = []
+    for match in _BRACKET_RE.finditer(definition or ""):
+        candidate = match.group(1).strip()
+        if candidate and candidate not in readings and _PINYIN_LIKE_RE.fullmatch(candidate):
+            readings.append(candidate)
+    return readings
+
+def plain_definition_text(definition: Optional[str]) -> str:
+    """Strips [pinyin] prefixes and leading 'N.' numbering for search indexing."""
+    text = _BRACKET_RE.sub(" ", definition or "")
+    text = re.sub(r"(?m)^\s*\d+\.\s*", " ", text)
+    return re.sub(r"\s+", " ", text).strip()
+
 def merge_json_strings(current_json: Optional[str], new_json_data: str) -> str:
     """Merges two JSON strings representing dictionaries."""
     try:

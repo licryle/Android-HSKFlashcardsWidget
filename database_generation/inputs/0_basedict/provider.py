@@ -3,7 +3,7 @@ import re
 import json
 import sqlite3
 from typing import List, Dict, Optional, Any, Iterator, Tuple
-from lib import Provider, ProviderType, convert_pinyin_with_tones, unidecode, iter_cedict
+from lib import Provider, ProviderType, convert_pinyin_with_tones, iter_cedict, format_cedict_definition, build_cedict_searchable_text
 
 class BaseDictProvider(Provider):
     def update(self):
@@ -27,31 +27,35 @@ class BaseDictProvider(Provider):
             return
 
         cedict_words = set()
+        definitions_by_simplified: Dict[str, List[Tuple[str, str]]] = {}
+        display_by_simplified: Dict[str, Tuple[str, str]] = {}
         for entry in iter_cedict(cedict_path):
             simplified = entry["simplified"]
             traditional = entry["traditional"]
             pinyins_raw = entry["pinyin"]
             definition_raw = entry["english"]
-            
+
             pinyins = convert_pinyin_with_tones(pinyins_raw)
             cedict_words.add(simplified)
-            
-            toneless = unidecode(pinyins)
-            concatenated = toneless.replace(" ", "")
-            hanzi_split = " ".join(list(simplified))
-            searchable_text = f"{simplified} {hanzi_split} {definition_raw} {toneless} {concatenated}".lower()
-            
+            definitions_by_simplified.setdefault(simplified, []).append((pinyins, definition_raw))
+            # Display columns keep last-entry-wins semantics (as before).
+            display_by_simplified[simplified] = (traditional, pinyins)
+
+        for simplified, entries in definitions_by_simplified.items():
+            traditional, pinyins = display_by_simplified[simplified]
             yield ("chinese_word", {
                 "simplified": simplified,
                 "traditional": traditional,
                 "pinyins": pinyins,
                 "hsk_level": "NOT_HSK",
-                "searchable_text": searchable_text
+                "searchable_text": build_cedict_searchable_text(simplified, entries)
             })
+
+        for simplified, entries in definitions_by_simplified.items():
             yield ("word_definition", {
                 "simplified": simplified,
                 "language": "en",
-                "definition": definition_raw
+                "definition": format_cedict_definition(entries)
             })
 
         # CEDICT occasionally removes headwords. Preserve records from the previous
