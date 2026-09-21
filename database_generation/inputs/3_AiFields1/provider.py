@@ -109,9 +109,13 @@ class AiFieldsProvider(Provider):
                         self.logger.warning(f"AiFieldsProvider: Discarding AI result for '{word}' - definition or examples contain non-Chinese characters.")
                         continue
                     
-                    # Convert empty strings to None (NULL) for metadata
-                    for key in res:
-                        if isinstance(res[key], str) and not res[key].strip():
+                    # Convert empty strings to None (NULL) for metadata.
+                    # Drop unknown keys: the model sometimes emits garbled ones
+                    # (e.g. "ant" instead of "antonym") which would crash the INSERT.
+                    for key in list(res.keys()):
+                        if key not in ('examples', 'modality', 'type', 'synonyms', 'antonym'):
+                            del res[key]
+                        elif isinstance(res[key], str) and not res[key].strip():
                             res[key] = None
 
                     cols = ['simplified'] + list(res.keys())
