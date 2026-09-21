@@ -12,17 +12,16 @@ from lib.conf import CEDICT_FILE
 
 def generate_prompt(words: List[str]) -> str:
     return f"""<|system|>
-You are a precise Chinese language assistant helping learners learn using mostly HSK3 vocabulary. You MUST return a valid JSON array of objects.
+You are a precise simplified Chinese language assistant helping learners learn using mostly HSK3 simplified chinese vocabulary. You MUST return a valid JSON array of objects.
 <|user|>
 Analyze the following Chinese words. For each word, return an object with these fields:
 
-1. "word": The original word FROM THE LIST BELOW. Do NOT change it to traditional characters or a different word.
-2. "definition": HSK3-level definitions. If multiple, separate with \\n.
-3. "examples": One example sentence per definition, separated with \\n. Use HSK3 vocabulary.
-4. "modality": EXACTLY ONE of ["ORAL", "WRITTEN", "ORAL_WRITTEN", "N/A"].
-5. "type": EXACTLY ONE of ["NOUN", "VERB", "ADJECTIVE", "ADVERB", "CONJUNCTION", "PREPOSITION", "INTERJECTION", "IDIOM", "N/A"]. If a word has multiple types, choose the most common one.
-6. "synonyms": Comma-separated simplified Chinese words (or empty string).
-7. "antonym": Closest antonym in simplified Chinese (or empty string).
+1. "word": The original simplified chinese word FROM THE LIST BELOW. Do NOT change it to traditional characters or a different word.
+2. "examples": One example sentence per definition, separated with \\n. Use HSK3 simplificed chinese vocabulary.
+3. "modality": EXACTLY ONE of ["ORAL", "WRITTEN", "ORAL_WRITTEN", "N/A"].
+4. "type": EXACTLY ONE of ["NOUN", "VERB", "ADJECTIVE", "ADVERB", "CONJUNCTION", "PREPOSITION", "INTERJECTION", "IDIOM", "N/A"]. If a word has multiple types, choose the most common one.
+5. "synonyms": Comma-separated simplified Chinese words (or empty string).
+6. "antonym": Closest antonym in simplified Chinese (or empty string).
 
 CRITICAL: 
 - Output MUST be a valid JSON array. 
@@ -36,7 +35,6 @@ Expected format:
 [
   {{
     "word": "example",
-    "definition": "def1\\ndef2",
     "examples": "ex1\\nex2",
     "modality": "ORAL_WRITTEN",
     "type": "NOUN",
@@ -78,7 +76,7 @@ class AiFieldsProvider(Provider):
         for i in range(0, len(missing_words), BATCH_SIZE):
             batch = missing_words[i:i + BATCH_SIZE]
             prompt = generate_prompt(batch)
-            required_fields = ['word', 'definition', 'examples', 'modality', 'type', 'synonyms', 'antonym']
+            required_fields = ['word', 'examples', 'modality', 'type', 'synonyms', 'antonym']
             
             ai_results = call_llm_api(API_ENDPOINT, MODEL_NAME, prompt, required_fields)
             
@@ -88,7 +86,6 @@ class AiFieldsProvider(Provider):
                     if not raw_word: continue
                     
                     word = raw_word.strip()
-                    definition = res.pop('definition', None)
 
                     # Strict Validation: The word MUST be in our current batch.
                     # This prevents traditional characters or garbage from being cached.
@@ -106,9 +103,9 @@ class AiFieldsProvider(Provider):
                             self.logger.warning(f"AiFieldsProvider: Discarding AI result for '{word}' - not in requested batch.")
                             continue
                     
-                    # Strict validation: definition and examples cannot contain non-Chinese characters (e.g., Latin letters)
+                    # Strict validation: collocation and examples cannot contain non-Chinese characters (e.g., Latin letters)
                     import re
-                    if (definition and re.search(r'[a-zA-Z]', definition)) or (res.get('examples') and re.search(r'[a-zA-Z]', res['examples'])):
+                    if (res.get('collocation') and re.search(r'[a-zA-Z]', res.get('collocation'))) or (res.get('examples') and re.search(r'[a-zA-Z]', res['examples'])):
                         self.logger.warning(f"AiFieldsProvider: Discarding AI result for '{word}' - definition or examples contain non-Chinese characters.")
                         continue
                     
