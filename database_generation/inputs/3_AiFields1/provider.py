@@ -121,9 +121,6 @@ class AiFieldsProvider(Provider):
                     placeholders = ', '.join(['?'] * len(cols))
                     vals = [word] + list(res.values())
                     cursor.execute(f"INSERT OR REPLACE INTO chinese_word ({', '.join(cols)}) VALUES ({placeholders})", vals)
-                    
-                    if definition:
-                        cursor.execute("INSERT OR REPLACE INTO word_definition (simplified, definition) VALUES (?, ?)", (word, definition))
 
                 conn.commit()
                 self.logger.info(f"AiFieldsProvider: Progress {i + len(batch)}/{len(missing_words)}")
@@ -141,10 +138,6 @@ class AiFieldsProvider(Provider):
                 "type": ProviderType.COLUMN,
                 "columns": ["examples", "modality", "type", "synonyms", "antonym"],
                 "index": "simplified"
-            },
-            "word_definition": {
-                "type": ProviderType.TABLE,
-                "columns": ["simplified", "language", "definition"]
             }
         }
 
@@ -167,16 +160,5 @@ class AiFieldsProvider(Provider):
             # Final validation: only yield if word is in our base dictionary
             if record['simplified'] in allowed_words:
                 yield ("chinese_word", record)
-            
-        # Definitions
-        cursor.execute("SELECT simplified, definition FROM word_definition")
-        for row in cursor.fetchall():
-            simplified, definition = row
-            if simplified in allowed_words:
-                yield ("word_definition", {
-                    "simplified": simplified,
-                    "language": DEFINITION_AI_LOCALE,
-                    "definition": definition
-                })
             
         conn.close()
