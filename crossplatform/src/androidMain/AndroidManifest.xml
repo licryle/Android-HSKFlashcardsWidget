@@ -5,5 +5,9 @@
             android:name=".domain.AnkiSyncWordListsService"
             android:exported="false"
             android:foregroundServiceType="dataSync" />
+        <service
+            android:name=".domain.DatabaseUpdateService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
     </application>
 </manifest>

@@ -199,6 +199,9 @@
     <string name="dbrestore_success">数据库已成功恢复</string>
 
     <string name="database_updating_progress">正在更新词典… %1$d%</string>
+    <string name="database_update_notification_name">词典更新</string>
+    <string name="database_update_notification_description">提供从资源更新词典的进度。</string>
+    <string name="database_update_starting">正在启动更新…</string>
     <string name="dbbackup_success">已成功备份数据库</string>
     <string name="dbbackup_failure_write">无法备份数据库</string>
     <string name="dbbackup_failure_folderpermission">正在取消备份：文件夹无写入权限</string>

@@ -1,7 +1,6 @@
 package fr.berliat.hskwidget.domain
 
 import androidx.room3.Room
-
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.createDirectories
 import io.github.vinceglb.filekit.exists
@@ -10,7 +9,10 @@ import io.github.vinceglb.filekit.path
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import platform.Foundation.*
+import platform.Foundation.NSBundle
+import platform.Foundation.NSFileManager
+import platform.Foundation.NSLog
+
 
 @OptIn(ExperimentalForeignApi::class)
 actual suspend fun copyDatabaseAssetFile(file: PlatformFile) {
@@ -31,14 +33,14 @@ actual suspend fun copyDatabaseAssetFile(file: PlatformFile) {
             println("Could not create directory for ${file.path}: $e")
         }
 
-		NSLog("INFO: copyDatabaseAssetFile ${file.path}")
+        NSLog("INFO: copyDatabaseAssetFile ${file.path}")
         // 3. Copy the file from the bundle to the destination path
         if (!file.exists()) {
             try {
                 fileManager.copyItemAtPath(
                     srcPath = databasePathInBundle,
                     toPath = file.path,
-					error = null
+                    error = null
                 )
             } catch (e: Exception) {
                 // Handle copy error
@@ -57,4 +59,13 @@ actual suspend fun createRoomDatabaseBuilderFromFile(file: PlatformFile): Databa
         Room.databaseBuilder(name = file.path)
     )
     // Because of the SQLDriver in KMP, can't use createFromXXX()
+}
+
+actual suspend fun updateInBackgroundLiveDatabaseFromAsset(
+    force: Boolean,
+    successCallback: (() -> Unit)?,
+    failureCallback: ((e: Exception) -> Unit)?
+) {
+    // On iOS, we just run it directly. 
+    DatabaseHelper.getInstance().runDatabaseUpdateNow(successCallback, failureCallback, force)
 }

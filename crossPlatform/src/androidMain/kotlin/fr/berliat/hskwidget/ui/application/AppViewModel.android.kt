@@ -1,12 +1,17 @@
 package fr.berliat.hskwidget.ui.application
 
+import android.Manifest
 import android.app.Activity
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetManager.ACTION_APPWIDGET_CONFIGURE
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Parcelable
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 
 import com.android.billingclient.api.BillingResult
@@ -40,6 +45,7 @@ actual class AppViewModel(navigationManager: NavigationManager, val activityProv
     : CommonAppViewModel(navigationManager) {
 
     private lateinit var ankiDelegate : HSKAnkiDelegate
+    private lateinit var notificationPermissionLauncher: ActivityResultLauncher<String>
 
     override fun init() {
         // Enable StrictMode in Debug mode
@@ -47,8 +53,13 @@ actual class AppViewModel(navigationManager: NavigationManager, val activityProv
             StrictModeManager.init()
         }
 
-        FileKit.init(activityProvider.invoke())
-        ExpectedUtils.init(activityProvider.invoke())
+        val activity = activityProvider.invoke()
+        FileKit.init(activity)
+        ExpectedUtils.init(activity)
+
+        notificationPermissionLauncher = activity.registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { _ -> }
 
         // Todo remove run blocking
         val gDrive = GoogleDriveBackup(
@@ -81,6 +92,19 @@ actual class AppViewModel(navigationManager: NavigationManager, val activityProv
         super.finishInitialization()
 
         syncPlayPurchases()
+    }
+
+    override protected fun askNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val activity = activityProvider.invoke()
+            if (ContextCompat.checkSelfPermission(
+                    activity,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
     }
 
     fun syncPlayPurchases() {

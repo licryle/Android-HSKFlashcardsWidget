@@ -407,7 +407,12 @@ class DatabaseHelper private constructor() {
         }
     }
 
-    suspend fun updateLiveDatabaseFromAsset(successCallback: () -> Unit, failureCallback: (e: Exception) -> Unit, force: Boolean = false)
+    suspend fun updateLiveDatabaseFromAsset(successCallback: (() -> Unit)? = null, failureCallback: ((e: Exception) -> Unit)? = null, force: Boolean = false)
+            = withContext(AppDispatchers.IO) {
+        updateInBackgroundLiveDatabaseFromAsset(force, successCallback, failureCallback)
+    }
+
+    suspend fun runDatabaseUpdateNow(successCallback: (() -> Unit)? = null, failureCallback: ((e: Exception) -> Unit)? = null, force: Boolean = false)
             = withContext(AppDispatchers.IO) {
         mutex.withLock {
             try {
@@ -415,7 +420,7 @@ class DatabaseHelper private constructor() {
                 try {
                     replaceWordsDataInDB(assetDb, force)
                     withContext(Dispatchers.Main) {
-                        successCallback()
+                        successCallback?.invoke()
                     }
                 } finally {
                     assetDb.close()
@@ -423,7 +428,7 @@ class DatabaseHelper private constructor() {
             } catch (e: Exception) {
                 Logger.e(tag = TAG, messageString = "Failed to update database from asset: ${e.message}")
                 withContext(Dispatchers.Main) {
-                    failureCallback(e)
+                    failureCallback?.invoke(e)
                 }
             } finally {
                 cleanTempDatabaseFiles()
@@ -431,6 +436,9 @@ class DatabaseHelper private constructor() {
         }
     }
 }
+
+expect suspend fun updateInBackgroundLiveDatabaseFromAsset(force: Boolean, successCallback: (() -> Unit)? = null, failureCallback: ((e: Exception) -> Unit)? = null)
+
 expect suspend fun createRoomDatabaseBuilderFromFile(file: PlatformFile) : DatabaseBuilderWithPath
 
 expect suspend fun copyDatabaseAssetFile(file: PlatformFile)

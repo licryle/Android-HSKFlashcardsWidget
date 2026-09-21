@@ -199,6 +199,9 @@ We recommend to choose the level you're at plus the one below, or above dependin
     <string name="dbrestore_success">Database successfully restored</string>
 
     <string name="database_updating_progress">Updating dictionary… %1$d%</string>
+    <string name="database_update_notification_name">Dictionary Update</string>
+    <string name="database_update_notification_description">Provides progress for the dictionary update from assets.</string>
+    <string name="database_update_starting">Starting update…</string>
     <string name="dbbackup_success">Successfully backed-up the database</string>
     <string name="dbbackup_failure_write">Couldn't back-up the database</string>
     <string name="dbbackup_failure_folderpermission">Cancelling back-up: no write permission on folder</string>

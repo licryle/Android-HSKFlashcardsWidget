@@ -145,6 +145,7 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
             }
 
             // Update from Database asset
+            askNotificationPermission()
             HSKAppServices.snackbar.show(SnackbarType.INFO, Res.string.database_update_start)
 
             DatabaseHelper.getInstance().updateLiveDatabaseFromAsset({
@@ -164,6 +165,9 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
 
             appConfig.appVersionCode.value = Utils.getAppVersion()
         }
+    }
+
+    protected open fun askNotificationPermission() {
     }
 
     fun didUpdateApp(): Boolean {

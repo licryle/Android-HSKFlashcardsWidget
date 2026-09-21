@@ -1,20 +1,17 @@
 package fr.berliat.hskwidget.domain
 
+import android.content.Intent
 import androidx.room3.Room
-
 import fr.berliat.hskwidget.core.ExpectedUtils
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
 import fr.berliat.hskwidget.domain.DatabaseHelper.Companion.DATABASE_ASSET_PATH
-
 import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.absolutePath
 import io.github.vinceglb.filekit.createDirectories
 import io.github.vinceglb.filekit.databasesDir
-
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-
 import java.io.File
 import java.io.FileOutputStream
 
@@ -40,6 +37,29 @@ actual suspend fun copyDatabaseAssetFile(file: PlatformFile) {
             FileOutputStream(File(file.absolutePath())).use { outStream ->
                 inStream.copyTo(outStream)
             }
+        }
+    }
+}
+
+actual suspend fun updateInBackgroundLiveDatabaseFromAsset(
+    force: Boolean,
+    successCallback: (() -> Unit)?,
+    failureCallback: ((e: Exception) -> Unit)?
+) {
+    val context = ExpectedUtils.context
+    val intent = Intent(context, DatabaseUpdateService::class.java).apply {
+        action = DatabaseUpdateService.ACTION_START_UPDATE
+        putExtra(DatabaseUpdateService.EXTRA_FORCE_REPAIR, force)
+    }
+    
+    try {
+        context.startForegroundService(intent)
+        withContext(Dispatchers.Main) {
+            successCallback?.invoke()
+        }
+    } catch (e: Exception) {
+        withContext(Dispatchers.Main) {
+            failureCallback?.invoke(e)
         }
     }
 }
