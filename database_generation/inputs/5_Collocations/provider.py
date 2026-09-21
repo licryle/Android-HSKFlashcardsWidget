@@ -6,7 +6,7 @@ import logging
 from typing import Dict, Any, Iterator, Tuple, List
 
 from lib.utils_ai import call_llm_api
-from lib import Provider, ProviderType, BATCH_SIZE, API_ENDPOINT, MODEL_NAME, HSK_FILES, COLLOCATIONS_CACHE_DB, load_cedict_simplified_words
+from lib import Provider, ProviderType, BATCH_SIZE, API_ENDPOINT, MODEL_NAME, HSK_FILES, COLLOCATIONS_CACHE_DB, load_u8_words
 from lib.conf import CEDICT_FILE
 
 def generate_prompt(words: List[str]) -> str:
@@ -44,7 +44,7 @@ class CollocationsProvider(Provider):
 
     def update(self):
         """Fetches missing collocations from the LLM and stores them in the local cache DB."""
-        words_to_process = load_cedict_simplified_words(CEDICT_FILE)
+        words_to_process = load_u8_words(CEDICT_FILE)
 
         conn = self._get_cache_conn()
         cursor = conn.cursor()

@@ -7,12 +7,12 @@ import re
 from typing import Dict, Any, Iterator, Tuple, List
 
 from lib.utils_ai import call_llm_api
-from lib import Provider, ProviderType, BATCH_SIZE, API_ENDPOINT, MODEL_NAME, iter_cedict, parse_cedict_line
+from lib import Provider, ProviderType, BATCH_SIZE, API_ENDPOINT, MODEL_NAME, iter_u8, parse_u8_line
 
 # Keep the same directory-based cache convention used by the other AI-backed providers.
 FRENCH_CACHE_DB = os.path.join(os.path.dirname(__file__), 'language_french_cache.db')
 CEDICT_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '0_basedict', 'cedict_ts.u8'))
-CFDICT_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), 'cfdict.u8'))
+CFDICT_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), 'cfdict-next-full.u8'))
 
 
 def generate_prompt(items: List[Dict[str, str]]) -> str:
@@ -86,7 +86,7 @@ class LanguageFrenchProvider(Provider):
         conn = sqlite3.connect(FRENCH_CACHE_DB)
         return conn
 
-    def _load_cfdict_word_map(self) -> List[Dict[str, str]]:
+    def _load_french_word_map(self) -> List[Dict[str, str]]:
         """Read the CFDICT French file. It is the first translation lookup layer."""
         queue: List[Dict[str, str]] = []
         if not os.path.exists(CFDICT_FILE):
@@ -98,12 +98,12 @@ class LanguageFrenchProvider(Provider):
                 if line.startswith('#'):
                     continue
 
-                entry = parse_cedict_line(line)
+                entry = parse_u8_line(line)
                 if not entry:
                     continue
 
                 simplified = entry['simplified']
-                french = entry['english']
+                french = entry['gloss']
                 parts = [part.strip() for part in french.split('/') if part.strip()]
                 fr = '; '.join(parts)
                 if not fr:
@@ -116,18 +116,18 @@ class LanguageFrenchProvider(Provider):
 
         return queue
 
-    def _load_cedict_word_map(self) -> List[Dict[str, str]]:
+    def _load_base_word_map(self) -> List[Dict[str, str]]:
         """Read the English CEDICT file and build the LLM fallback queue."""
         queue: List[Dict[str, str]] = []
         seen = set()
-        for entry in iter_cedict(CEDICT_FILE):
+        for entry in iter_u8(CEDICT_FILE):
             word = entry['simplified']
             if word in seen:
                 continue
             seen.add(word)
             queue.append({
                 'word': word,
-                'english': entry['english'],
+                'english': entry['gloss'],
             })
         return queue
 
@@ -136,14 +136,14 @@ class LanguageFrenchProvider(Provider):
         conn = self._get_cache_conn()
         cursor = conn.cursor()
 
-        cedict_queue = self._load_cedict_word_map()
-        base_words = {item['word'] for item in cedict_queue}
+        base_queue = self._load_base_word_map()
+        base_words = {item['word'] for item in base_queue}
 
-        cfdict_queue = [item for item in self._load_cfdict_word_map()
+        french_queue = [item for item in self._load_french_word_map()
                         if item['word'] in base_words]
-        if cfdict_queue:
-            self.logger.info(f"LanguageFrenchProvider: seeding {len(cfdict_queue)} French entries from CFDICT.")
-            for item in cfdict_queue:
+        if french_queue:
+            self.logger.info(f"LanguageFrenchProvider: seeding {len(french_queue)} French entries from CFDICT.")
+            for item in french_queue:
                 word = item['word']
                 fr = item['fr']
                 definition_json = json.dumps({'fr': fr}, ensure_ascii=False)
@@ -156,7 +156,7 @@ class LanguageFrenchProvider(Provider):
         cursor.execute("SELECT simplified FROM chinese_word")
         cached_words = {row[0] for row in cursor.fetchall()}
 
-        missing = [item for item in cedict_queue if item['word'] not in cached_words]
+        missing = [item for item in base_queue if item['word'] not in cached_words]
         if not missing:
             self.logger.info("LanguageFrenchProvider: no missing words left for the LLM fallback.")
             conn.close()
@@ -204,7 +204,7 @@ class LanguageFrenchProvider(Provider):
         if not os.path.exists(FRENCH_CACHE_DB):
             return
 
-        base_words = {item['word'] for item in self._load_cedict_word_map()}
+        base_words = {item['word'] for item in self._load_base_word_map()}
         conn = sqlite3.connect(FRENCH_CACHE_DB)
         cursor = conn.cursor()
         cursor.execute("SELECT simplified, definition FROM chinese_word")

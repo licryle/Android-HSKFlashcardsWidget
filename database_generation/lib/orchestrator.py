@@ -9,7 +9,8 @@ import tempfile
 from datetime import datetime
 from typing import List, Dict, Any, Set, Iterator, Tuple, Optional
 from .base_provider import Provider, ProviderType
-from .utils import merge_json_strings, get_app_version, load_cedict_simplified_words, extract_bracketed_pinyins, plain_definition_text
+from .utils import merge_json_strings, get_app_version
+from .u8_utils import load_u8_words, extract_bracketed_pinyins, plain_definition_text
 from .conf import CEDICT_FILE, DEFINITION_AI_LOCALE
 
 class Orchestrator:
@@ -457,7 +458,7 @@ class Orchestrator:
     def _generate_report(self, conn: sqlite3.Connection):
         self.logger.info("Generating summary report...")
 
-        cedict_words = set(load_cedict_simplified_words(CEDICT_FILE))
+        cedict_words = set(load_u8_words(CEDICT_FILE))
         cedict_count = len(cedict_words)
 
         cursor = conn.cursor()

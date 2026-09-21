@@ -1,62 +1,40 @@
 import os
-import re
 import json
 import sqlite3
-from typing import List, Dict, Optional, Any, Iterator, Tuple
-from lib import Provider, ProviderType, convert_pinyin_with_tones, iter_cedict, format_cedict_definition, build_cedict_searchable_text
+from typing import Dict, Any, Iterator, Tuple
+from lib import ProviderType, build_u8_searchable_text
+from lib import u8_utils
 
-class BaseDictProvider(Provider):
-    def update(self):
-        pass
+class BaseDictProvider(u8_utils.U8Provider):
+    U8_FILE = os.path.join(os.path.dirname(__file__), "cedict_ts.u8")
+    LANGUAGE = "en"
+    FILTER_TO_BASE = False
 
     def schema(self) -> Dict[str, Dict[str, Any]]:
-        return {
-            "chinese_word": {
-                "type": ProviderType.TABLE,
-                "columns": ["simplified", "traditional", "pinyins", "hsk_level", "searchable_text"]
-            },
-            "word_definition": {
-                "type": ProviderType.TABLE,
-                "columns": ["simplified", "language", "definition"]
-            }
+        schema = super().schema()
+        schema["chinese_word"] = {
+            "type": ProviderType.TABLE,
+            "columns": ["simplified", "traditional", "pinyins", "hsk_level", "searchable_text"]
         }
+        return schema
 
     def data(self) -> Iterator[Tuple[str, Dict[str, Any]]]:
-        cedict_path = os.path.join(os.path.dirname(__file__), "cedict_ts.u8")
-        if not os.path.exists(cedict_path):
+        grouped = self._read_grouped()
+        if not grouped:
             return
 
-        cedict_words = set()
-        definitions_by_simplified: Dict[str, List[Tuple[str, str]]] = {}
-        display_by_simplified: Dict[str, Tuple[str, str]] = {}
-        for entry in iter_cedict(cedict_path):
-            simplified = entry["simplified"]
-            traditional = entry["traditional"]
-            pinyins_raw = entry["pinyin"]
-            definition_raw = entry["english"]
-
-            pinyins = convert_pinyin_with_tones(pinyins_raw)
-            cedict_words.add(simplified)
-            definitions_by_simplified.setdefault(simplified, []).append((pinyins, definition_raw))
-            # Display columns keep last-entry-wins semantics (as before).
-            display_by_simplified[simplified] = (traditional, pinyins)
-
-        for simplified, entries in definitions_by_simplified.items():
-            traditional, pinyins = display_by_simplified[simplified]
+        base_words = set(grouped)
+        for simplified, data in grouped.items():
+            traditional, pinyins = data["display"]
             yield ("chinese_word", {
                 "simplified": simplified,
                 "traditional": traditional,
                 "pinyins": pinyins,
                 "hsk_level": "NOT_HSK",
-                "searchable_text": build_cedict_searchable_text(simplified, entries)
+                "searchable_text": build_u8_searchable_text(simplified, data["entries"])
             })
 
-        for simplified, entries in definitions_by_simplified.items():
-            yield ("word_definition", {
-                "simplified": simplified,
-                "language": "en",
-                "definition": format_cedict_definition(entries)
-            })
+        yield from self._yield_definitions(grouped)
 
         # CEDICT occasionally removes headwords. Preserve records from the previous
         # generated dictionary so an update never turns existing definitions into
@@ -79,7 +57,7 @@ class BaseDictProvider(Provider):
             for row in conn.execute(f"SELECT {select_columns} FROM chinese_word"):
                 record = dict(zip(available_columns, row))
                 simplified = record["simplified"]
-                if simplified in cedict_words:
+                if simplified in base_words:
                     continue
                 yield ("chinese_word", record)
 
