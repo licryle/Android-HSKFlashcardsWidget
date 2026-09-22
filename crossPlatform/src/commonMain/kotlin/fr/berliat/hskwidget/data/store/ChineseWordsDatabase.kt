@@ -6,14 +6,14 @@ import androidx.room3.Database
 import androidx.room3.RoomDatabase
 import androidx.room3.RoomDatabaseConstructor
 import androidx.room3.executeSQL
+import androidx.room3.immediateTransaction
 import androidx.room3.useWriterConnection
+import fr.berliat.hskwidget.core.Utils
 
 import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.cacheDir
-import io.github.vinceglb.filekit.copyTo
 import io.github.vinceglb.filekit.div
-import io.github.vinceglb.filekit.name
 
 import fr.berliat.hskwidget.data.dao.AnnotatedChineseWordDAO
 import fr.berliat.hskwidget.data.dao.ChineseWordAnnotationDAO
@@ -39,6 +39,9 @@ import fr.berliat.hskwidget.data.type.ListTypeConverter
 import fr.berliat.hskwidget.data.type.ModalityConverter
 import fr.berliat.hskwidget.data.type.Pinyins
 import fr.berliat.hskwidget.data.type.WordTypeConverter
+import fr.berliat.hskwidget.domain.DatabaseHelper
+import io.github.vinceglb.filekit.delete
+import io.github.vinceglb.filekit.path
 
 @Database(
     entities = [ChineseWordAnnotation::class, ChineseWord::class, WordDefinition::class, ChineseWordFrequency::class,
@@ -72,16 +75,41 @@ abstract class ChineseWordsDatabase: RoomDatabase() {
         get() = _databaseFile!!
 
     suspend fun snapshotToFile(): PlatformFile? = try {
-        // Flush live WAL to the main file
-        this.useWriterConnection { connection ->
-            connection.executeSQL("PRAGMA wal_checkpoint(truncate)")
+        val dest = FileKit.cacheDir / Utils.getRandomString(10)
+        dest.delete(false)
+
+        useWriterConnection { connection ->
+            connection.executeSQL("PRAGMA wal_checkpoint(TRUNCATE)")
+            connection.executeSQL("VACUUM INTO '${dest.path.replace("'", "''")}'")
         }
 
-        val mainFile = this.databaseFile
-        val dest = FileKit.cacheDir / mainFile.name
-        mainFile.copyTo(dest)
         dest
     } catch (_: Exception) { null }
+
+    suspend fun truncateToUserData() {
+        useWriterConnection { connection ->
+            connection.immediateTransaction {
+                try { wordDefinitionDAO().deleteAll() } catch (_: Exception) {}
+                try { chineseWordDAO().deleteAll() } catch (_: Exception) {}
+                try { wordListDAO().deleteAllSystemEntries() } catch (_: Exception) {}
+
+                try { connection.executeSQL("INSERT INTO chinese_word_fts(chinese_word_fts) VALUES('delete-all')") } catch (_: Exception) {}
+                try { connection.executeSQL("INSERT INTO word_definition_fts(word_definition_fts) VALUES('delete-all')") } catch (_: Exception) {}
+            }
+        }
+    }
+
+    suspend fun clone(): ChineseWordsDatabase? = try {
+        DatabaseHelper.createRoomDatabaseFromFile(snapshotToFile()!!)
+    } catch (_: Exception) { null }
+
+    suspend fun rebuildFTSIndexes() {
+        useWriterConnection { connection ->
+            connection.executeSQL("INSERT INTO chinese_word_fts(chinese_word_fts) VALUES('rebuild')")
+            connection.executeSQL("INSERT INTO word_definition_fts(word_definition_fts) VALUES('rebuild')")
+            connection.executeSQL("INSERT INTO chinese_word_annotation_fts(chinese_word_annotation_fts) VALUES('rebuild')")
+        }
+    }
 }
 
 expect object ChineseWordsDatabaseConstructor : RoomDatabaseConstructor<ChineseWordsDatabase> {

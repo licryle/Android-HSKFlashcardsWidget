@@ -31,6 +31,9 @@ interface WordListDAO {
     @Query("SELECT * FROM word_list_entry")
     suspend fun getAllListEntries(): List<WordListEntry>
 
+    @Query("SELECT * FROM word_list_entry WHERE list_id IN (SELECT id FROM word_list WHERE list_type = 'USER')")
+    suspend fun getUserListEntries(): List<WordListEntry>
+
     @Query("$wordlist_with_count WHERE list_type = 'SYSTEM' $wordlist_with_count_groupby ORDER BY last_modified DESC")
     suspend fun getSystemLists(): List<WordListWithCount>
 
@@ -127,6 +130,15 @@ interface WordListDAO {
     @Query("DELETE FROM word_list_entry")
     suspend fun deleteAllEntries()
 
+    @Query("DELETE FROM word_list_entry WHERE list_id IN (SELECT id FROM word_list WHERE list_type = 'USER')")
+    suspend fun deleteAllUserEntries()
+
+    @Query("DELETE FROM word_list_entry WHERE list_id IN (SELECT id FROM word_list WHERE list_type = 'SYSTEM')")
+    suspend fun deleteAllSystemEntries()
+
     @Query("DELETE FROM word_list")
     suspend fun deleteAllLists()
+
+    @Query("DELETE FROM word_list WHERE list_type = 'USER'")
+    suspend fun deleteAllUserLists()
 }

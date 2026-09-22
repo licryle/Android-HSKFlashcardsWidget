@@ -1,8 +1,6 @@
 package fr.berliat.hskwidget.domain
 
 import androidx.room3.RoomDatabase
-import androidx.room3.executeSQL
-import androidx.room3.useWriterConnection
 import androidx.room3.migration.Migration
 import androidx.sqlite.SQLiteConnection
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
@@ -14,6 +12,7 @@ import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.core.AppDispatchers
 import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
+import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
 
 import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.PlatformFile
@@ -196,20 +195,6 @@ class DatabaseHelper private constructor() {
                 .setDriver(sqlDriver)
                 .setQueryCoroutineContext(AppDispatchers.IO)
                 .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
-                .addCallback(object : RoomDatabase.Callback() {
-                    override suspend fun onOpen(connection: SQLiteConnection) {
-                        // Rebuild FTS indexes on open to fix any corruption in the pre-populated asset
-                        // or from previous sync issues. FTS5 'rebuild' is efficient and safe.
-                        try {
-                            connection.execSQL("INSERT INTO chinese_word_fts(chinese_word_fts) VALUES('rebuild')")
-                            connection.execSQL("INSERT INTO word_definition_fts(word_definition_fts) VALUES('rebuild')")
-                            connection.execSQL("INSERT INTO chinese_word_annotation_fts(chinese_word_annotation_fts) VALUES('rebuild')")
-                            Logger.i(tag=TAG, messageString = "FTS5 indexes rebuilt successfully")
-                        } catch (e: Exception) {
-                            Logger.e(tag=TAG, messageString = "Failed to rebuild FTS5 indexes: ${e.message}")
-                        }
-                    }
-                })
 
             val db = finalBuilder.build()
             db._databaseFile = databaseBuilder.file
@@ -277,8 +262,8 @@ class DatabaseHelper private constructor() {
             withContext(AppDispatchers.IO) {
                 Logger.d(tag = TAG, messageString = "Initiating Database Restoration: reading file")
                 val importedAnnotations = updateWith.chineseWordAnnotationDAO().getAll()
-                val importedListEntries = updateWith.wordListDAO().getAllListEntries()
-                val importedLists = updateWith.wordListDAO().getAllLists()
+                val importedListEntries = updateWith.wordListDAO().getUserListEntries()
+                val importedLists = updateWith.wordListDAO().getUserLists()
                 val importedWidgets = updateWith.widgetListDAO().getAllEntries()
                 val importedFreq = updateWith.chineseWordFrequencyDAO().getAll()
                 if (importedAnnotations.isEmpty() && importedListEntries.isEmpty()
@@ -294,10 +279,23 @@ class DatabaseHelper private constructor() {
                 dbToUpdate.chineseWordAnnotationDAO().insertAll(importedAnnotations)
 
                 Logger.d(tag = TAG, messageString = "Starting to import Word_List to local DB")
-                dbToUpdate.wordListDAO().deleteAllEntries()
-                dbToUpdate.wordListDAO().deleteAllLists()
+                dbToUpdate.wordListDAO().deleteAllUserEntries()
+                dbToUpdate.wordListDAO().deleteAllUserLists()
                 dbToUpdate.wordListDAO().insertAllLists(importedLists.map { it.wordList })
                 dbToUpdate.wordListDAO().insertAllWords(importedListEntries)
+
+                Logger.d(tag = TAG, messageString = "Starting to update the AnkiDeckIds on System lists")
+                updateWith.wordListDAO().getSystemLists().forEach {
+                    try {
+                        dbToUpdate.wordListDAO().updateAnkiDeckId(it.id, it.ankiDeckId)
+                    } catch (e: Exception) {
+                        Logger.d(tag = TAG, messageString = "Couldn't update the AnkiDeckIds on list ${it.id}", throwable = e)
+                    }
+                }
+
+                Logger.d(tag = TAG, messageString = "Starting to rebuild the Annotated & Exam lists")
+                HSKAppServices.wordListRepo.buildListSystemAnnotated()
+                HSKAppServices.wordListRepo.buildListSystemExam()
 
                 Logger.d(tag = TAG, messageString = "Starting to import WordFrequency to local DB")
                 dbToUpdate.chineseWordFrequencyDAO().deleteAll()
@@ -305,7 +303,14 @@ class DatabaseHelper private constructor() {
 
                 Logger.d(tag = TAG, messageString = "Starting to import WidgetList to local DB")
                 dbToUpdate.widgetListDAO().deleteAllWidgets()
-                dbToUpdate.widgetListDAO().insertListsToWidget(importedWidgets)
+
+                val widgetIds = FlashcardWidgetProvider().getWidgetIds()
+                val listIds = dbToUpdate.wordListDAO().getAllLists().map { it.id }
+                val finalImportedWidgets = importedWidgets.filter {
+                    widgetIds.contains(it.widgetId) &&  listIds.contains(it.listId)
+                }
+
+                dbToUpdate.widgetListDAO().insertListsToWidget(finalImportedWidgets)
 
                 Logger.i(tag = TAG, messageString = "Database import done")
             }
@@ -324,6 +329,12 @@ class DatabaseHelper private constructor() {
         replaceUserDataInDB(liveDatabase, sourceDb)
         finalFile.delete()
     }
+
+    suspend fun snapshotLiveUserDataToFile(): PlatformFile? = try {
+        val newDb = _db!!.clone()
+        newDb!!.truncateToUserData()
+        newDb.snapshotToFile()
+    } catch (_: Exception) { null }
 
     suspend fun replaceWordsDataInDB(updateWith: ChineseWordsDatabase, force: Boolean = false)
             = withContext(AppDispatchers.IO) {
@@ -388,12 +399,8 @@ class DatabaseHelper private constructor() {
                 _updateProgress.value = (processedCount.toFloat() / totalToUpdate.toFloat()) * 100f
             }
 
-            // Rebuild FTS indexes after bulk update to ensure sync and fix any corruption
-            _db!!.useWriterConnection { connection ->
-                connection.executeSQL("INSERT INTO chinese_word_fts(chinese_word_fts) VALUES('rebuild')")
-                connection.executeSQL("INSERT INTO word_definition_fts(word_definition_fts) VALUES('rebuild')")
-                connection.executeSQL("INSERT INTO chinese_word_annotation_fts(chinese_word_annotation_fts) VALUES('rebuild')")
-            }
+            // Rebuild FTS indexes after bulk update since we don't save it
+            _db!!.rebuildFTSIndexes()
 
             // Reset progress on success
             appConfig.dictionaryImportProgress.value = -1

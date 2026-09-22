@@ -63,7 +63,7 @@ object DatabaseDiskBackup {
         onFail: (Throwable) -> Unit
     ) = withContext(AppDispatchers.IO){
         try {
-            val snapshot = DatabaseHelper.getInstance().liveDatabase.snapshotToFile()
+            val snapshot = DatabaseHelper.getInstance().snapshotLiveUserDataToFile()
             val timestamp = Clock.System.now()
             val filename = "${timestamp.YYMMDDHHMMSS()}_${DatabaseHelper.DATABASE_FILENAME}".toSafeFileName()
 

@@ -186,9 +186,9 @@ We recommend to choose the level you're at plus the one below, or above dependin
     <string name="config_backup_max_number">Number of backups to keep</string>
     <string name="config_backup_max_number_hint">Max files</string>
     <string-array name="config_backup_max_locally"> <!-- Must be in format "{Int} {String}" -->
-        <item>2 (~100MB)</item>
-        <item>5 (~250MB)</item>
-        <item>10 (~500MB)</item>
+        <item>2 (~10MB)</item>
+        <item>5 (~25MB)</item>
+        <item>10 (~50MB)</item>
     </string-array>
 
 

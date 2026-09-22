@@ -35,7 +35,7 @@ object GoogleBackupSharedLogic {
         try {
             val gDriveBackup = HSKAppServices.gDriveBackup
 
-            val gDriveBackupSnapshot = DatabaseHelper.getInstance().liveDatabase.snapshotToFile()
+            val gDriveBackupSnapshot = DatabaseHelper.getInstance().snapshotLiveUserDataToFile()
             if (gDriveBackupSnapshot == null) {
                 GoogleBackupFlowState.globalTransferState.emit(BackupCloudTransferEvent.BackupFailed(Exception("Database snapshot failed")))
                 return

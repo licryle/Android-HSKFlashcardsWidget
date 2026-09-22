@@ -185,11 +185,6 @@
     <string name="config_backup_icon_alt">数据库上传</string>
     <string name="config_backup_max_number">要保留的备份数量</string>
     <string name="config_backup_max_number_hint">最大文件数</string>
-    <string-array name="config_backup_max_locally">
-        <item>2 (~100MB)</item>
-        <item>5 (~250MB)</item>
-        <item>10 (~500MB)</item>
-    </string-array>
 
 
     <string name="dbrestore_start">数据库恢复已开始</string>
