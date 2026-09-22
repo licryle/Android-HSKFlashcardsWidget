@@ -1,6 +1,7 @@
 package fr.berliat.hskwidget.domain
 
 import android.content.Intent
+import co.touchlab.kermit.Logger
 import fr.berliat.hskwidget.core.ExpectedUtils
 
 actual object GoogleBackupService {
@@ -12,7 +13,7 @@ actual object GoogleBackupService {
         try {
             context.startForegroundService(intent)
         } catch (e: Exception) {
-            android.util.Log.e("GoogleBackupService", "Failed to start GoogleBackupUploadService", e)
+            Logger.e(tag = TAG, messageString = "Failed to start GoogleBackupUploadService", throwable = e)
         }
     }
 
@@ -24,7 +25,9 @@ actual object GoogleBackupService {
         try {
             context.startForegroundService(intent)
         } catch (e: Exception) {
-            android.util.Log.e("GoogleBackupService", "Failed to start GoogleBackupDownloadService", e)
+            Logger.e(tag = TAG, messageString = "Failed to start GoogleBackupDownloadService", throwable = e)
         }
     }
+
+    private const val TAG = "GoogleBackupService"
 }
