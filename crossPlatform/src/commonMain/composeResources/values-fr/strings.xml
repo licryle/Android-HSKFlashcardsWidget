@@ -252,10 +252,6 @@ Nous vous recommandons de choisir le niveau où vous en êtes plus celui du dess
     <string name="config_anki_integration">Enregistrer automatiquement les listes et les notes correspondantes dans Anki.
 Lors de l'activation, effectue une synchronisation complète à partir de zéro.</string>
 
-    <string name="config_repair_db_title">Réparer le dictionnaire</string>
-    <string name="config_repair_db_description">Si le dictionnaire semble corrompu au niveau des définitions, vous pouvez tenter de le réparer en ré-important les données depuis les ressources de l'application. Cela n'affectera pas vos notes personnelles.</string>
-    <string name="config_repair_db_action">Réparer</string>
-
     <string name="anki_not_installed"><![CDATA[AnkiDroid n'est pas installé, ou utilise une version très ancienne (<2.5)]]></string>
     <string name="anki_permission_denied">Permission d'appeler l'API AnkiDroid refusée.</string>
     <string name="anki_must_start">Tentative de démarrage d'Anki en arrière-plan</string>

@@ -166,10 +166,6 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
         return appConfig.appVersionCode.value != Utils.getAppVersion()
     }
 
-    fun databaseUpdateUnfinished(): Boolean {
-        return appConfig.dictionaryImportProgress.value != -1
-    }
-
     private fun handleDbOperations() {
         viewModelScope.launch(AppDispatchers.IO) {
             DatabaseHelper.cleanTempDatabaseFiles()

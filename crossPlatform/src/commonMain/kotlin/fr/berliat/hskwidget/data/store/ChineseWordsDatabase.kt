@@ -8,6 +8,7 @@ import androidx.room3.RoomDatabaseConstructor
 import androidx.room3.executeSQL
 import androidx.room3.immediateTransaction
 import androidx.room3.useWriterConnection
+import co.touchlab.kermit.Logger
 import fr.berliat.hskwidget.core.Utils
 
 import io.github.vinceglb.filekit.FileKit
@@ -61,6 +62,7 @@ import io.github.vinceglb.filekit.path
 abstract class ChineseWordsDatabase: RoomDatabase() {
     companion object {
         const val DATABASE_VERSION = 3
+        private const val TAG = "ChineseWordsDatabase"
     }
     abstract fun annotatedChineseWordDAO(): AnnotatedChineseWordDAO
     abstract fun chineseWordAnnotationDAO(): ChineseWordAnnotationDAO
@@ -84,7 +86,10 @@ abstract class ChineseWordsDatabase: RoomDatabase() {
         }
 
         dest
-    } catch (_: Exception) { null }
+    } catch (e: Exception) {
+        Logger.e(tag = TAG, messageString = "snapshotToFile() failed", throwable = e)
+        null
+    }
 
     suspend fun truncateToUserData() {
         useWriterConnection { connection ->
@@ -101,7 +106,10 @@ abstract class ChineseWordsDatabase: RoomDatabase() {
 
     suspend fun clone(): ChineseWordsDatabase? = try {
         DatabaseHelper.createRoomDatabaseFromFile(snapshotToFile()!!)
-    } catch (_: Exception) { null }
+    } catch (e: Exception) {
+        Logger.e(tag = TAG, messageString = "snapshotToFile() failed", throwable = e)
+        null
+    }
 
     suspend fun rebuildFTSIndexes() {
         useWriterConnection { connection ->

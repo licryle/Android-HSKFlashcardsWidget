@@ -116,14 +116,13 @@ class DatabaseHelper private constructor() {
                         `synonyms` TEXT DEFAULT '',
                         `antonym` TEXT DEFAULT '',
                         `searchable_text` TEXT NOT NULL DEFAULT '',
-                        `version` INTEGER NOT NULL DEFAULT 0,
                         PRIMARY KEY(`simplified`)
                     )
                 """.trimIndent())
                 connection.execSQL("""
                     INSERT INTO `chinese_word_new`
-                    (`simplified`, `traditional`, `hsk_level`, `pinyins`, `popularity`, `examples`, `collocations`, `modality`, `type`, `synonyms`, `antonym`, `searchable_text`, `version`)
-                    SELECT `simplified`, `traditional`, `hsk_level`, `pinyins`, `popularity`, `examples`, `collocations`, `modality`, `type`, `synonyms`, `antonym`, '', 48
+                    (`simplified`, `traditional`, `hsk_level`, `pinyins`, `popularity`, `examples`, `collocations`, `modality`, `type`, `synonyms`, `antonym`, `searchable_text`)
+                    SELECT `simplified`, `traditional`, `hsk_level`, `pinyins`, `popularity`, `examples`, `collocations`, `modality`, `type`, `synonyms`, `antonym`, ''
                     FROM `chinese_word`
                 """.trimIndent())
                 connection.execSQL("DROP TABLE `chinese_word`")
@@ -157,7 +156,6 @@ class DatabaseHelper private constructor() {
                         `simplified` TEXT NOT NULL,
                         `language` TEXT NOT NULL,
                         `definition` TEXT NOT NULL,
-                        `version` INTEGER NOT NULL DEFAULT 0,
                         PRIMARY KEY(`simplified`, `language`),
                         FOREIGN KEY(`simplified`) REFERENCES `chinese_word`(`simplified`) ON UPDATE NO ACTION ON DELETE CASCADE
                     )
@@ -230,24 +228,31 @@ class DatabaseHelper private constructor() {
             if (!liveFile.exists()) {
                 copyDatabaseAssetFile(getDatabaseLiveFile())
             } else if (shouldUpdateDatabaseFromAsset(HSKAppServices.appPreferences.appVersionCode.value)) {
+                _updateProgress.value = 0f
                 try {
                     HSKAppServices.snackbar.show(SnackbarType.INFO, Res.string.database_update_start)
 
                     val original = buildDatabase(createRoomDatabaseBuilderFromFile(liveFile))
                     val clone = original.clone()
+                    _updateProgress.value = 33f
                     original.close()
+                    if (clone == null) throw Exception("Couldn't clone existing db")
 
                     copyDatabaseAssetFile(getDatabaseLiveFile())
+                    _updateProgress.value = 66f
+
                     val newDb = buildDatabase(createRoomDatabaseBuilderFromFile(liveFile))
-                    replaceUserDataInDB(newDb, clone!!)
+                    replaceUserDataInDB(newDb, clone)
                     newDb.close()
+                    clone.close()
 
+                    _updateProgress.value = 100f
                     HSKAppServices.snackbar.show(SnackbarType.SUCCESS, Res.string.database_update_success)
-
                 } catch (e: Exception) {
                     HSKAppServices.snackbar.show(SnackbarType.ERROR, Res.string.database_update_failure, listOf(e.message ?: ""))
                     Logging.logAnalyticsError(TAG, "UpdateDatabaseFromAssetFailure", e.message ?: "")
                 } finally {
+                    _updateProgress.value = null
                     cleanTempDatabaseFiles()
                 }
             }
@@ -375,114 +380,7 @@ class DatabaseHelper private constructor() {
         newDb!!.truncateToUserData()
         newDb.snapshotToFile()
     } catch (_: Exception) { null }
-
-    suspend fun replaceWordsDataInDB(updateWith: ChineseWordsDatabase, force: Boolean = false)
-            = withContext(AppDispatchers.IO) {
-        val appConfig = HSKAppServices.appPreferences
-        val currentAppVersion = Utils.getAppVersion()
-        val chunkSize = 5000
-
-        try {
-            Logger.d(tag = TAG, messageString = "Initiating Database Update")
-
-            // Determine baseline
-            val baselineVersion = if (force) {
-                -1
-            } else if (appConfig.dictionaryImportProgress.value != -1) {
-                // Resume case
-                appConfig.dictionaryImportBaselineVersion.value
-            } else {
-                appConfig.dictionaryLastImportedAssetVersion.value
-            }
-
-            val wordsToUpdateCount = updateWith.chineseWordDAO().getCountNewerThan(baselineVersion)
-            val defsToUpdateCount = updateWith.wordDefinitionDAO().getCountNewerThan(baselineVersion)
-            val totalToUpdate = wordsToUpdateCount + defsToUpdateCount
-
-            if (totalToUpdate == 0) {
-                Logger.i(tag = TAG, messageString = "Database is already up to date")
-                appConfig.dictionaryLastImportedAssetVersion.value = currentAppVersion
-                appConfig.dictionaryImportProgress.value = -1
-                return@withContext
-            }
-
-            // No import in queue, Persistence for resume
-            if (appConfig.dictionaryImportProgress.value == -1) {
-                appConfig.dictionaryImportBaselineVersion.value = baselineVersion
-                appConfig.dictionaryLastImportedAssetVersion.value = currentAppVersion
-                appConfig.dictionaryImportProgress.value = 0
-            }
-
-            var processedCount = appConfig.dictionaryImportProgress.value.coerceAtLeast(0)
-            _updateProgress.value = (processedCount.toFloat() / totalToUpdate.toFloat()) * 100f
-
-            // Process Chinese Words
-            while (processedCount < wordsToUpdateCount) {
-                val chunk = updateWith.chineseWordDAO().getPageNewerThan(baselineVersion, chunkSize, processedCount)
-                if (chunk.isEmpty()) break
-                
-                _db!!.chineseWordDAO().upsertAll(chunk)
-                processedCount += chunk.size
-                appConfig.dictionaryImportProgress.value = processedCount
-                _updateProgress.value = (processedCount.toFloat() / totalToUpdate.toFloat()) * 100f
-            }
-
-            // Process Definitions
-            while (processedCount < totalToUpdate) {
-                val offset = processedCount - wordsToUpdateCount
-                val chunk = updateWith.wordDefinitionDAO().getPageNewerThan(baselineVersion, chunkSize, offset)
-                if (chunk.isEmpty()) break
-
-                _db!!.wordDefinitionDAO().upsertAll(chunk)
-                processedCount += chunk.size
-                appConfig.dictionaryImportProgress.value = processedCount
-                _updateProgress.value = (processedCount.toFloat() / totalToUpdate.toFloat()) * 100f
-            }
-
-            // Rebuild FTS indexes after bulk update since we don't save it
-            _db!!.rebuildFTSIndexes()
-
-            // Reset progress on success
-            appConfig.dictionaryImportProgress.value = -1
-            Logger.i(tag = TAG, messageString = "Database update done")
-        } catch (e: Exception) {
-            throw e
-        } finally {
-            _updateProgress.value = null
-        }
-    }
-
-    suspend fun updateLiveDatabaseFromAsset(successCallback: (() -> Unit)? = null, failureCallback: ((e: Exception) -> Unit)? = null, force: Boolean = false)
-            = withContext(AppDispatchers.IO) {
-        updateInBackgroundLiveDatabaseFromAsset(force, successCallback, failureCallback)
-    }
-
-    suspend fun runDatabaseUpdateNow(successCallback: (() -> Unit)? = null, failureCallback: ((e: Exception) -> Unit)? = null, force: Boolean = false)
-            = withContext(AppDispatchers.IO) {
-        mutex.withLock {
-            try {
-                val assetDb = createRoomDatabaseFromAsset()
-                try {
-                    replaceWordsDataInDB(assetDb, force)
-                    withContext(Dispatchers.Main) {
-                        successCallback?.invoke()
-                    }
-                } finally {
-                    assetDb.close()
-                }
-            } catch (e: Exception) {
-                Logger.e(tag = TAG, messageString = "Failed to update database from asset: ${e.message}")
-                withContext(Dispatchers.Main) {
-                    failureCallback?.invoke(e)
-                }
-            } finally {
-                cleanTempDatabaseFiles()
-            }
-        }
-    }
 }
-
-expect suspend fun updateInBackgroundLiveDatabaseFromAsset(force: Boolean, successCallback: (() -> Unit)? = null, failureCallback: ((e: Exception) -> Unit)? = null)
 
 expect suspend fun createRoomDatabaseBuilderFromFile(file: PlatformFile) : DatabaseBuilderWithPath
 

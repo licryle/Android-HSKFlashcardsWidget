@@ -20,6 +20,5 @@ import androidx.room3.Index
 data class WordDefinition(
     val simplified: String,
     val language: String,
-    val definition: String,
-    @ColumnInfo(name = "version", defaultValue = "0") val version: Int = 0
+    val definition: String
 )

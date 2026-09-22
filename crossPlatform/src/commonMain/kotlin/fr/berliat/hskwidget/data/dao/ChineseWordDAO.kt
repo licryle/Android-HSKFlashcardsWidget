@@ -19,12 +19,6 @@ interface ChineseWordDAO {
     @Query("SELECT COUNT(*) FROM chinese_word")
     suspend fun getCount(): Int
 
-    @Query("SELECT COUNT(*) FROM chinese_word WHERE version > :version")
-    suspend fun getCountNewerThan(version: Int): Int
-
-    @Query("SELECT * FROM chinese_word WHERE version > :version ORDER BY simplified LIMIT :limit OFFSET :offset")
-    suspend fun getPageNewerThan(version: Int, limit: Int, offset: Int): List<ChineseWord>
-
     @Query("DELETE FROM chinese_word")
     fun deleteAll()
 }

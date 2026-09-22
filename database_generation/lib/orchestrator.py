@@ -9,7 +9,7 @@ import tempfile
 from datetime import datetime
 from typing import List, Dict, Any, Set, Iterator, Tuple, Optional
 from .base_provider import Provider, ProviderType
-from .utils import merge_json_strings, get_app_version
+from .utils import merge_json_strings
 from .u8_utils import load_u8_words, extract_bracketed_pinyins, plain_definition_text
 from .conf import CEDICT_FILE, DEFINITION_AI_LOCALE
 
@@ -22,7 +22,6 @@ class Orchestrator:
         self.table_definitions = self._parse_room_entities()
         self.column_defaults: Dict[str, Dict[str, Any]] = {}
         self.previous_database_path: Optional[str] = None
-        self.app_version = get_app_version()
         self._setup_logging()
 
     def _setup_logging(self):
@@ -224,47 +223,6 @@ class Orchestrator:
                                 data_to_insert[col_name] = self.column_defaults[table_name][col_name]
                             elif not field_info.get('notNull', False):
                                 data_to_insert[col_name] = None
-                    
-                    # Versioning Logic
-                    version = self.app_version
-                    if prev_conn and table_name in ['chinese_word', 'word_definition']:
-                        pk_cols = table_def['primaryKey']
-                        where_clause = " AND ".join([f"{col} = ?" for col in pk_cols])
-                        pk_values = [data_to_insert[col] for col in pk_cols]
-                        prev_cursor = prev_conn.cursor()
-                        
-                        try:
-                            prev_cursor.execute(f"SELECT * FROM {table_name} WHERE {where_clause}", pk_values)
-                            prev_row = prev_cursor.fetchone()
-                            if prev_row:
-                                prev_data = {key: prev_row[key] for key in prev_row.keys()}
-                                is_identical = True
-                                for col, val in data_to_insert.items():
-                                    if col in ['version', 'searchable_text', 'definition']:
-                                        continue
-                                    
-                                    if normalize(prev_data.get(col)) != normalize(val):
-                                        is_identical = False
-                                        break
-                                
-                                if is_identical:
-                                    # Preserve old version, or use 48 as legacy baseline
-                                    version = prev_data.get('version') or 48
-                            
-                            elif table_name == 'word_definition':
-                                # Schema 2 -> 3 Transition: Compare against definition column in old chinese_word table
-                                prev_cursor.execute("SELECT definition FROM chinese_word WHERE simplified = ?", (data_to_insert['simplified'],))
-                                legacy_row = prev_cursor.fetchone()
-                                if legacy_row:
-                                    old_def = legacy_row[0]
-                                    if old_def == data_to_insert['definition']:
-                                        version = 48
-                                    
-                        except sqlite3.OperationalError:
-                            pass # Table might not exist in prev DB
-                    
-                    if 'version' in table_fields:
-                        data_to_insert['version'] = version
 
                     cols = list(data_to_insert.keys())
                     placeholders = ', '.join(['?'] * len(cols))
@@ -291,28 +249,6 @@ class Orchestrator:
                         if row:
                             current_def = row[0]
                             record['definition'] = merge_json_strings(current_def, record['definition'])
-
-                    # Check for changes to trigger version update
-                    version_to_set = self.app_version
-                    if prev_conn and table_name in ['chinese_word', 'word_definition']:
-                        prev_cursor = prev_conn.cursor()
-                        prev_cursor.execute(f"SELECT * FROM {table_name} WHERE {index_col} = ?", (record[index_col],))
-                        prev_row = prev_cursor.fetchone()
-                        if prev_row:
-                            prev_data = {key: prev_row[key] for key in prev_row.keys()}
-                            changed = False
-                            for col in update_cols:
-                                if col == 'version': continue
-                                
-                                if normalize(prev_data.get(col)) != normalize(record[col]):
-                                    changed = True
-                                    break
-                            
-                            if not changed:
-                                version_to_set = prev_data.get('version') or 48
-                    
-                    if 'version' in table_def['fields']:
-                        record['version'] = version_to_set
                     
                     # Finalize columns for update
                     final_update_cols = [c for c in record.keys() if c != index_col]
@@ -393,10 +329,10 @@ class Orchestrator:
         cursor = conn.cursor()
         
         # Update chinese_word
-        cursor.execute("SELECT simplified, traditional, pinyins, examples, collocations, synonyms, antonym, searchable_text, version FROM chinese_word")
+        cursor.execute("SELECT simplified, traditional, pinyins, examples, collocations, synonyms, antonym, searchable_text FROM chinese_word")
         words = cursor.fetchall()
         for row in words:
-            simplified, traditional, pinyins, examples, collocations, synonyms, antonym, old_searchable_text, old_version = row
+            simplified, traditional, pinyins, examples, collocations, synonyms, antonym, old_searchable_text = row
             
             # Fetch definitions (all languages)
             cursor.execute("SELECT definition FROM word_definition WHERE simplified = ?", (simplified,))
@@ -421,15 +357,7 @@ class Orchestrator:
             new_searchable_text = " ".join([str(p) for p in parts if p]).lower()
             
             if new_searchable_text != old_searchable_text:
-                # Only bump version if it's already "new" data or if we specifically want to force 
-                # a refresh of the searchable index for legacy data.
-                # Given we just moved to versioning, we'll only bump if the record was already marked 
-                # as changed in this build (self.app_version) to avoid invalidating the "legacy 48" status.
-                version_to_set = old_version
-                if old_version == self.app_version:
-                    version_to_set = self.app_version
-                
-                cursor.execute("UPDATE chinese_word SET searchable_text = ?, version = ? WHERE simplified = ?", (new_searchable_text, version_to_set, simplified))
+                cursor.execute("UPDATE chinese_word SET searchable_text = ? WHERE simplified = ?", (new_searchable_text, simplified))
         
         # Update chinese_word_annotation
         cursor.execute("SELECT a_simplified, a_pinyins, notes, themes, a_searchable_text FROM chinese_word_annotation")
@@ -475,7 +403,7 @@ class Orchestrator:
             return f"{count} ({count / total_or_ref * 100:.1f}%)" if total_or_ref > 0 else f"{count} (0.0%)"
 
         report = []
-        report.append("\n" + "=" * 95)
+        report.append("=" * 95)
         report.append(f"{'DICTIONARY GENERATION SUMMARY REPORT':^95}")
         report.append("=" * 95)
         report.append(f"{'Category':<35} | {'Total':<15} | {'In CEDict (% of Ref)':<20} | {'Out of CEDict':<15}")
@@ -515,61 +443,6 @@ class Orchestrator:
             out_c = total - in_c
             report.append(
                 f"{f'Field: {col}':<35} | {total:<15} | {pct_in(in_c, cedict_count):<20} | {str(out_c):<15}")
-
-        report.append("-" * 95)
-
-        # 2. Breakdown per version (counting total rows across both tables)
-        report.append(f"{'VERSION BREAKDOWN REPORT (chinese_word + word_definition Rows)':^95}")
-        report.append("-" * 95)
-        report.append(f"{'Version':<35} | {'Count (% of Total)':<20}")
-        report.append("-" * 95)
-
-        # Count chinese_word rows per version
-        cursor.execute("SELECT version, simplified FROM chinese_word")
-        cw_version_counts = {}
-        for v, word in cursor.fetchall():
-            if v not in cw_version_counts:
-                cw_version_counts[v] = 0
-            cw_version_counts[v] += 1
-
-        # Count word_definition rows per version. 
-        # Since word_definition doesn't have a version column, we map it via chinese_word's version.
-        cursor.execute("SELECT wd.simplified FROM word_definition wd")
-        wd_words = cursor.fetchall()
-        
-        # Build a mapping from word to its version in chinese_word
-        cursor.execute("SELECT simplified, version FROM chinese_word")
-        word_to_version = {row[0]: row[1] for row in cursor.fetchall()}
-
-        wd_version_counts = {}
-        for (word,) in wd_words:
-            v = word_to_version.get(word)
-            if v not in wd_version_counts:
-                wd_version_counts[v] = 0
-            wd_version_counts[v] += 1
-
-        # Combine versions
-        all_versions = set(cw_version_counts.keys()).union(set(wd_version_counts.keys()))
-        
-        # Calculate total across all versions (total rows in chinese_word + total rows in word_definition)
-        total_all_v = 0
-        for val in cw_version_counts.values():
-            total_all_v += val
-        for val in wd_version_counts.values():
-            total_all_v += val
-        
-        report.append(
-            f"{'All versions':<35} | {f'{total_all_v} (100.0%)':<20}")
-        report.append("-" * 95)
-
-        for v in sorted(all_versions, key=lambda x: str(x)):
-            cw_cnt = cw_version_counts.get(v, 0)
-            wd_cnt = wd_version_counts.get(v, 0)
-            v_total_rows = cw_cnt + wd_cnt
-            
-            count_str = f"{v_total_rows} ({v_total_rows / total_all_v * 100:.1f}%)" if total_all_v > 0 else f"{v_total_rows} (0.0%)"
-            report.append(
-                f"{str(v):<35} | {count_str:<20}")
 
         report.append("=" * 95 + "\n")
 

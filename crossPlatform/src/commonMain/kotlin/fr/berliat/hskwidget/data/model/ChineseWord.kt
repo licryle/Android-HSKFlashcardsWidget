@@ -28,8 +28,7 @@ data class ChineseWord(
     @ColumnInfo(name = "type", defaultValue = "N/A") val wordType: WordType? = WordType.UNKNOWN,
     @ColumnInfo(name = "synonyms", defaultValue = "") val synonyms: String? = "",
     @ColumnInfo(name = "antonym", defaultValue = "") val antonym: String? = "",
-    @ColumnInfo(name = "searchable_text", defaultValue = "") val searchableText: String = "",
-    @ColumnInfo(name = "version", defaultValue = "0") val version: Int = 0
+    @ColumnInfo(name = "searchable_text", defaultValue = "") val searchableText: String = ""
 ) {
     /** Hydrated by read DAOs; never persisted in chinese_word. */
     @Ignore

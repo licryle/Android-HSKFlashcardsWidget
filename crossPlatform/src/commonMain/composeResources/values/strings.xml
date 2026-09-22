@@ -252,10 +252,6 @@ We recommend to choose the level you're at plus the one below, or above dependin
     <string name="config_anki_integration">Save lists and corresponding notes in Anki automatically.
 Upon toggling on, operates a full sync from scratch.</string>
 
-    <string name="config_repair_db_title">Repair Dictionary</string>
-    <string name="config_repair_db_description">If the dictionary seems corrupted (missing definitions), you can attempt to repair it by re-importing data from the application assets. This won't affect your personal notes.</string>
-    <string name="config_repair_db_action">Repair</string>
-
     <string name="anki_not_installed"><![CDATA[AnkiDroid is not installed, or runs a very old version (<2.5)]]></string>
     <string name="anki_permission_denied">Permission to call AnkiDroid API denied.</string>
     <string name="anki_must_start">Attempting to start Anki in the background</string>

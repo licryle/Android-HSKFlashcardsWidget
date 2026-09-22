@@ -40,26 +40,3 @@ actual suspend fun copyDatabaseAssetFile(file: PlatformFile) {
         }
     }
 }
-
-actual suspend fun updateInBackgroundLiveDatabaseFromAsset(
-    force: Boolean,
-    successCallback: (() -> Unit)?,
-    failureCallback: ((e: Exception) -> Unit)?
-) {
-    val context = ExpectedUtils.context
-    val intent = Intent(context, DatabaseUpdateService::class.java).apply {
-        action = DatabaseUpdateService.ACTION_START_UPDATE
-        putExtra(DatabaseUpdateService.EXTRA_FORCE_REPAIR, force)
-    }
-    
-    try {
-        context.startForegroundService(intent)
-        withContext(Dispatchers.Main) {
-            successCallback?.invoke()
-        }
-    } catch (e: Exception) {
-        withContext(Dispatchers.Main) {
-            failureCallback?.invoke(e)
-        }
-    }
-}

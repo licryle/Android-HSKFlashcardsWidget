@@ -246,10 +246,6 @@
     <string name="config_anki_activate">激活 Anki 集成</string>
     <string name="config_anki_integration">自动在 Anki 中保存列表和相应的笔记。\n开启后，将从头开始执行完整同步。</string>
 
-    <string name="config_repair_db_title">修复词典</string>
-    <string name="config_repair_db_description">如果词典似乎已损坏，您可以尝试通过从应用程序资源重新导入数据来修复它。这不会影响您的个人笔记。</string>
-    <string name="config_repair_db_action">修复</string>
-
     <string name="anki_not_installed"><![CDATA[未安装 AnkiDroid，或运行的版本非常旧 (<2.5)]]></string>
     <string name="anki_permission_denied">调用 AnkiDroid API 的权限被拒绝。</string>
     <string name="anki_must_start">尝试在后台启动 Anki</string>

@@ -19,12 +19,6 @@ interface WordDefinitionDAO {
     @Query("SELECT COUNT(*) FROM word_definition")
     suspend fun getCount(): Int
 
-    @Query("SELECT COUNT(*) FROM word_definition WHERE version > :version")
-    suspend fun getCountNewerThan(version: Int): Int
-
-    @Query("SELECT * FROM word_definition WHERE version > :version ORDER BY simplified, language LIMIT :limit OFFSET :offset")
-    suspend fun getPageNewerThan(version: Int, limit: Int, offset: Int): List<WordDefinition>
-
     @Query("DELETE FROM word_definition")
     suspend fun deleteAll()
 }
