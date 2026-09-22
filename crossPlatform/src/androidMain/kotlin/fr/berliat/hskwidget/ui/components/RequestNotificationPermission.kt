@@ -14,8 +14,8 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
-fun RequestNotificationPermission(trigger: SharedFlow<Unit>,
-                                  onDenied: (() -> Unit)? = null, onGranted: (() -> Unit)? = null) {
+actual fun RequestNotificationPermission(trigger: SharedFlow<Unit>,
+                                  onDenied: (() -> Unit)?, onGranted: (() -> Unit)?) {
     val context = LocalContext.current
 
     // Launcher to request permission

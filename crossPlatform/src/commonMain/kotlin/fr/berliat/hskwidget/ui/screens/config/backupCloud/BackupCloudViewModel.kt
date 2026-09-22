@@ -29,9 +29,12 @@ import io.github.vinceglb.filekit.path
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -53,6 +56,9 @@ class BackupCloudViewModel (
 
     val restoreFileFrom = MutableStateFlow<Instant?>(null)
 
+    private val _requestNotificationPermission = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    val requestNotificationPermission: SharedFlow<Unit> = _requestNotificationPermission.asSharedFlow()
+
     private val cloudRestoreFile = PlatformFile(FileKit.cacheDir.path + "/" + Utils.getRandomString(10))
 
     init {
@@ -70,6 +76,7 @@ class BackupCloudViewModel (
 
     fun backup() {
         gDriveBackup.login {
+            _requestNotificationPermission.tryEmit(Unit)
             GoogleBackupService.startBackup()
         }
 
@@ -78,6 +85,7 @@ class BackupCloudViewModel (
 
     fun restore() {
         gDriveBackup.login {
+            _requestNotificationPermission.tryEmit(Unit)
             GoogleBackupService.startRestore()
         }
     }

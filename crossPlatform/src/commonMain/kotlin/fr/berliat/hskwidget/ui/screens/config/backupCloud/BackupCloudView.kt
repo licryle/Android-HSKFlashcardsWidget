@@ -23,6 +23,7 @@ import fr.berliat.hskwidget.core.fromKBToMB
 import fr.berliat.hskwidget.ui.components.ConfirmDialog
 import fr.berliat.hskwidget.ui.components.IconButton
 import fr.berliat.hskwidget.ui.components.ProgressCard
+import fr.berliat.hskwidget.ui.components.RequestNotificationPermission
 
 import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.cloud_download_24px
@@ -73,6 +74,8 @@ fun BackupCloudView(
     val busy = viewModel.isBusy.collectAsState()
     val transferState = viewModel.transferState.collectAsState()
     val restoreFileFrom = viewModel.restoreFileFrom.collectAsState()
+
+    RequestNotificationPermission(viewModel.requestNotificationPermission)
 
     val restoreFileTime = restoreFileFrom.value
     restoreFileTime?.let {
