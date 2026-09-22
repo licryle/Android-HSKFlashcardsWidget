@@ -9,7 +9,6 @@ import fr.berliat.googledrivebackup.GoogleDriveState
 import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.data.store.AppPreferencesStore
 import fr.berliat.hskwidget.domain.DatabaseHelper
-import fr.berliat.hskwidget.ui.screens.config.backupCloud.BackupCloudTransferEvent.*
 
 import fr.berliat.hskwidget.Res
 import fr.berliat.hskwidget.core.AppDispatchers
