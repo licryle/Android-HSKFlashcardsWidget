@@ -75,7 +75,7 @@ abstract class ChineseWordsDatabase: RoomDatabase() {
         get() = _databaseFile!!
 
     suspend fun snapshotToFile(): PlatformFile? = try {
-        val dest = FileKit.cacheDir / Utils.getRandomString(10)
+        val dest = FileKit.cacheDir / (DatabaseHelper.TEMP_FILE_PREFIX + Utils.getRandomString(10))
         dest.delete(false)
 
         useWriterConnection { connection ->

@@ -2,6 +2,7 @@ package fr.berliat.hskwidget.ui.application
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
 
 import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.core.AppServices
@@ -16,10 +17,7 @@ import fr.berliat.hskwidget.core.HSKAppServicesPriority
 import fr.berliat.hskwidget.core.Logging
 import fr.berliat.hskwidget.core.SnackbarType
 import fr.berliat.hskwidget.data.store.PrefixedPreferencesStore
-import fr.berliat.hskwidget.database_update_failure
 import fr.berliat.hskwidget.database_update_list_system
-import fr.berliat.hskwidget.database_update_start
-import fr.berliat.hskwidget.database_update_success
 import fr.berliat.hskwidget.dbbackup_failure_folderpermission
 import fr.berliat.hskwidget.dbbackup_failure_write
 import fr.berliat.hskwidget.dbbackup_success
@@ -143,17 +141,12 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
                 }
             }
 
-            // Update from Database asset
-            askNotificationPermission()
-            HSKAppServices.snackbar.show(SnackbarType.INFO, Res.string.database_update_start)
-
-            DatabaseHelper.getInstance().updateLiveDatabaseFromAsset({
-                HSKAppServices.snackbar.show(SnackbarType.SUCCESS, Res.string.database_update_success)
-            }, { e ->
-                HSKAppServices.snackbar.show(SnackbarType.ERROR, Res.string.database_update_failure, listOf(e.message ?: ""))
-
-                Logging.logAnalyticsError(TAG, "UpdateDatabaseFromAssetFailure", e.message ?: "")
-            })
+            // Update from Database asset happens in DatabaseHelper: createRoomDatabaseBuilderLive()
+            if (DatabaseHelper.shouldUpdateDatabaseFromAsset(actualVersion)) {
+                Logger.d(tag = TAG, messageString = "Starting to rebuild the Annotated & Exam lists")
+                HSKAppServices.wordListRepo.buildListSystemAnnotated()
+                HSKAppServices.wordListRepo.buildListSystemExam()
+            }
 
             if (actualVersion != 0 && actualVersion < 47 && Utils.getAppVersion() >= 47) {
                 HSKAppServices.snackbar.show(SnackbarType.INFO, Res.string.database_update_list_system)

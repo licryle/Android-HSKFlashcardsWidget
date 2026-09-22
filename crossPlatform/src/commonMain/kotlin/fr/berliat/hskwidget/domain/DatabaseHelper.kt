@@ -7,12 +7,17 @@ import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import androidx.sqlite.execSQL
 
 import co.touchlab.kermit.Logger
+import fr.berliat.hskwidget.Res
 
 import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.core.AppDispatchers
 import fr.berliat.hskwidget.core.HSKAppServices
+import fr.berliat.hskwidget.core.Logging
+import fr.berliat.hskwidget.core.SnackbarType
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
-import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
+import fr.berliat.hskwidget.database_update_failure
+import fr.berliat.hskwidget.database_update_start
+import fr.berliat.hskwidget.database_update_success
 
 import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.PlatformFile
@@ -62,14 +67,17 @@ class DatabaseHelper private constructor() {
         const val DATABASE_FILENAME = "Mandarin_Assistant.db"
         const val DATABASE_ASSET_PATH = "databases/$DATABASE_FILENAME"
         private const val TAG = "ChineseWordsDatabase"
+        const val TEMP_FILE_PREFIX = "DB_TMP_"
 
         fun getDatabaseLiveDir() = Utils.getAppDatabasePath()
         fun getDatabaseLiveFile() = getDatabaseLiveDir() / DATABASE_FILENAME
 
         suspend fun getInstance(): DatabaseHelper = withContext(AppDispatchers.IO) {
-            INSTANCE?.let { return@withContext it }
+            INSTANCE?.let { return@withContext it } // for optimization
 
             mutex.withLock {
+                INSTANCE?.let { return@withContext it } // for safety
+
                 val instance = DatabaseHelper()
                 instance._db = createRoomDatabaseLive()
                 instance.DATABASE_LIVE_DIR = getDatabaseLiveDir()
@@ -212,30 +220,64 @@ class DatabaseHelper private constructor() {
         suspend fun createRoomDatabaseFromAsset() : ChineseWordsDatabase =
             buildDatabase(createRoomDatabaseBuilderFromAsset())
 
+        /** ToDo: could there be a better way to handle DB updates? In AppViewModel it's too late,
+         * and here, well, it's in a weird disconnected place.
+         */
         private suspend fun createRoomDatabaseBuilderLive(): DatabaseBuilderWithPath = withContext(
             AppDispatchers.IO
         ) {
             val liveFile = getDatabaseLiveFile()
             if (!liveFile.exists()) {
                 copyDatabaseAssetFile(getDatabaseLiveFile())
+            } else if (shouldUpdateDatabaseFromAsset(HSKAppServices.appPreferences.appVersionCode.value)) {
+                try {
+                    HSKAppServices.snackbar.show(SnackbarType.INFO, Res.string.database_update_start)
+
+                    val original = buildDatabase(createRoomDatabaseBuilderFromFile(liveFile))
+                    val clone = original.clone()
+                    original.close()
+
+                    copyDatabaseAssetFile(getDatabaseLiveFile())
+                    val newDb = buildDatabase(createRoomDatabaseBuilderFromFile(liveFile))
+                    replaceUserDataInDB(newDb, clone!!)
+                    newDb.close()
+
+                    HSKAppServices.snackbar.show(SnackbarType.SUCCESS, Res.string.database_update_success)
+
+                } catch (e: Exception) {
+                    HSKAppServices.snackbar.show(SnackbarType.ERROR, Res.string.database_update_failure, listOf(e.message ?: ""))
+                    Logging.logAnalyticsError(TAG, "UpdateDatabaseFromAssetFailure", e.message ?: "")
+                } finally {
+                    cleanTempDatabaseFiles()
+                }
             }
 
             return@withContext createRoomDatabaseBuilderFromFile(liveFile)
         }
 
+        fun shouldUpdateDatabaseFromAsset(appVersion: Int): Boolean {
+            if (appVersion == 0) return false // first launch, nothing to update
+
+            val updateDbVersions = listOf(32, 37, 48, 64)
+
+            return updateDbVersions.any { updateVersion ->
+                appVersion < updateVersion && Utils.getAppVersion() >= updateVersion
+            }
+        }
+
         private suspend fun createRoomDatabaseBuilderFromAsset(): DatabaseBuilderWithPath = withContext(
             AppDispatchers.IO
         ) {
-            val tempFile = FileKit.cacheDir / Utils.getRandomString(10)
+            val tempFile = FileKit.cacheDir / (TEMP_FILE_PREFIX + Utils.getRandomString(10))
             copyDatabaseAssetFile(tempFile)
             return@withContext createRoomDatabaseBuilderFromFile(tempFile)
         }
 
-        suspend fun cleanTempDatabaseFiles() {
-            val dir = getDatabaseLiveDir()
+        suspend fun cleanTempDatabaseFiles() = withContext(AppDispatchers.IO) {
+            val dir = FileKit.cacheDir
             val filesToDelete = dir.list().filter { file ->
                 // Return true for files that match the pattern
-                file.name.contains("Temp_HSK_DB_")
+                file.name.contains(TEMP_FILE_PREFIX)
             }
 
             // Delete the matching files
@@ -293,9 +335,7 @@ class DatabaseHelper private constructor() {
                     }
                 }
 
-                Logger.d(tag = TAG, messageString = "Starting to rebuild the Annotated & Exam lists")
-                HSKAppServices.wordListRepo.buildListSystemAnnotated()
-                HSKAppServices.wordListRepo.buildListSystemExam()
+                // Can't do the word lists population here, so pushing it to the App main process.
 
                 Logger.d(tag = TAG, messageString = "Starting to import WordFrequency to local DB")
                 dbToUpdate.chineseWordFrequencyDAO().deleteAll()
@@ -304,10 +344,10 @@ class DatabaseHelper private constructor() {
                 Logger.d(tag = TAG, messageString = "Starting to import WidgetList to local DB")
                 dbToUpdate.widgetListDAO().deleteAllWidgets()
 
-                val widgetIds = FlashcardWidgetProvider().getWidgetIds()
+                /*val widgetIds = FlashcardWidgetProvider().getWidgetIds()*/
                 val listIds = dbToUpdate.wordListDAO().getAllLists().map { it.id }
                 val finalImportedWidgets = importedWidgets.filter {
-                    widgetIds.contains(it.widgetId) &&  listIds.contains(it.listId)
+                    /*widgetIds.contains(it.widgetId) && */ listIds.contains(it.listId)
                 }
 
                 dbToUpdate.widgetListDAO().insertListsToWidget(finalImportedWidgets)
@@ -321,7 +361,7 @@ class DatabaseHelper private constructor() {
         // only copy to cache if not already in cache
         var finalFile = updateFrom
         if (! updateFrom.absolutePath().contains(FileKit.cacheDir.path)) {
-            finalFile = FileKit.cacheDir / updateFrom.name
+            finalFile = FileKit.cacheDir / (TEMP_FILE_PREFIX + updateFrom.name)
             updateFrom.copyTo(finalFile)
         }
 

@@ -67,11 +67,12 @@ object HSKAppServices : AppServices() {
     private fun registerMostServices() {
         // Required for Widget -- Minimal Set
         register("snackbar", HSKAppServicesPriority.Widget) { SnackbarManager }
-        register("database", HSKAppServicesPriority.Widget) { DatabaseHelper.getInstance().liveDatabase }
         register("resources", HSKAppServicesPriority.Widget) { CachedResources.load() }
         register("appPreferences", HSKAppServicesPriority.Widget) {
             AppPreferencesStore.getInstance(PrefixedPreferencesStore.getDataStore(Utils.getAppDatabasePath() / "app.preferences_pb"))
         }
+        // Must be after appPreferences because of aggressive db update when starting up app on app updates.
+        register("database", HSKAppServicesPriority.Widget) { DatabaseHelper.getInstance().liveDatabase }
 
         register("widgetsPreferencesProvider", HSKAppServicesPriority.Widget) {
             val provider : WidgetPreferencesStoreProvider = { widgetId: Int ->
