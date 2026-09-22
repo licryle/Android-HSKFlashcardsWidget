@@ -12,6 +12,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import kotlinx.io.buffered
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.readString
@@ -46,26 +47,34 @@ object Logging {
     }
 
     fun setupFileLogging() {
-        try {
-            val file = Utils.getAppDataPath() / "app_logs.txt"
-            logFile = file
-            val path = file.toKotlinxIoPath()
+        logScope.launch(AppDispatchers.IO) {
+            logMutex.withLock {
+                try {
+                    val file = Utils.getAppDataPath() / "app_logs.txt"
+                    logFile = file
+                    val path = file.toKotlinxIoPath()
 
-            // Truncate the file on launch
-            SystemFileSystem.sink(path, append = false).buffered().use { sink ->
-                sink.writeString("--- App Launch ---\n")
+                    // Truncate the file on launch
+                    SystemFileSystem.sink(path, append = false).buffered().use { sink ->
+                        sink.writeString("--- App Launch ---\n")
+                    }
+
+                    Logger.addLogWriter(FileLogWriter(file))
+                } catch (e: Exception) {
+                    Logger.e(
+                        tag = "Logging",
+                        messageString = "Failed to setup file logging",
+                        throwable = e
+                    )
+                }
             }
-
-            Logger.addLogWriter(FileLogWriter(file))
-        } catch (e: Exception) {
-            Logger.e(tag = "Logging", messageString = "Failed to setup file logging", throwable = e)
         }
     }
 
-    fun getLogFileContent(): String {
-        val file = logFile ?: return ""
+    suspend fun getLogFileContent(): String = withContext(AppDispatchers.IO) {
+        val file = logFile ?: return@withContext ""
         val path = file.toKotlinxIoPath()
-        return try {
+        return@withContext try {
             if (SystemFileSystem.exists(path)) {
                 SystemFileSystem.source(path).buffered().use { it.readString() }
             } else {
