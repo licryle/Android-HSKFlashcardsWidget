@@ -7,10 +7,18 @@ import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.div
 import io.github.vinceglb.filekit.toKotlinxIoPath
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.io.buffered
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.readString
 import kotlinx.io.writeString
+
+private val logScope = CoroutineScope(SupervisorJob() + AppDispatchers.IO)
+private val logMutex = Mutex()
 
 object Logging {
     private var logFile: PlatformFile? = null
@@ -18,17 +26,21 @@ object Logging {
     class FileLogWriter(private val file: PlatformFile) : LogWriter() {
         override fun log(severity: Severity, message: String, tag: String, throwable: Throwable?) {
             val path = file.toKotlinxIoPath()
-            try {
-                // SystemFileSystem.sink with append=true is supported in newer kotlinx-io
-                // If not, we might need a workaround, but let's try this first.
-                SystemFileSystem.sink(path, append = true).buffered().use { sink ->
-                    sink.writeString("[$severity] $tag: $message\n")
-                    throwable?.let {
-                        sink.writeString(it.stackTraceToString() + "\n")
+            logScope.launch(AppDispatchers.IO) {
+                logMutex.withLock {
+                    try {
+                        // SystemFileSystem.sink with append=true is supported in newer kotlinx-io
+                        // If not, we might need a workaround, but let's try this first.
+                        SystemFileSystem.sink(path, append = true).buffered().use { sink ->
+                            sink.writeString("[$severity] $tag: $message\n")
+                            throwable?.let {
+                                sink.writeString(it.stackTraceToString() + "\n")
+                            }
+                        }
+                    } catch (_: Exception) {
+                        // Ignore to avoid infinite loop
                     }
                 }
-            } catch (e: Exception) {
-                // Ignore to avoid infinite loop
             }
         }
     }
@@ -133,8 +145,7 @@ object Logging {
         LIST_DELETE,
         LIST_MODIFY_WORD,
         LIST_RENAME,
-        DICT_HSK3_ON,
-        DICT_HSK3_OFF,
+        DICT_CHANGE_LANG,
         DICT_ANNOTATION_ON,
         DICT_ANNOTATION_OFF,
         DICT_TEXT_SIZE_CHANGE,
