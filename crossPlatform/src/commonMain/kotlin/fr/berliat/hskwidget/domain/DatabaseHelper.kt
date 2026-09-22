@@ -227,25 +227,23 @@ class DatabaseHelper private constructor() {
         suspend fun createRoomDatabaseFromAsset() : ChineseWordsDatabase =
             buildDatabase(createRoomDatabaseBuilderFromAsset())
 
-        private suspend fun createRoomDatabaseBuilderLive(): DatabaseBuilderWithPath {
+        private suspend fun createRoomDatabaseBuilderLive(): DatabaseBuilderWithPath = withContext(
+            AppDispatchers.IO
+        ) {
             val liveFile = getDatabaseLiveFile()
             if (!liveFile.exists()) {
                 copyDatabaseAssetFile(getDatabaseLiveFile())
             }
 
-            return createRoomDatabaseBuilderFromFile(liveFile)
+            return@withContext createRoomDatabaseBuilderFromFile(liveFile)
         }
 
-        private suspend fun createRoomDatabaseBuilderFromAsset(): DatabaseBuilderWithPath {
-            val tempFile = FileKit.cacheDir / Utils.getRandomString(10)
-            copyDatabaseAssetFile(tempFile)
-            return createRoomDatabaseBuilderFromFile(tempFile)
-        }
-
-        suspend fun loadExternalDatabase(dbFilePath: PlatformFile) = withContext(
+        private suspend fun createRoomDatabaseBuilderFromAsset(): DatabaseBuilderWithPath = withContext(
             AppDispatchers.IO
         ) {
-            return@withContext createRoomDatabaseFromFile(dbFilePath)
+            val tempFile = FileKit.cacheDir / Utils.getRandomString(10)
+            copyDatabaseAssetFile(tempFile)
+            return@withContext createRoomDatabaseBuilderFromFile(tempFile)
         }
 
         suspend fun cleanTempDatabaseFiles() {
@@ -322,7 +320,7 @@ class DatabaseHelper private constructor() {
             updateFrom.copyTo(finalFile)
         }
 
-        val sourceDb = loadExternalDatabase(finalFile)
+        val sourceDb = createRoomDatabaseFromFile(finalFile)
         replaceUserDataInDB(liveDatabase, sourceDb)
         finalFile.delete()
     }

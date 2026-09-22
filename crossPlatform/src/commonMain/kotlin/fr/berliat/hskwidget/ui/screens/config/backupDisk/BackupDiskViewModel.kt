@@ -95,7 +95,7 @@ class BackupDiskViewModel(
 
                         try {
                             file.copyTo(FileKit.cacheDir / file.name)
-                            val sourceDb = DatabaseHelper.loadExternalDatabase(copiedFile)
+                            val sourceDb = DatabaseHelper.createRoomDatabaseFromFile(copiedFile)
                             DatabaseHelper.replaceUserDataInDB(dbHelper.liveDatabase, sourceDb)
                             copiedFile.delete()
 
