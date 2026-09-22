@@ -98,7 +98,7 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
 
         handleDbOperations()
 
-        if (didUpdateApp() || databaseUpdateUnfinished()) handleAppUpdate()
+        if (didUpdateApp()) handleAppUpdate()
 
         executePendingActions()
     }
