@@ -1,6 +1,5 @@
 package fr.berliat.hskwidget.domain
 
-import android.content.Intent
 import androidx.room3.Room
 import fr.berliat.hskwidget.core.ExpectedUtils
 import fr.berliat.hskwidget.data.store.ChineseWordsDatabase
