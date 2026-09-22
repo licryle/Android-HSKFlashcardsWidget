@@ -82,6 +82,8 @@ class DictionarySearchViewModel(private val prefsStore: AppPreferencesStore = HS
         prefsStore.dictionaryLocale.value = locale
         performSearch()
         widgetProvider.redrawAllFlashCardWidgets()
+
+        Logging.logAnalyticsEvent(Logging.ANALYTICS_EVENTS.DICT_CHANGE_LANG)
     }
 
     fun performSearch() {
