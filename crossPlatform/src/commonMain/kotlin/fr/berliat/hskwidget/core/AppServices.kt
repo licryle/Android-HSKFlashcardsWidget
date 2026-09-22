@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.concurrent.Volatile
+import kotlin.time.Duration.Companion.milliseconds
 
 open class AppServices {
     private val _status = MutableStateFlow<Status>(Status.NotInitialized)
@@ -107,7 +108,7 @@ open class AppServices {
      * @return true if status is Ready, false otherwise.
      */
     suspend fun awaitReady(timeoutMs: Long = 5000): Boolean {
-        return withTimeoutOrNull(timeoutMs) {
+        return withTimeoutOrNull(timeoutMs.milliseconds) {
             status.first { it is Status.Ready }
             true
         } ?: false
