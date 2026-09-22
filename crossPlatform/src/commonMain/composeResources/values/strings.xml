@@ -224,7 +224,7 @@ We recommend to choose the level you're at plus the one below, or above dependin
     <string name="config_backup_cloud_backupnow">Backup now</string>
     <string name="config_backup_cloud_restorenow">Restore now</string>
 
-    <string name="googledrive_backup_start_title">Backup in progress</string>
+    <string name="googledrive_backup_start_title">Google backup in progress</string>
     <string name="googledrive_backup_start_message">Preparing for backup.</string>
     <string name="googledrive_backup_success_title">Backup complete</string>
     <string name="googledrive_backup_success_message">Backup succeeded at %1$s.</string>
@@ -236,7 +236,7 @@ We recommend to choose the level you're at plus the one below, or above dependin
     <string name="googledrive_backup_failed_message">Backup failed with error message: %1$s.</string>
     <string name="googledrive_backup_nogoogleapi">No Google API available on this device</string>
     <string name="googledrive_backup_noaccountselected">No Google account was selected, cancelling.</string>
-    <string name="googledrive_restore_start_title">Restoration starting</string>
+    <string name="googledrive_restore_start_title">Google Restoration in progress</string>
     <string name="googledrive_restore_start_message">Restoration from Google Drive started.</string>
     <string name="googledrive_restore_success_title">Restoration download complete</string>
     <string name="googledrive_restore_success_message">Files from Google Drive downloaded at %1$s.</string>

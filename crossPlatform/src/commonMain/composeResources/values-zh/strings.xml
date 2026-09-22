@@ -224,7 +224,7 @@
     <string name="config_backup_cloud_backupnow">立即备份</string>
     <string name="config_backup_cloud_restorenow">立即恢复</string>
 
-    <string name="googledrive_backup_start_title">备份中</string>
+    <string name="googledrive_backup_start_title">Google 的备份中</string>
     <string name="googledrive_backup_start_message">正在准备备份。</string>
     <string name="googledrive_backup_success_title">备份完成</string>
     <string name="googledrive_backup_success_message">备份成功，时间为 %1$s。</string>
@@ -236,7 +236,7 @@
     <string name="googledrive_backup_failed_message">备份失败，错误信息为：%1$s。</string>
     <string name="googledrive_backup_nogoogleapi">此设备上没有可用的 Google API</string>
     <string name="googledrive_backup_noaccountselected">未选择 Google 账号，正在取消。</string>
-    <string name="googledrive_restore_start_title">恢复启动中</string>
+    <string name="googledrive_restore_start_title">从 Google 的恢复启动中</string>
     <string name="googledrive_restore_start_message">从 Google Drive 恢复已开始。</string>
     <string name="googledrive_restore_success_title">恢复下载完成</string>
     <string name="googledrive_restore_success_message">来自 Google Drive 的文件已在 %1$s 下载。</string>
