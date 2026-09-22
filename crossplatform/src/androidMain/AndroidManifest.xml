@@ -9,5 +9,13 @@
             android:name=".domain.DatabaseUpdateService"
             android:exported="false"
             android:foregroundServiceType="dataSync" />
+        <service
+            android:name=".domain.GoogleBackupUploadService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
+        <service
+            android:name=".domain.GoogleBackupDownloadService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
     </application>
 </manifest>
