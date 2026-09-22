@@ -125,8 +125,7 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
                     val oldStore = AppPreferencesStore.getInstance(oldDataStore)
 
                     actualVersion = oldStore.appVersionCode.value
-                    // Overwri
-                    // te our current live config with the old values
+                    // Overwrite our current live config with the old values
                     appConfig.overwriteWith(oldStore)
 
                     oldAppPrefFile.delete()
@@ -156,7 +155,7 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
                 Logging.logAnalyticsError(TAG, "UpdateDatabaseFromAssetFailure", e.message ?: "")
             })
 
-            if (actualVersion < 47 && Utils.getAppVersion() >= 47) {
+            if (actualVersion != 0 && actualVersion < 47 && Utils.getAppVersion() >= 47) {
                 HSKAppServices.snackbar.show(SnackbarType.INFO, Res.string.database_update_list_system)
 
                 HSKAppServices.wordListRepo.buildListSystemAnnotated()
