@@ -141,7 +141,8 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
                 }
             }
 
-            // Update from Database asset happens in DatabaseHelper: createRoomDatabaseBuilderLive()
+            // Todo: Can it be cleaned-up ?
+            //  Update from Database asset happens in DatabaseHelper: createRoomDatabaseBuilderLive()
             if (DatabaseHelper.shouldUpdateDatabaseFromAsset(actualVersion)) {
                 Logger.d(tag = TAG, messageString = "Starting to rebuild the Annotated & Exam lists")
                 HSKAppServices.wordListRepo.buildListSystemAnnotated()
