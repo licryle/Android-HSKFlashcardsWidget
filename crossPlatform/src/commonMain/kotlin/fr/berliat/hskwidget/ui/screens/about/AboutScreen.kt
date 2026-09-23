@@ -143,7 +143,13 @@ fun AboutScreen(
                     stringResource(
                         Res.string.about_stats_text,
                         stats.wordsCnt,
-                        stats.annotationCnt
+                        stats.englishDefPct,
+                        stats.frenchDefPct,
+                        stats.hsk3DefPct,
+                        stats.collocationsPct,
+                        stats.examplesPct,
+                        stats.antonymsSynonymsPct,
+                        stats.typeUsagePct
                     ),
                     style = MaterialTheme.typography.bodyMedium
                 )

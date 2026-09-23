@@ -12,6 +12,8 @@ import fr.berliat.hskwidget.core.Logging
 import fr.berliat.hskwidget.core.SnackbarType
 import org.jetbrains.compose.resources.getString
 
+import fr.berliat.hskwidget.core.Locale
+import kotlin.math.roundToInt
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,9 +26,20 @@ class AboutViewModel {
 
     private val viewModelScope = CoroutineScope(SupervisorJob())
 
-    class Stats(val wordsCnt: Int, val annotationCnt: Int)
+    data class Stats(
+        val wordsCnt: Int = 0,
+        val annotationCnt: Int = 0,
+        val englishDefPct: Int = 0,
+        val frenchDefPct: Int = 0,
+        val hsk3DefPct: Int = 0,
+        val collocationsPct: Int = 0,
+        val examplesPct: Int = 0,
+        val antonymsSynonymsPct: Int = 0,
+        val typeUsagePct: Int = 0
+    )
+
     // Internal mutable state
-    private val _stats = MutableStateFlow(Stats(0, 0))
+    private val _stats = MutableStateFlow(Stats())
     val stats: StateFlow<Stats> = _stats.asStateFlow() // expose as read-only
 
     // Actions
@@ -68,17 +81,38 @@ class AboutViewModel {
 
         viewModelScope.launch(AppDispatchers.IO) {
             val db = HSKAppServices.database
-            val words = db.chineseWordDAO()
-            val annotations = db.chineseWordAnnotationDAO()
-            // Here we executed in the coRoutine Scope
-            val wordsCnt = words.getCount()
-            val annotationsCnt = annotations.getCount()
+            val wordsDao = db.chineseWordDAO()
+            val definitionsDao = db.wordDefinitionDAO()
+            val annotationsDao = db.chineseWordAnnotationDAO()
 
-            // Switch back to the main thread to update UI
-            // Update the UI with the result
+            val fieldsStats = wordsDao.getFieldsStats()
+            val defStats = definitionsDao.getLanguageStats(
+                enCode = Locale.ENGLISH.code,
+                frCode = Locale.FRENCH.code,
+                hsk3Code = Locale.CN_HSK3.code
+            )
+            val annotationsCnt = annotationsDao.getCount()
+
+            val totalWords = fieldsStats.total
+            val fetchedStats = if (totalWords > 0) {
+                Stats(
+                    wordsCnt = totalWords,
+                    annotationCnt = annotationsCnt,
+                    englishDefPct = (defStats.englishCnt * 100f / totalWords).roundToInt(),
+                    frenchDefPct = (defStats.frenchCnt * 100f / totalWords).roundToInt(),
+                    hsk3DefPct = (defStats.hsk3Cnt * 100f / totalWords).roundToInt(),
+                    collocationsPct = (fieldsStats.collocationsCnt * 100f / totalWords).roundToInt(),
+                    examplesPct = (fieldsStats.examplesCnt * 100f / totalWords).roundToInt(),
+                    antonymsSynonymsPct = (fieldsStats.antonymsAndSynonymsCnt * 100f / totalWords).roundToInt(),
+                    typeUsagePct = (fieldsStats.typeAndUsageCnt * 100f / totalWords).roundToInt()
+                )
+            } else {
+                Stats(annotationCnt = annotationsCnt)
+            }
+
             Logger.d(tag = TAG, messageString = "stats fetched")
 
-            _stats.value = Stats(wordsCnt, annotationsCnt)
+            _stats.value = fetchedStats
         }
     }
 

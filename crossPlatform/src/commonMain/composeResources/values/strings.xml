@@ -51,7 +51,16 @@ This project uses the awesome projects of:
     <string name="about_stats_title">Statistics</string>
     <string name="about_terms_conditions_title"><![CDATA[Privacy Policy & Licences]]></string>
     <string name="about_stats">Loading…</string>
-    <string name="about_stats_text">%1$s words in dictionary.\n%2$s annotations.</string>
+    <string name="about_stats_text">Words in dictionary: %1$d
+- English definitions (%2$d%)
+- French definitions (%3$d%)
+- HSK3 definitions (%4$d%)
+
+AI Fields coverage:
+- Collocations (%5$d%)
+- Examples (%6$d%)
+- Antonyms+Synonyms (%7$d%)
+- Type+Usage (%8$d%)</string>
     <string name="about_email_noapp">No email client found. Address copied to clipboard.</string>
 
     <string name="dictionary_noresult_text">%1$s not in dictionary, add annotation?</string>

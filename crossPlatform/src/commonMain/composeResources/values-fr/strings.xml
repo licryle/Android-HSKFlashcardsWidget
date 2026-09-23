@@ -51,7 +51,16 @@ Ce projet utilise les formidables projets de :
     <string name="about_stats_title">Statistiques</string>
     <string name="about_terms_conditions_title"><![CDATA[Politique de confidentialité et licences]]></string>
     <string name="about_stats">Chargement…</string>
-    <string name="about_stats_text">%1$s mots dans le dictionnaire.\n%2$s annotations.</string>
+    <string name="about_stats_text">Mots dans le dictionnaire : %1$d
+- Définitions en anglais (%2$d%)
+- Définitions en français (%3$d%)
+- Définitions HSK3 (%4$d%)
+
+Couverture des champs IA :
+- Collocations (%5$d%)
+- Exemples (%6$d%)
+- Antonymes+Synonymes (%7$d%)
+- Type+Usage (%8$d%)</string>
     <string name="about_email_noapp">Aucun client e-mail trouvé. Adresse copiée dans le presse-papier.</string>
 
     <string name="dictionary_noresult_text">%1$s n'est pas dans le dictionnaire, ajouter une annotation ?</string>

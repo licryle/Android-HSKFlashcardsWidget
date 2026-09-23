@@ -51,7 +51,16 @@
     <string name="about_stats_title">统计数据</string>
     <string name="about_terms_conditions_title"><![CDATA[隐私政策与许可证]]></string>
     <string name="about_stats">加载中…</string>
-    <string name="about_stats_text">词典中有 %1$s 个词。\n%2$s 个注释。</string>
+    <string name="about_stats_text">词典词汇量：%1$d
+- 英语定义 (%2$d%)
+- 法语定义 (%3$d%)
+- HSK3 定义 (%4$d%)
+
+AI 字段覆盖率：
+- 搭配 (%5$d%)
+- 例句 (%6$d%)
+- 反义词+同义词 (%7$d%)
+- 词性+用法 (%8$d%)</string>
     <string name="about_email_noapp">未找到电子邮件客户端。地址已复制到剪贴板。</string>
 
     <string name="dictionary_noresult_text">词典中没有 %1$s，要添加注释吗？</string>
