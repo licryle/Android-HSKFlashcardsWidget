@@ -45,6 +45,18 @@ private const val order_by_logic =
 @Dao
 interface AnnotatedChineseWordDAO {
     @Query("SELECT * FROM (" +
+            "  $select_left_join WHERE " +
+            "    (0=:hasAnnotation OR (1=:hasAnnotation AND a.first_seen IS NOT NULL))" +
+            "    AND (a.is_exam=:atExam OR :atExam IS NULL)" +
+            "  UNION ALL " +
+            "  $select_right_join WHERE a.a_simplified IS NULL AND (0=:hasAnnotation) AND (:atExam IS NULL)" +
+            ") " +
+            "ORDER BY is_first_seen_null, first_seen DESC, popularity DESC " +
+            "LIMIT :pageSize OFFSET (:page * :pageSize)")
+    @RewriteQueriesToDropUnusedColumns
+    suspend fun getEmptySearchRows(hasAnnotation: Boolean, atExam: Boolean? = null, page: Int = 0, pageSize: Int = 30): List<AnnotatedChineseWord>
+
+    @Query("SELECT * FROM (" +
             "  $select_left_join WHERE (" +
             "    :str = '' OR a.a_simplified IN (" +
             "      SELECT simplified FROM chinese_word_fts WHERE searchable_text MATCH :str || '*' " +
@@ -93,11 +105,15 @@ interface AnnotatedChineseWordDAO {
     @Transaction
     suspend fun searchFromStrLike(str: String?, language: Locale, hasAnnotation: Boolean, atExam: Boolean? = null, page: Int = 0, pageSize: Int = 30): List<AnnotatedChineseWord> {
         val query = str?.trim() ?: ""
-        
+
+        if (query.isEmpty()) {
+            return hydrate(getEmptySearchRows(hasAnnotation, atExam, page, pageSize))
+        }
+
         // Use FTS search as primary (much faster)
         val ftsResults = searchFromStrLikeRows(query, language.code, hasAnnotation, atExam, page, pageSize)
         if (ftsResults.isNotEmpty()) return hydrate(ftsResults)
-        
+
         // Fallback to simple LIKE if FTS returns nothing (e.g. index out of sync)
         return hydrate(searchFromStrLikeSimpleRows(query, hasAnnotation, atExam, page, pageSize))
     }
@@ -112,6 +128,34 @@ interface AnnotatedChineseWordDAO {
 
     suspend fun getRandomWordFromLists(listIds: List<Long>, bannedWords: Array<String>): AnnotatedChineseWord? =
         getRandomWordFromListsRow(listIds, bannedWords)?.let { hydrate(listOf(it)).first() }
+
+    @Query("SELECT * FROM (" +
+            "SELECT a.a_simplified, COALESCE(w.simplified, a.a_simplified) simplified, " +
+            " a.a_pinyins, a.notes, a.class_type, a.class_level, a.themes, a.first_seen, a.is_exam, a.a_searchable_text, " +
+            " w.traditional, w.hsk_level, w.pinyins, w.popularity, " +
+            " w.modality, w.examples, w.type, w.synonyms, w.antonym, w.collocations, w.searchable_text, " +
+            " (a.first_seen IS NULL) AS is_first_seen_null " +
+            " FROM chinese_word_annotation AS a INNER JOIN word_list_entry AS wle ON a.a_simplified = wle.simplified " +
+            " INNER JOIN word_list AS wl ON wl.id = wle.list_id " +
+            " LEFT JOIN chinese_word AS w ON a.a_simplified = w.simplified " +
+            " WHERE wl.name = :listName " +
+            " AND (0=:hasAnnotation OR (1=:hasAnnotation AND a.first_seen IS NOT NULL)) " +
+            " UNION ALL " +
+            " SELECT COALESCE(a.a_simplified, w.simplified) a_simplified, w.simplified, " +
+            " a.a_pinyins, a.notes, a.class_type, a.class_level, a.themes, a.first_seen, a.is_exam, a.a_searchable_text, " +
+            " w.traditional, w.hsk_level, w.pinyins, w.popularity, " +
+            " w.modality, w.examples, w.type, w.synonyms, w.antonym, w.collocations, w.searchable_text, " +
+            " (a.first_seen IS NULL) AS is_first_seen_null " +
+            " FROM chinese_word AS w INNER JOIN word_list_entry AS wle ON w.simplified = wle.simplified " +
+            " INNER JOIN word_list AS wl ON wl.id = wle.list_id " +
+            " LEFT JOIN chinese_word_annotation AS a ON a.a_simplified = w.simplified " +
+            " WHERE wl.name = :listName AND a.a_simplified IS NULL " +
+            " AND (0=:hasAnnotation) " +
+            ") " +
+            "ORDER BY popularity DESC, is_first_seen_null, first_seen DESC " +
+            "LIMIT :pageSize OFFSET (:page * :pageSize)")
+    @RewriteQueriesToDropUnusedColumns
+    suspend fun getEmptyWordListRows(listName: String, hasAnnotation: Boolean, page: Int = 0, pageSize: Int = 30): List<AnnotatedChineseWord>
 
     @Query("SELECT * FROM (" +
             "SELECT a.a_simplified, COALESCE(w.simplified, a.a_simplified) simplified, " +
@@ -152,8 +196,15 @@ interface AnnotatedChineseWordDAO {
     suspend fun searchFromWordListRows(listName: String, str: String, language: String, hasAnnotation: Boolean, page: Int = 0, pageSize: Int = 30): List<AnnotatedChineseWord>
 
     @Transaction
-    suspend fun searchFromWordList(listName: String, str: String, language: Locale, hasAnnotation: Boolean, page: Int = 0, pageSize: Int = 30): List<AnnotatedChineseWord> =
-        hydrate(searchFromWordListRows(listName, str, language.code, hasAnnotation, page, pageSize))
+    suspend fun searchFromWordList(listName: String, str: String, language: Locale, hasAnnotation: Boolean, page: Int = 0, pageSize: Int = 30): List<AnnotatedChineseWord> {
+        val query = str.trim()
+        val rows = if (query.isEmpty()) {
+            getEmptyWordListRows(listName, hasAnnotation, page, pageSize)
+        } else {
+            searchFromWordListRows(listName, query, language.code, hasAnnotation, page, pageSize)
+        }
+        return hydrate(rows)
+    }
 
     suspend fun getAllAnnotated(): List<AnnotatedChineseWord> {
         return searchFromStrLike("", Locale.ENGLISH, hasAnnotation = true, atExam = null, 0, Int.MAX_VALUE)
