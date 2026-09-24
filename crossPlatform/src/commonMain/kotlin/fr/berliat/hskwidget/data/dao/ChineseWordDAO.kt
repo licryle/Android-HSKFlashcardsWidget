@@ -39,5 +39,5 @@ interface ChineseWordDAO {
     suspend fun getFieldsStats(): WordFieldsStats
 
     @Query("DELETE FROM chinese_word")
-    fun deleteAll()
+    suspend fun deleteAll()
 }
