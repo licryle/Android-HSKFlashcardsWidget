@@ -60,12 +60,3 @@ actual suspend fun createRoomDatabaseBuilderFromFile(file: PlatformFile): Databa
     )
     // Because of the SQLDriver in KMP, can't use createFromXXX()
 }
-
-actual suspend fun updateInBackgroundLiveDatabaseFromAsset(
-    force: Boolean,
-    successCallback: (() -> Unit)?,
-    failureCallback: ((e: Exception) -> Unit)?
-) {
-    // On iOS, we just run it directly. 
-    DatabaseHelper.getInstance().runDatabaseUpdateNow(successCallback, failureCallback, force)
-}
