@@ -176,8 +176,8 @@ fun DetailedWordView (
                 verticalAlignment = Alignment.Top
             ) {
                 Column(
-                    modifier = Modifier.wrapContentWidth(),
-                    verticalArrangement = Arrangement.Top,
+                    modifier = Modifier.fillMaxHeight().wrapContentWidth(),
+                    verticalArrangement = Arrangement.SpaceBetween,
                 ) {
                     onSpeakClick?.let {
                         RoundIconButton(
@@ -253,8 +253,8 @@ fun DetailedWordView (
                 }
 
                 Column(
-                    modifier = Modifier.wrapContentWidth(),
-                    verticalArrangement = Arrangement.Top,
+                    modifier = Modifier.fillMaxHeight().wrapContentWidth(),
+                    verticalArrangement = Arrangement.SpaceBetween,
                     horizontalAlignment = Alignment.End
                 ) {
                     onFavoriteClick?.let {
