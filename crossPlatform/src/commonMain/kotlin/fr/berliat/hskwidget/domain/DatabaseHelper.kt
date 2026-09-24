@@ -1,7 +1,9 @@
 package fr.berliat.hskwidget.domain
 
 import androidx.room3.RoomDatabase
+import androidx.room3.immediateTransaction
 import androidx.room3.migration.Migration
+import androidx.room3.useWriterConnection
 import androidx.sqlite.SQLiteConnection
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import androidx.sqlite.execSQL
@@ -225,25 +227,33 @@ class DatabaseHelper private constructor() {
         ) {
             val liveFile = getDatabaseLiveFile()
             if (!liveFile.exists()) {
-                copyDatabaseAssetFile(getDatabaseLiveFile())
+                copyDatabaseAssetFile(liveFile)
+                if (!liveFile.exists()) throw IllegalStateException(
+                    "Failed to provision live database from asset at ${liveFile.path}"
+                )
             } else if (shouldUpdateDatabaseFromAsset(HSKAppServices.appPreferences.appVersionCode.value)) {
                 _updateProgress.value = 0f
+                var original: ChineseWordsDatabase? = null
+                var clone: ChineseWordsDatabase? = null
+                var newDb: ChineseWordsDatabase? = null
                 try {
                     HSKAppServices.snackbar.show(SnackbarType.INFO, Res.string.database_update_start)
 
-                    val original = buildDatabase(createRoomDatabaseBuilderFromFile(liveFile))
-                    val clone = original.clone()
+                    original = buildDatabase(createRoomDatabaseBuilderFromFile(liveFile))
+                    clone = original.clone()
                     _updateProgress.value = 33f
                     original.close()
+                    original = null
                     if (clone == null) throw Exception("Couldn't clone existing db")
 
-                    copyDatabaseAssetFile(getDatabaseLiveFile())
+                    copyDatabaseAssetFile(liveFile, overwrite = true)
+                    if (!liveFile.exists()) throw IllegalStateException(
+                        "Failed to replace live database from asset at ${liveFile.path}"
+                    )
                     _updateProgress.value = 66f
 
-                    val newDb = buildDatabase(createRoomDatabaseBuilderFromFile(liveFile))
+                    newDb = buildDatabase(createRoomDatabaseBuilderFromFile(liveFile))
                     replaceUserDataInDB(newDb, clone)
-                    newDb.close()
-                    clone.close()
 
                     _updateProgress.value = 100f
                     HSKAppServices.snackbar.show(SnackbarType.SUCCESS, Res.string.database_update_success)
@@ -251,6 +261,9 @@ class DatabaseHelper private constructor() {
                     HSKAppServices.snackbar.show(SnackbarType.ERROR, Res.string.database_update_failure, listOf(e.message ?: ""))
                     Logging.logAnalyticsError(TAG, "UpdateDatabaseFromAssetFailure", e.message ?: "")
                 } finally {
+                    try { newDb?.close() } catch (_: Exception) {}
+                    try { clone?.close() } catch (_: Exception) {}
+                    try { original?.close() } catch (_: Exception) {}
                     _updateProgress.value = null
                     cleanTempDatabaseFiles()
                 }
@@ -312,6 +325,7 @@ class DatabaseHelper private constructor() {
                 val importedLists = updateWith.wordListDAO().getUserLists()
                 val importedWidgets = updateWith.widgetListDAO().getAllEntries()
                 val importedFreq = updateWith.chineseWordFrequencyDAO().getAll()
+                val systemLists = updateWith.wordListDAO().getSystemLists()
                 if (importedAnnotations.isEmpty() && importedListEntries.isEmpty()
                     && importedWidgets.isEmpty() && importedFreq.isEmpty()
                 ) {
@@ -319,42 +333,48 @@ class DatabaseHelper private constructor() {
                     throw IllegalStateException("Database is empty")
                 }
 
-                // Impoooort
-                Logger.d(tag = TAG, messageString = "Starting to import Annotations to local DB")
-                dbToUpdate.chineseWordAnnotationDAO().deleteAll()
-                dbToUpdate.chineseWordAnnotationDAO().insertAll(importedAnnotations)
+                // All deletes + re-inserts run in a single transaction so an
+                // interruption can't leave the live DB half-wiped.
+                dbToUpdate.useWriterConnection { connection ->
+                    connection.immediateTransaction {
+                        // Impoooort
+                        Logger.d(tag = TAG, messageString = "Starting to import Annotations to local DB")
+                        dbToUpdate.chineseWordAnnotationDAO().deleteAll()
+                        dbToUpdate.chineseWordAnnotationDAO().insertAll(importedAnnotations)
 
-                Logger.d(tag = TAG, messageString = "Starting to import Word_List to local DB")
-                dbToUpdate.wordListDAO().deleteAllUserEntries()
-                dbToUpdate.wordListDAO().deleteAllUserLists()
-                dbToUpdate.wordListDAO().insertAllLists(importedLists.map { it.wordList })
-                dbToUpdate.wordListDAO().insertAllWords(importedListEntries)
+                        Logger.d(tag = TAG, messageString = "Starting to import Word_List to local DB")
+                        dbToUpdate.wordListDAO().deleteAllUserEntries()
+                        dbToUpdate.wordListDAO().deleteAllUserLists()
+                        dbToUpdate.wordListDAO().insertAllLists(importedLists.map { it.wordList })
+                        dbToUpdate.wordListDAO().insertAllWords(importedListEntries)
 
-                Logger.d(tag = TAG, messageString = "Starting to update the AnkiDeckIds on System lists")
-                updateWith.wordListDAO().getSystemLists().forEach {
-                    try {
-                        dbToUpdate.wordListDAO().updateAnkiDeckId(it.id, it.ankiDeckId)
-                    } catch (e: Exception) {
-                        Logger.d(tag = TAG, messageString = "Couldn't update the AnkiDeckIds on list ${it.id}", throwable = e)
+                        Logger.d(tag = TAG, messageString = "Starting to update the AnkiDeckIds on System lists")
+                        systemLists.forEach {
+                            try {
+                                dbToUpdate.wordListDAO().updateAnkiDeckId(it.id, it.ankiDeckId)
+                            } catch (e: Exception) {
+                                Logger.d(tag = TAG, messageString = "Couldn't update the AnkiDeckIds on list ${it.id}", throwable = e)
+                            }
+                        }
+
+                        // Can't do the word lists population here, so pushing it to the App main process.
+
+                        Logger.d(tag = TAG, messageString = "Starting to import WordFrequency to local DB")
+                        dbToUpdate.chineseWordFrequencyDAO().deleteAll()
+                        dbToUpdate.chineseWordFrequencyDAO().insertAll(importedFreq)
+
+                        Logger.d(tag = TAG, messageString = "Starting to import WidgetList to local DB")
+                        dbToUpdate.widgetListDAO().deleteAllWidgets()
+
+                        /*val widgetIds = FlashcardWidgetProvider().getWidgetIds()*/
+                        val listIds = dbToUpdate.wordListDAO().getAllLists().map { it.id }
+                        val finalImportedWidgets = importedWidgets.filter {
+                            /*widgetIds.contains(it.widgetId) && */ listIds.contains(it.listId)
+                        }
+
+                        dbToUpdate.widgetListDAO().insertListsToWidget(finalImportedWidgets)
                     }
                 }
-
-                // Can't do the word lists population here, so pushing it to the App main process.
-
-                Logger.d(tag = TAG, messageString = "Starting to import WordFrequency to local DB")
-                dbToUpdate.chineseWordFrequencyDAO().deleteAll()
-                dbToUpdate.chineseWordFrequencyDAO().insertAll(importedFreq)
-
-                Logger.d(tag = TAG, messageString = "Starting to import WidgetList to local DB")
-                dbToUpdate.widgetListDAO().deleteAllWidgets()
-
-                /*val widgetIds = FlashcardWidgetProvider().getWidgetIds()*/
-                val listIds = dbToUpdate.wordListDAO().getAllLists().map { it.id }
-                val finalImportedWidgets = importedWidgets.filter {
-                    /*widgetIds.contains(it.widgetId) && */ listIds.contains(it.listId)
-                }
-
-                dbToUpdate.widgetListDAO().insertListsToWidget(finalImportedWidgets)
 
                 Logger.i(tag = TAG, messageString = "Database import done")
             }
@@ -370,17 +390,25 @@ class DatabaseHelper private constructor() {
         }
 
         val sourceDb = createRoomDatabaseFromFile(finalFile)
-        replaceUserDataInDB(liveDatabase, sourceDb)
-        finalFile.delete()
+        try {
+            replaceUserDataInDB(liveDatabase, sourceDb)
+        } finally {
+            try { sourceDb.close() } catch (_: Exception) {}
+            try { finalFile.delete() } catch (_: Exception) {}
+        }
     }
 
     suspend fun snapshotLiveUserDataToFile(): PlatformFile? = try {
-        val newDb = _db!!.clone()
-        newDb!!.truncateToUserData()
-        newDb.snapshotToFile()
+        val newDb = _db!!.clone() ?: return null
+        try {
+            newDb.truncateToUserData()
+            newDb.snapshotToFile()
+        } finally {
+            try { newDb.close() } catch (_: Exception) {}
+        }
     } catch (_: Exception) { null }
 }
 
 expect suspend fun createRoomDatabaseBuilderFromFile(file: PlatformFile) : DatabaseBuilderWithPath
 
-expect suspend fun copyDatabaseAssetFile(file: PlatformFile)
+expect suspend fun copyDatabaseAssetFile(file: PlatformFile, overwrite: Boolean = false)

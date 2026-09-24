@@ -15,7 +15,7 @@ import platform.Foundation.NSLog
 
 
 @OptIn(ExperimentalForeignApi::class)
-actual suspend fun copyDatabaseAssetFile(file: PlatformFile) {
+actual suspend fun copyDatabaseAssetFile(file: PlatformFile, overwrite: Boolean) {
     withContext(Dispatchers.Default) { // IO dispatcher isn't a direct concept on K/N, use Default for background work
         val fileManager = NSFileManager.defaultManager()
 
@@ -27,25 +27,29 @@ actual suspend fun copyDatabaseAssetFile(file: PlatformFile) {
 
         requireNotNull(databasePathInBundle) { "Database asset file not found in bundle: ${DatabaseHelper.DATABASE_FILENAME}" }
 
+        // Fast path: nothing to do when the destination already exists and no overwrite was requested.
+        if (!overwrite && file.exists()) return@withContext
+
+        val parent = file.parent()
+            ?: throw IllegalStateException("Cannot determine parent directory of ${file.path}")
         try {
-            file.parent()!!.createDirectories(true)
+            parent.createDirectories(true)
         } catch (e: Exception) {
-            println("Could not create directory for ${file.path}: $e")
+            throw IllegalStateException("Could not create directory for ${file.path}: $e", e)
         }
 
-        NSLog("INFO: copyDatabaseAssetFile ${file.path}")
-        // 3. Copy the file from the bundle to the destination path
-        if (!file.exists()) {
-            try {
-                fileManager.copyItemAtPath(
-                    srcPath = databasePathInBundle,
-                    toPath = file.path,
-                    error = null
-                )
-            } catch (e: Exception) {
-                // Handle copy error
-                println("Could not copy database file: $e")
-            }
+        NSLog("INFO: copyDatabaseAssetFile ${file.path} (overwrite=$overwrite)")
+        if (overwrite && file.exists()) {
+            // Remove the previous live file so the bundled asset fully replaces it.
+            fileManager.removeItemAtPath(file.path, error = null)
+        }
+        val copied = fileManager.copyItemAtPath(
+            srcPath = databasePathInBundle,
+            toPath = file.path,
+            error = null
+        )
+        if (!copied || !file.exists()) {
+            throw IllegalStateException("Could not copy database asset to ${file.path}")
         }
     }
 }

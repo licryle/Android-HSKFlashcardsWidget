@@ -26,16 +26,23 @@ actual suspend fun createRoomDatabaseBuilderFromFile(file: PlatformFile): Databa
     // Because of the SQLDriver in KMP, can't use createFromXXX()
 }
 
-actual suspend fun copyDatabaseAssetFile(file: PlatformFile) {
+actual suspend fun copyDatabaseAssetFile(file: PlatformFile, overwrite: Boolean) {
     withContext(Dispatchers.IO) {
         val assetMgr = ExpectedUtils.context.assets
+        val dest = File(file.absolutePath())
+        if (!overwrite && dest.exists()) return@withContext
 
         FileKit.databasesDir.createDirectories()
+        dest.parentFile?.mkdirs()
 
         assetMgr.open(DATABASE_ASSET_PATH).use { inStream ->
-            FileOutputStream(File(file.absolutePath())).use { outStream ->
+            FileOutputStream(dest).use { outStream ->
                 inStream.copyTo(outStream)
             }
         }
+
+        if (!dest.exists()) throw IllegalStateException(
+            "Failed to copy database asset to ${file.absolutePath()}"
+        )
     }
 }
