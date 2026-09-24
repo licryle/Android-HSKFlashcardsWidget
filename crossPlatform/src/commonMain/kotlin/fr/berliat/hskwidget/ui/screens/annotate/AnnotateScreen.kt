@@ -97,12 +97,12 @@ fun AnnotateScreen(
             themes = word?.annotation?.themes.orEmpty()
             isExam = word?.annotation?.isExam ?: false
             selectedClassType = if (word?.hasAnnotation() ?: false) {
-                word.annotation!!.classType!!
+                word.annotation?.classType ?: viewModel.lastAnnotatedClassType.value
             } else {
                 viewModel.lastAnnotatedClassType.value
             }
             selectedClassLevel = if (word?.hasAnnotation() ?: false) {
-                word.annotation!!.level!!
+                word.annotation?.level ?: viewModel.lastAnnotatedClassLevel.value
             } else {
                 viewModel.lastAnnotatedClassLevel.value
             }

@@ -22,7 +22,7 @@ data class AnnotatedChineseWord (
     val pinyins: Pinyins
         get() {
             return if (hasWord()) {
-                word?.pinyins!!
+                word?.pinyins ?: Pinyins()
             } else {
                 annotation?.pinyins ?: Pinyins()
             }
@@ -31,7 +31,7 @@ data class AnnotatedChineseWord (
     val hskLevel: HSK_Level
         get() {
             return if (hasWord()) {
-                word?.hskLevel!!
+                word?.hskLevel ?: HSK_Level.NOT_HSK
             } else {
                 HSK_Level.NOT_HSK
             }

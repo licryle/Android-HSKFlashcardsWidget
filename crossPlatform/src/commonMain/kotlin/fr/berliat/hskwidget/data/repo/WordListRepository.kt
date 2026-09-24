@@ -114,21 +114,25 @@ class WordListRepository(
                 }
             }
 
-            val annotatedWord = annotatedChineseWordDAO.getFromSimplified(simplified)!!
-            for (toA in toAdd) {
-                val wordList = wordListDAO.getListById(toA)!!.wordList
-                val deck = getOrCreate(wordList)
-                val entry = WordListEntry(toA, simplified)
-                if (ankiStore.importOrUpdateCard(deck, entry, annotatedWord) == null) {
-                    nbErrors += 1
-                }
-            }
-
-            if (nbErrors == 0) {
-                Result.success(Unit) // Indicate success if no errors
+            val annotatedWord = annotatedChineseWordDAO.getFromSimplified(simplified)
+            if (annotatedWord == null) {
+                Result.failure(Exception("Word $simplified unknown, skipping Anki sync"))
             } else {
-                // If there were errors, return a failure with the count
-                Result.failure(Exception("$nbErrors errors during update of ${entries.size} entries"))
+                for (toA in toAdd) {
+                    val wordList = wordListDAO.getListById(toA)?.wordList ?: continue
+                    val deck = getOrCreate(wordList)
+                    val entry = WordListEntry(toA, simplified)
+                    if (ankiStore.importOrUpdateCard(deck, entry, annotatedWord) == null) {
+                        nbErrors += 1
+                    }
+                }
+
+                if (nbErrors == 0) {
+                    Result.success(Unit) // Indicate success if no errors
+                } else {
+                    // If there were errors, return a failure with the count
+                    Result.failure(Exception("$nbErrors errors during update of ${entries.size} entries"))
+                }
             }
         }
     }
@@ -189,9 +193,10 @@ class WordListRepository(
 
         val entries = wordListDAO.getEntriesForWord(simplified)
         val entry = entries.find { it.listId == wordList.id }
+            ?: return@withContext null // raced with another change, nothing left to remove
 
         // Checked on first list of function
-        wordListDAO.deleteWordFromList(entry!!.listId, entry.simplified)
+        wordListDAO.deleteWordFromList(entry.listId, entry.simplified)
 
         return@withContext suspend { // Will execute only if Anki integration is active, allowed and ready to fire
             if (ankiStore.deleteCard(entry)) {
