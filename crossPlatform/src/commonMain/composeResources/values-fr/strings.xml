@@ -195,9 +195,9 @@ Nous vous recommandons de choisir le niveau où vous en êtes plus celui du dess
     <string name="config_backup_max_number">Nombre de sauvegardes à conserver</string>
     <string name="config_backup_max_number_hint">Max fichiers</string>
     <string-array name="config_backup_max_locally">
-        <item>2 (~100 Mo)</item>
-        <item>5 (~250 Mo)</item>
-        <item>10 (~500 Mo)</item>
+        <item>2 (~10 Mo)</item>
+        <item>5 (~25 Mo)</item>
+        <item>10 (~50 Mo)</item>
     </string-array>
 
 
