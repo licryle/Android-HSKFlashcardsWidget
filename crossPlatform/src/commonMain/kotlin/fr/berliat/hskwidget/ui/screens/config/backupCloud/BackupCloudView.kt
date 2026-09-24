@@ -146,16 +146,18 @@ fun BackupCloudView(
                 text = stringResource(Res.string.config_backup_cloud_backupnow),
                 onClick = viewModel::backup,
                 drawable = Res.drawable.cloud_upload_24px,
-                enabled = ! busy.value
+                enabled = ! busy.value,
+                modifier = Modifier.weight(1f)
             )
 
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.weight(0.2f))
 
             IconButton(
                 text = stringResource(Res.string.config_backup_cloud_restorenow),
                 onClick = viewModel::restore,
                 drawable = Res.drawable.cloud_download_24px,
-                enabled = ! busy.value
+                enabled = ! busy.value,
+                modifier = Modifier.weight(1f)
             )
         }
 
