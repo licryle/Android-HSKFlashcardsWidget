@@ -9,15 +9,13 @@ import androidx.compose.ui.unit.sp
 object AppTypographies {
     val pinyin: TextStyle
         @Composable get() = TextStyle(
-            fontSize = 18.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            fontSize = 18.sp
         )
 
 
     val hanzi: TextStyle
         @Composable get() = TextStyle(
-            fontSize = 28.sp,
-            color = MaterialTheme.colorScheme.onSurface
+            fontSize = 28.sp
         )
 
     val clickedPinyin: TextStyle
