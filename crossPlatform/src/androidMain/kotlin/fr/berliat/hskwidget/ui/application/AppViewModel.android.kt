@@ -25,8 +25,6 @@ import fr.berliat.hskwidget.core.HSKAppServices
 import fr.berliat.hskwidget.core.StrictModeManager
 import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
 import fr.berliat.hskwidget.domain.HSKAnkiDelegate
-import fr.berliat.hskwidget.Res
-import fr.berliat.hskwidget.app_name
 import fr.berliat.hskwidget.core.Utils
 import fr.berliat.hskwidget.data.store.PrefCompat.PrefCompatMigration
 import fr.berliat.hskwidget.data.store.SupportDevStore
@@ -36,10 +34,6 @@ import fr.berliat.hskwidget.ui.navigation.NavigationManager
 import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.dialogs.init
-
-import kotlinx.coroutines.runBlocking
-
-import org.jetbrains.compose.resources.getString
 
 actual class AppViewModel(navigationManager: NavigationManager, val activityProvider: () -> FragmentActivity)
     : CommonAppViewModel(navigationManager) {
@@ -61,10 +55,9 @@ actual class AppViewModel(navigationManager: NavigationManager, val activityProv
             ActivityResultContracts.RequestPermission()
         ) { _ -> }
 
-        // Todo remove run blocking
         val gDrive = GoogleDriveBackup(
             activityProvider.invoke(),
-            runBlocking { getString(Res.string.app_name) }
+            fr.berliat.hskwidget.core.CachedResources.appName
         )
         gDrive.transferChunkSize = MediaHttpUploader.MINIMUM_CHUNK_SIZE * 2
         HSKAppServices.registerGoogleBackup(gDrive)
@@ -94,7 +87,7 @@ actual class AppViewModel(navigationManager: NavigationManager, val activityProv
         syncPlayPurchases()
     }
 
-    override protected fun askNotificationPermission() {
+    override fun askNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             val activity = activityProvider.invoke()
             if (ContextCompat.checkSelfPermission(
