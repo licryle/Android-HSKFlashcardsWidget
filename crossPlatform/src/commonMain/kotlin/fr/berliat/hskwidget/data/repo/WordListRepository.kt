@@ -342,7 +342,7 @@ class WordListRepository(
         return@withContext deck
     }
 
-    suspend fun buildListSystemAnnotated() {
+    suspend fun buildListSystemAnnotated() = withContext(AppDispatchers.IO) {
         val list = wordListDAO.getSystemLists().filter { it.name == WordList.SYSTEM_ANNOTATED_NAME }
         if (list.isEmpty())
             wordListDAO.insertList(WordList(WordList.SYSTEM_ANNOTATED_NAME, listType = WordList.ListType.SYSTEM))
@@ -350,16 +350,21 @@ class WordListRepository(
         rebuildListSystemAnnotated()
     }
 
-    suspend fun rebuildListSystemAnnotated() {
+    suspend fun rebuildListSystemAnnotated() = withContext(AppDispatchers.IO) {
         val list = wordListDAO.getSystemLists().filter { it.name == WordList.SYSTEM_ANNOTATED_NAME }
-        wordListDAO.deleteAllFromList(list.first().id)
+        if (list.isEmpty()) return@withContext
+        val listId = list.first().id
 
-        for (word in annotatedChineseWordDAO.getAllAnnotated()) {
-            addWordToSysAnnotatedList(word)
+        wordListDAO.deleteAllFromList(listId)
+
+        val words = annotatedChineseWordDAO.getAllAnnotated()
+        if (words.isNotEmpty()) {
+            val entries = words.map { WordListEntry(listId, it.simplified) }
+            wordListDAO.insertAllWords(entries)
         }
     }
 
-    suspend fun buildListSystemExam() {
+    suspend fun buildListSystemExam() = withContext(AppDispatchers.IO) {
         val list = wordListDAO.getSystemLists().filter { it.name == WordList.SYSTEM_EXAM_NAME }
         if (list.isEmpty())
             wordListDAO.insertList(WordList(WordList.SYSTEM_EXAM_NAME, listType = WordList.ListType.SYSTEM))
@@ -367,12 +372,17 @@ class WordListRepository(
         rebuildListSystemExam()
     }
 
-    suspend fun rebuildListSystemExam() {
+    suspend fun rebuildListSystemExam() = withContext(AppDispatchers.IO) {
         val list = wordListDAO.getSystemLists().filter { it.name == WordList.SYSTEM_EXAM_NAME }
-        wordListDAO.deleteAllFromList(list.first().id)
+        if (list.isEmpty()) return@withContext
+        val listId = list.first().id
 
-        for (word in annotatedChineseWordDAO.getAllAtExam()) {
-            addWordToSysExamList(word)
+        wordListDAO.deleteAllFromList(listId)
+
+        val words = annotatedChineseWordDAO.getAllAtExam()
+        if (words.isNotEmpty()) {
+            val entries = words.map { WordListEntry(listId, it.simplified) }
+            wordListDAO.insertAllWords(entries)
         }
     }
 }
