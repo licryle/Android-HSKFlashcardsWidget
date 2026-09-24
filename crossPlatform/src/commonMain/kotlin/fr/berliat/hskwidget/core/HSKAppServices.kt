@@ -96,7 +96,7 @@ object HSKAppServices : AppServices() {
                 get<ChineseWordsDatabase>("database").annotatedChineseWordDAO()
             )
         }
-        register("HSKSegmenter", HSKAppServicesPriority.PartialApp) {
+        register("HSKSegmenter", HSKAppServicesPriority.FullApp) {
             val segmenter = Utils.getHSKSegmenter()
 
             get<CoroutineScope>("appScope").launch(AppDispatchers.IO) {
