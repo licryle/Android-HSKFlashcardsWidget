@@ -18,9 +18,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.font.FontStyle.Companion.Italic
@@ -121,12 +118,12 @@ fun DetailedWordView (
     ) {
         Column {
             Row(
-                modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Max),
+                modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.Top
             ) {
                 Column(
-                    modifier = Modifier.fillMaxHeight().wrapContentWidth(),
-                    verticalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.wrapContentWidth(),
+                    verticalArrangement = Arrangement.Top,
                 ) {
                     onSpeakClick?.let {
                         RoundIconButton(
@@ -146,8 +143,10 @@ fun DetailedWordView (
                 }
 
                 val vSpacing = if (nothingMore) Arrangement.Top else Arrangement.SpaceBetween
-                Column(modifier = Modifier.weight(1f).fillMaxHeight(),
-                    verticalArrangement = vSpacing) {
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = vSpacing
+                ) {
                     HSKWordView(
                         hanziText = word.simplified,
                         pinyinText = pinyins,
@@ -192,8 +191,8 @@ fun DetailedWordView (
                 }
 
                 Column(
-                    modifier = Modifier.fillMaxHeight().wrapContentWidth(),
-                    verticalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.wrapContentWidth(),
+                    verticalArrangement = Arrangement.Top,
                     horizontalAlignment = Alignment.End
                 ) {
                     onFavoriteClick?.let {
