@@ -1,5 +1,8 @@
 package fr.berliat.hskwidget.ui.components
 
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
+
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,7 +23,19 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.layout.IntrinsicMeasurable
+import androidx.compose.ui.layout.IntrinsicMeasureScope
+import androidx.compose.ui.layout.LayoutModifier
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.text.font.FontStyle.Companion.Italic
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.foundation.layout.fillMaxHeight
 
 import fr.berliat.hskwidget.core.Locale
 import fr.berliat.hskwidget.core.Logging
@@ -53,8 +68,45 @@ import fr.berliat.hskwidget.widget_btn_speak
 
 import HSKWordView
 
-import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.resources.stringResource
+/**
+ * When [verticallyConstrained] is true, the center column must not contribute to the
+ * Row's intrinsic height, so the Row height is defined by the side (button) columns
+ * only. Combined with fillMaxHeight + clipToBounds, the center content is then
+ * cropped to the height of the first column instead of expanding the card.
+ */
+private fun Modifier.excludeFromHeightIntrinsics(): Modifier = this.then(
+    object : LayoutModifier {
+        override fun MeasureScope.measure(
+            measurable: Measurable,
+            constraints: Constraints
+        ): MeasureResult {
+            val placeable = measurable.measure(constraints)
+            return layout(placeable.width, placeable.height) {
+                placeable.placeRelative(0, 0)
+            }
+        }
+
+        override fun IntrinsicMeasureScope.minIntrinsicHeight(
+            measurable: IntrinsicMeasurable,
+            width: Int
+        ): Int = 0
+
+        override fun IntrinsicMeasureScope.maxIntrinsicHeight(
+            measurable: IntrinsicMeasurable,
+            width: Int
+        ): Int = 0
+
+        override fun IntrinsicMeasureScope.minIntrinsicWidth(
+            measurable: IntrinsicMeasurable,
+            height: Int
+        ): Int = measurable.minIntrinsicWidth(height)
+
+        override fun IntrinsicMeasureScope.maxIntrinsicWidth(
+            measurable: IntrinsicMeasurable,
+            height: Int
+        ): Int = measurable.maxIntrinsicWidth(height)
+    }
+)
 
 @Composable
 fun DetailedWordView (
@@ -68,7 +120,9 @@ fun DetailedWordView (
     onSpeakClick: ((AnnotatedChineseWord) -> Unit)? = null,
     onCopyClick: ((AnnotatedChineseWord) -> Unit)? = null,
     onListsClick: ((AnnotatedChineseWord) -> Unit)? = null,
-    onPinyinChange: (String) -> Unit = {}
+    onPinyinChange: (String) -> Unit = {},
+    showAnnotation: Boolean = true,
+    verticallyConstrained: Boolean = false,
 ) {
     // Compute definition / annotation / alt definition
     var definition = word.word?.definition?.get(dictionaryLocale) ?: ""
@@ -77,7 +131,7 @@ fun DetailedWordView (
         definition = annotation
         annotation = ""
     }
-    var altDef = if (dictionaryLocale != Locale.CN_HSK3)
+    val altDef = if (dictionaryLocale != Locale.CN_HSK3)
         word.word?.definition?.get(Locale.CN_HSK3) ?: ""
     else
         word.word?.definition?.get(Locale.getDefault()) ?: ""
@@ -105,7 +159,7 @@ fun DetailedWordView (
 
     PrettyCard(
         onClick = {
-            if (nothingMore) return@PrettyCard
+            if (nothingMore || verticallyConstrained) return@PrettyCard
 
             isMoreVisible = !isMoreVisible
             if (isMoreVisible)
@@ -118,7 +172,7 @@ fun DetailedWordView (
     ) {
         Column {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
                 verticalAlignment = Alignment.Top
             ) {
                 Column(
@@ -142,9 +196,13 @@ fun DetailedWordView (
                     }
                 }
 
-                val vSpacing = if (nothingMore) Arrangement.Top else Arrangement.SpaceBetween
+                val vSpacing = if (nothingMore || verticallyConstrained) Arrangement.Top else Arrangement.SpaceBetween
                 Column(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .then(if (verticallyConstrained) Modifier.excludeFromHeightIntrinsics() else Modifier)
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .clipToBounds(),
                     verticalArrangement = vSpacing
                 ) {
                     HSKWordView(
@@ -165,17 +223,21 @@ fun DetailedWordView (
                     // Definition & Annotation
                     Text(
                         definition.ifEmpty { annotation },
-                        style = bodyLargeStyle
+                        style = bodyLargeStyle,
+                        overflow = TextOverflow.Clip,
+                        softWrap = true
                     )
-                    if (!definition.isEmpty() && annotation.isNotEmpty()) {
+                    if (showAnnotation && !definition.isEmpty() && annotation.isNotEmpty()) {
                         Text(
                             annotation,
                             style = bodyMediumStyle.copy(fontStyle = Italic),
-                            color = MaterialTheme.colorScheme.secondary
+                            color = MaterialTheme.colorScheme.secondary,
+                            overflow = TextOverflow.Clip,
+                            softWrap = true
                         )
                     }
 
-                    // Toggle more
+                    // Toggle more (hidden when cropped, since it can't be expanded anyway)
                     if (!nothingMore) {
                         Row(horizontalArrangement = Arrangement.Center,
                             modifier = Modifier.fillMaxWidth()) {
