@@ -31,6 +31,11 @@ actual suspend fun copyDatabaseAssetFile(file: PlatformFile, overwrite: Boolean)
         val assetMgr = ExpectedUtils.context.assets
         val dest = File(file.absolutePath())
         if (!overwrite && dest.exists()) return@withContext
+        if (overwrite) {
+            // Drop any WAL/SHM sidecars so stale pages can't shadow the new file.
+            File(dest.absolutePath + "-wal").delete()
+            File(dest.absolutePath + "-shm").delete()
+        }
 
         FileKit.databasesDir.createDirectories()
         dest.parentFile?.mkdirs()

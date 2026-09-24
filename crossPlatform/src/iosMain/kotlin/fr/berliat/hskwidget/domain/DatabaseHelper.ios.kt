@@ -40,8 +40,11 @@ actual suspend fun copyDatabaseAssetFile(file: PlatformFile, overwrite: Boolean)
 
         NSLog("INFO: copyDatabaseAssetFile ${file.path} (overwrite=$overwrite)")
         if (overwrite && file.exists()) {
-            // Remove the previous live file so the bundled asset fully replaces it.
+            // Remove the previous live file so the bundled asset fully replaces it,
+            // including any WAL/SHM sidecars that would otherwise shadow the new file.
             fileManager.removeItemAtPath(file.path, error = null)
+            fileManager.removeItemAtPath(file.path + "-wal", error = null)
+            fileManager.removeItemAtPath(file.path + "-shm", error = null)
         }
         val copied = fileManager.copyItemAtPath(
             srcPath = databasePathInBundle,
