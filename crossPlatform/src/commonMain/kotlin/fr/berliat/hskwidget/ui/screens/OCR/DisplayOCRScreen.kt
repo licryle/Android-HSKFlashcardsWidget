@@ -88,6 +88,7 @@ fun DisplayOCRScreen(
     onFavoriteClick : (AnnotatedChineseWord) -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val dictionaryTextSize by appConfig.dictionaryTextSize.asStateFlow().collectAsStateWithLifecycle()
 
     LaunchedEffect(preText) {
         viewModel.setText(preText)
@@ -167,7 +168,7 @@ fun DisplayOCRScreen(
             DetailedWordView(
                 word = word,
                 pinyinEditable = false,
-                textSize = uiState.textSize,
+                textSize = dictionaryTextSize.value,
                 dictionaryLocale = Locale.resolve(appConfig.dictionaryLocale.value),
                 onFavoriteClick = onFavoriteClick,
                 onSpeakClick = viewModel::speakWord,
