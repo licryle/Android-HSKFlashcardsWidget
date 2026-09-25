@@ -141,16 +141,14 @@ def format_u8_definition(entries: List[tuple]) -> str:
 def build_u8_searchable_text(simplified: str, entries: List[tuple]) -> str:
     """Builds aggregated search-index text for a single simplified headword.
 
-    Covers every reading (toneless + concatenated forms) and every gloss in
-    plain form: no [pinyin] prefixes, no numbering.
+    Covers every reading (toneless + concatenated forms) without definition glosses.
     """
     grouped = _group_u8_entries(entries)
     variants = list(grouped.keys())
-    glosses = [gloss for gloss_list in grouped.values() for gloss in gloss_list]
     toneless_parts = [unidecode(variant) for variant in variants]
     concatenated_parts = [toneless.replace(" ", "") for toneless in toneless_parts]
     hanzi_split = " ".join(list(simplified))
-    parts = [simplified, hanzi_split] + glosses + toneless_parts + concatenated_parts
+    parts = [simplified, hanzi_split] + toneless_parts + concatenated_parts
     return " ".join([str(part) for part in parts if part]).lower()
 
 
