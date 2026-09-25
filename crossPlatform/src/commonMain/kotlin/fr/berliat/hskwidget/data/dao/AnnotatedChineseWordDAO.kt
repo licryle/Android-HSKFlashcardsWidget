@@ -8,7 +8,7 @@ import fr.berliat.hskwidget.core.Locale
 import fr.berliat.hskwidget.data.model.AnnotatedChineseWord
 
 private const val select_left_join =
-    "SELECT a.a_simplified, COALESCE(w.simplified, a.a_simplified) simplified, " +
+    "SELECT a.a_simplified, w.simplified, " +
             " a.a_pinyins, a.notes, a.class_type, a.class_level, a.themes, a.first_seen, a.is_exam, a.a_searchable_text, " +
             " w.traditional, w.hsk_level, w.pinyins, w.popularity, " +
             " w.modality, w.examples, w.type, w.synonyms, w.antonym, w.collocations, w.searchable_text, " +
@@ -18,7 +18,7 @@ private const val select_left_join =
             " "
 
 private const val select_right_join =
-    "SELECT COALESCE(a.a_simplified, w.simplified) a_simplified, w.simplified, " +
+    "SELECT a.a_simplified, w.simplified, " +
             " a.a_pinyins, a.notes, a.class_type, a.class_level, a.themes, a.first_seen, a.is_exam, a.a_searchable_text, " +
             " w.traditional, w.hsk_level, w.pinyins, w.popularity, " +
             " w.modality, w.examples, w.type, w.synonyms, w.antonym, w.collocations, w.searchable_text, " +
@@ -29,18 +29,18 @@ private const val select_right_join =
 
 private const val order_by_logic =
     "ORDER BY ( " +
-            "  (CASE WHEN simplified = :str THEN 100 ELSE 0 END) + " +
-            "  (CASE WHEN simplified LIKE :str || '%' THEN 50 ELSE 0 END) + " +
+            "  (CASE WHEN simplified = :str OR a_simplified = :str THEN 100 ELSE 0 END) + " +
+            "  (CASE WHEN simplified LIKE :str || '%' OR a_simplified LIKE :str || '%' THEN 50 ELSE 0 END) + " +
             "  (CASE WHEN traditional LIKE :str || '%' THEN 50 ELSE 0 END) + " +
             "  (CASE WHEN searchable_text = :str THEN 100 ELSE 0 END) + " +
             "  (CASE WHEN searchable_text LIKE :str || '%' THEN 50 ELSE 0 END) + " +
             "  (CASE WHEN a_searchable_text = :str THEN 100 ELSE 0 END) + " +
             "  (CASE WHEN a_searchable_text LIKE :str || '%' THEN 50 ELSE 0 END) + " +
             "  (CASE WHEN notes LIKE :str || '%' OR notes LIKE '% ' || :str || '%' OR notes LIKE '%;' || :str || '%' THEN 50 ELSE 0 END) + " +
-            "  (CASE WHEN simplified LIKE '%' || :str || '%' THEN 10 ELSE 0 END) + " +
+            "  (CASE WHEN simplified LIKE '%' || :str || '%' OR a_simplified LIKE '%' || :str || '%' THEN 10 ELSE 0 END) + " +
             "  (CASE WHEN searchable_text LIKE '%' || :str || '%' THEN 10 ELSE 0 END) + " +
             "  (CASE WHEN a_searchable_text LIKE '%' || :str || '%' THEN 10 ELSE 0 END) " +
-    ") DESC, popularity DESC, is_first_seen_null, first_seen DESC "
+            ") DESC, popularity DESC, is_first_seen_null, first_seen DESC "
 
 @Dao
 interface AnnotatedChineseWordDAO {
@@ -119,10 +119,10 @@ interface AnnotatedChineseWordDAO {
     }
 
     @Query("SELECT * FROM (" +
-           "       $select_left_join WHERE a.a_simplified IN (SELECT simplified FROM word_list_entry WHERE list_id IN (:listIds) AND simplified NOT IN (:bannedWords))" +
-           " UNION ALL " +
-           "$select_right_join WHERE a.a_simplified IS NULL AND w.simplified IN (SELECT simplified FROM word_list_entry WHERE list_id IN (:listIds) AND simplified NOT IN (:bannedWords))" +
-           ") ORDER BY RANDOM() LIMIT 1")
+            "       $select_left_join WHERE a.a_simplified IN (SELECT simplified FROM word_list_entry WHERE list_id IN (:listIds) AND simplified NOT IN (:bannedWords))" +
+            " UNION ALL " +
+            "$select_right_join WHERE a.a_simplified IS NULL AND w.simplified IN (SELECT simplified FROM word_list_entry WHERE list_id IN (:listIds) AND simplified NOT IN (:bannedWords))" +
+            ") ORDER BY RANDOM() LIMIT 1")
     @RewriteQueriesToDropUnusedColumns
     suspend fun getRandomWordFromListsRow(listIds: List<Long>, bannedWords: Array<String>): AnnotatedChineseWord?
 
@@ -130,7 +130,7 @@ interface AnnotatedChineseWordDAO {
         getRandomWordFromListsRow(listIds, bannedWords)?.let { hydrate(listOf(it)).first() }
 
     @Query("SELECT * FROM (" +
-            "SELECT a.a_simplified, COALESCE(w.simplified, a.a_simplified) simplified, " +
+            "SELECT a.a_simplified, w.simplified, " +
             " a.a_pinyins, a.notes, a.class_type, a.class_level, a.themes, a.first_seen, a.is_exam, a.a_searchable_text, " +
             " w.traditional, w.hsk_level, w.pinyins, w.popularity, " +
             " w.modality, w.examples, w.type, w.synonyms, w.antonym, w.collocations, w.searchable_text, " +
@@ -141,7 +141,7 @@ interface AnnotatedChineseWordDAO {
             " WHERE wl.name = :listName " +
             " AND (0=:hasAnnotation OR (1=:hasAnnotation AND a.first_seen IS NOT NULL)) " +
             " UNION ALL " +
-            " SELECT COALESCE(a.a_simplified, w.simplified) a_simplified, w.simplified, " +
+            " SELECT a.a_simplified, w.simplified, " +
             " a.a_pinyins, a.notes, a.class_type, a.class_level, a.themes, a.first_seen, a.is_exam, a.a_searchable_text, " +
             " w.traditional, w.hsk_level, w.pinyins, w.popularity, " +
             " w.modality, w.examples, w.type, w.synonyms, w.antonym, w.collocations, w.searchable_text, " +
@@ -158,7 +158,7 @@ interface AnnotatedChineseWordDAO {
     suspend fun getEmptyWordListRows(listName: String, hasAnnotation: Boolean, page: Int = 0, pageSize: Int = 30): List<AnnotatedChineseWord>
 
     @Query("SELECT * FROM (" +
-            "SELECT a.a_simplified, COALESCE(w.simplified, a.a_simplified) simplified, " +
+            "SELECT a.a_simplified, w.simplified, " +
             " a.a_pinyins, a.notes, a.class_type, a.class_level, a.themes, a.first_seen, a.is_exam, a.a_searchable_text, " +
             " w.traditional, w.hsk_level, w.pinyins, w.popularity, " +
             " w.modality, w.examples, w.type, w.synonyms, w.antonym, w.collocations, w.searchable_text, " +
@@ -174,7 +174,7 @@ interface AnnotatedChineseWordDAO {
             "      UNION SELECT a_simplified AS simplified FROM chinese_word_annotation_fts WHERE a_searchable_text MATCH :str || '*' " +
             "    ))" +
             " UNION ALL " +
-            " SELECT COALESCE(a.a_simplified, w.simplified) a_simplified, w.simplified, " +
+            " SELECT a.a_simplified, w.simplified, " +
             " a.a_pinyins, a.notes, a.class_type, a.class_level, a.themes, a.first_seen, a.is_exam, a.a_searchable_text, " +
             " w.traditional, w.hsk_level, w.pinyins, w.popularity, " +
             " w.modality, w.examples, w.type, w.synonyms, w.antonym, w.collocations, w.searchable_text, " +
