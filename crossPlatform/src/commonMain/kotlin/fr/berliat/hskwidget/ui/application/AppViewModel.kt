@@ -144,14 +144,8 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
             // Todo: Can it be cleaned-up ?
             //  Update from Database asset happens in DatabaseHelper: createRoomDatabaseBuilderLive()
             if (DatabaseHelper.shouldUpdateDatabaseFromAsset(actualVersion)) {
-                Logger.d(tag = TAG, messageString = "Starting to rebuild the Annotated & Exam lists")
-                HSKAppServices.wordListRepo.buildListSystemAnnotated()
-                HSKAppServices.wordListRepo.buildListSystemExam()
-            }
-
-            if (actualVersion != 0 && actualVersion < 47 && Utils.getAppVersion() >= 47) {
                 HSKAppServices.snackbar.show(SnackbarType.INFO, Res.string.database_update_list_system)
-
+                Logger.d(tag = TAG, messageString = "Starting to rebuild the Annotated & Exam lists")
                 HSKAppServices.wordListRepo.buildListSystemAnnotated()
                 HSKAppServices.wordListRepo.buildListSystemExam()
             }

@@ -367,6 +367,8 @@ class WordListRepository(
             val entries = words.map { WordListEntry(listId, it.simplified) }
             wordListDAO.insertAllWords(entries)
         }
+
+        wordListDAO.touchList(listId)
     }
 
     suspend fun buildListSystemExam() = withContext(AppDispatchers.IO) {
@@ -389,5 +391,7 @@ class WordListRepository(
             val entries = words.map { WordListEntry(listId, it.simplified) }
             wordListDAO.insertAllWords(entries)
         }
+
+        wordListDAO.touchList(listId)
     }
 }
