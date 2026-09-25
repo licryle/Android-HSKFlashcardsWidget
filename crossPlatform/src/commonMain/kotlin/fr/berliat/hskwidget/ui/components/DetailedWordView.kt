@@ -137,7 +137,7 @@ fun DetailedWordView (
         word.word?.definition?.get(Locale.getDefault()) ?: ""
 
     // Pinyins
-    var pinyins = word.word?.pinyins.toString().ifEmpty { word.annotation?.pinyins?.toString() ?: "" }
+    var pinyins = word.pinyins.toString()
 
     // Show/Hide "more" section
     var isMoreVisible by remember { mutableStateOf(false) }
