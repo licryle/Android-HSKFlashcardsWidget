@@ -1,5 +1,6 @@
 package fr.berliat.hskwidget.core
 
+import co.touchlab.kermit.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -92,12 +93,18 @@ open class AppServices {
                 services.entries
                     .filter { it.value.priority <= upToLevel && !it.value.isReady() }
                     .sortedBy { it.value.priority.priority } // highest first
-                    .forEach { (_, entry) ->
-                        entry.instance = entry.factory()
+                    .forEach { (name, entry) ->
+                        try {
+                            entry.instance = entry.factory()
+                        } catch (e: Throwable) {
+                            Logger.e(tag = "AppServices", messageString = "Failed to initialize service: $name", throwable = e)
+                            throw e
+                        }
                     }
 
                 _status.value = evaluateStatus()
             } catch (t: Throwable) {
+                Logger.e(tag = "AppServices", messageString = "AppServices init failed", throwable = t)
                 _status.value = Status.Failed(t)
             }
         }

@@ -36,8 +36,6 @@ import io.github.vinceglb.filekit.resolve
 import kotlinx.coroutines.flow.MutableStateFlow
 
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -61,23 +59,25 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
         HSKAppServices.init(HSKAppServicesPriority.PartialApp)
         // Launch a coroutine that reacts to changes
         viewModelScope.launch(AppDispatchers.IO) {
-            HSKAppServices.status
-                .filter  {
-                    status -> status is AppServices.Status.Ready
-                        && status.upToPrio >= HSKAppServicesPriority.PartialApp
-                }
-                .take(1)
-                .collect{ status ->
-                    val readyStatus = status as AppServices.Status.Ready
-
-                    readyUp()
-                    if (readyStatus.upToPrio >= HSKAppServicesPriority.FullApp) {
-                        // Already ready from a previous launch still in memory
-                        executePendingActions()
-                    } else {
-                        finishInitialization()
+            HSKAppServices.status.collect { status ->
+                when (status) {
+                    is AppServices.Status.Failed -> {
+                        Logger.e(tag = TAG, messageString = "HSKAppServices init failed", throwable = status.error)
                     }
+                    is AppServices.Status.Ready -> {
+                        if (status.upToPrio >= HSKAppServicesPriority.PartialApp) {
+                            readyUp()
+                            if (status.upToPrio >= HSKAppServicesPriority.FullApp) {
+                                // Already ready from a previous launch still in memory
+                                executePendingActions()
+                            } else {
+                                finishInitialization()
+                            }
+                        }
+                    }
+                    else -> {}
                 }
+            }
         }
 
         // Collect intents from the bus
