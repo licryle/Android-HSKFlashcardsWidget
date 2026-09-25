@@ -32,10 +32,14 @@ actual suspend fun copyDatabaseAssetFile(file: PlatformFile, overwrite: Boolean)
 
         val parent = file.parent()
             ?: throw IllegalStateException("Cannot determine parent directory of ${file.path}")
-        try {
-            parent.createDirectories(true)
-        } catch (e: Exception) {
-            throw IllegalStateException("Could not create directory for ${file.path}: $e", e)
+        if (!parent.exists()) {
+            try {
+                parent.createDirectories()
+            } catch (e: Exception) {
+                if (!parent.exists()) {
+                    throw IllegalStateException("Could not create directory for ${file.path}: $e", e)
+                }
+            }
         }
 
         NSLog("INFO: copyDatabaseAssetFile ${file.path} (overwrite=$overwrite)")
