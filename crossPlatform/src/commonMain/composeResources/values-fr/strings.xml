@@ -51,7 +51,9 @@ Ce projet utilise les formidables projets de :
     <string name="about_stats_title">Statistiques</string>
     <string name="about_terms_conditions_title"><![CDATA[Politique de confidentialité et licences]]></string>
     <string name="about_stats">Chargement…</string>
-    <string name="about_stats_text">Mots dans le dictionnaire : %1$d
+    <string name="about_stats_text">Vos annotations: %9$d
+
+Mots dans le dictionnaire : %1$d
 - Définitions en anglais (%2$d%)
 - Définitions en français (%3$d%)
 - Définitions HSK3 (%4$d%)

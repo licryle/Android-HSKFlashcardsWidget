@@ -51,7 +51,9 @@ This project uses the awesome projects of:
     <string name="about_stats_title">Statistics</string>
     <string name="about_terms_conditions_title"><![CDATA[Privacy Policy & Licences]]></string>
     <string name="about_stats">Loading…</string>
-    <string name="about_stats_text">Words in dictionary: %1$d
+    <string name="about_stats_text">Your annotations: %9$d
+
+Words in dictionary: %1$d
 - English definitions (%2$d%)
 - French definitions (%3$d%)
 - HSK3 definitions (%4$d%)

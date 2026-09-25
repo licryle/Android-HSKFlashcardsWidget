@@ -51,7 +51,8 @@
     <string name="about_stats_title">统计数据</string>
     <string name="about_terms_conditions_title"><![CDATA[隐私政策与许可证]]></string>
     <string name="about_stats">加载中…</string>
-    <string name="about_stats_text">词典词汇量：%1$d
+    <string name="about_stats_text">你的注释：%9$d
+词典词汇量：%1$d
 - 英语定义 (%2$d%)
 - 法语定义 (%3$d%)
 - HSK3 定义 (%4$d%)
