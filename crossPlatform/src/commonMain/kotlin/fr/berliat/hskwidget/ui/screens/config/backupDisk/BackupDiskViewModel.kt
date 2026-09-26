@@ -98,6 +98,7 @@ class BackupDiskViewModel(
                             val sourceDb = DatabaseHelper.createRoomDatabaseFromFile(copiedFile)
                             DatabaseHelper.replaceUserDataInDB(dbHelper.liveDatabase, sourceDb)
                             copiedFile.delete()
+                            DatabaseHelper.postReplaceUserDataInDB()
 
                             withContext(Dispatchers.Main) {
                                 HSKAppServices.snackbar.show(SnackbarType.SUCCESS, Res.string.dbrestore_success)

@@ -314,6 +314,13 @@ class DatabaseHelper private constructor() {
             }
         }
 
+
+        suspend fun postReplaceUserDataInDB() {
+            Logger.d(tag = TAG, messageString = "Starting to rebuild the Annotated & Exam lists")
+            HSKAppServices.wordListRepo.buildListSystemExam()
+            HSKAppServices.wordListRepo.buildListSystemAnnotated()
+        }
+
         suspend fun replaceUserDataInDB(
             dbToUpdate: ChineseWordsDatabase,
             updateWith: ChineseWordsDatabase
@@ -345,8 +352,25 @@ class DatabaseHelper private constructor() {
                         Logger.d(tag = TAG, messageString = "Starting to import Word_List to local DB")
                         dbToUpdate.wordListDAO().deleteAllUserEntries()
                         dbToUpdate.wordListDAO().deleteAllUserLists()
-                        dbToUpdate.wordListDAO().insertAllLists(importedLists.map { it.wordList })
-                        dbToUpdate.wordListDAO().insertAllWords(importedListEntries)
+
+                        val oldToNewListIdMap = mutableMapOf<Long, Long>()
+                        oldToNewListIdMap.putAll(dbToUpdate.wordListDAO().getAllLists().map { it.id to it.id })
+                        importedLists.forEach { listWithCount ->
+                            val oldId = listWithCount.id
+                            val newId = dbToUpdate.wordListDAO().insertList(listWithCount.wordList.copy(id = 0))
+                            oldToNewListIdMap[oldId] = newId
+                        }
+
+                        val validWords = dbToUpdate.chineseWordDAO().getAllSimplifiedWords().toSet() +
+                                dbToUpdate.chineseWordAnnotationDAO().getAllSimplifiedAnnotations().toSet()
+
+                        val remappedAndValidListEntries = importedListEntries.mapNotNull { entry ->
+                            val newListId = oldToNewListIdMap[entry.listId] ?: return@mapNotNull null
+                            if (!validWords.contains(entry.simplified)) return@mapNotNull null
+                            entry.copy(listId = newListId)
+                        }
+
+                        dbToUpdate.wordListDAO().insertAllWords(remappedAndValidListEntries)
 
                         Logger.d(tag = TAG, messageString = "Starting to update the AnkiDeckIds on System lists")
                         systemLists.forEach {
@@ -366,10 +390,9 @@ class DatabaseHelper private constructor() {
                         Logger.d(tag = TAG, messageString = "Starting to import WidgetList to local DB")
                         dbToUpdate.widgetListDAO().deleteAllWidgets()
 
-                        /*val widgetIds = FlashcardWidgetProvider().getWidgetIds()*/
-                        val listIds = dbToUpdate.wordListDAO().getAllLists().map { it.id }
-                        val finalImportedWidgets = importedWidgets.filter {
-                            /*widgetIds.contains(it.widgetId) && */ listIds.contains(it.listId)
+                        val finalImportedWidgets = importedWidgets.mapNotNull { widget ->
+                            val newListId = oldToNewListIdMap[widget.listId] ?: return@mapNotNull null
+                            widget.copy(listId = newListId)
                         }
 
                         dbToUpdate.widgetListDAO().insertListsToWidget(finalImportedWidgets)
@@ -392,6 +415,7 @@ class DatabaseHelper private constructor() {
         val sourceDb = createRoomDatabaseFromFile(finalFile)
         try {
             replaceUserDataInDB(liveDatabase, sourceDb)
+            postReplaceUserDataInDB()
         } finally {
             try { sourceDb.close() } catch (_: Exception) {}
             try { finalFile.delete() } catch (_: Exception) {}

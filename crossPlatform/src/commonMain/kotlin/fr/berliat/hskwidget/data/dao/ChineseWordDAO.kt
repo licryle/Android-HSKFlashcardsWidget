@@ -21,6 +21,9 @@ interface ChineseWordDAO {
     @Query("SELECT * FROM chinese_word")
     suspend fun getAll(): List<ChineseWord>
 
+    @Query("SELECT simplified FROM chinese_word")
+    suspend fun getAllSimplifiedWords(): List<String>
+
     @Query("SELECT * FROM chinese_word WHERE simplified = :simplifiedWord")
     suspend fun findWordFromSimplified(simplifiedWord: String?): ChineseWord?
 

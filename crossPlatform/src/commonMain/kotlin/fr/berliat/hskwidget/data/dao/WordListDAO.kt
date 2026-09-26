@@ -58,13 +58,13 @@ interface WordListDAO {
     @Insert
     suspend fun insertList(wordList: WordList): Long
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertAllLists(lists: List<WordList>)
 
     @Insert
     suspend fun insertWordToList(entry: WordListEntry)
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertAllWords(entries: List<WordListEntry>)
 
     @Delete

@@ -3,6 +3,7 @@ package fr.berliat.hskwidget.data.dao
 import androidx.room3.Dao
 import androidx.room3.Delete
 import androidx.room3.Insert
+import androidx.room3.OnConflictStrategy
 import androidx.room3.Query
 import fr.berliat.hskwidget.data.model.WidgetListEntry
 
@@ -17,7 +18,7 @@ interface WidgetListDAO {
     @Insert
     suspend fun insertListToWidget(entry: WidgetListEntry)
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertListsToWidget(entries: List<WidgetListEntry>)
 
     @Delete

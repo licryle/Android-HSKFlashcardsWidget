@@ -23,6 +23,7 @@ import fr.berliat.hskwidget.dbbackup_failure_write
 import fr.berliat.hskwidget.dbbackup_success
 import fr.berliat.hskwidget.domain.SearchQuery
 import fr.berliat.hskwidget.ui.navigation.NavigationManager
+import fr.berliat.hskwidget.ui.widget.FlashcardWidgetProvider
 import io.github.vinceglb.filekit.FileKit
 
 import io.github.vinceglb.filekit.PlatformFile
@@ -145,9 +146,8 @@ open class CommonAppViewModel(val navigationManager: NavigationManager): ViewMod
             //  Update from Database asset happens in DatabaseHelper: createRoomDatabaseBuilderLive()
             if (DatabaseHelper.shouldUpdateDatabaseFromAsset(actualVersion)) {
                 HSKAppServices.snackbar.show(SnackbarType.INFO, Res.string.database_update_list_system)
-                Logger.d(tag = TAG, messageString = "Starting to rebuild the Annotated & Exam lists")
-                HSKAppServices.wordListRepo.buildListSystemAnnotated()
-                HSKAppServices.wordListRepo.buildListSystemExam()
+                DatabaseHelper.postReplaceUserDataInDB()
+                FlashcardWidgetProvider().updateAllFlashCardWidgets()
             }
 
             appConfig.appVersionCode.value = Utils.getAppVersion()

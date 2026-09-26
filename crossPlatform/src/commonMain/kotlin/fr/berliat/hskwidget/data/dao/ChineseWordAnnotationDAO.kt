@@ -12,6 +12,9 @@ interface ChineseWordAnnotationDAO {
     @Query("SELECT * FROM chinese_word_annotation")
     suspend fun getAll(): List<ChineseWordAnnotation>
 
+    @Query("SELECT a_simplified FROM chinese_word_annotation")
+    suspend fun getAllSimplifiedAnnotations(): List<String>
+
     @Query("SELECT * FROM chinese_word_annotation WHERE " +
             "a_simplified = :simplified LIMIT 1")
     suspend fun findBySimplified(simplified: String): ChineseWordAnnotation
