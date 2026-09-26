@@ -1,6 +1,7 @@
 package fr.berliat.hskwidget.core
 
 import android.os.Bundle
+import co.touchlab.kermit.Logger
 
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.analytics
@@ -23,13 +24,17 @@ actual object ExpectedLogging {
             bundle.putString(it.key, it.value)
         }
 
-        val widgets = FlashcardWidgetProvider.getWidgetIds()
-        bundle.putString("WIDGET_TOTAL_NUMBER", widgets.size.toString())
+        try {
+            val widgets = FlashcardWidgetProvider.getWidgetIds()
+            bundle.putString("WIDGET_TOTAL_NUMBER", widgets.size.toString())
 
-        if (widgets.isEmpty()) {
-            bundle.putString("MAX_WIDGET_ID", "0")
-        } else {
-            bundle.putString("MAX_WIDGET_ID", widgets.last().toString())
+            if (widgets.isEmpty()) {
+                bundle.putString("MAX_WIDGET_ID", "0")
+            } else {
+                bundle.putString("MAX_WIDGET_ID", widgets.last().toString())
+            }
+        } catch (e: Exception) {
+            Logger.e(tag = "ExpectedLogging", messageString = "Cannot get widgets list", throwable = e)
         }
 
         HSKAppServices.appScope.launch(Dispatchers.IO) {
